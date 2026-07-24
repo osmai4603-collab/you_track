@@ -21,6 +21,23 @@ import 'package:issues_tracking/features/app/domain/usecases/get_app_settings.da
 import 'package:issues_tracking/features/app/domain/usecases/save_app_settings.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/app_cubit.dart';
 
+import 'package:issues_tracking/features/projects/data/datasources/projects_local_data_source.dart';
+import 'package:issues_tracking/features/projects/data/repositories/projects_repository_impl.dart';
+import 'package:issues_tracking/features/projects/domain/repositories/projects_repository.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/get_projects_use_case.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/get_project_templates_use_case.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/get_project_by_id_use_case.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/create_project_use_case.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/update_project_use_case.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/archive_project_use_case.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/delete_project_use_case.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/get_project_members_use_case.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/add_project_member_use_case.dart';
+import 'package:issues_tracking/features/projects/presentation/cubits/projects_list_cubit.dart';
+import 'package:issues_tracking/features/projects/presentation/cubits/project_creation_cubit.dart';
+import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
+import 'package:issues_tracking/features/projects/presentation/cubits/project_members_cubit.dart';
+
 final sl = GetIt.instance;
 
 Future<void> initDependencies() async {
@@ -33,6 +50,7 @@ Future<void> initDependencies() async {
   _initAppFeature();
   _initDashboardsFeature();
   _initIssuesFeature();
+  _initProjectsFeature();
 }
 
 
@@ -100,3 +118,47 @@ void _initIssuesFeature() {
     repository: sl(),
   ));
 }
+
+void _initProjectsFeature() {
+  // Data Sources
+  sl.registerLazySingleton<ProjectsLocalDataSource>(
+    () => ProjectsLocalDataSourceImpl(),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<ProjectsRepository>(
+    () => ProjectsRepositoryImpl(localDataSource: sl()),
+  );
+
+  // UseCases
+  sl.registerLazySingleton(() => GetProjectsUseCase(sl()));
+  sl.registerLazySingleton(() => GetProjectTemplatesUseCase(sl()));
+  sl.registerLazySingleton(() => GetProjectByIdUseCase(sl()));
+  sl.registerLazySingleton(() => CreateProjectUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateProjectUseCase(sl()));
+  sl.registerLazySingleton(() => ArchiveProjectUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteProjectUseCase(sl()));
+  sl.registerLazySingleton(() => GetProjectMembersUseCase(sl()));
+  sl.registerLazySingleton(() => AddProjectMemberUseCase(sl()));
+
+  // Cubits
+  sl.registerFactory(() => ProjectsListCubit(
+    getProjectsUseCase: sl(),
+    archiveProjectUseCase: sl(),
+    deleteProjectUseCase: sl(),
+    updateProjectUseCase: sl(),
+  ));
+  sl.registerFactory(() => ProjectCreationCubit(
+    getProjectTemplatesUseCase: sl(),
+    createProjectUseCase: sl(),
+    addProjectMemberUseCase: sl(),
+  ));
+  sl.registerFactory(() => ProjectDetailsCubit(
+    getProjectByIdUseCase: sl(),
+  ));
+  sl.registerFactory(() => ProjectMembersCubit(
+    getProjectMembersUseCase: sl(),
+    addProjectMemberUseCase: sl(),
+  ));
+}
+

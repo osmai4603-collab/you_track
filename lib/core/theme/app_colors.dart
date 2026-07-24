@@ -45,28 +45,28 @@ final class AppColors {
 
   static const light = AppColors._(
     brand: CategoryColors(
-      color50: Color(0xFFE3F2FD),
-      color100: Color(0xFFBBDEFB),
-      color200: Color(0xFF90CAF9),
-      color300: Color(0xFF64B5F6),
-      color400: Color(0xFF42A5F5),
-      color500: Color(0xFF2196F3), // Primary Brand Color
-      color600: Color(0xFF1E88E5),
-      color700: Color(0xFF1976D2),
-      color800: Color(0xFF1565C0),
-      color900: Color(0xFF0D47A1),
+      color50: Color(0xFFE6F2FF),
+      color100: Color(0xFFB3D9FF),
+      color200: Color(0xFF80BFFF),
+      color300: Color(0xFF4DA6FF),
+      color400: Color(0xFF1A8CFF),
+      color500: Color(0xFF0080FF), // Primary Brand Color (Saturated)
+      color600: Color(0xFF0073E6),
+      color700: Color(0xFF0066CC),
+      color800: Color(0xFF0059B3),
+      color900: Color(0xFF004080),
     ),
     neutral: CategoryColors(
-      color50: Color(0xFFFAFAFA),
-      color100: Color(0xFFF5F5F5),
-      color200: Color(0xFFEEEEEE),
-      color300: Color(0xFFE0E0E0),
-      color400: Color(0xFFBDBDBD),
-      color500: Color(0xFF9E9E9E),
-      color600: Color(0xFF757575),
-      color700: Color(0xFF616161),
-      color800: Color(0xFF424242),
-      color900: Color(0xFF212121),
+      color50: Color(0xFFFFFFFF),
+      color100: Color(0xFFF8FAFC),
+      color200: Color(0xFFF1F5F9),
+      color300: Color(0xFFE2E8F0),
+      color400: Color(0xFFCBD5E1),
+      color500: Color(0xFF94A3B8),
+      color600: Color(0xFF64748B),
+      color700: Color(0xFF475569),
+      color800: Color(0xFF334155),
+      color900: Color(0xFF1E293B),
     ),
     success: CategoryColors(
       color50: Color(0xFFE8F5E9),
@@ -120,28 +120,28 @@ final class AppColors {
 
   static const dark = AppColors._(
     brand: CategoryColors(
-      color50: Color(0xFF0D47A1),
-      color100: Color(0xFF1565C0),
-      color200: Color(0xFF1976D2),
-      color300: Color(0xFF1E88E5),
-      color400: Color(0xFF2196F3),
-      color500: Color(0xFF42A5F5), // Primary Brand Color
-      color600: Color(0xFF64B5F6),
-      color700: Color(0xFF90CAF9),
-      color800: Color(0xFFBBDEFB),
-      color900: Color(0xFFE3F2FD),
+      color50: Color(0xFF004080),
+      color100: Color(0xFF0059B3),
+      color200: Color(0xFF0066CC),
+      color300: Color(0xFF0073E6),
+      color400: Color(0xFF0080FF),
+      color500: Color(0xFF1A8CFF), // Primary Brand Color
+      color600: Color(0xFF4DA6FF),
+      color700: Color(0xFF80BFFF),
+      color800: Color(0xFFB3D9FF),
+      color900: Color(0xFFE6F2FF),
     ),
     neutral: CategoryColors(
-      color50: Color(0xFF121212),
-      color100: Color(0xFF1E1E1E),
-      color200: Color(0xFF2C2C2C),
-      color300: Color(0xFF383838),
-      color400: Color(0xFF424242),
-      color500: Color(0xFF616161),
-      color600: Color(0xFF757575),
-      color700: Color(0xFF9E9E9E),
-      color800: Color(0xFFE0E0E0),
-      color900: Color(0xFFF5F5F5),
+      color50: Color(0xFF11171A), // Very dark blue grey
+      color100: Color(0xFF1A2227),
+      color200: Color(0xFF263238), // blueGrey 900
+      color300: Color(0xFF37474F), // blueGrey 800
+      color400: Color(0xFF455A64), // blueGrey 700
+      color500: Color(0xFF546E7A), // blueGrey 600
+      color600: Color(0xFF607D8B), // blueGrey 500
+      color700: Color(0xFF78909C), // blueGrey 400
+      color800: Color(0xFF90A4AE), // blueGrey 300
+      color900: Color(0xFFCFD8DC), // blueGrey 100
     ),
     success: CategoryColors(
       color50: Color(0xFF1B5E20),

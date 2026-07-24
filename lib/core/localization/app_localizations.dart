@@ -181,6 +181,258 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Search'**
   String get search;
+
+  /// No description provided for @projectsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Projects'**
+  String get projectsTitle;
+
+  /// No description provided for @filterProjectsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Filter projects by name or ID'**
+  String get filterProjectsHint;
+
+  /// No description provided for @newProjectButton.
+  ///
+  /// In en, this message translates to:
+  /// **'New project'**
+  String get newProjectButton;
+
+  /// No description provided for @editProjectButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get editProjectButton;
+
+  /// No description provided for @cloneProjectButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Clone'**
+  String get cloneProjectButton;
+
+  /// No description provided for @archiveProjectButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Archive'**
+  String get archiveProjectButton;
+
+  /// No description provided for @convertToTemplateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Convert to template'**
+  String get convertToTemplateButton;
+
+  /// No description provided for @deleteProjectButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteProjectButton;
+
+  /// No description provided for @selectTemplateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Project'**
+  String get selectTemplateTitle;
+
+  /// No description provided for @defaultTemplateTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Default Project Template'**
+  String get defaultTemplateTitle;
+
+  /// No description provided for @useThisTemplateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Use this template'**
+  String get useThisTemplateButton;
+
+  /// No description provided for @cancelButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancelButton;
+
+  /// No description provided for @projectNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get projectNameLabel;
+
+  /// No description provided for @projectNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name for your project'**
+  String get projectNameHint;
+
+  /// No description provided for @projectIdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Project ID'**
+  String get projectIdLabel;
+
+  /// No description provided for @projectIdHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter project ID'**
+  String get projectIdHint;
+
+  /// No description provided for @createProjectButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create project'**
+  String get createProjectButton;
+
+  /// No description provided for @moreSettingsButton.
+  ///
+  /// In en, this message translates to:
+  /// **'More settings'**
+  String get moreSettingsButton;
+
+  /// No description provided for @addPeopleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add people to your new project'**
+  String get addPeopleTitle;
+
+  /// No description provided for @selectUsersHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Select users and groups or enter an email address'**
+  String get selectUsersHint;
+
+  /// No description provided for @userLicensesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard user licenses: 8'**
+  String get userLicensesLabel;
+
+  /// No description provided for @backButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get backButton;
+
+  /// No description provided for @nextButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get nextButton;
+
+  /// No description provided for @skipSetupButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip setup and go to project'**
+  String get skipSetupButton;
+
+  /// No description provided for @ownedByLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Owned by {owner}'**
+  String ownedByLabel(Object owner);
+
+  /// No description provided for @createdOnLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Created on {date}'**
+  String createdOnLabel(Object date);
+
+  /// No description provided for @noIssuesFoundBody.
+  ///
+  /// In en, this message translates to:
+  /// **'No issues found'**
+  String get noIssuesFoundBody;
+
+  /// No description provided for @editSearchQueryButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit search query'**
+  String get editSearchQueryButton;
+
+  /// No description provided for @agileBoardsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Agile Boards'**
+  String get agileBoardsTitle;
+
+  /// No description provided for @scrumBoardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scrum board'**
+  String get scrumBoardTitle;
+
+  /// No description provided for @kanbanBoardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Kanban board'**
+  String get kanbanBoardTitle;
+
+  /// No description provided for @versionBasedBoardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Version-based board'**
+  String get versionBasedBoardTitle;
+
+  /// No description provided for @customBoardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom board'**
+  String get customBoardTitle;
+
+  /// No description provided for @personalBoardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal board'**
+  String get personalBoardTitle;
+
+  /// No description provided for @projectTeamTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Project Team'**
+  String get projectTeamTitle;
+
+  /// No description provided for @otherPeopleAccessTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Other People with Access'**
+  String get otherPeopleAccessTitle;
+
+  /// No description provided for @addPeopleButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Add people...'**
+  String get addPeopleButton;
+
+  /// No description provided for @overview.
+  ///
+  /// In en, this message translates to:
+  /// **'Overview'**
+  String get overview;
+
+  /// No description provided for @ganttCharts.
+  ///
+  /// In en, this message translates to:
+  /// **'Gantt Charts'**
+  String get ganttCharts;
+
+  /// No description provided for @knowledgeBase.
+  ///
+  /// In en, this message translates to:
+  /// **'Knowledge Base'**
+  String get knowledgeBase;
+
+  /// No description provided for @settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settings;
+
+  /// No description provided for @projectActionsHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Project Actions'**
+  String get projectActionsHeader;
 }
 
 class _AppLocalizationsDelegate

@@ -6,6 +6,7 @@ import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dar
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_state.dart';
+import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
 
 class IssuesToolbar extends StatefulWidget {
   const IssuesToolbar({super.key});
@@ -32,8 +33,12 @@ class _IssuesToolbarState extends State<IssuesToolbar> {
 
     return BlocBuilder<IssuesBloc, IssuesState>(
       builder: (context, state) {
-        final filter = state is IssuesLoaded ? state.filter : const IssueFilter();
-        final resultCount = state is IssuesLoaded ? state.filteredIssues.length : 0;
+        final filter = state is IssuesLoaded
+            ? state.filter
+            : const IssueFilter();
+        final resultCount = state is IssuesLoaded
+            ? state.filteredIssues.length
+            : 0;
 
         return Container(
           padding: const EdgeInsets.symmetric(
@@ -42,9 +47,7 @@ class _IssuesToolbarState extends State<IssuesToolbar> {
           ),
           decoration: BoxDecoration(
             color: colors.surface,
-            border: Border(
-              bottom: BorderSide(color: colors.outlineVariant),
-            ),
+            border: Border(bottom: BorderSide(color: colors.outlineVariant)),
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -119,9 +122,7 @@ class _NewIssueButton extends StatelessWidget {
           horizontal: AppSpacing.medium,
           vertical: AppSpacing.small,
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       ),
     );
   }
@@ -188,7 +189,9 @@ class _SearchBoxState extends State<_SearchBox> {
             vertical: AppSpacing.small,
           ),
           filled: true,
-          fillColor: widget.colors.surfaceContainerHighest.withValues(alpha: 0.5),
+          fillColor: widget.colors.surfaceContainerHighest.withValues(
+            alpha: 0.5,
+          ),
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(6),
             borderSide: BorderSide(
@@ -238,7 +241,7 @@ class _SortDropdown extends StatelessWidget {
       },
       itemBuilder: (context) => IssueSortField.values.map((field) {
         final isSelected = filter.sortField == field;
-        return PopupMenuItem<IssueSortField>(
+        return AppPopupMenuItem<IssueSortField>(
           value: field,
           child: Row(
             children: [
@@ -279,9 +282,7 @@ class _SortDropdown extends StatelessWidget {
             const SizedBox(width: 4),
             Text(
               filter.sortField.label,
-              style: textTheme.labelMedium?.copyWith(
-                color: colors.onSurface,
-              ),
+              style: textTheme.labelMedium?.copyWith(color: colors.onSurface),
             ),
             const SizedBox(width: 4),
             Icon(
@@ -429,9 +430,7 @@ class _ViewModeButton extends StatelessWidget {
       tooltip: tooltip,
       style: IconButton.styleFrom(
         backgroundColor: isSelected ? colors.primary : Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         padding: const EdgeInsets.all(8),
         visualDensity: VisualDensity.compact,
       ),

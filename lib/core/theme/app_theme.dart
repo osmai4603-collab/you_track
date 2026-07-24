@@ -7,11 +7,9 @@ import 'app_text_theme.dart';
 sealed class AppTheme {
   const AppTheme._();
 
-  static final ThemeData light = ThemeData(
-    useMaterial3: true,
+  static ThemeData get light => _buildThemeData(
     colorScheme: AppColorScheme.light,
     textTheme: AppTextTheme.light,
-
     // Add additional component themes here if needed
   );
 
@@ -29,6 +27,7 @@ sealed class AppTheme {
       useMaterial3: true,
       brightness: colorScheme.brightness,
       colorScheme: colorScheme,
+      scaffoldBackgroundColor: colorScheme.surface,
       listTileTheme: ListTileThemeData(
         titleTextStyle: textTheme.titleSmall,
         contentPadding: AppSpacing.paddingAllSmall,
@@ -46,23 +45,45 @@ sealed class AppTheme {
         mouseCursor: WidgetStatePropertyAll(MouseCursor.defer),
       ),
 
-      dropdownMenuTheme: DropdownMenuThemeData(),
-      chipTheme: ChipThemeData(shape: _defaultShape),
+      chipTheme: ChipThemeData(
+        shape: _defaultShape,
+        labelStyle: textTheme.labelSmall,
+      ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(shape: _defaultShape),
+        style: ElevatedButton.styleFrom(
+          shape: _defaultShape,
+          foregroundColor: colorScheme.primary,
+          backgroundColor: colorScheme.onPrimary,
+          textStyle: textTheme.labelSmall?.copyWith(fontWeight: .bold),
+        ),
       ),
 
       outlinedButtonTheme: OutlinedButtonThemeData(
-        style: OutlinedButton.styleFrom(shape: _defaultShape),
+        style: OutlinedButton.styleFrom(
+          shape: _defaultShape,
+          foregroundColor: colorScheme.primary,
+          backgroundColor: colorScheme.onPrimary,
+          textStyle: textTheme.labelSmall?.copyWith(fontWeight: .bold),
+        ),
       ),
 
       filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(shape: _defaultShape),
+        style: FilledButton.styleFrom(
+          shape: _defaultShape,
+          foregroundColor: colorScheme.onPrimary,
+          backgroundColor: colorScheme.primary,
+          textStyle: textTheme.labelSmall?.copyWith(fontWeight: .bold),
+        ),
       ),
 
       textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(shape: _defaultShape),
+        style: TextButton.styleFrom(
+          shape: _defaultShape,
+          foregroundColor: colorScheme.primary,
+          backgroundColor: colorScheme.onPrimary,
+          textStyle: textTheme.labelSmall?.copyWith(fontWeight: .bold),
+        ),
       ),
 
       inputDecorationTheme: _fieldDecoration(
@@ -73,7 +94,7 @@ sealed class AppTheme {
   }
 
   static final _defaultShape = RoundedRectangleBorder(
-    borderRadius: .circular(AppRadius.small),
+    borderRadius: .circular(AppRadius.extraSmall),
   );
 
   static InputDecorationThemeData _fieldDecoration({
@@ -86,8 +107,12 @@ sealed class AppTheme {
         color: colorScheme.onSurfaceVariant.withValues(alpha: 0.35),
       ),
       isDense: true,
-      filled: true,
-      fillColor: colorScheme.surfaceContainerLow,
+      // filled: true,
+      // fillColor: colorScheme.surfaceContainerLowest,
+      border: OutlineInputBorder(borderRadius: .circular(AppRadius.extraSmall)),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: .circular(AppRadius.extraSmall),
+      ),
     );
   }
 }

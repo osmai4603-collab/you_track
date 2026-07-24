@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/features/dashboards/domain/entities/dashboard_widget.dart';
+import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
 
 class DashboardWidgetCard extends StatelessWidget {
   final DashboardWidget widgetEntity;
@@ -63,15 +64,15 @@ class DashboardWidgetCard extends StatelessWidget {
                   padding: AppSpacing.paddingAllSmall,
                   menuPadding: AppSpacing.paddingAllSmall,
                   itemBuilder: (context) => [
-                    const PopupMenuItem(
+                    const AppPopupMenuItem(
                       value: 'edit',
                       child: Text('Edit settings'),
                     ),
-                    const PopupMenuItem(
+                    const AppPopupMenuItem(
                       value: 'clone',
                       child: Text('Clone widget'),
                     ),
-                    const PopupMenuItem(
+                    const AppPopupMenuItem(
                       value: 'remove',
                       child: Text('Remove widget'),
                     ),
