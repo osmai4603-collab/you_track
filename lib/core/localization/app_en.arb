@@ -1,0 +1,20 @@
+{
+  "@@locale": "en",
+  "appName": "Issues Tracking",
+  "@appName": {
+    "description": "The name of the application"
+  },
+  "welcomeMessage": "Welcome to Issues Tracking",
+  "login": "Login",
+  "register": "Register",
+  "email": "Email",
+  "password": "Password",
+  "submit": "Submit",
+  "projects": "Projects",
+  "issues": "Issues",
+  "board": "Board",
+  "notifications": "Notifications",
+  "createIssue": "Create Issue",
+  "createProject": "Create Project",
+  "search": "Search"
+}
