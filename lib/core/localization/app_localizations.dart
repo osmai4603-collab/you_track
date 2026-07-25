@@ -763,6 +763,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Period'**
   String get customFieldEnumTypePeriod;
+
+  /// No description provided for @searchMembersHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for text or add a filter'**
+  String get searchMembersHint;
+
+  /// No description provided for @teamRolesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Team roles'**
+  String get teamRolesLabel;
+
+  /// No description provided for @ownerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner'**
+  String get ownerLabel;
+
+  /// No description provided for @projectOwnerBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'project owner'**
+  String get projectOwnerBadge;
+
+  /// No description provided for @removeMemberAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove member'**
+  String get removeMemberAction;
+
+  /// No description provided for @removeMemberConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove member?'**
+  String get removeMemberConfirmTitle;
+
+  /// No description provided for @removeMemberConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to remove this member from the project?'**
+  String get removeMemberConfirmBody;
+
+  /// No description provided for @emptyMembersTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No team members yet'**
+  String get emptyMembersTitle;
+
+  /// No description provided for @accessDeniedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Access Denied'**
+  String get accessDeniedTitle;
+
+  /// No description provided for @accessDeniedBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to view this page'**
+  String get accessDeniedBody;
 }
 
 class _AppLocalizationsDelegate

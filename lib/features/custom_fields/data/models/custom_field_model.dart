@@ -49,7 +49,7 @@ class CustomFieldModel extends CustomFieldEntity {
       id: (json['id'] ?? '').toString(),
       projectId: (json['project_id'] ?? '').toString(),
       name: (json['name'] ?? '').toString(),
-      fieldType: CustomFieldTypeEnum.fromValue(json['field_type']?.toString() ?? ''),
+      fieldType: CustomFieldEnumType.fromValue(json['field_type']?.toString() ?? ''),
       fieldMode: (json['field_mode'] ?? 'ownedField').toString(),
       valueMode: (json['value_mode'] ?? 'single').toString(),
       defaultValue: json['default_value']?.toString(),

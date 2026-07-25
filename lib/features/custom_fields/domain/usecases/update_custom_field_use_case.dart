@@ -8,7 +8,7 @@ import '../repositories/custom_fields_repository.dart';
 class UpdateCustomFieldParams extends Params {
   final String fieldId;
   final String? name;
-  final CustomFieldTypeEnum? fieldType;
+  final CustomFieldEnumType? fieldType;
   final String? defaultValue;
 
   const UpdateCustomFieldParams({

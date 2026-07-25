@@ -6,6 +6,7 @@ import 'package:issues_tracking/features/dashboards/presentation/cubits/youtrack
 import 'package:issues_tracking/features/dashboards/presentation/widgets/breadcrumbs.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_state.dart';
+import 'package:issues_tracking/features/projects/presentation/cubits/project_members_cubit.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../../core/constants/app_spacing.dart';
@@ -126,7 +127,12 @@ class _SectionTwo extends StatelessWidget {
           ],
           if (isPeople) ...[
             _ActionButton(
-              onPressed: () {},
+              onPressed: () {
+                final projectId = _extractProjectId(currentPath);
+                if (projectId != null) {
+                  _showAddMemberDialog(context, projectId);
+                }
+              },
               icon: Icons.person_add,
               label: 'Add People',
             ),
@@ -140,6 +146,57 @@ class _SectionTwo extends StatelessWidget {
           ],
         ],
       ),
+    );
+  }
+
+  String? _extractProjectId(String path) {
+    final segments = path.split('/');
+    // Expected pattern: /projects/:projectId/people or /projects/:projectId/settings/...
+    if (segments.length >= 3 && segments[1] == 'projects') {
+      return segments[2];
+    }
+    return null;
+  }
+
+  void _showAddMemberDialog(BuildContext context, String projectId) {
+    final controller = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Add People'),
+          content: TextField(
+            controller: controller,
+            decoration: const InputDecoration(
+              hintText: 'Enter email or name',
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              onPressed: () {
+                final value = controller.text.trim();
+                if (value.isNotEmpty) {
+                  context.read<ProjectMembersCubit>().addMember(
+                    projectId: projectId,
+                    name: value.contains('@') ? value.split('@').first : value,
+                    email: value.contains('@')
+                        ? value
+                        : '$value@youtrack.local',
+                    roles: const ['Contributor'],
+                  );
+                }
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Add'),
+            ),
+          ],
+        );
+      },
     );
   }
 }

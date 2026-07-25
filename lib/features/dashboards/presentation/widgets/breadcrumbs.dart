@@ -12,24 +12,27 @@ class Breadcrumbs extends StatelessWidget {
     
     return Padding(
       padding: const EdgeInsetsDirectional.only(start: 8.0),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        textDirection: TextDirection.ltr,
-        children: [
-          for (int i = 0; i < segments.length; i++) ...[
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 8.0),
-              child: Text('/', style: TextStyle(color: Colors.grey, fontSize: 12)),
-            ),
-            _BreadcrumbItem(
-              label: _formatSegment(segments[i]),
-              onTap: () {
-                final targetPath = '/${segments.sublist(0, i + 1).join('/')}';
-                context.go(targetPath);
-              },
-            ),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          textDirection: TextDirection.ltr,
+          children: [
+            for (int i = 0; i < segments.length; i++) ...[
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text('/', style: TextStyle(color: Colors.grey, fontSize: 12)),
+              ),
+              _BreadcrumbItem(
+                label: _formatSegment(segments[i]),
+                onTap: () {
+                  final targetPath = '/${segments.sublist(0, i + 1).join('/')}';
+                  context.go(targetPath);
+                },
+              ),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }

@@ -155,5 +155,15 @@
   "customFieldEnumTypePeriod": "Period",
   "@customFieldEnumTypePeriod": {
     "description": "Display name for Period field type"
-  }
+  },
+  "searchMembersHint": "Search for text or add a filter",
+  "teamRolesLabel": "Team roles",
+  "ownerLabel": "Owner",
+  "projectOwnerBadge": "project owner",
+  "removeMemberAction": "Remove member",
+  "removeMemberConfirmTitle": "Remove member?",
+  "removeMemberConfirmBody": "Are you sure you want to remove this member from the project?",
+  "emptyMembersTitle": "No team members yet",
+  "accessDeniedTitle": "Access Denied",
+  "accessDeniedBody": "You don't have permission to view this page"
 }

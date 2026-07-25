@@ -55,10 +55,10 @@ import 'package:issues_tracking/features/custom_field/data/repositories/custom_f
 import 'package:issues_tracking/features/custom_field/domain/repositories/custom_field_repository.dart';
 import 'package:issues_tracking/features/custom_field/domain/usecases/validate_custom_field_name.dart';
 import 'package:issues_tracking/features/custom_field/domain/usecases/create_custom_field.dart';
-import 'package:issues_tracking/features/custom_field/presentation/cubits/custom_field_panel_cubit.dart';
-import 'package:issues_tracking/features/custom_field/presentation/cubits/tab_selection_cubit.dart';
-import 'package:issues_tracking/features/custom_field/presentation/cubits/form_state_cubit.dart';
-import 'package:issues_tracking/features/custom_field/presentation/cubits/privacy_state_cubit.dart';
+import 'package:issues_tracking/features/custom_fields/presentation/cubits/cubits/custom_field_panel_cubit.dart';
+import 'package:issues_tracking/features/custom_fields/presentation/cubits/cubits/tab_selection_cubit.dart';
+import 'package:issues_tracking/features/custom_fields/presentation/cubits/cubits/form_state_cubit.dart';
+import 'package:issues_tracking/features/custom_fields/presentation/cubits/cubits/privacy_state_cubit.dart';
 
 final sl = GetIt.instance;
 

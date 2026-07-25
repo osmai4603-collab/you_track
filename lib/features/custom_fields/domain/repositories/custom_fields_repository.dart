@@ -9,14 +9,14 @@ abstract class CustomFieldsRepository {
   Future<Either<Failure, CustomFieldEntity>> addField({
     required String projectId,
     required String name,
-    required CustomFieldTypeEnum fieldType,
+    required CustomFieldEnumType fieldType,
     String? defaultValue,
   });
 
   Future<Either<Failure, CustomFieldEntity>> updateField({
     required String fieldId,
     String? name,
-    CustomFieldTypeEnum? fieldType,
+    CustomFieldEnumType? fieldType,
     String? defaultValue,
   });
 

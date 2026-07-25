@@ -345,4 +345,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get customFieldEnumTypePeriod => 'Period';
+
+  @override
+  String get searchMembersHint => 'Search for text or add a filter';
+
+  @override
+  String get teamRolesLabel => 'Team roles';
+
+  @override
+  String get ownerLabel => 'Owner';
+
+  @override
+  String get projectOwnerBadge => 'project owner';
+
+  @override
+  String get removeMemberAction => 'Remove member';
+
+  @override
+  String get removeMemberConfirmTitle => 'Remove member?';
+
+  @override
+  String get removeMemberConfirmBody =>
+      'Are you sure you want to remove this member from the project?';
+
+  @override
+  String get emptyMembersTitle => 'No team members yet';
+
+  @override
+  String get accessDeniedTitle => 'Access Denied';
+
+  @override
+  String get accessDeniedBody => 'You don\'t have permission to view this page';
 }

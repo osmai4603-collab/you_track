@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../domain/usecases/validate_custom_field_name.dart';
-import '../../domain/usecases/create_custom_field.dart';
-import '../../domain/entities/field_type.dart';
+import '../../../../custom_field/domain/usecases/validate_custom_field_name.dart';
+import '../../../../custom_field/domain/usecases/create_custom_field.dart';
+import '../../../../custom_field/domain/entities/field_type.dart';
 
 part 'form_state_state.dart';
 

@@ -155,5 +155,15 @@
   "customFieldEnumTypePeriod": "الفترة",
   "@customFieldEnumTypePeriod": {
     "description": "اسم عرض لنوع الحقل period"
-  }
+  },
+  "searchMembersHint": "البحث عن نص أو إضافة فلتر",
+  "teamRolesLabel": "أدوار الفريق",
+  "ownerLabel": "المالك",
+  "projectOwnerBadge": "مالك المشروع",
+  "removeMemberAction": "إزالة العضو",
+  "removeMemberConfirmTitle": "إزالة العضو؟",
+  "removeMemberConfirmBody": "هل أنت متأكد من إزالة هذا العضو من المشروع؟",
+  "emptyMembersTitle": "لا يوجد أعضاء في الفريق بعد",
+  "accessDeniedTitle": "تم رفض الوصول",
+  "accessDeniedBody": "ليس لديك صلاحية لعرض هذه الصفحة"
 }

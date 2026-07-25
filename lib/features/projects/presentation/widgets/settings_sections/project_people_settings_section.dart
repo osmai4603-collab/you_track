@@ -2,9 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
+import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_member_entity.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_members_cubit.dart';
+
+const _roleColors = <String, Color>{
+  'System Admin': Color(0xFFE65100),
+  'Contributor': Color(0xFF00897B),
+  'Project Admin': Color(0xFFF57C00),
+};
 
 class ProjectPeopleSettingsSection extends StatefulWidget {
   const ProjectPeopleSettingsSection({super.key});
@@ -14,6 +21,9 @@ class ProjectPeopleSettingsSection extends StatefulWidget {
 }
 
 class _ProjectPeopleSettingsSectionState extends State<ProjectPeopleSettingsSection> {
+  final _localMembers = <String, List<String>>{};
+  String? _selectedRoleFilter;
+
   @override
   void initState() {
     super.initState();
@@ -23,326 +33,575 @@ class _ProjectPeopleSettingsSectionState extends State<ProjectPeopleSettingsSect
     }
   }
 
+  List<ProjectMemberEntity> _getLocalMembers(List<ProjectMemberEntity> members) {
+    return members.map((m) {
+      final localRoles = _localMembers[m.id];
+      if (localRoles != null) {
+        return m.copyWith(roles: localRoles);
+      }
+      return m;
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    final textTheme = Theme.of(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return BlocBuilder<ProjectDetailsCubit, ProjectDetailsState>(
       builder: (context, projectState) {
         final project = projectState.project;
+        final isAdmin = project?.owner == 'admin';
 
-        return SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.large),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(project?.name ?? '...', project?.projectKey ?? '', colors, textTheme),
-              const SizedBox(height: AppSpacing.extraLarge),
-              _buildQuickActions(colors, textTheme),
-              const SizedBox(height: AppSpacing.extraLarge),
-              Text(
-                'Team members',
-                style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+        if (!isAdmin) {
+          return _buildAccessDeniedView(l10n, textTheme);
+        }
+
+        return BlocBuilder<ProjectMembersCubit, ProjectMembersState>(
+          builder: (context, state) {
+            final members = _getLocalMembers(state.members);
+            final query = state.searchQuery.toLowerCase();
+            final filtered = members.where((m) {
+              final matchesSearch = m.name.toLowerCase().contains(query) ||
+                  m.email.toLowerCase().contains(query);
+              final matchesRole = _selectedRoleFilter == null ||
+                  m.roles.contains(_selectedRoleFilter);
+              return matchesSearch && matchesRole;
+            }).toList();
+            final teamMembers = filtered.where((m) => m.roles.isNotEmpty).toList();
+            final otherPeople = filtered.where((m) => m.roles.isEmpty).toList();
+
+            return SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.large),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _buildSearchFilterBar(l10n, textTheme, colors),
+                  const SizedBox(height: AppSpacing.large),
+                  _buildProjectTeamHeader(
+                    teamMembers.length,
+                    project?.owner ?? '',
+                    l10n,
+                    textTheme,
+                    colors,
+                  ),
+                  const SizedBox(height: AppSpacing.medium),
+                  if (state.status == ProjectMembersStatus.loading)
+                    const Padding(
+                      padding: EdgeInsets.all(AppSpacing.large),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (state.status == ProjectMembersStatus.failure)
+                    Padding(
+                      padding: const EdgeInsets.all(AppSpacing.large),
+                      child: Center(
+                        child: Text(
+                          state.errorMessage ?? '',
+                          style: textTheme.textTheme.bodySmall?.copyWith(
+                            color: colors.error,
+                          ),
+                        ),
+                      ),
+                    )
+                  else if (teamMembers.isEmpty && otherPeople.isEmpty)
+                    _buildEmptyState(l10n, textTheme, colors)
+                  else ...[
+                    _buildMembersTableHeader(textTheme, colors),
+                    ...teamMembers.map((m) => _buildMemberRow(
+                          m,
+                          l10n,
+                          textTheme,
+                          colors,
+                        )),
+                    const SizedBox(height: AppSpacing.extraLarge),
+                    _buildOtherPeopleSection(
+                      otherPeople,
+                      l10n,
+                      textTheme,
+                      colors,
+                    ),
+                  ],
+                  const SizedBox(height: AppSpacing.extraLarge),
+                ],
               ),
-              const SizedBox(height: AppSpacing.medium),
-              _buildMembersTable(colors, textTheme),
-              const SizedBox(height: AppSpacing.extraLarge),
-              _buildOwnerSection(project?.owner ?? 'admin', project?.createdAt, colors, textTheme),
-              const SizedBox(height: AppSpacing.extraLarge),
-            ],
-          ),
+            );
+          },
         );
       },
     );
   }
 
-  Widget _buildHeader(String projectName, String projectKey, ColorScheme colors, TextTheme textTheme) {
-    final shortKey = projectKey.length > 3 ? projectKey.substring(0, 3).toUpperCase() : projectKey.toUpperCase();
+  Widget _buildAccessDeniedView(AppLocalizations l10n, ThemeData textTheme) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.extraLarge),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.lock_outline, size: 64, color: Colors.grey.shade400),
+            const SizedBox(height: AppSpacing.medium),
+            Text(
+              l10n.accessDeniedTitle,
+              style: textTheme.textTheme.headlineSmall?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.small),
+            Text(
+              l10n.accessDeniedBody,
+              style: textTheme.textTheme.bodyMedium?.copyWith(
+                color: Colors.grey.shade600,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
+  Widget _buildSearchFilterBar(
+    AppLocalizations l10n,
+    ThemeData textTheme,
+    ColorScheme colors,
+  ) {
+    return TextField(
+      onChanged: (value) {
+        context.read<ProjectMembersCubit>().updateSearchQuery(value);
+      },
+      decoration: InputDecoration(
+        hintText: l10n.searchMembersHint,
+        prefixIcon: IconButton(
+          icon: const Icon(Icons.add, size: 20),
+          onPressed: () {},
+        ),
+        suffixIcon: const Icon(Icons.search, size: 20),
+        border: OutlineInputBorder(
+          borderRadius: AppRadius.smallBorderRadius,
+          borderSide: BorderSide(color: colors.outline),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: AppRadius.smallBorderRadius,
+          borderSide: BorderSide(color: colors.outline),
+        ),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.medium,
+          vertical: AppSpacing.small,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProjectTeamHeader(
+    int count,
+    String owner,
+    AppLocalizations l10n,
+    ThemeData textTheme,
+    ColorScheme colors,
+  ) {
     return Row(
       children: [
         Text(
-          projectName,
-          style: textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+          l10n.projectTeamTitle,
+          style: textTheme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(width: AppSpacing.small),
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.small, vertical: 2),
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.small,
+            vertical: 2,
+          ),
           decoration: BoxDecoration(
-            color: Colors.orange,
+            color: colors.surfaceContainerHighest,
             borderRadius: AppRadius.extraSmallBorderRadius,
           ),
           child: Text(
-            shortKey,
-            style: textTheme.labelSmall?.copyWith(
-              color: Colors.white,
+            '$count',
+            style: textTheme.textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.bold,
             ),
+          ),
+        ),
+        const Spacer(),
+        PopupMenuButton<String>(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              CircleAvatar(
+                radius: 10,
+                backgroundColor: Colors.green,
+                child: Text(
+                  owner.isNotEmpty ? owner[0].toUpperCase() : '?',
+                  style: textTheme.textTheme.labelSmall?.copyWith(
+                    color: Colors.white,
+                    fontSize: 10,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.extraSmall),
+              Text(
+                owner,
+                style: textTheme.textTheme.bodySmall,
+              ),
+              const Icon(Icons.arrow_drop_down, size: 18),
+            ],
+          ),
+          onSelected: (_) {},
+          itemBuilder: (context) => [
+            PopupMenuItem(value: owner, child: Text(owner)),
+          ],
+        ),
+        const SizedBox(width: AppSpacing.medium),
+        PopupMenuButton<String>(
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l10n.teamRolesLabel,
+                style: textTheme.textTheme.bodySmall,
+              ),
+              const Icon(Icons.arrow_drop_down, size: 18),
+            ],
+          ),
+          onSelected: (value) {
+            setState(() {
+              _selectedRoleFilter = value == 'all' ? null : value;
+            });
+          },
+          itemBuilder: (context) => [
+            const PopupMenuItem(value: 'all', child: Text('All')),
+            const PopupMenuItem(
+              value: 'System Admin',
+              child: Text('System Admin'),
+            ),
+            const PopupMenuItem(
+              value: 'Contributor',
+              child: Text('Contributor'),
+            ),
+            const PopupMenuItem(
+              value: 'Project Admin',
+              child: Text('Project Admin'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMembersTableHeader(ThemeData textTheme, ColorScheme colors) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.small),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 24,
+            child: Checkbox(
+              value: false,
+              onChanged: (_) {},
+              visualDensity: VisualDensity.compact,
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Text(
+              'Name',
+              style: textTheme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Text(
+              'Roles',
+              style: textTheme.textTheme.labelLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          const SizedBox(width: 32),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMemberRow(
+    ProjectMemberEntity member,
+    AppLocalizations l10n,
+    ThemeData textTheme,
+    ColorScheme colors,
+  ) {
+    final initials = member.name.isNotEmpty
+        ? member.name.split(' ').map((e) => e[0]).take(2).join()
+        : '?';
+    final avatarColor = _roleColors[member.roles.isNotEmpty ? member.roles.first : ''] ??
+        colors.primaryContainer;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.extraSmall),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 24,
+            child: Checkbox(
+              value: false,
+              onChanged: (_) {},
+              visualDensity: VisualDensity.compact,
+            ),
+          ),
+          Expanded(
+            flex: 2,
+            child: Row(
+              children: [
+                CircleAvatar(
+                  radius: 16,
+                  backgroundColor: avatarColor,
+                  child: Text(
+                    initials,
+                    style: textTheme.textTheme.labelSmall?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppSpacing.small),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              member.name,
+                              style: textTheme.textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.w500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          if (member.isOwner) ...[
+                            const SizedBox(width: AppSpacing.extraSmall),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 1,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.green.withValues(alpha: 0.1),
+                                borderRadius: AppRadius.extraSmallBorderRadius,
+                              ),
+                              child: Text(
+                                l10n.projectOwnerBadge,
+                                style: textTheme.textTheme.labelSmall?.copyWith(
+                                  color: Colors.green.shade700,
+                                  fontSize: 9,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                      Text(
+                        member.email,
+                        style: textTheme.textTheme.labelSmall?.copyWith(
+                          color: Colors.grey.shade600,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 3,
+            child: Wrap(
+              spacing: AppSpacing.extraSmall,
+              runSpacing: AppSpacing.extraSmall,
+              children: member.roles.map((role) {
+                return _buildRoleChip(role, member, l10n, textTheme, colors);
+              }).toList(),
+            ),
+          ),
+          if (!member.isOwner)
+            _buildMemberContextMenu(member, l10n, textTheme, colors)
+          else
+            const SizedBox(width: 32),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRoleChip(
+    String role,
+    ProjectMemberEntity member,
+    AppLocalizations l10n,
+    ThemeData textTheme,
+    ColorScheme colors,
+  ) {
+    final chipColor = _roleColors[role] ?? Colors.grey.shade600;
+
+    return PopupMenuButton<String>(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(
+          color: chipColor.withValues(alpha: 0.1),
+          borderRadius: AppRadius.extraSmallBorderRadius,
+          border: Border.all(color: chipColor.withValues(alpha: 0.3)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              role,
+              style: textTheme.textTheme.labelSmall?.copyWith(
+                color: chipColor,
+                fontSize: 11,
+              ),
+            ),
+            const Icon(Icons.arrow_drop_down, size: 14, color: Colors.grey),
+          ],
+        ),
+      ),
+      onSelected: (selectedRole) {
+        setState(() {
+          final currentRoles = _localMembers[member.id] ?? List.from(member.roles);
+          if (currentRoles.contains(selectedRole)) {
+            currentRoles.remove(selectedRole);
+          } else {
+            currentRoles.add(selectedRole);
+          }
+          _localMembers[member.id] = currentRoles;
+        });
+      },
+      itemBuilder: (context) => [
+        'System Admin',
+        'Contributor',
+        'Project Admin',
+      ].map((r) {
+        final isSelected = member.roles.contains(r);
+        return PopupMenuItem<String>(
+          value: r,
+          child: Row(
+            children: [
+              Icon(
+                isSelected ? Icons.check_box : Icons.check_box_outline_blank,
+                size: 18,
+              ),
+              const SizedBox(width: AppSpacing.small),
+              Text(r),
+            ],
+          ),
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildEmptyState(AppLocalizations l10n, ThemeData textTheme, ColorScheme colors) {
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.extraLarge),
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.people_outline, size: 64, color: Colors.grey.shade400),
+            const SizedBox(height: AppSpacing.medium),
+            Text(
+              l10n.emptyMembersTitle,
+              style: textTheme.textTheme.bodyMedium?.copyWith(
+                color: Colors.grey.shade600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOtherPeopleSection(
+    List<ProjectMemberEntity> people,
+    AppLocalizations l10n,
+    ThemeData textTheme,
+    ColorScheme colors,
+  ) {
+    if (people.isEmpty) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.otherPeopleAccessTitle,
+          style: textTheme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.medium),
+        _buildMembersTableHeader(textTheme, colors),
+        ...people.map((m) => _buildMemberRow(m, l10n, textTheme, colors)),
+      ],
+    );
+  }
+
+  Widget _buildMemberContextMenu(
+    ProjectMemberEntity member,
+    AppLocalizations l10n,
+    ThemeData textTheme,
+    ColorScheme colors,
+  ) {
+    return PopupMenuButton<String>(
+      icon: Icon(Icons.more_vert, size: 18, color: Colors.grey.shade600),
+      onSelected: (value) {
+        if (value == 'remove') {
+          _showRemoveConfirmation(member, l10n, textTheme, colors);
+        }
+      },
+      itemBuilder: (context) => [
+        PopupMenuItem(
+          value: 'remove',
+          child: Text(
+            l10n.removeMemberAction,
+            style: TextStyle(color: colors.error),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildQuickActions(ColorScheme colors, TextTheme textTheme) {
-    final actions = [
-      ('People', Icons.people_outline),
-      ('Custom Fields', Icons.list_alt),
-      ('Workflows', Icons.account_tree_outlined),
-      ('Time Tracking', Icons.timer_outlined),
-      ('Notifications', Icons.notifications_outlined),
-      ('Apps', Icons.apps_outlined),
-    ];
-
-    return Wrap(
-      spacing: AppSpacing.medium,
-      runSpacing: AppSpacing.medium,
-      children: actions.map((action) {
-        return InkWell(
-          onTap: () {},
-          borderRadius: AppRadius.smallBorderRadius,
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.medium, vertical: AppSpacing.small),
-            decoration: BoxDecoration(
-              border: Border.all(color: colors.outlineVariant),
-              borderRadius: AppRadius.smallBorderRadius,
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(action.$2, size: 18, color: colors.onSurfaceVariant),
-                const SizedBox(width: AppSpacing.extraSmall),
-                Text(action.$1, style: textTheme.labelMedium),
-              ],
+  void _showRemoveConfirmation(
+    ProjectMemberEntity member,
+    AppLocalizations l10n,
+    ThemeData textTheme,
+    ColorScheme colors,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.removeMemberConfirmTitle),
+        content: Text(l10n.removeMemberConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.cancelButton),
+          ),
+          TextButton(
+            onPressed: () {
+              setState(() {
+                _localMembers.remove(member.id);
+              });
+              Navigator.of(context).pop();
+            },
+            child: Text(
+              l10n.removeMemberAction,
+              style: TextStyle(color: colors.error),
             ),
           ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildMembersTable(ColorScheme colors, TextTheme textTheme) {
-    return Card(
-      elevation: 0.20,
-      shape: RoundedRectangleBorder(
-        borderRadius: AppRadius.mediumBorderRadius,
-        side: BorderSide(color: colors.outlineVariant),
-      ),
-      margin: EdgeInsets.zero,
-      clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.medium),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Expanded(
-                  flex: 2,
-                  child: Text(
-                    'Name',
-                    style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                ),
-                Expanded(
-                  flex: 3,
-                  child: Text(
-                    'Roles',
-                    style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
-                  ),
-                ),
-              ],
-            ),
-            const Divider(height: AppSpacing.large),
-            BlocBuilder<ProjectMembersCubit, ProjectMembersState>(
-              builder: (context, state) {
-                if (state.status == ProjectMembersStatus.loading) {
-                  return const Padding(
-                    padding: EdgeInsets.all(AppSpacing.large),
-                    child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-                if (state.status == ProjectMembersStatus.failure) {
-                  return Padding(
-                    padding: const EdgeInsets.all(AppSpacing.large),
-                    child: Center(
-                      child: Text(
-                        state.errorMessage ?? 'Failed to load members',
-                        style: textTheme.bodySmall?.copyWith(color: colors.error),
-                      ),
-                    ),
-                  );
-                }
-                if (state.members.isEmpty) {
-                  return Padding(
-                    padding: const EdgeInsets.all(AppSpacing.extraLarge),
-                    child: Center(
-                      child: Text(
-                        'No team members yet',
-                        style: textTheme.bodyMedium?.copyWith(color: colors.onSurfaceVariant),
-                      ),
-                    ),
-                  );
-                }
-                return _buildMemberRows(state.members, colors, textTheme);
-              },
-            ),
-          ],
-        ),
+        ],
       ),
     );
-  }
-
-  Widget _buildMemberRows(List<ProjectMemberEntity> members, ColorScheme colors, TextTheme textTheme) {
-    return Column(
-      children: members.map((member) {
-        final initials = member.name.isNotEmpty
-            ? member.name.split(' ').map((e) => e[0]).take(2).join()
-            : '?';
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: AppSpacing.small),
-          child: Row(
-            children: [
-              Expanded(
-                flex: 2,
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: colors.primaryContainer,
-                      child: Text(
-                        initials,
-                        style: textTheme.labelSmall?.copyWith(
-                          color: colors.onPrimaryContainer,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.small),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          member.name,
-                          style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w500),
-                        ),
-                        Text(
-                          member.email,
-                          style: textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                flex: 3,
-                child: Wrap(
-                  spacing: AppSpacing.extraSmall,
-                  runSpacing: AppSpacing.extraSmall,
-                  children: member.roles.map((role) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.small, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: colors.surfaceContainerLow,
-                        borderRadius: AppRadius.extraSmallBorderRadius,
-                        border: Border.all(color: colors.outlineVariant),
-                      ),
-                      child: Text(
-                        role,
-                        style: textTheme.labelSmall?.copyWith(fontSize: 11),
-                      ),
-                    );
-                  }).toList(),
-                ),
-              ),
-              if (member.isOwner)
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.small, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withValues(alpha: 0.1),
-                    borderRadius: AppRadius.extraSmallBorderRadius,
-                    border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
-                  ),
-                  child: Text(
-                    'Owner',
-                    style: textTheme.labelSmall?.copyWith(
-                      color: Colors.green.shade700,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 10,
-                    ),
-                  ),
-                ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildOwnerSection(String owner, DateTime? createdAt, ColorScheme colors, TextTheme textTheme) {
-    return Card(
-      elevation: 0.20,
-      shape: RoundedRectangleBorder(
-        borderRadius: AppRadius.mediumBorderRadius,
-        side: BorderSide(color: colors.outlineVariant),
-      ),
-      margin: EdgeInsets.zero,
-      clipBehavior: Clip.antiAlias,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.medium),
-        child: Row(
-          children: [
-            const Icon(Icons.person, size: 40, color: Colors.green),
-            const SizedBox(width: AppSpacing.medium),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Project owner',
-                    style: textTheme.labelMedium?.copyWith(color: colors.onSurfaceVariant),
-                  ),
-                  const SizedBox(height: AppSpacing.extraSmall),
-                  Text(
-                    owner,
-                    style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
-                  ),
-                  if (createdAt != null)
-                    Text(
-                      'Owner since ${_formatDate(createdAt)}',
-                      style: textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant),
-                    ),
-                ],
-              ),
-            ),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.small, vertical: 4),
-              decoration: BoxDecoration(
-                color: Colors.green.withValues(alpha: 0.1),
-                borderRadius: AppRadius.smallBorderRadius,
-                border: Border.all(color: Colors.green.withValues(alpha: 0.3)),
-              ),
-              child: Text(
-                'Owner',
-                style: textTheme.labelSmall?.copyWith(
-                  color: Colors.green.shade700,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  String _formatDate(DateTime date) {
-    final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-    ];
-    return '${months[date.month - 1]} ${date.day}, ${date.year}';
   }
 }

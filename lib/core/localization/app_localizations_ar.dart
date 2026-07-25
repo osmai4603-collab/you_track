@@ -345,4 +345,35 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get customFieldEnumTypePeriod => 'الفترة';
+
+  @override
+  String get searchMembersHint => 'البحث عن نص أو إضافة فلتر';
+
+  @override
+  String get teamRolesLabel => 'أدوار الفريق';
+
+  @override
+  String get ownerLabel => 'المالك';
+
+  @override
+  String get projectOwnerBadge => 'مالك المشروع';
+
+  @override
+  String get removeMemberAction => 'إزالة العضو';
+
+  @override
+  String get removeMemberConfirmTitle => 'إزالة العضو؟';
+
+  @override
+  String get removeMemberConfirmBody =>
+      'هل أنت متأكد من إزالة هذا العضو من المشروع؟';
+
+  @override
+  String get emptyMembersTitle => 'لا يوجد أعضاء في الفريق بعد';
+
+  @override
+  String get accessDeniedTitle => 'تم رفض الوصول';
+
+  @override
+  String get accessDeniedBody => 'ليس لديك صلاحية لعرض هذه الصفحة';
 }

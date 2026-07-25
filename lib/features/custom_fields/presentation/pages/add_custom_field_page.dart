@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../custom_field/presentation/cubits/custom_field_panel_cubit.dart';
+import '../cubits/cubits/custom_field_panel_cubit.dart';
 import '../widgets/sliding_panel.dart';
 import '../widgets/panel_overlay.dart';
 

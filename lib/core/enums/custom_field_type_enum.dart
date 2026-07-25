@@ -51,6 +51,12 @@ sealed class CustomFieldEnumType extends AppEnum {
   }
 
   String get value;
+
+  List<String> get availableValues => [];
+
+  String? firstAvailableOrDefault(String? defaultValue) {
+    return null;
+  }
 }
 
 final class BuildCustomFieldEnumType extends CustomFieldEnumType {

@@ -10,22 +10,26 @@ class ProjectMembersState extends Equatable {
   final ProjectMembersStatus status;
   final List<ProjectMemberEntity> members;
   final String? errorMessage;
+  final String searchQuery;
 
   const ProjectMembersState({
     this.status = ProjectMembersStatus.initial,
     this.members = const [],
     this.errorMessage,
+    this.searchQuery = '',
   });
 
   ProjectMembersState copyWith({
     ProjectMembersStatus? status,
     List<ProjectMemberEntity>? members,
     String? errorMessage,
+    String? searchQuery,
   }) {
     return ProjectMembersState(
       status: status ?? this.status,
       members: members ?? this.members,
       errorMessage: errorMessage,
+      searchQuery: searchQuery ?? this.searchQuery,
     );
   }
 
@@ -37,7 +41,7 @@ class ProjectMembersState extends Equatable {
   }
 
   @override
-  List<Object?> get props => [status, members, errorMessage];
+  List<Object?> get props => [status, members, errorMessage, searchQuery];
 }
 
 class ProjectMembersCubit extends Cubit<ProjectMembersState> {
@@ -84,5 +88,9 @@ class ProjectMembersCubit extends Cubit<ProjectMembersState> {
       (failure) => emit(state.copyWith(errorMessage: failure.message)),
       (added) => emit(state.addMemberLocal(added)),
     );
+  }
+
+  void updateSearchQuery(String query) {
+    emit(state.copyWith(searchQuery: query));
   }
 }

@@ -21,6 +21,10 @@ class _CustomFieldsSettingsSectionState
     extends State<CustomFieldsSettingsSection> {
   final Set<String> _selectedFieldIds = {};
   bool _isPanelOpen = false;
+  final _fieldNameController = TextEditingController();
+  final _defaultValueController = TextEditingController();
+  CustomFieldEnumType _selectedType = CustomFieldEnumType.string;
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -108,10 +112,77 @@ class _CustomFieldsSettingsSectionState
                       ),
                     ),
                     const Divider(),
-                    // Panel content will be added in later tasks
+                    // Form content
                     Expanded(
-                      child: Center(
-                        child: Text('Panel content coming soon'),
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            TextField(
+                              controller: _fieldNameController,
+                              decoration: const InputDecoration(
+                                labelText: 'Field name',
+                                hintText: 'e.g. Priority',
+                                isDense: true,
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                            const SizedBox(height: AppSpacing.medium),
+                            DropdownButtonFormField<CustomFieldEnumType>(
+                              initialValue: _selectedType,
+                              decoration: const InputDecoration(
+                                labelText: 'Type',
+                                isDense: true,
+                                border: OutlineInputBorder(),
+                              ),
+                              items: CustomFieldEnumType.values.map((type) {
+                                return DropdownMenuItem(
+                                  value: type,
+                                  child: Text(_typeDisplayName(type)),
+                                );
+                              }).toList(),
+                              onChanged: (type) {
+                                if (type != null) {
+                                  setState(() {
+                                    _selectedType = type;
+                                  });
+                                }
+                              },
+                            ),
+                            const SizedBox(height: AppSpacing.medium),
+                            TextField(
+                              controller: _defaultValueController,
+                              decoration: const InputDecoration(
+                                labelText: 'Default value (optional)',
+                                isDense: true,
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                            if (_isSubmitting) ...[
+                              const SizedBox(height: AppSpacing.medium),
+                              const LinearProgressIndicator(),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Action buttons
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: _isSubmitting ? null : _closePanel,
+                            child: const Text('Cancel'),
+                          ),
+                          const SizedBox(width: AppSpacing.small),
+                          FilledButton(
+                            onPressed: _isSubmitting ? null : _submitAddField,
+                            child: const Text('Add'),
+                          ),
+                        ],
                       ),
                     ),
                   ],
@@ -145,7 +216,7 @@ class _CustomFieldsSettingsSectionState
         const Spacer(),
         if (state is CustomFieldsLoaded) ...[
           FilledButton.icon(
-            onPressed: () => _showAddFieldDialog(context),
+            onPressed: _openPanel,
             icon: const Icon(Icons.add, size: 18),
             label: const Text('Add field'),
           ),
@@ -258,7 +329,7 @@ class _CustomFieldsSettingsSectionState
             ),
             const SizedBox(height: AppSpacing.large),
             FilledButton.icon(
-              onPressed: () => _showAddFieldDialog(context),
+              onPressed: _openPanel,
               icon: const Icon(Icons.add, size: 18),
               label: const Text('Add field'),
             ),
@@ -470,6 +541,8 @@ class _CustomFieldsSettingsSectionState
         return 'Text';
       case CustomFieldEnumType.period:
         return 'Period';
+        default:
+        return 'Period';
     }
   }
 
@@ -484,124 +557,6 @@ class _CustomFieldsSettingsSectionState
         }
       });
     }
-  }
-
-  void _showAddFieldDialog(BuildContext context) {
-    final nameController = TextEditingController();
-    CustomFieldEnumType selectedType = CustomFieldEnumType.priority;
-    String? selectedDefault;
-
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return StatefulBuilder(
-          builder: (context, setDialogState) {
-            return AlertDialog(
-              title: const Text('Add Custom Field'),
-              content: SizedBox(
-                width: 400,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Field name',
-                        hintText: 'e.g. Priority',
-                        isDense: true,
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.medium),
-                    DropdownButtonFormField<CustomFieldEnumType>(
-                      initialValue: selectedType,
-                      decoration: const InputDecoration(
-                        labelText: 'Type',
-                        isDense: true,
-                        border: OutlineInputBorder(),
-                      ),
-                      items: CustomFieldEnumType.values.map((type) {
-                        return DropdownMenuItem(
-                          value: type,
-                          child: Text(_typeDisplayName(type)),
-                        );
-                      }).toList(),
-                      onChanged: (type) {
-                        if (type != null) {
-                          setDialogState(() {
-                            selectedType = type;
-                            selectedDefault = type.firstAvailableOrDefault(null);
-                          });
-                        }
-                      },
-                    ),
-                    const SizedBox(height: AppSpacing.medium),
-                    DropdownButtonFormField<String>(
-                      initialValue: selectedDefault,
-                      decoration: const InputDecoration(
-                        labelText: 'Default value (optional)',
-                        isDense: true,
-                        border: OutlineInputBorder(),
-                      ),
-                      items: [
-                        const DropdownMenuItem(
-                          value: null,
-                          child: Text('None'),
-                        ),
-                        ...selectedType.availableValues.map((v) {
-                          return DropdownMenuItem(
-                            value: v,
-                            child: Text(v),
-                          );
-                        }),
-                      ],
-                      onChanged: (value) {
-                        setDialogState(() => selectedDefault = value);
-                      },
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(dialogContext).pop(),
-                  child: const Text('Cancel'),
-                ),
-                FilledButton(
-                  onPressed: () {
-                    final name = nameController.text.trim();
-                    if (name.isEmpty) {
-                      ScaffoldMessenger.of(dialogContext).showSnackBar(
-                        const SnackBar(
-                          content: Text('Field name is required'),
-                        ),
-                      );
-                      return;
-                    }
-                    final projectId = context
-                        .read<ProjectDetailsCubit>()
-                        .state
-                        .project
-                        ?.id;
-                    if (projectId != null) {
-                      context.read<CustomFieldsCubit>().addField(
-                            projectId: projectId,
-                            name: name,
-                            fieldType: selectedType,
-                            defaultValue: selectedDefault,
-                          );
-                    }
-                    Navigator.of(dialogContext).pop();
-                  },
-                  child: const Text('Add'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
   }
 
   void _showEditFieldDialog(BuildContext context, CustomFieldEntity field) {
@@ -648,8 +603,8 @@ class _CustomFieldsSettingsSectionState
                         if (type != null && type != selectedType) {
                           setDialogState(() {
                             selectedType = type;
-                            selectedDefault =
-                                type.firstAvailableOrDefault(null);
+                            // selectedDefault =
+                            //     type.firstAvailableOrDefault(null);
                           });
                         }
                       },
@@ -750,6 +705,55 @@ class _CustomFieldsSettingsSectionState
   }
   
   void _closePanel() {
+    setState(() {
+      _isPanelOpen = false;
+    });
+  }
 
+  void _openPanel() {
+    setState(() {
+      _isPanelOpen = true;
+    });
+  }
+
+  void _submitAddField() {
+    final name = _fieldNameController.text.trim();
+    if (name.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Field name is required'),
+        ),
+      );
+      return;
+    }
+    final projectId =
+        context.read<ProjectDetailsCubit>().state.project?.id;
+    if (projectId != null) {
+      setState(() {
+        _isSubmitting = true;
+      });
+      context.read<CustomFieldsCubit>().addField(
+            projectId: projectId,
+            name: name,
+            fieldType: _selectedType,
+            defaultValue: _defaultValueController.text.trim().isEmpty
+                ? null
+                : _defaultValueController.text.trim(),
+          );
+      _fieldNameController.clear();
+      _defaultValueController.clear();
+      setState(() {
+        _selectedType = CustomFieldEnumType.string;
+        _isSubmitting = false;
+        _isPanelOpen = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _fieldNameController.dispose();
+    _defaultValueController.dispose();
+    super.dispose();
   }
 }

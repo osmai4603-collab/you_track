@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:issues_tracking/features/custom_field/presentation/cubits/tab_selection_cubit.dart';
+import 'package:issues_tracking/features/custom_fields/presentation/cubits/cubits/tab_selection_cubit.dart';
 import 'package:issues_tracking/features/custom_field/domain/entities/field_type.dart';
 
 void main() {

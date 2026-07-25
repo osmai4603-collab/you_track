@@ -5,7 +5,7 @@ class CustomFieldEntity extends Entity {
   final String id;
   final String projectId;
   final String name;
-  final CustomFieldTypeEnum fieldType;
+  final CustomFieldEnumType fieldType;
   final String fieldMode;
   final String valueMode;
   final String? defaultValue;
@@ -45,7 +45,7 @@ class CustomFieldEntity extends Entity {
     String? id,
     String? projectId,
     String? name,
-    CustomFieldTypeEnum? fieldType,
+    CustomFieldEnumType? fieldType,
     String? fieldMode,
     String? valueMode,
     String? defaultValue,

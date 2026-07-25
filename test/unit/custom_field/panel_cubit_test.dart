@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:issues_tracking/features/custom_field/presentation/cubits/custom_field_panel_cubit.dart';
+import 'package:issues_tracking/features/custom_fields/presentation/cubits/cubits/custom_field_panel_cubit.dart';
 
 void main() {
   group('CustomFieldPanelCubit', () {

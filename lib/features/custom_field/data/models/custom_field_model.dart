@@ -39,6 +39,7 @@ class CustomFieldModel extends CustomField {
     );
   }
 
+  @override
   CustomFieldModel copyWith({
     String? id,
     String? projectId,
