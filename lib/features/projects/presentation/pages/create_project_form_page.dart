@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:issues_tracking/core/constants/app_icons.dart';
+import 'package:go_router/go_router.dart';
+import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
-import '../../domain/entities/project_entity.dart';
+import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
+import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
+import '../cubits/projects_list_cubit.dart';
 import '../cubits/project_creation_cubit.dart';
 
 /// صفحة 4: نموذج إدخال اسم ومعرف المشروع الجديد
 class CreateProjectFormPage extends StatefulWidget {
-  final void Function(ProjectEntity createdProject) onProjectCreated;
-  final VoidCallback onCancel;
-
-  const CreateProjectFormPage({
-    super.key,
-    required this.onProjectCreated,
-    required this.onCancel,
-  });
+  const CreateProjectFormPage({super.key});
 
   @override
   State<CreateProjectFormPage> createState() => _CreateProjectFormPageState();
@@ -63,41 +59,26 @@ class _CreateProjectFormPageState extends State<CreateProjectFormPage> {
       listener: (context, state) {
         if (state.status == ProjectCreationStatus.projectCreated &&
             state.createdProject != null) {
-          widget.onProjectCreated(state.createdProject!);
+          context.read<ProjectsListCubit>().addProjectLocally(
+            state.createdProject!,
+          );
+          context.go(
+            AppRouteKeys.addProjectMembersPath(state.createdProject!.id),
+          );
         }
       },
       builder: (context, state) {
-        final templateName = state.selectedTemplate?.name ?? 'Default';
-
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Header ──────────────────────────────────────
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.medium,
-                vertical: AppSpacing.small,
-              ),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: colors.outlineVariant, width: 0.5),
+            ProjectsHeader(
+              breadcrumbs: [
+                BreadcrumbItem(
+                  title: localization.projectsTitle,
+                  onTap: (ctx) => ctx.go(AppRouteKeys.projects),
                 ),
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: widget.onCancel,
-                    icon: const Icon(AppIcons.arrowBack, size: 18),
-                  ),
-                  const SizedBox(width: AppSpacing.small),
-                  Text(
-                    '${localization.projectsTitle} / New $templateName Project',
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
+                BreadcrumbItem(title: localization.createProject),
+              ],
             ),
             // ── نموذج الإدخال ──────────────────────────────
             Expanded(
@@ -216,7 +197,8 @@ class _CreateProjectFormPageState extends State<CreateProjectFormPage> {
                           ),
                           const SizedBox(width: AppSpacing.small),
                           OutlinedButton(
-                            onPressed: widget.onCancel,
+                            onPressed: () =>
+                                context.go(AppRouteKeys.projectTemplates),
                             child: Text(localization.cancelButton),
                           ),
                         ],

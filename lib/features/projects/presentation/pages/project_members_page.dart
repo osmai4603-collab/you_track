@@ -4,17 +4,17 @@ import 'package:issues_tracking/core/constants/app_icons.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
+import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
+import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
 import '../cubits/project_members_cubit.dart';
 
 /// صفحة 7: إدارة أعضاء الفريق والأدوار للمشروع
 class ProjectMembersPage extends StatefulWidget {
   final String projectId;
-  final VoidCallback onBack;
 
   const ProjectMembersPage({
     super.key,
     required this.projectId,
-    required this.onBack,
   });
 
   @override
@@ -37,37 +37,15 @@ class _ProjectMembersPageState extends State<ProjectMembersPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Header ──────────────────────────────────────
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.medium,
-            vertical: AppSpacing.small,
-          ),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: colors.outlineVariant, width: 0.5),
-            ),
-          ),
-          child: Row(
-            children: [
-              IconButton(
-                onPressed: widget.onBack,
-                icon: const Icon(AppIcons.arrowBack, size: 18),
-              ),
-              const SizedBox(width: AppSpacing.small),
-              Text(
-                '${localization.projectsTitle} / People',
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const Spacer(),
-              FilledButton.icon(
-                onPressed: () => _showAddMemberDialog(context),
-                icon: const Icon(AppIcons.personAdd, size: 16),
-                label: Text(localization.addPeopleButton),
-              ),
-            ],
+        ProjectsHeader(
+          breadcrumbs: [
+            BreadcrumbItem(title: localization.projectsTitle),
+            BreadcrumbItem(title: 'People'),
+          ],
+          trailing: FilledButton.icon(
+            onPressed: () => _showAddMemberDialog(context),
+            icon: const Icon(AppIcons.personAdd, size: 16),
+            label: Text(localization.addPeopleButton),
           ),
         ),
         // ── القائمة ──────────────────────────────────

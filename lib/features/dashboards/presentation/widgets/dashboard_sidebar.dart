@@ -4,14 +4,14 @@ import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 
-class DashboardSidebar extends StatefulWidget {
-  const DashboardSidebar({super.key});
+class YouTrackSidebar extends StatefulWidget {
+  const YouTrackSidebar({super.key});
 
   @override
-  State<DashboardSidebar> createState() => _DashboardSidebarState();
+  State<YouTrackSidebar> createState() => _YouTrackSidebarState();
 }
 
-class _DashboardSidebarState extends State<DashboardSidebar> {
+class _YouTrackSidebarState extends State<YouTrackSidebar> {
   bool _isCollapsed = false;
 
   @override

@@ -1,22 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_icons.dart';
+import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
-import '../../domain/entities/project_template_entity.dart';
 import '../cubits/project_creation_cubit.dart';
+import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
+import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
 
 /// صفحة 2: اختيار قالب المشروع
 class ProjectTemplateSelectionPage extends StatefulWidget {
-  final void Function(ProjectTemplateEntity template) onTemplateTap;
-  final VoidCallback onBack;
-
-  const ProjectTemplateSelectionPage({
-    super.key,
-    required this.onTemplateTap,
-    required this.onBack,
-  });
+  const ProjectTemplateSelectionPage({super.key});
 
   @override
   State<ProjectTemplateSelectionPage> createState() =>
@@ -61,36 +57,16 @@ class _ProjectTemplateSelectionPageState
     final textTheme = Theme.of(context).textTheme;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Header ──────────────────────────────────────
-        Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.medium,
-            vertical: AppSpacing.small,
-          ),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: colors.outlineVariant, width: 0.5),
+        ProjectsHeader(
+          breadcrumbs: [
+            BreadcrumbItem(
+              title: localization.projectsTitle,
+              onTap: (ctx) => ctx.go(AppRouteKeys.projects),
             ),
-          ),
-          child: Row(
-            children: [
-              IconButton(
-                onPressed: widget.onBack,
-                icon: const Icon(AppIcons.arrowBack, size: 18),
-              ),
-              const SizedBox(width: AppSpacing.small),
-              Text(
-                '${localization.projectsTitle} / ${localization.selectTemplateTitle}',
-                style: textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
+            BreadcrumbItem(title: localization.selectTemplateTitle),
+          ],
         ),
-        // ── قائمة القوالب ──────────────────────────────
         Expanded(
           child: BlocBuilder<ProjectCreationCubit, ProjectCreationState>(
             builder: (context, state) {
@@ -118,7 +94,14 @@ class _ProjectTemplateSelectionPageState
                       borderRadius: AppRadius.mediumBorderRadius,
                       child: InkWell(
                         borderRadius: AppRadius.mediumBorderRadius,
-                        onTap: () => widget.onTemplateTap(template),
+                        onTap: () {
+                          context.read<ProjectCreationCubit>().selectTemplate(
+                            template,
+                          );
+                          context.go(
+                            AppRouteKeys.templateDetailsPath(template.id),
+                          );
+                        },
                         child: Padding(
                           padding: AppSpacing.paddingAllMedium,
                           child: Row(

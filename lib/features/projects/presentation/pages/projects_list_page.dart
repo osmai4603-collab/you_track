@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_icons.dart';
+import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
+import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
+import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
 import '../cubits/projects_list_cubit.dart';
+import '../cubits/project_details_cubit.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
 
 final List<Color> _projectColors = const [
@@ -18,14 +23,7 @@ final List<Color> _projectColors = const [
 ];
 
 class ProjectsListPage extends StatefulWidget {
-  final VoidCallback onCreateProject;
-  final void Function(String projectId) onProjectTap;
-
-  const ProjectsListPage({
-    super.key,
-    required this.onCreateProject,
-    required this.onProjectTap,
-  });
+  const ProjectsListPage({super.key});
 
   @override
   State<ProjectsListPage> createState() => _ProjectsListPageState();
@@ -53,11 +51,40 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
     final textTheme = Theme.of(context).textTheme;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // ── Header ──────────────────────────────────────
-        _buildProjectsHeader(colors, localization, textTheme, context),
-        // ── قائمة المشاريع ──────────────────────────────
+        ProjectsHeader(
+          breadcrumbs: [BreadcrumbItem(title: localization.projectsTitle)],
+          trailing: Row(
+            spacing: AppSpacing.small,
+            children: [
+              SizedBox(
+                width: 300,
+                height: 32,
+                child: TextField(
+                  controller: _searchController,
+                  onChanged: (value) {
+                    context.read<ProjectsListCubit>().searchProjects(value);
+                  },
+                  decoration: InputDecoration(
+                    hintText: localization.filterProjectsHint,
+                    prefixIcon: const Icon(AppIcons.search, size: 16),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.small,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: AppRadius.smallBorderRadius,
+                      borderSide: BorderSide(color: colors.outlineVariant),
+                    ),
+                  ),
+                ),
+              ),
+              FilledButton(
+                onPressed: () => context.go(AppRouteKeys.projectTemplates),
+                child: Text(localization.createProject),
+              ),
+            ],
+          ),
+        ),
         Expanded(
           child: BlocBuilder<ProjectsListCubit, ProjectsListState>(
             builder: (context, state) {
@@ -102,7 +129,14 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
                       return Material(
                         color: colors.surface,
                         child: InkWell(
-                          onTap: () => widget.onProjectTap(project.id),
+                          onTap: () {
+                            context.read<ProjectDetailsCubit>().loadProject(
+                              project.id,
+                            );
+                            context.go(
+                              AppRouteKeys.projectDetailsPath(project.id),
+                            );
+                          },
                           child: Padding(
                             padding: const EdgeInsets.symmetric(
                               horizontal: AppSpacing.medium,
@@ -214,67 +248,6 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
           ),
         ),
       ],
-    );
-  }
-
-  Container _buildProjectsHeader(
-    ColorScheme colors,
-    AppLocalizations localization,
-    TextTheme textTheme,
-    BuildContext context,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.medium,
-        vertical: AppSpacing.small,
-      ),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: colors.outlineVariant, width: 0.5),
-        ),
-      ),
-      child: Row(
-        spacing: AppSpacing.small,
-        children: [
-          Expanded(
-            child: Text(
-              localization.projectsTitle,
-              style: textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          // حقل البحث
-          SizedBox(
-            width: 300,
-            height: 32,
-            child: TextField(
-              controller: _searchController,
-              onChanged: (value) {
-                context.read<ProjectsListCubit>().searchProjects(value);
-              },
-              decoration: InputDecoration(
-                hintText: localization.filterProjectsHint,
-                prefixIcon: const Icon(AppIcons.search, size: 16),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.small,
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: AppRadius.smallBorderRadius,
-                  borderSide: BorderSide(color: colors.outlineVariant),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: AppSpacing.small),
-          // زر إنشاء مشروع جديد
-          FilledButton(
-            onPressed: widget.onCreateProject,
-            //  icon: const Icon(AppIcons.add),
-            child: Text(localization.createProject),
-          ),
-        ],
-      ),
     );
   }
 

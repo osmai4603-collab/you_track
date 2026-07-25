@@ -180,4 +180,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get projectActionsHeader => 'Project Actions';
+
+  @override
+  String get loginTitle => 'Log in to YouTrack';
+
+  @override
+  String get usernameOrEmailHint => 'Username or Email';
+
+  @override
+  String get passwordHint => 'Password';
+
+  @override
+  String get rememberMeLabel => 'Remember me';
+
+  @override
+  String get resetPasswordButton => 'Reset password';
+
+  @override
+  String get loginButton => 'Log in';
+
+  @override
+  String get privacyPolicyLabel => 'By logging in, you agree to the';
+
+  @override
+  String get privacyPolicyButton => 'Privacy Policy';
 }

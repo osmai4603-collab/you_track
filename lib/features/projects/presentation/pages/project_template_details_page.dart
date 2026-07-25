@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:issues_tracking/core/constants/app_icons.dart';
+import 'package:go_router/go_router.dart';
+import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
+import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
+import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
 import '../cubits/project_creation_cubit.dart';
 
 /// صفحة 3: تفاصيل القالب المختار وحقوله الافتراضية
 class ProjectTemplateDetailsPage extends StatelessWidget {
-  final VoidCallback onUseTemplate;
-  final VoidCallback onCancel;
+  final String templateId;
 
   const ProjectTemplateDetailsPage({
     super.key,
-    required this.onUseTemplate,
-    required this.onCancel,
+    required this.templateId,
   });
 
   @override
@@ -33,32 +34,18 @@ class ProjectTemplateDetailsPage extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Header ──────────────────────────────────────
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.medium,
-                vertical: AppSpacing.small,
-              ),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: colors.outlineVariant, width: 0.5),
+            ProjectsHeader(
+              breadcrumbs: [
+                BreadcrumbItem(
+                  title: localization.projectsTitle,
+                  onTap: (ctx) => ctx.go(AppRouteKeys.projects),
                 ),
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: onCancel,
-                    icon: const Icon(AppIcons.arrowBack, size: 18),
-                  ),
-                  const SizedBox(width: AppSpacing.small),
-                  Text(
-                    template.name,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
+                BreadcrumbItem(
+                  title: localization.selectTemplateTitle,
+                  onTap: (ctx) => ctx.go(AppRouteKeys.projectTemplates),
+                ),
+                BreadcrumbItem(title: template.name),
+              ],
             ),
             // ── المحتوى ──────────────────────────────────
             Expanded(
@@ -133,12 +120,12 @@ class ProjectTemplateDetailsPage extends StatelessWidget {
                     Row(
                       children: [
                         FilledButton(
-                          onPressed: onUseTemplate,
+                          onPressed: () => context.go(AppRouteKeys.createProject),
                           child: Text(localization.useThisTemplateButton),
                         ),
                         const SizedBox(width: AppSpacing.small),
                         OutlinedButton(
-                          onPressed: onCancel,
+                          onPressed: () => context.go(AppRouteKeys.projectTemplates),
                           child: Text(localization.cancelButton),
                         ),
                       ],

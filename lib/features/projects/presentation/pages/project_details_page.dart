@@ -1,21 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_icons.dart';
+import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
+import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
+import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
 import '../cubits/project_details_cubit.dart';
 
 /// صفحة 6: عرض تفاصيل المشروع مع التبويبات الداخلية والشريط الجانبي
-class ProjectDetailsPage extends StatelessWidget {
-  final VoidCallback onBack;
-  final VoidCallback onManageMembers;
+class ProjectDetailsPage extends StatefulWidget {
+  final String projectId;
 
-  const ProjectDetailsPage({
-    super.key,
-    required this.onBack,
-    required this.onManageMembers,
-  });
+  const ProjectDetailsPage({super.key, required this.projectId});
+
+  @override
+  State<ProjectDetailsPage> createState() => _ProjectDetailsPageState();
+}
+
+class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<ProjectDetailsCubit>().loadProject(widget.projectId);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,57 +70,14 @@ class ProjectDetailsPage extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Header ──────────────────────────────────────
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.medium,
-                vertical: AppSpacing.small,
-              ),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: colors.outlineVariant, width: 0.5),
+            ProjectsHeader(
+              breadcrumbs: [
+                BreadcrumbItem(
+                  title: localization.projectsTitle,
+                  onTap: (ctx) => ctx.go(AppRouteKeys.projects),
                 ),
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: onBack,
-                    icon: const Icon(AppIcons.arrowBack, size: 18),
-                  ),
-                  const SizedBox(width: AppSpacing.small),
-                  Container(
-                    width: 28,
-                    height: 28,
-                    decoration: BoxDecoration(
-                      color: colors.primaryContainer,
-                      borderRadius: AppRadius.extraSmallBorderRadius,
-                    ),
-                    child: Center(
-                      child: Text(
-                        project.projectKey,
-                        style: textTheme.labelSmall?.copyWith(
-                          color: colors.onPrimaryContainer,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 9,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.small),
-                  Text(
-                    project.name,
-                    style: textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                  const Spacer(),
-                  IconButton(
-                    onPressed: onManageMembers,
-                    icon: const Icon(AppIcons.people, size: 18),
-                    tooltip: 'Manage Members',
-                  ),
-                ],
-              ),
+                BreadcrumbItem(title: project.name),
+              ],
             ),
             // ── التبويبات الداخلية ──────────────────────────
             Container(

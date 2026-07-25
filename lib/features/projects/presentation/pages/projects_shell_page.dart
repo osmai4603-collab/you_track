@@ -1,153 +1,127 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../cubits/projects_list_cubit.dart';
-import '../cubits/project_creation_cubit.dart';
-import '../cubits/project_details_cubit.dart';
-import '../cubits/project_members_cubit.dart';
-import 'projects_list_page.dart';
-import 'project_template_selection_page.dart';
-import 'project_template_details_page.dart';
-import 'create_project_form_page.dart';
-import 'add_project_members_page.dart';
-import 'project_details_page.dart';
-import 'project_members_page.dart';
+import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
 
-/// الصفحة الرئيسية التي تدير التنقل الداخلي بين جميع صفحات قسم المشاريع.
-/// تستخدم Navigator داخلي لتجنب تعقيد GoRouter مع الصفحات الفرعية المتعددة.
-class ProjectsShellPage extends StatefulWidget {
-  const ProjectsShellPage({super.key});
+class ProjectsShellScope extends InheritedWidget {
+  final ProjectsShellState shellState;
 
-  @override
-  State<ProjectsShellPage> createState() => _ProjectsShellPageState();
-}
+  const ProjectsShellScope({
+    super.key,
+    required this.shellState,
+    required super.child,
+  });
 
-enum ProjectsView {
-  list,
-  templateSelection,
-  templateDetails,
-  createForm,
-  addMembers,
-  projectDetails,
-  projectMembers,
-}
-
-class _ProjectsShellPageState extends State<ProjectsShellPage> {
-  ProjectsView _currentView = ProjectsView.list;
-  String? _selectedProjectId;
-  String? _selectedTemplateId;
-
-  void _navigateTo(ProjectsView view, {String? projectId, String? templateId}) {
-    setState(() {
-      _currentView = view;
-      if (projectId != null) _selectedProjectId = projectId;
-      if (templateId != null) _selectedTemplateId = templateId;
-    });
+  static ProjectsShellState of(BuildContext context) {
+    final scope =
+        context.dependOnInheritedWidgetOfExactType<ProjectsShellScope>();
+    assert(scope != null, 'ProjectsShellScope not found');
+    return scope!.shellState;
   }
 
-  void _goBack() {
+  @override
+  bool updateShouldNotify(ProjectsShellScope oldWidget) => false;
+}
+
+class ProjectsShellPage extends StatefulWidget {
+  final Widget child;
+
+  const ProjectsShellPage({super.key, required this.child});
+
+  @override
+  State<ProjectsShellPage> createState() => ProjectsShellState();
+}
+
+class ProjectsShellState extends State<ProjectsShellPage> {
+  List<BreadcrumbItem> _breadcrumbs = [];
+  Widget? _trailing;
+
+  void updateHeader({
+    required List<BreadcrumbItem> breadcrumbs,
+    Widget? trailing,
+  }) {
+    if (!mounted) return;
     setState(() {
-      switch (_currentView) {
-        case ProjectsView.templateSelection:
-          _currentView = ProjectsView.list;
-          break;
-        case ProjectsView.templateDetails:
-          _currentView = ProjectsView.templateSelection;
-          break;
-        case ProjectsView.createForm:
-          _currentView = ProjectsView.templateDetails;
-          break;
-        case ProjectsView.addMembers:
-          _currentView = ProjectsView.createForm;
-          break;
-        case ProjectsView.projectDetails:
-          _currentView = ProjectsView.list;
-          break;
-        case ProjectsView.projectMembers:
-          _currentView = ProjectsView.projectDetails;
-          break;
-        case ProjectsView.list:
-          break;
-      }
+      _breadcrumbs = breadcrumbs;
+      _trailing = trailing;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 200),
-      child: _buildCurrentView(),
+    return ProjectsShellScope(
+      shellState: this,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          ProjectsBreadcrumbHeader(
+            breadcrumbs: _breadcrumbs,
+            trailing: _trailing,
+          ),
+          Expanded(child: widget.child),
+        ],
+      ),
     );
   }
+}
 
-  Widget _buildCurrentView() {
-    switch (_currentView) {
-      case ProjectsView.list:
-        return ProjectsListPage(
-          key: const ValueKey('list'),
-          onCreateProject: () => _navigateTo(ProjectsView.templateSelection),
-          onProjectTap: (id) {
-            context.read<ProjectDetailsCubit>().loadProject(id);
-            _navigateTo(ProjectsView.projectDetails, projectId: id);
-          },
-        );
-      case ProjectsView.templateSelection:
-        return ProjectTemplateSelectionPage(
-          key: const ValueKey('templates'),
-          onTemplateTap: (template) {
-            context.read<ProjectCreationCubit>().selectTemplate(template);
-            _navigateTo(ProjectsView.templateDetails, templateId: template.id);
-          },
-          onBack: _goBack,
-        );
-      case ProjectsView.templateDetails:
-        return ProjectTemplateDetailsPage(
-          key: const ValueKey('templateDetails'),
-          onUseTemplate: () => _navigateTo(ProjectsView.createForm),
-          onCancel: _goBack,
-        );
-      case ProjectsView.createForm:
-        return CreateProjectFormPage(
-          key: const ValueKey('createForm'),
-          onProjectCreated: (project) {
-            context.read<ProjectsListCubit>().addProjectLocally(project);
-            _navigateTo(ProjectsView.addMembers, projectId: project.id);
-          },
-          onCancel: _goBack,
-        );
-      case ProjectsView.addMembers:
-        return AddProjectMembersPage(
-          key: const ValueKey('addMembers'),
-          onSkip: () {
-            _navigateTo(ProjectsView.projectDetails);
-            if (_selectedProjectId != null) {
-              context.read<ProjectDetailsCubit>().loadProject(_selectedProjectId!);
-            }
-          },
-          onBack: _goBack,
-          onNext: () {
-            _navigateTo(ProjectsView.projectDetails);
-            if (_selectedProjectId != null) {
-              context.read<ProjectDetailsCubit>().loadProject(_selectedProjectId!);
-            }
-          },
-        );
-      case ProjectsView.projectDetails:
-        return ProjectDetailsPage(
-          key: const ValueKey('projectDetails'),
-          onBack: () => _navigateTo(ProjectsView.list),
-          onManageMembers: () {
-            if (_selectedProjectId != null) {
-              context.read<ProjectMembersCubit>().loadMembers(_selectedProjectId!);
-            }
-            _navigateTo(ProjectsView.projectMembers);
-          },
-        );
-      case ProjectsView.projectMembers:
-        return ProjectMembersPage(
-          key: const ValueKey('projectMembers'),
-          projectId: _selectedProjectId ?? '',
-          onBack: _goBack,
-        );
-    }
+class ProjectsHeader extends StatefulWidget {
+  final List<BreadcrumbItem> breadcrumbs;
+  final Widget? trailing;
+
+  const ProjectsHeader({
+    super.key,
+    required this.breadcrumbs,
+    this.trailing,
+  });
+
+  @override
+  State<ProjectsHeader> createState() => _ProjectsHeaderState();
+}
+
+class _ProjectsHeaderState extends State<ProjectsHeader> {
+  List<BreadcrumbItem>? _lastBreadcrumbs;
+  Widget? _lastTrailing;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _scheduleUpdateIfNeeded();
   }
+
+  @override
+  void didUpdateWidget(ProjectsHeader oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _scheduleUpdateIfNeeded();
+  }
+
+  void _scheduleUpdateIfNeeded() {
+    if (!mounted) return;
+    final sameBreadcrumbs = _listEquals(_lastBreadcrumbs, widget.breadcrumbs);
+    final sameTrailing = _lastTrailing == widget.trailing;
+    if (sameBreadcrumbs && sameTrailing) return;
+
+    _lastBreadcrumbs = List.from(widget.breadcrumbs);
+    _lastTrailing = widget.trailing;
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final shell = ProjectsShellScope.of(context);
+      shell.updateHeader(
+        breadcrumbs: widget.breadcrumbs,
+        trailing: widget.trailing,
+      );
+    });
+  }
+
+  bool _listEquals(List<BreadcrumbItem>? a, List<BreadcrumbItem>? b) {
+    if (a == null && b == null) return true;
+    if (a == null || b == null) return false;
+    if (a.length != b.length) return false;
+    for (int i = 0; i < a.length; i++) {
+      if (a[i].title != b[i].title || a[i].onTap != b[i].onTap) return false;
+    }
+    return true;
+  }
+
+  @override
+  Widget build(BuildContext context) => const SizedBox.shrink();
 }

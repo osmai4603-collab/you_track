@@ -58,5 +58,13 @@
   "ganttCharts": "Gantt Charts",
   "knowledgeBase": "Knowledge Base",
   "settings": "Settings",
-  "projectActionsHeader": "Project Actions"
+  "projectActionsHeader": "Project Actions",
+  "loginTitle": "Log in to YouTrack",
+  "usernameOrEmailHint": "Username or Email",
+  "passwordHint": "Password",
+  "rememberMeLabel": "Remember me",
+  "resetPasswordButton": "Reset password",
+  "loginButton": "Log in",
+  "privacyPolicyLabel": "By logging in, you agree to the",
+  "privacyPolicyButton": "Privacy Policy"
 }

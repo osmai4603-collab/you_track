@@ -433,6 +433,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Project Actions'**
   String get projectActionsHeader;
+
+  /// No description provided for @loginTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in to YouTrack'**
+  String get loginTitle;
+
+  /// No description provided for @usernameOrEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Username or Email'**
+  String get usernameOrEmailHint;
+
+  /// No description provided for @passwordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordHint;
+
+  /// No description provided for @rememberMeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember me'**
+  String get rememberMeLabel;
+
+  /// No description provided for @resetPasswordButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset password'**
+  String get resetPasswordButton;
+
+  /// No description provided for @loginButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Log in'**
+  String get loginButton;
+
+  /// No description provided for @privacyPolicyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'By logging in, you agree to the'**
+  String get privacyPolicyLabel;
+
+  /// No description provided for @privacyPolicyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy Policy'**
+  String get privacyPolicyButton;
 }
 
 class _AppLocalizationsDelegate

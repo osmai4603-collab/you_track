@@ -180,4 +180,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get projectActionsHeader => 'إجراءات المشروع';
+
+  @override
+  String get loginTitle => 'تسجيل الدخول إلى YouTrack';
+
+  @override
+  String get usernameOrEmailHint => 'اسم المستخدم أو البريد الإلكتروني';
+
+  @override
+  String get passwordHint => 'كلمة المرور';
+
+  @override
+  String get rememberMeLabel => 'تذكرني';
+
+  @override
+  String get resetPasswordButton => 'إعادة تعيين كلمة المرور';
+
+  @override
+  String get loginButton => 'تسجيل الدخول';
+
+  @override
+  String get privacyPolicyLabel => 'بتسجيل الدخول، فإنك توافق على';
+
+  @override
+  String get privacyPolicyButton => 'سياسة الخصوصية';
 }

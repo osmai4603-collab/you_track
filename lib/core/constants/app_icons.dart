@@ -48,4 +48,7 @@ sealed class AppIcons {
   static const IconData drafts = Icons.drafts_rounded;
   static const IconData tag = Icons.local_offer_rounded;
   static const IconData savedSearch = Icons.saved_search_rounded;
+  // أيقونات صفحة تسجيل الدخول
+  static const IconData visibility = Icons.visibility_rounded;
+  static const IconData visibilityOff = Icons.visibility_off_rounded;
 }

@@ -58,5 +58,13 @@
   "ganttCharts": "مخططات جانت",
   "knowledgeBase": "قاعدة المعرفة",
   "settings": "الإعدادات",
-  "projectActionsHeader": "إجراءات المشروع"
+  "projectActionsHeader": "إجراءات المشروع",
+  "loginTitle": "تسجيل الدخول إلى YouTrack",
+  "usernameOrEmailHint": "اسم المستخدم أو البريد الإلكتروني",
+  "passwordHint": "كلمة المرور",
+  "rememberMeLabel": "تذكرني",
+  "resetPasswordButton": "إعادة تعيين كلمة المرور",
+  "loginButton": "تسجيل الدخول",
+  "privacyPolicyLabel": "بتسجيل الدخول، فإنك توافق على",
+  "privacyPolicyButton": "سياسة الخصوصية"
 }

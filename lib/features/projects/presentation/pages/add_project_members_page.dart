@@ -1,22 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_icons.dart';
+import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
+import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
+import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
 import '../cubits/project_creation_cubit.dart';
+import '../cubits/project_details_cubit.dart';
 
 /// صفحة 5: إضافة أعضاء الفريق بعد إنشاء المشروع
 class AddProjectMembersPage extends StatefulWidget {
-  final VoidCallback onSkip;
-  final VoidCallback onBack;
-  final VoidCallback onNext;
+  final String projectId;
 
   const AddProjectMembersPage({
     super.key,
-    required this.onSkip,
-    required this.onBack,
-    required this.onNext,
+    required this.projectId,
   });
 
   @override
@@ -45,34 +46,11 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Header ──────────────────────────────────────
-            Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.medium,
-                vertical: AppSpacing.small,
-              ),
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: colors.outlineVariant, width: 0.5),
-                ),
-              ),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: widget.onBack,
-                    icon: const Icon(AppIcons.arrowBack, size: 18),
-                  ),
-                  const SizedBox(width: AppSpacing.small),
-                  Expanded(
-                    child: Text(
-                      localization.addPeopleTitle,
-                      style: textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+            ProjectsHeader(
+              breadcrumbs: [
+                BreadcrumbItem(title: localization.projectsTitle),
+                BreadcrumbItem(title: localization.addPeopleTitle),
+              ],
             ),
             // ── المحتوى ──────────────────────────────────
             Expanded(
@@ -206,17 +184,23 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
                     Row(
                       children: [
                         OutlinedButton(
-                          onPressed: widget.onBack,
+                          onPressed: () => context.go(AppRouteKeys.createProject),
                           child: Text(localization.backButton),
                         ),
                         const SizedBox(width: AppSpacing.small),
                         FilledButton(
-                          onPressed: widget.onNext,
+                          onPressed: () {
+                            context.read<ProjectDetailsCubit>().loadProject(widget.projectId);
+                            context.go(AppRouteKeys.projectDetailsPath(widget.projectId));
+                          },
                           child: Text(localization.nextButton),
                         ),
                         const Spacer(),
                         TextButton(
-                          onPressed: widget.onSkip,
+                          onPressed: () {
+                            context.read<ProjectDetailsCubit>().loadProject(widget.projectId);
+                            context.go(AppRouteKeys.projectDetailsPath(widget.projectId));
+                          },
                           child: Text(localization.skipSetupButton),
                         ),
                       ],
