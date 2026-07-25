@@ -28,10 +28,17 @@ sealed class AppTheme {
       brightness: colorScheme.brightness,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: colorScheme.surface,
+      dividerTheme: DividerThemeData(
+        color: colorScheme.outline,
+        space: 0,
+      ),
       listTileTheme: ListTileThemeData(
-        titleTextStyle: textTheme.titleSmall,
-        contentPadding: AppSpacing.paddingAllSmall,
+        titleTextStyle: textTheme.titleSmall?.copyWith(
+          color: colorScheme.onSurface,
+        ),
+        contentPadding: AppSpacing.paddingAllExtraSmall,
         dense: true,
+        minTileHeight: 30,
       ),
       iconTheme: IconThemeData(size: 16, color: colorScheme.onSurfaceVariant),
 
@@ -56,6 +63,7 @@ sealed class AppTheme {
           foregroundColor: colorScheme.primary,
           backgroundColor: colorScheme.onPrimary,
           textStyle: textTheme.labelSmall?.copyWith(fontWeight: .bold),
+
         ),
       ),
 
@@ -112,6 +120,7 @@ sealed class AppTheme {
       border: OutlineInputBorder(borderRadius: .circular(AppRadius.extraSmall)),
       enabledBorder: OutlineInputBorder(
         borderRadius: .circular(AppRadius.extraSmall),
+        borderSide: BorderSide(color: colorScheme.outline)
       ),
     );
   }

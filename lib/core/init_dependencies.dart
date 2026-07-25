@@ -6,6 +6,7 @@ import "package:issues_tracking/features/dashboards/data/repositories/dashboard_
 import "package:issues_tracking/features/dashboards/domain/repositories/dashboard_repository.dart";
 import "package:issues_tracking/features/dashboards/domain/usecases/get_dashboards.dart";
 import "package:issues_tracking/features/dashboards/presentation/bloc/dashboard_bloc.dart";
+import "package:issues_tracking/features/dashboards/presentation/cubits/youtrack_shell_cubit.dart";
 
 import 'package:issues_tracking/features/issues/data/datasources/issues_mock_data_source.dart';
 import 'package:issues_tracking/features/issues/data/repositories/issues_repository_impl.dart';
@@ -95,6 +96,8 @@ void _initDashboardsFeature() {
     getDashboards: sl(),
     repository: sl(),
   ));
+
+  sl.registerFactory(() => YouTrackShellCubit());
 }
 
 void _initIssuesFeature() {

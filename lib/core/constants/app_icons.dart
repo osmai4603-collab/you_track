@@ -51,4 +51,6 @@ sealed class AppIcons {
   // أيقونات صفحة تسجيل الدخول
   static const IconData visibility = Icons.visibility_rounded;
   static const IconData visibilityOff = Icons.visibility_off_rounded;
+
+  static const IconData star = Icons.star_rounded;
 }

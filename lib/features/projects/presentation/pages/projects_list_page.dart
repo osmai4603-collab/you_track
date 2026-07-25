@@ -7,8 +7,6 @@ import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
-import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
-import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
 import '../cubits/projects_list_cubit.dart';
 import '../cubits/project_details_cubit.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
@@ -52,39 +50,39 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
 
     return Column(
       children: [
-        ProjectsHeader(
-          breadcrumbs: [BreadcrumbItem(title: localization.projectsTitle)],
-          trailing: Row(
-            spacing: AppSpacing.small,
-            children: [
-              SizedBox(
-                width: 300,
-                height: 32,
-                child: TextField(
-                  controller: _searchController,
-                  onChanged: (value) {
-                    context.read<ProjectsListCubit>().searchProjects(value);
-                  },
-                  decoration: InputDecoration(
-                    hintText: localization.filterProjectsHint,
-                    prefixIcon: const Icon(AppIcons.search, size: 16),
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.small,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: AppRadius.smallBorderRadius,
-                      borderSide: BorderSide(color: colors.outlineVariant),
-                    ),
-                  ),
-                ),
-              ),
-              FilledButton(
-                onPressed: () => context.go(AppRouteKeys.projectTemplates),
-                child: Text(localization.createProject),
-              ),
-            ],
-          ),
-        ),
+        // ProjectsHeader(
+        //   breadcrumbs: [BreadcrumbItem(title: localization.projectsTitle)],
+        //   trailing: Row(
+        //     spacing: AppSpacing.small,
+        //     children: [
+        //       SizedBox(
+        //         width: 300,
+        //         height: 32,
+        //         child: TextField(
+        //           controller: _searchController,
+        //           onChanged: (value) {
+        //             context.read<ProjectsListCubit>().searchProjects(value);
+        //           },
+        //           decoration: InputDecoration(
+        //             hintText: localization.filterProjectsHint,
+        //             prefixIcon: const Icon(AppIcons.search, size: 16),
+        //             contentPadding: const EdgeInsets.symmetric(
+        //               horizontal: AppSpacing.small,
+        //             ),
+        //             border: OutlineInputBorder(
+        //               borderRadius: AppRadius.smallBorderRadius,
+        //               borderSide: BorderSide(color: colors.outlineVariant),
+        //             ),
+        //           ),
+        //         ),
+        //       ),
+        //       FilledButton(
+        //         onPressed: () => context.go(AppRouteKeys.projectTemplates),
+        //         child: Text(localization.createProject),
+        //       ),
+        //     ],
+        //   ),
+        // ),
         Expanded(
           child: BlocBuilder<ProjectsListCubit, ProjectsListState>(
             builder: (context, state) {
@@ -120,7 +118,7 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
                       vertical: AppSpacing.extraSmall,
                     ),
                     itemCount: projects.length,
-                    separatorBuilder: (_, __) => Divider(
+                    separatorBuilder: (_, _) => Divider(
                       height: 1,
                       color: colors.outlineVariant.withValues(alpha: 0.3),
                     ),

@@ -5,11 +5,14 @@ import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
 import 'package:issues_tracking/features/dashboards/presentation/bloc/dashboard_bloc.dart';
 import 'package:issues_tracking/features/dashboards/presentation/bloc/dashboard_event.dart';
+import 'package:issues_tracking/features/dashboards/presentation/cubits/youtrack_shell_cubit.dart';
 import 'package:issues_tracking/features/dashboards/presentation/pages/dashboard_page.dart';
 import 'package:issues_tracking/features/dashboards/presentation/widgets/dashboard_sidebar.dart';
+import 'package:issues_tracking/features/dashboards/presentation/widgets/youtrack_shell.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
 import 'package:issues_tracking/features/issues/presentation/pages/issues_page.dart';
+import 'package:issues_tracking/features/projects/presentation/pages/project_view_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/projects_list_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/project_template_selection_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/project_template_details_page.dart';
@@ -57,12 +60,13 @@ sealed class NavigationService {
         builder: (context, state) => const LoginPage(),
       ),
       StatefulShellRoute.indexedStack(
-        builder: (context, state, navigationShell) => BlocProvider(
-          create: (_) => sl<DashboardBloc>()..add(LoadDashboards()),
-          child: BlocProvider(
-            create: (_) => sl<IssuesBloc>()..add(const LoadIssues()),
-            child: _ShellLayout(navigationShell: navigationShell),
-          ),
+        builder: (context, state, navigationShell) => MultiBlocProvider(
+          providers: [
+            BlocProvider(create: (_) => sl<DashboardBloc>()..add(LoadDashboards())),
+            BlocProvider(create: (_) => sl<IssuesBloc>()..add(const LoadIssues())),
+            BlocProvider(create: (_) => sl<YouTrackShellCubit>()),
+          ],
+          child: YouTrackShell(navigationShell: navigationShell),
         ),
         branches: [
           // ╔════════════════════════════════════════════════════════════════════╗
@@ -133,7 +137,7 @@ sealed class NavigationService {
               BlocProvider(create: (_) => sl<ProjectDetailsCubit>()),
               BlocProvider(create: (_) => sl<ProjectMembersCubit>()),
             ],
-            child: ProjectsShellPage(child: child),
+            child: child,
           ),
           routes: [
             // ── Projects List ────────────────────────────────────────
@@ -202,7 +206,7 @@ sealed class NavigationService {
                     final projectId = state.pathParameters['projectId']!;
                     return CustomTransitionPage(
                       key: state.pageKey,
-                      child: ProjectDetailsPage(projectId: projectId),
+                      child: ProjectView(projectId: projectId),
                       transitionsBuilder: _fadeTransition,
                     );
                   },
@@ -264,23 +268,5 @@ sealed class NavigationService {
     Widget child,
   ) {
     return FadeTransition(opacity: animation, child: child);
-  }
-}
-
-class _ShellLayout extends StatelessWidget {
-  final StatefulNavigationShell navigationShell;
-
-  const _ShellLayout({required this.navigationShell});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Row(
-        children: [
-          const YouTrackSidebar(),
-          Expanded(child: navigationShell),
-        ],
-      ),
-    );
   }
 }
