@@ -41,7 +41,7 @@ class ProjectsBreadcrumbHeader extends StatelessWidget {
               children: _buildBreadcrumbs(context, colors, textTheme),
             ),
           ),
-          ?trailing,
+          if (trailing != null) trailing!,
         ],
       ),
     );
@@ -100,13 +100,9 @@ class _BreadcrumbTextState extends State<_BreadcrumbText> {
         onTap: () => widget.item.onTap?.call(context),
         child: Text(
           widget.item.title,
-          style: textTheme.titleMedium?.copyWith(
-            fontWeight: widget.isLast ? FontWeight.w600 : FontWeight.w500,
-            color: isClickable ? Colors.red : colors.onSurface,
-            decoration: isClickable
-                ? TextDecoration.underline
-                : TextDecoration.none,
-            decorationColor: Colors.red,
+          style: textTheme.bodyMedium?.copyWith(
+            fontWeight: widget.isLast ? FontWeight.w500 : FontWeight.w400,
+            color: isClickable ? colors.primary : colors.onSurfaceVariant,
           ),
         ),
       ),

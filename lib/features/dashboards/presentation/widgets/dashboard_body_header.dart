@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/features/dashboards/presentation/cubits/youtrack_shell_cubit.dart';
 import 'package:issues_tracking/features/dashboards/presentation/widgets/breadcrumbs.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
@@ -103,7 +105,8 @@ class _SectionTwo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isIssues = currentPath.contains('issues');
-    final isProjects = currentPath.contains('projects') && !isIssues;
+    final isPeople = currentPath.contains('people');
+    final isProjects = currentPath.contains('projects') && !isIssues && !isPeople;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -116,9 +119,16 @@ class _SectionTwo extends StatelessWidget {
             _SearchField(hint: 'Filter projects by name or ID'),
             const SizedBox(width: 16),
             _ActionButton(
-              onPressed: () {},
+              onPressed: () => context.go(AppRouteKeys.projectTemplates),
               icon: Icons.add,
               label: 'Create Project',
+            ),
+          ],
+          if (isPeople) ...[
+            _ActionButton(
+              onPressed: () {},
+              icon: Icons.person_add,
+              label: 'Add People',
             ),
           ],
           if (isIssues && !isProjects) ...[

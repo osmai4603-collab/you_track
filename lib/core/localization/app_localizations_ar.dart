@@ -137,6 +137,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get noIssuesFoundBody => 'لم يتم العثور على مشكلات';
 
   @override
+  String get noProjectsFound => 'لم يتم العثور على مشاريع';
+
+  @override
   String get editSearchQueryButton => 'تعديل استعلام البحث';
 
   @override
@@ -204,4 +207,142 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get privacyPolicyButton => 'سياسة الخصوصية';
+
+  @override
+  String get priorityShowStopper => 'عارض';
+
+  @override
+  String get priorityCritical => 'حرج';
+
+  @override
+  String get priorityMajor => 'رئيسي';
+
+  @override
+  String get priorityNormal => 'عادي';
+
+  @override
+  String get priorityMinor => 'ثانوي';
+
+  @override
+  String get typeBug => 'خلل';
+
+  @override
+  String get typeCosmetic => 'تجميلي';
+
+  @override
+  String get typeException => 'استثناء';
+
+  @override
+  String get typeFeature => 'ميزة';
+
+  @override
+  String get typeTask => 'مهمة';
+
+  @override
+  String get typeUsabilityProblem => 'مشكلة استخدام';
+
+  @override
+  String get typePerformanceProblem => 'مشكلة أداء';
+
+  @override
+  String get typeEpic => 'ملحمة';
+
+  @override
+  String get stateToDo => 'للتنفيذ';
+
+  @override
+  String get stateInProgress => 'قيد التنفيذ';
+
+  @override
+  String get stateDone => 'منتهي';
+
+  @override
+  String get subsystemNoValue => 'لا قيمة';
+
+  @override
+  String get subsystemIssueTracking => 'تتبع المشاكل';
+
+  @override
+  String get subsystemProjectManagement => 'إدارة المشاريع';
+
+  @override
+  String get subsystemMigration => 'ترحيل';
+
+  @override
+  String get roleContributor => 'مساهم';
+
+  @override
+  String get roleProjectAdmin => 'مدير مشروع';
+
+  @override
+  String get roleSystemAdmin => 'مدير نظام';
+
+  @override
+  String get serverTypeGithub => 'جيت‌هاب';
+
+  @override
+  String get serverTypeGitlab => 'جيت‌لاب';
+
+  @override
+  String get serverTypeBitbucket => 'بت‌باكيت';
+
+  @override
+  String get serverTypeBitbucketServer => 'خادم بت‌باكيت';
+
+  @override
+  String get serverTypeGogs => 'جوغز';
+
+  @override
+  String get serverTypeGitea => 'جيتيا';
+
+  @override
+  String get serverTypeSpace => 'سبيس';
+
+  @override
+  String get serverTypeGenerice => 'عام';
+
+  @override
+  String get serverTypeAzureRepos => 'أزور ريبوز';
+
+  @override
+  String get customFieldEnumTypeBuild => 'البناء';
+
+  @override
+  String get customFieldEnumTypeEnum => 'التعداد';
+
+  @override
+  String get customFieldEnumTypeGroup => 'المجموعة';
+
+  @override
+  String get customFieldEnumTypeOwnedField => 'الملف المملوك';
+
+  @override
+  String get customFieldEnumTypeState => 'الحالة';
+
+  @override
+  String get customFieldEnumTypeUser => 'المستخدم';
+
+  @override
+  String get customFieldEnumTypeVersion => 'الإصدار';
+
+  @override
+  String get customFieldEnumTypeDate => 'التاريخ';
+
+  @override
+  String get customFieldEnumTypeDateTime => 'التاريخ والوقت';
+
+  @override
+  String get customFieldEnumTypeFloat => 'عشري';
+
+  @override
+  String get customFieldEnumTypeInteger => 'عدد صحيح';
+
+  @override
+  String get customFieldEnumTypeString => 'نص';
+
+  @override
+  String get customFieldEnumTypeText => 'نص طويل';
+
+  @override
+  String get customFieldEnumTypePeriod => 'الفترة';
 }

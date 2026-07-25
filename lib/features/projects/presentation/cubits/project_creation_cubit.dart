@@ -16,6 +16,8 @@ class ProjectCreationState extends Equatable {
   final ProjectTemplateEntity? selectedTemplate;
   final String projectName;
   final String projectKey;
+  final String projectDescription;
+  final int startingNumber;
   final ProjectEntity? createdProject;
   final List<ProjectMemberEntity> pendingMembers;
   final String? errorMessage;
@@ -26,6 +28,8 @@ class ProjectCreationState extends Equatable {
     this.selectedTemplate,
     this.projectName = '',
     this.projectKey = '',
+    this.projectDescription = '',
+    this.startingNumber = 1,
     this.createdProject,
     this.pendingMembers = const [],
     this.errorMessage,
@@ -37,6 +41,8 @@ class ProjectCreationState extends Equatable {
     ProjectTemplateEntity? selectedTemplate,
     String? projectName,
     String? projectKey,
+    String? projectDescription,
+    int? startingNumber,
     ProjectEntity? createdProject,
     List<ProjectMemberEntity>? pendingMembers,
     String? errorMessage,
@@ -47,6 +53,8 @@ class ProjectCreationState extends Equatable {
       selectedTemplate: selectedTemplate ?? this.selectedTemplate,
       projectName: projectName ?? this.projectName,
       projectKey: projectKey ?? this.projectKey,
+      projectDescription: projectDescription ?? this.projectDescription,
+      startingNumber: startingNumber ?? this.startingNumber,
       createdProject: createdProject ?? this.createdProject,
       pendingMembers: pendingMembers ?? this.pendingMembers,
       errorMessage: errorMessage,
@@ -60,6 +68,8 @@ class ProjectCreationState extends Equatable {
         selectedTemplate,
         projectName,
         projectKey,
+        projectDescription,
+        startingNumber,
         createdProject,
         pendingMembers,
         errorMessage,
@@ -100,10 +110,12 @@ class ProjectCreationCubit extends Cubit<ProjectCreationState> {
     emit(state.copyWith(selectedTemplate: template));
   }
 
-  void updateFormInfo({required String name, required String key}) {
+  void updateFormInfo({required String name, required String key, String? description, int? startingNumber}) {
     emit(state.copyWith(
       projectName: name,
       projectKey: key.toUpperCase(),
+      projectDescription: description,
+      startingNumber: startingNumber,
     ));
   }
 
@@ -122,7 +134,9 @@ class ProjectCreationCubit extends Cubit<ProjectCreationState> {
       id: 'proj_${DateTime.now().millisecondsSinceEpoch}',
       name: state.projectName.trim(),
       projectKey: state.projectKey.trim().toUpperCase(),
-      description: state.selectedTemplate?.description,
+      description: state.projectDescription.isNotEmpty
+          ? state.projectDescription.trim()
+          : state.selectedTemplate?.description,
       isArchived: false,
       isTemplate: false,
       templateId: state.selectedTemplate?.id ?? 'default',

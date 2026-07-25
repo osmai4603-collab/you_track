@@ -8,7 +8,7 @@ import "package:issues_tracking/features/dashboards/domain/usecases/get_dashboar
 import "package:issues_tracking/features/dashboards/presentation/bloc/dashboard_bloc.dart";
 import "package:issues_tracking/features/dashboards/presentation/cubits/youtrack_shell_cubit.dart";
 
-import 'package:issues_tracking/features/issues/data/datasources/issues_mock_data_source.dart';
+import 'package:issues_tracking/features/issues/data/datasources/issues_remote_data_source.dart';
 import 'package:issues_tracking/features/issues/data/repositories/issues_repository_impl.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/issues_repository.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_issues.dart';
@@ -23,6 +23,7 @@ import 'package:issues_tracking/features/app/domain/usecases/save_app_settings.d
 import 'package:issues_tracking/features/app/presentation/cubit/app_cubit.dart';
 
 import 'package:issues_tracking/features/projects/data/datasources/projects_local_data_source.dart';
+import 'package:issues_tracking/features/projects/data/datasources/projects_remote_data_source.dart';
 import 'package:issues_tracking/features/projects/data/repositories/projects_repository_impl.dart';
 import 'package:issues_tracking/features/projects/domain/repositories/projects_repository.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/get_projects_use_case.dart';
@@ -39,6 +40,26 @@ import 'package:issues_tracking/features/projects/presentation/cubits/project_cr
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_members_cubit.dart';
 
+import 'package:issues_tracking/features/custom_fields/data/datasources/custom_fields_remote_data_source.dart';
+import 'package:issues_tracking/features/custom_fields/data/repositories/custom_fields_repository_impl.dart';
+import 'package:issues_tracking/features/custom_fields/domain/repositories/custom_fields_repository.dart';
+import 'package:issues_tracking/features/custom_fields/domain/usecases/get_custom_fields_use_case.dart';
+import 'package:issues_tracking/features/custom_fields/domain/usecases/add_custom_field_use_case.dart';
+import 'package:issues_tracking/features/custom_fields/domain/usecases/update_custom_field_use_case.dart';
+import 'package:issues_tracking/features/custom_fields/domain/usecases/delete_custom_fields_use_case.dart';
+import 'package:issues_tracking/features/custom_fields/domain/usecases/reorder_custom_fields_use_case.dart';
+import 'package:issues_tracking/features/custom_fields/presentation/cubits/custom_fields_cubit.dart';
+
+import 'package:issues_tracking/features/custom_field/data/datasources/custom_field_remote_data_source.dart';
+import 'package:issues_tracking/features/custom_field/data/repositories/custom_field_repository_impl.dart';
+import 'package:issues_tracking/features/custom_field/domain/repositories/custom_field_repository.dart';
+import 'package:issues_tracking/features/custom_field/domain/usecases/validate_custom_field_name.dart';
+import 'package:issues_tracking/features/custom_field/domain/usecases/create_custom_field.dart';
+import 'package:issues_tracking/features/custom_field/presentation/cubits/custom_field_panel_cubit.dart';
+import 'package:issues_tracking/features/custom_field/presentation/cubits/tab_selection_cubit.dart';
+import 'package:issues_tracking/features/custom_field/presentation/cubits/form_state_cubit.dart';
+import 'package:issues_tracking/features/custom_field/presentation/cubits/privacy_state_cubit.dart';
+
 final sl = GetIt.instance;
 
 Future<void> initDependencies() async {
@@ -52,6 +73,8 @@ Future<void> initDependencies() async {
   _initDashboardsFeature();
   _initIssuesFeature();
   _initProjectsFeature();
+  _initCustomFieldsFeature();
+  _initCustomFieldFeature();
 }
 
 
@@ -102,8 +125,8 @@ void _initDashboardsFeature() {
 
 void _initIssuesFeature() {
   // Data Sources
-  sl.registerLazySingleton<IssuesMockDataSource>(
-    () => IssuesMockDataSourceImpl(),
+  sl.registerLazySingleton<IssuesRemoteDataSource>(
+    () => IssuesRemoteDataSourceImpl(sl()),
   );
 
   // Repositories
@@ -127,10 +150,16 @@ void _initProjectsFeature() {
   sl.registerLazySingleton<ProjectsLocalDataSource>(
     () => ProjectsLocalDataSourceImpl(),
   );
+  sl.registerLazySingleton<ProjectsRemoteDataSource>(
+    () => ProjectsRemoteDataSourceImpl(sl()),
+  );
 
   // Repositories
   sl.registerLazySingleton<ProjectsRepository>(
-    () => ProjectsRepositoryImpl(localDataSource: sl()),
+    () => ProjectsRepositoryImpl(
+      remoteDataSource: sl(),
+      localDataSource: sl(),
+    ),
   );
 
   // UseCases
@@ -163,5 +192,54 @@ void _initProjectsFeature() {
     getProjectMembersUseCase: sl(),
     addProjectMemberUseCase: sl(),
   ));
+}
+
+void _initCustomFieldsFeature() {
+  sl.registerLazySingleton<CustomFieldsRemoteDataSource>(
+    () => CustomFieldsRemoteDataSourceImpl(sl()),
+  );
+
+  sl.registerLazySingleton<CustomFieldsRepository>(
+    () => CustomFieldsRepositoryImpl(sl()),
+  );
+
+  sl.registerLazySingleton(() => GetCustomFieldsUseCase(sl()));
+  sl.registerLazySingleton(() => AddCustomFieldUseCase(sl()));
+  sl.registerLazySingleton(() => UpdateCustomFieldUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteCustomFieldsUseCase(sl()));
+  sl.registerLazySingleton(() => ReorderCustomFieldsUseCase(sl()));
+
+  sl.registerFactory(() => CustomFieldsCubit(
+    getFieldsUseCase: sl(),
+    addFieldUseCase: sl(),
+    updateFieldUseCase: sl(),
+    deleteFieldsUseCase: sl(),
+    reorderFieldsUseCase: sl(),
+  ));
+}
+
+void _initCustomFieldFeature() {
+  // Data Sources
+  sl.registerLazySingleton<CustomFieldRemoteDataSource>(
+    () => CustomFieldRemoteDataSourceImpl(sl()),
+  );
+
+  // Repositories
+  sl.registerLazySingleton<CustomFieldRepository>(
+    () => CustomFieldRepositoryImpl(sl()),
+  );
+
+  // Use Cases
+  sl.registerLazySingleton(() => ValidateCustomFieldName(sl()));
+  sl.registerLazySingleton(() => CreateCustomField(sl()));
+
+  // Cubits
+  sl.registerFactory(() => CustomFieldPanelCubit());
+  sl.registerFactory(() => TabSelectionCubit());
+  sl.registerFactory(() => FormStateCubit(
+    validateFieldName: sl(),
+    createCustomField: sl(),
+  ));
+  sl.registerFactory(() => PrivacyStateCubit());
 }
 

@@ -65,26 +65,27 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
     UpdateFilter event,
     Emitter<IssuesState> emit,
   ) async {
-    if (state is IssuesLoaded) {
-      final current = state as IssuesLoaded;
-      emit(IssuesLoading());
+    final current = state;
+    emit(IssuesLoading());
 
-      final result = await getIssues(
-        params: GetIssuesParams(filter: event.filter),
-      );
+    final tagsResult = await repository.getAllTags();
+    final tags = tagsResult.fold((_) => <String>[], (t) => t);
 
-      result.fold(
-        (failure) => emit(IssuesError(failure.message)),
-        (issues) => emit(IssuesLoaded(
-          issues: current.issues,
-          filteredIssues: issues,
-          filter: event.filter,
-          selectedIssueId: current.selectedIssueId,
-          selectedIssueIds: current.selectedIssueIds,
-          allTags: current.allTags,
-        )),
-      );
-    }
+    final result = await getIssues(
+      params: GetIssuesParams(filter: event.filter),
+    );
+
+    result.fold(
+      (failure) => emit(IssuesError(failure.message)),
+      (issues) => emit(IssuesLoaded(
+        issues: issues,
+        filteredIssues: issues,
+        filter: event.filter,
+        selectedIssueId: current is IssuesLoaded ? current.selectedIssueId : null,
+        selectedIssueIds: current is IssuesLoaded ? current.selectedIssueIds : {},
+        allTags: tags,
+      )),
+    );
   }
 
   Future<void> _onChangeSort(

@@ -91,7 +91,7 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
               }
               if (state.status == ProjectsListStatus.failure) {
                 return Center(
-                  child: Text(
+                  child: SelectableText(
                     state.errorMessage ?? '',
                     style: textTheme.bodyMedium?.copyWith(color: colors.error),
                   ),
@@ -102,7 +102,7 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
               if (projects.isEmpty) {
                 return Center(
                   child: Text(
-                    localization.noIssuesFoundBody,
+                    localization.noProjectsFound,
                     style: textTheme.bodyMedium?.copyWith(
                       color: colors.onSurfaceVariant,
                     ),
@@ -325,7 +325,7 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
     return PopupMenuButton<String>(
       color: colors.surfaceContainerLow,
       constraints: const BoxConstraints(maxWidth: 250),
-      borderRadius: .circular(8.0),
+      borderRadius: BorderRadius.circular(8.0),
       child: Padding(
         padding: const EdgeInsets.all(4.0),
         child: const Icon(AppIcons.moreVert),

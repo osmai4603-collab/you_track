@@ -7,20 +7,22 @@ import 'package:issues_tracking/features/dashboards/presentation/bloc/dashboard_
 import 'package:issues_tracking/features/dashboards/presentation/bloc/dashboard_event.dart';
 import 'package:issues_tracking/features/dashboards/presentation/cubits/youtrack_shell_cubit.dart';
 import 'package:issues_tracking/features/dashboards/presentation/pages/dashboard_page.dart';
-import 'package:issues_tracking/features/dashboards/presentation/widgets/dashboard_sidebar.dart';
 import 'package:issues_tracking/features/dashboards/presentation/widgets/youtrack_shell.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
 import 'package:issues_tracking/features/issues/presentation/pages/issues_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/project_view_page.dart';
+import 'package:issues_tracking/features/projects/presentation/pages/project_settings_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/projects_list_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/project_template_selection_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/project_template_details_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/create_project_form_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/add_project_members_page.dart';
-import 'package:issues_tracking/features/projects/presentation/pages/project_details_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/project_members_page.dart';
-import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
+import 'package:issues_tracking/features/projects/presentation/widgets/settings_sections/project_general_settings_section.dart';
+import 'package:issues_tracking/features/projects/presentation/widgets/settings_sections/project_people_settings_section.dart';
+import 'package:issues_tracking/features/custom_fields/presentation/pages/custom_fields_settings_section.dart';
+import 'package:issues_tracking/features/custom_fields/presentation/cubits/custom_fields_cubit.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/projects_list_cubit.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_creation_cubit.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
@@ -126,6 +128,7 @@ sealed class NavigationService {
     ],
   );
 
+  
   static StatefulShellBranch _projectsBranch() {
     return StatefulShellBranch(
       routes: [
@@ -249,6 +252,104 @@ sealed class NavigationService {
                           transitionsBuilder: _fadeTransition,
                         );
                       },
+                    ),
+
+                    // ── Project Settings ────────────────────────────
+                    ShellRoute(
+                      builder: (context, state, child) {
+                        final projectId = state.pathParameters['projectId']!;
+                        return ProjectSettingsPage(
+                          projectId: projectId,
+                          child: child,
+                        );
+                      },
+                      routes: [
+                        GoRoute(
+                          path: 'settings',
+                          redirect: (context, state) {
+                            final projectId = state.pathParameters['projectId'];
+                            return AppRouteKeys.projectSettingsSectionPath(
+                              projectId!,
+                              AppRouteKeys.projectSettingsGeneral,
+                            );
+                          },
+                        ),
+                        GoRoute(
+                          path: 'settings/general',
+                          pageBuilder: (context, state) => CustomTransitionPage(
+                            key: state.pageKey,
+                            child: const ProjectGeneralSettingsSection(),
+                            transitionsBuilder: _fadeTransition,
+                          ),
+                        ),
+                        GoRoute(
+                          path: 'settings/people',
+                          pageBuilder: (context, state) => CustomTransitionPage(
+                            key: state.pageKey,
+                            child: const ProjectPeopleSettingsSection(),
+                            transitionsBuilder: _fadeTransition,
+                          ),
+                        ),
+                        GoRoute(
+                          path: 'settings/custom-fields',
+                          pageBuilder: (context, state) => CustomTransitionPage(
+                            key: state.pageKey,
+                            child: BlocProvider<CustomFieldsCubit>(
+                              create: (_) => sl<CustomFieldsCubit>(),
+                              child: const CustomFieldsSettingsSection(),
+                            ),
+                            transitionsBuilder: _fadeTransition,
+                          ),
+                        ),
+                        GoRoute(
+                          path: 'settings/vcs',
+                          pageBuilder: (context, state) => CustomTransitionPage(
+                            key: state.pageKey,
+                            child: const Center(child: Text('Version Control Settings')),
+                            transitionsBuilder: _fadeTransition,
+                          ),
+                        ),
+                        GoRoute(
+                          path: 'settings/notifications',
+                          pageBuilder: (context, state) => CustomTransitionPage(
+                            key: state.pageKey,
+                            child: const Center(child: Text('Notifications Settings')),
+                            transitionsBuilder: _fadeTransition,
+                          ),
+                        ),
+                        GoRoute(
+                          path: 'settings/builds',
+                          pageBuilder: (context, state) => CustomTransitionPage(
+                            key: state.pageKey,
+                            child: const Center(child: Text('Build Servers Settings')),
+                            transitionsBuilder: _fadeTransition,
+                          ),
+                        ),
+                        GoRoute(
+                          path: 'settings/time',
+                          pageBuilder: (context, state) => CustomTransitionPage(
+                            key: state.pageKey,
+                            child: const Center(child: Text('Time Tracking Settings')),
+                            transitionsBuilder: _fadeTransition,
+                          ),
+                        ),
+                        GoRoute(
+                          path: 'settings/workflows',
+                          pageBuilder: (context, state) => CustomTransitionPage(
+                            key: state.pageKey,
+                            child: const Center(child: Text('Workflows Settings')),
+                            transitionsBuilder: _fadeTransition,
+                          ),
+                        ),
+                        GoRoute(
+                          path: 'settings/apps',
+                          pageBuilder: (context, state) => CustomTransitionPage(
+                            key: state.pageKey,
+                            child: const Center(child: Text('Apps Settings')),
+                            transitionsBuilder: _fadeTransition,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

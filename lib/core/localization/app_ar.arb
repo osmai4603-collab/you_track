@@ -44,6 +44,7 @@
   "ownedByLabel": "المالك: {owner}",
   "createdOnLabel": "تم إنشاؤه في {date}",
   "noIssuesFoundBody": "لم يتم العثور على مشكلات",
+  "noProjectsFound": "لم يتم العثور على مشاريع",
   "editSearchQueryButton": "تعديل استعلام البحث",
   "agileBoardsTitle": "لوحات Agile",
   "scrumBoardTitle": "لوحة Scrum",
@@ -66,5 +67,93 @@
   "resetPasswordButton": "إعادة تعيين كلمة المرور",
   "loginButton": "تسجيل الدخول",
   "privacyPolicyLabel": "بتسجيل الدخول، فإنك توافق على",
-  "privacyPolicyButton": "سياسة الخصوصية"
+  "privacyPolicyButton": "سياسة الخصوصية",
+  "priorityShowStopper": "عارض",
+  "priorityCritical": "حرج",
+  "priorityMajor": "رئيسي",
+  "priorityNormal": "عادي",
+  "priorityMinor": "ثانوي",
+  "typeBug": "خلل",
+  "typeCosmetic": "تجميلي",
+  "typeException": "استثناء",
+  "typeFeature": "ميزة",
+  "typeTask": "مهمة",
+  "typeUsabilityProblem": "مشكلة استخدام",
+  "typePerformanceProblem": "مشكلة أداء",
+  "typeEpic": "ملحمة",
+  "stateToDo": "للتنفيذ",
+  "stateInProgress": "قيد التنفيذ",
+  "stateDone": "منتهي",
+  "subsystemNoValue": "لا قيمة",
+  "subsystemIssueTracking": "تتبع المشاكل",
+  "subsystemProjectManagement": "إدارة المشاريع",
+  "subsystemMigration": "ترحيل",
+  "roleContributor": "مساهم",
+  "roleProjectAdmin": "مدير مشروع",
+  "roleSystemAdmin": "مدير نظام",
+  "serverTypeGithub": "جيت‌هاب",
+  "serverTypeGitlab": "جيت‌لاب",
+  "serverTypeBitbucket": "بت‌باكيت",
+  "serverTypeBitbucketServer": "خادم بت‌باكيت",
+  "serverTypeGogs": "جوغز",
+  "serverTypeGitea": "جيتيا",
+  "serverTypeSpace": "سبيس",
+  "serverTypeGenerice": "عام",
+  "serverTypeAzureRepos": "أزور ريبوز",
+  "customFieldEnumTypeBuild": "البناء",
+  "@customFieldEnumTypeBuild": {
+    "description": "اسم عرض لنوع الحقل build"
+  },
+  "customFieldEnumTypeEnum": "التعداد",
+  "@customFieldEnumTypeEnum": {
+    "description": "اسم عرض لنوع الحقل enum"
+  },
+  "customFieldEnumTypeGroup": "المجموعة",
+  "@customFieldEnumTypeGroup": {
+    "description": "اسم عرض لنوع الحقل group"
+  },
+  "customFieldEnumTypeOwnedField": "الملف المملوك",
+  "@customFieldEnumTypeOwnedField": {
+    "description": "اسم عرض لنوع الحقل owned-field"
+  },
+  "customFieldEnumTypeState": "الحالة",
+  "@customFieldEnumTypeState": {
+    "description": "اسم عرض لنوع الحقل state"
+  },
+  "customFieldEnumTypeUser": "المستخدم",
+  "@customFieldEnumTypeUser": {
+    "description": "اسم عرض لنوع الحقل user"
+  },
+  "customFieldEnumTypeVersion": "الإصدار",
+  "@customFieldEnumTypeVersion": {
+    "description": "اسم عرض لنوع الحقل version"
+  },
+  "customFieldEnumTypeDate": "التاريخ",
+  "@customFieldEnumTypeDate": {
+    "description": "اسم عرض لنوع الحقل date"
+  },
+  "customFieldEnumTypeDateTime": "التاريخ والوقت",
+  "@customFieldEnumTypeDateTime": {
+    "description": "اسم عرض لنوع الحقل date-time"
+  },
+  "customFieldEnumTypeFloat": "عشري",
+  "@customFieldEnumTypeFloat": {
+    "description": "اسم عرض لنوع الحقل float"
+  },
+  "customFieldEnumTypeInteger": "عدد صحيح",
+  "@customFieldEnumTypeInteger": {
+    "description": "اسم عرض لنوع الحقل integer"
+  },
+  "customFieldEnumTypeString": "نص",
+  "@customFieldEnumTypeString": {
+    "description": "اسم عرض لنوع الحقل string"
+  },
+  "customFieldEnumTypeText": "نص طويل",
+  "@customFieldEnumTypeText": {
+    "description": "اسم عرض لنوع الحقل text"
+  },
+  "customFieldEnumTypePeriod": "الفترة",
+  "@customFieldEnumTypePeriod": {
+    "description": "اسم عرض لنوع الحقل period"
+  }
 }

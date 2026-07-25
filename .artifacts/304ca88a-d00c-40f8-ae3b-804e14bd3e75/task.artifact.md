@@ -1,0 +1,7 @@
+- `[x]` Create `ProjectIcon` widget in `lib/features/projects/presentation/widgets/project_icon.dart`
+- `[x]` Create `ProjectGeneralSettingsSection` in `lib/features/projects/presentation/widgets/settings_sections/project_general_settings_section.dart`
+- `[x]` Update `ProjectSettingsSidebarHeader` to use `ProjectIcon`
+- `[x]` Update `ProjectSettingsSidebar` to use real data and add footer
+- `[x]` Update `ProjectSettingsPage` to include breadcrumbs header and load project details
+- `[x]` Update `ProjectsBreadcrumbHeader` to fix syntax and style
+- `[x]` Register `ProjectGeneralSettingsSection` in `NavigationService`

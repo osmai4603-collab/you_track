@@ -5,21 +5,26 @@ import '../../domain/entities/project_member_entity.dart';
 import '../../domain/entities/project_template_entity.dart';
 import '../../domain/repositories/projects_repository.dart';
 import '../datasources/projects_local_data_source.dart';
+import '../datasources/projects_remote_data_source.dart';
 import '../models/project_model.dart';
 import '../models/project_member_model.dart';
 
 class ProjectsRepositoryImpl implements ProjectsRepository {
+  final ProjectsRemoteDataSource remoteDataSource;
   final ProjectsLocalDataSource localDataSource;
 
-  ProjectsRepositoryImpl({required this.localDataSource});
+  ProjectsRepositoryImpl({
+    required this.remoteDataSource,
+    required this.localDataSource,
+  });
 
   @override
   Future<Either<Failure, List<ProjectEntity>>> getProjects() async {
     try {
-      final projects = await localDataSource.getProjects();
+      final projects = await remoteDataSource.getProjects();
       return Right(projects);
     } catch (e) {
-      return Left(LocalDatabaseFailure(e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -36,10 +41,10 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
   @override
   Future<Either<Failure, ProjectEntity>> getProjectById(String id) async {
     try {
-      final project = await localDataSource.getProjectById(id);
+      final project = await remoteDataSource.getProjectById(id);
       return Right(project);
     } catch (e) {
-      return Left(LocalDatabaseFailure(e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -47,10 +52,10 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
   Future<Either<Failure, ProjectEntity>> createProject(ProjectEntity project) async {
     try {
       final model = ProjectModel.fromEntity(project);
-      final created = await localDataSource.createProject(model);
+      final created = await remoteDataSource.createProject(model);
       return Right(created);
     } catch (e) {
-      return Left(LocalDatabaseFailure(e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -58,40 +63,40 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
   Future<Either<Failure, ProjectEntity>> updateProject(ProjectEntity project) async {
     try {
       final model = ProjectModel.fromEntity(project);
-      final updated = await localDataSource.updateProject(model);
+      final updated = await remoteDataSource.updateProject(model);
       return Right(updated);
     } catch (e) {
-      return Left(LocalDatabaseFailure(e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
   @override
   Future<Either<Failure, Unit>> archiveProject(String id) async {
     try {
-      await localDataSource.archiveProject(id);
+      await remoteDataSource.archiveProject(id);
       return const Right(unit);
     } catch (e) {
-      return Left(LocalDatabaseFailure(e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
   @override
   Future<Either<Failure, Unit>> deleteProject(String id) async {
     try {
-      await localDataSource.deleteProject(id);
+      await remoteDataSource.deleteProject(id);
       return const Right(unit);
     } catch (e) {
-      return Left(LocalDatabaseFailure(e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
   @override
   Future<Either<Failure, List<ProjectMemberEntity>>> getProjectMembers(String projectId) async {
     try {
-      final members = await localDataSource.getProjectMembers(projectId);
+      final members = await remoteDataSource.getProjectMembers(projectId);
       return Right(members);
     } catch (e) {
-      return Left(LocalDatabaseFailure(e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 
@@ -99,10 +104,10 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
   Future<Either<Failure, ProjectMemberEntity>> addProjectMember(ProjectMemberEntity member) async {
     try {
       final model = ProjectMemberModel.fromEntity(member);
-      final added = await localDataSource.addProjectMember(model);
+      final added = await remoteDataSource.addProjectMember(model);
       return Right(added);
     } catch (e) {
-      return Left(LocalDatabaseFailure(e.toString()));
+      return Left(ServerFailure(e.toString()));
     }
   }
 }

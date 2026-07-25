@@ -344,6 +344,12 @@ abstract class AppLocalizations {
   /// **'No issues found'**
   String get noIssuesFoundBody;
 
+  /// No description provided for @noProjectsFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No projects found'**
+  String get noProjectsFound;
+
   /// No description provided for @editSearchQueryButton.
   ///
   /// In en, this message translates to:
@@ -481,6 +487,282 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Privacy Policy'**
   String get privacyPolicyButton;
+
+  /// No description provided for @priorityShowStopper.
+  ///
+  /// In en, this message translates to:
+  /// **'Show Stopper'**
+  String get priorityShowStopper;
+
+  /// No description provided for @priorityCritical.
+  ///
+  /// In en, this message translates to:
+  /// **'Critical'**
+  String get priorityCritical;
+
+  /// No description provided for @priorityMajor.
+  ///
+  /// In en, this message translates to:
+  /// **'Major'**
+  String get priorityMajor;
+
+  /// No description provided for @priorityNormal.
+  ///
+  /// In en, this message translates to:
+  /// **'Normal'**
+  String get priorityNormal;
+
+  /// No description provided for @priorityMinor.
+  ///
+  /// In en, this message translates to:
+  /// **'Minor'**
+  String get priorityMinor;
+
+  /// No description provided for @typeBug.
+  ///
+  /// In en, this message translates to:
+  /// **'Bug'**
+  String get typeBug;
+
+  /// No description provided for @typeCosmetic.
+  ///
+  /// In en, this message translates to:
+  /// **'Cosmetic'**
+  String get typeCosmetic;
+
+  /// No description provided for @typeException.
+  ///
+  /// In en, this message translates to:
+  /// **'Exception'**
+  String get typeException;
+
+  /// No description provided for @typeFeature.
+  ///
+  /// In en, this message translates to:
+  /// **'Feature'**
+  String get typeFeature;
+
+  /// No description provided for @typeTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Task'**
+  String get typeTask;
+
+  /// No description provided for @typeUsabilityProblem.
+  ///
+  /// In en, this message translates to:
+  /// **'Usability Problem'**
+  String get typeUsabilityProblem;
+
+  /// No description provided for @typePerformanceProblem.
+  ///
+  /// In en, this message translates to:
+  /// **'Performance Problem'**
+  String get typePerformanceProblem;
+
+  /// No description provided for @typeEpic.
+  ///
+  /// In en, this message translates to:
+  /// **'Epic'**
+  String get typeEpic;
+
+  /// No description provided for @stateToDo.
+  ///
+  /// In en, this message translates to:
+  /// **'To Do'**
+  String get stateToDo;
+
+  /// No description provided for @stateInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In Progress'**
+  String get stateInProgress;
+
+  /// No description provided for @stateDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get stateDone;
+
+  /// No description provided for @subsystemNoValue.
+  ///
+  /// In en, this message translates to:
+  /// **'No Value'**
+  String get subsystemNoValue;
+
+  /// No description provided for @subsystemIssueTracking.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue Tracking'**
+  String get subsystemIssueTracking;
+
+  /// No description provided for @subsystemProjectManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Project Management'**
+  String get subsystemProjectManagement;
+
+  /// No description provided for @subsystemMigration.
+  ///
+  /// In en, this message translates to:
+  /// **'Migration'**
+  String get subsystemMigration;
+
+  /// No description provided for @roleContributor.
+  ///
+  /// In en, this message translates to:
+  /// **'Contributor'**
+  String get roleContributor;
+
+  /// No description provided for @roleProjectAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Project Admin'**
+  String get roleProjectAdmin;
+
+  /// No description provided for @roleSystemAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'System Admin'**
+  String get roleSystemAdmin;
+
+  /// No description provided for @serverTypeGithub.
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub'**
+  String get serverTypeGithub;
+
+  /// No description provided for @serverTypeGitlab.
+  ///
+  /// In en, this message translates to:
+  /// **'GitLab'**
+  String get serverTypeGitlab;
+
+  /// No description provided for @serverTypeBitbucket.
+  ///
+  /// In en, this message translates to:
+  /// **'Bitbucket'**
+  String get serverTypeBitbucket;
+
+  /// No description provided for @serverTypeBitbucketServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Bitbucket Server'**
+  String get serverTypeBitbucketServer;
+
+  /// No description provided for @serverTypeGogs.
+  ///
+  /// In en, this message translates to:
+  /// **'Gogs'**
+  String get serverTypeGogs;
+
+  /// No description provided for @serverTypeGitea.
+  ///
+  /// In en, this message translates to:
+  /// **'Gitea'**
+  String get serverTypeGitea;
+
+  /// No description provided for @serverTypeSpace.
+  ///
+  /// In en, this message translates to:
+  /// **'Space'**
+  String get serverTypeSpace;
+
+  /// No description provided for @serverTypeGenerice.
+  ///
+  /// In en, this message translates to:
+  /// **'Generic'**
+  String get serverTypeGenerice;
+
+  /// No description provided for @serverTypeAzureRepos.
+  ///
+  /// In en, this message translates to:
+  /// **'Azure Repos'**
+  String get serverTypeAzureRepos;
+
+  /// Display name for Build field type
+  ///
+  /// In en, this message translates to:
+  /// **'Build'**
+  String get customFieldEnumTypeBuild;
+
+  /// Display name for Enum field type
+  ///
+  /// In en, this message translates to:
+  /// **'Enum'**
+  String get customFieldEnumTypeEnum;
+
+  /// Display name for Group field type
+  ///
+  /// In en, this message translates to:
+  /// **'Group'**
+  String get customFieldEnumTypeGroup;
+
+  /// Display name for Owned Field field type
+  ///
+  /// In en, this message translates to:
+  /// **'Owned Field'**
+  String get customFieldEnumTypeOwnedField;
+
+  /// Display name for State field type
+  ///
+  /// In en, this message translates to:
+  /// **'State'**
+  String get customFieldEnumTypeState;
+
+  /// Display name for User field type
+  ///
+  /// In en, this message translates to:
+  /// **'User'**
+  String get customFieldEnumTypeUser;
+
+  /// Display name for Version field type
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get customFieldEnumTypeVersion;
+
+  /// Display name for Date field type
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get customFieldEnumTypeDate;
+
+  /// Display name for Date Time field type
+  ///
+  /// In en, this message translates to:
+  /// **'Date Time'**
+  String get customFieldEnumTypeDateTime;
+
+  /// Display name for Float field type
+  ///
+  /// In en, this message translates to:
+  /// **'Float'**
+  String get customFieldEnumTypeFloat;
+
+  /// Display name for Integer field type
+  ///
+  /// In en, this message translates to:
+  /// **'Integer'**
+  String get customFieldEnumTypeInteger;
+
+  /// Display name for String field type
+  ///
+  /// In en, this message translates to:
+  /// **'String'**
+  String get customFieldEnumTypeString;
+
+  /// Display name for Text field type
+  ///
+  /// In en, this message translates to:
+  /// **'Text'**
+  String get customFieldEnumTypeText;
+
+  /// Display name for Period field type
+  ///
+  /// In en, this message translates to:
+  /// **'Period'**
+  String get customFieldEnumTypePeriod;
 }
 
 class _AppLocalizationsDelegate

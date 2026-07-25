@@ -44,6 +44,7 @@
   "ownedByLabel": "Owned by {owner}",
   "createdOnLabel": "Created on {date}",
   "noIssuesFoundBody": "No issues found",
+  "noProjectsFound": "No projects found",
   "editSearchQueryButton": "Edit search query",
   "agileBoardsTitle": "Agile Boards",
   "scrumBoardTitle": "Scrum board",
@@ -66,5 +67,93 @@
   "resetPasswordButton": "Reset password",
   "loginButton": "Log in",
   "privacyPolicyLabel": "By logging in, you agree to the",
-  "privacyPolicyButton": "Privacy Policy"
+  "privacyPolicyButton": "Privacy Policy",
+  "priorityShowStopper": "Show Stopper",
+  "priorityCritical": "Critical",
+  "priorityMajor": "Major",
+  "priorityNormal": "Normal",
+  "priorityMinor": "Minor",
+  "typeBug": "Bug",
+  "typeCosmetic": "Cosmetic",
+  "typeException": "Exception",
+  "typeFeature": "Feature",
+  "typeTask": "Task",
+  "typeUsabilityProblem": "Usability Problem",
+  "typePerformanceProblem": "Performance Problem",
+  "typeEpic": "Epic",
+  "stateToDo": "To Do",
+  "stateInProgress": "In Progress",
+  "stateDone": "Done",
+  "subsystemNoValue": "No Value",
+  "subsystemIssueTracking": "Issue Tracking",
+  "subsystemProjectManagement": "Project Management",
+  "subsystemMigration": "Migration",
+  "roleContributor": "Contributor",
+  "roleProjectAdmin": "Project Admin",
+  "roleSystemAdmin": "System Admin",
+  "serverTypeGithub": "GitHub",
+  "serverTypeGitlab": "GitLab",
+  "serverTypeBitbucket": "Bitbucket",
+  "serverTypeBitbucketServer": "Bitbucket Server",
+  "serverTypeGogs": "Gogs",
+  "serverTypeGitea": "Gitea",
+  "serverTypeSpace": "Space",
+  "serverTypeGenerice": "Generic",
+  "serverTypeAzureRepos": "Azure Repos",
+  "customFieldEnumTypeBuild": "Build",
+  "@customFieldEnumTypeBuild": {
+    "description": "Display name for Build field type"
+  },
+  "customFieldEnumTypeEnum": "Enum",
+  "@customFieldEnumTypeEnum": {
+    "description": "Display name for Enum field type"
+  },
+  "customFieldEnumTypeGroup": "Group",
+  "@customFieldEnumTypeGroup": {
+    "description": "Display name for Group field type"
+  },
+  "customFieldEnumTypeOwnedField": "Owned Field",
+  "@customFieldEnumTypeOwnedField": {
+    "description": "Display name for Owned Field field type"
+  },
+  "customFieldEnumTypeState": "State",
+  "@customFieldEnumTypeState": {
+    "description": "Display name for State field type"
+  },
+  "customFieldEnumTypeUser": "User",
+  "@customFieldEnumTypeUser": {
+    "description": "Display name for User field type"
+  },
+  "customFieldEnumTypeVersion": "Version",
+  "@customFieldEnumTypeVersion": {
+    "description": "Display name for Version field type"
+  },
+  "customFieldEnumTypeDate": "Date",
+  "@customFieldEnumTypeDate": {
+    "description": "Display name for Date field type"
+  },
+  "customFieldEnumTypeDateTime": "Date Time",
+  "@customFieldEnumTypeDateTime": {
+    "description": "Display name for Date Time field type"
+  },
+  "customFieldEnumTypeFloat": "Float",
+  "@customFieldEnumTypeFloat": {
+    "description": "Display name for Float field type"
+  },
+  "customFieldEnumTypeInteger": "Integer",
+  "@customFieldEnumTypeInteger": {
+    "description": "Display name for Integer field type"
+  },
+  "customFieldEnumTypeString": "String",
+  "@customFieldEnumTypeString": {
+    "description": "Display name for String field type"
+  },
+  "customFieldEnumTypeText": "Text",
+  "@customFieldEnumTypeText": {
+    "description": "Display name for Text field type"
+  },
+  "customFieldEnumTypePeriod": "Period",
+  "@customFieldEnumTypePeriod": {
+    "description": "Display name for Period field type"
+  }
 }

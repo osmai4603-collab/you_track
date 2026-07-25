@@ -1,4 +1,7 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_icons.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
@@ -6,10 +9,14 @@ import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
-import 'package:issues_tracking/features/issues/domain/entities/issue_priority.dart';
-import 'package:issues_tracking/features/issues/domain/entities/issue_state.dart';
-import 'package:issues_tracking/features/issues/domain/entities/issue_type.dart';
+import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dart';
+import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
+import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
+import 'package:issues_tracking/features/issues/presentation/bloc/issues_state.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_member_entity.dart';
+import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
+import 'package:issues_tracking/features/projects/presentation/cubits/project_members_cubit.dart';
+import 'package:issues_tracking/core/init_dependencies.dart' show sl;
 
 class ProjectView extends StatefulWidget {
   final String projectId;
@@ -31,138 +38,17 @@ class _ProjectViewState extends State<ProjectView> {
     _SidebarItem('Setting', AppIcons.settings, '/settings'),
   ];
 
-  final List<ProjectMemberEntity> _members = [];
-  final List<Issue> _issues = [];
+  late final ProjectMembersCubit _membersCubit;
+  late final ProjectDetailsCubit _projectDetailsCubit;
+  late final IssuesBloc _issuesBloc;
 
   @override
   void initState() {
     super.initState();
-    _initMockData();
-  }
-
-  void _initMockData() {
-    _members.addAll([
-      ProjectMemberEntity(
-        id: 'm1',
-        projectId: widget.projectId,
-        name: 'Omar Khaled',
-        email: 'omar@example.com',
-        roles: ['Project Admin', 'Developer'],
-        isOwner: true,
-      ),
-      ProjectMemberEntity(
-        id: 'm2',
-        projectId: widget.projectId,
-        name: 'Sara Ali',
-        email: 'sara@example.com',
-        roles: ['Developer'],
-      ),
-      ProjectMemberEntity(
-        id: 'm3',
-        projectId: widget.projectId,
-        name: 'Ahmed Hassan',
-        email: 'ahmed@example.com',
-        roles: ['Designer'],
-      ),
-      ProjectMemberEntity(
-        id: 'm4',
-        projectId: widget.projectId,
-        name: 'Layla Mahmoud',
-        email: 'layla@example.com',
-        roles: ['QA'],
-      ),
-    ]);
-
-    final now = DateTime.now();
-    _issues.addAll([
-      Issue(
-        id: 'yt-1',
-        projectKey: 'YT',
-        issueNumber: 1,
-        title: 'Fix critical login authentication bug',
-        state: IssueTrackState.open,
-        priority: IssuePriority.critical,
-        issueType: IssueType.bug,
-        reporterId: 'u1',
-        reporterName: 'Omar Khaled',
-        createdAt: now.subtract(const Duration(days: 2)),
-        updatedAt: now.subtract(const Duration(hours: 5)),
-        commentsCount: 3,
-        attachmentsCount: 1,
-      ),
-      Issue(
-        id: 'yt-5',
-        projectKey: 'YT',
-        issueNumber: 5,
-        title: 'Design new onboarding flow',
-        state: IssueTrackState.inProgress,
-        priority: IssuePriority.major,
-        issueType: IssueType.feature,
-        reporterId: 'u2',
-        reporterName: 'Sara Ali',
-        createdAt: now.subtract(const Duration(days: 10)),
-        updatedAt: now.subtract(const Duration(days: 1)),
-        commentsCount: 8,
-        attachmentsCount: 3,
-      ),
-      Issue(
-        id: 'yt-8',
-        projectKey: 'YT',
-        issueNumber: 8,
-        title: 'Fix timezone display inconsistency',
-        state: IssueTrackState.fixed,
-        priority: IssuePriority.minor,
-        issueType: IssueType.bug,
-        reporterId: 'u3',
-        reporterName: 'Ahmed Hassan',
-        createdAt: now.subtract(const Duration(days: 7)),
-        updatedAt: now.subtract(const Duration(days: 3)),
-        commentsCount: 2,
-      ),
-      Issue(
-        id: 'yt-9',
-        projectKey: 'YT',
-        issueNumber: 9,
-        title: 'Add CSV export functionality',
-        state: IssueTrackState.verified,
-        priority: IssuePriority.normal,
-        issueType: IssueType.feature,
-        reporterId: 'u1',
-        reporterName: 'Omar Khaled',
-        createdAt: now.subtract(const Duration(days: 15)),
-        updatedAt: now.subtract(const Duration(days: 6)),
-        commentsCount: 5,
-      ),
-      Issue(
-        id: 'yt-12',
-        projectKey: 'YT',
-        issueNumber: 12,
-        title: 'Improve search algorithm relevance',
-        state: IssueTrackState.open,
-        priority: IssuePriority.major,
-        issueType: IssueType.improvement,
-        reporterId: 'u2',
-        reporterName: 'Sara Ali',
-        createdAt: now.subtract(const Duration(days: 4)),
-        updatedAt: now.subtract(const Duration(days: 1)),
-        commentsCount: 4,
-        attachmentsCount: 1,
-      ),
-      Issue(
-        id: 'yt-15',
-        projectKey: 'YT',
-        issueNumber: 15,
-        title: 'Fix email notification templates',
-        state: IssueTrackState.duplicate,
-        priority: IssuePriority.normal,
-        issueType: IssueType.bug,
-        reporterId: 'u3',
-        reporterName: 'Ahmed Hassan',
-        createdAt: now.subtract(const Duration(days: 6)),
-        updatedAt: now.subtract(const Duration(days: 4)),
-        commentsCount: 1,
-      ),
-    ]);
+    _membersCubit = sl<ProjectMembersCubit>()..loadMembers(widget.projectId);
+    _projectDetailsCubit = sl<ProjectDetailsCubit>()..loadProject(widget.projectId);
+    _issuesBloc = sl<IssuesBloc>()
+      ..add(UpdateFilter(IssueFilter(projectFilter: widget.projectId)));
   }
 
   @override
@@ -170,54 +56,123 @@ class _ProjectViewState extends State<ProjectView> {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Row(
-      children: [
-        _buildSidebar(colors, textTheme),
-        VerticalDivider(thickness: 1, width: 0),
-        Expanded(
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.large),
-            child: Column(
-              spacing: AppSpacing.extraLarge,
-              children: [
-                Row(
-                  spacing: AppSpacing.medium,
-                  children: [
-                    Icon(AppIcons.star, color: Colors.orange, size: 21),
-                    Text(
-                      'Demo Project',
-                      style: textTheme.headlineSmall?.copyWith(
-                        fontWeight: .bold,
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 400,
-                  child: Row(
-                    spacing: AppSpacing.large,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Expanded(
-                        child: _InfoCard(
-                          title: 'Team Members',
-                          child: _buildMembersList(colors, textTheme),
-                        ),
-                      ),
-                      Expanded(
-                        child: _InfoCard(
-                          title: 'Issues',
-                          child: _buildIssuesList(colors, textTheme),
-                        ),
-                      ),
-                    ],
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _membersCubit),
+        BlocProvider.value(value: _projectDetailsCubit),
+        BlocProvider.value(value: _issuesBloc),
+      ],
+      child: Row(
+        children: [
+          _buildSidebar(colors, textTheme),
+          const VerticalDivider(thickness: 1, width: 0),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.large),
+              child: Column(
+                spacing: AppSpacing.extraLarge,
+                children: [
+                  BlocBuilder<ProjectDetailsCubit, ProjectDetailsState>(
+                    builder: (context, state) {
+                      final projectName = state.project?.name ?? 'Loading...';
+                      return Row(
+                        spacing: AppSpacing.medium,
+                        children: [
+                          Icon(AppIcons.star, color: Colors.orange, size: 21),
+                          Text(
+                            projectName,
+                            style: textTheme.headlineSmall?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      );
+                    },
                   ),
-                ),
-              ],
+                  SizedBox(
+                    height: 400,
+                    child: Row(
+                      spacing: AppSpacing.large,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: _InfoCard(
+                            title: 'Team Members',
+                            child: BlocBuilder<ProjectMembersCubit, ProjectMembersState>(
+                              builder: (context, state) {
+                                if (state.status == ProjectMembersStatus.loading) {
+                                  return const Center(child: CircularProgressIndicator());
+                                }
+                                if (state.status == ProjectMembersStatus.failure) {
+                                  return Center(
+                                    child: SelectableText(
+                                      state.errorMessage ?? 'Failed to load members',
+                                      style: textTheme.bodySmall?.copyWith(color: colors.error),
+                                    ),
+                                  );
+                                }
+                                if (state.members.isEmpty) {
+                                  return Center(
+                                    child: Text(
+                                      'No members yet',
+                                      style: textTheme.bodySmall?.copyWith(
+                                        color: colors.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return _buildMembersList(state.members, colors, textTheme);
+                              },
+                            ),
+                          ),
+                        ),
+                        Expanded(
+                          child: _InfoCard(
+                            title: 'Issues',
+                            child: BlocBuilder<IssuesBloc, IssuesState>(
+                              builder: (context, state) {
+                                if (state is IssuesLoading) {
+                                  return const Center(child: CircularProgressIndicator());
+                                }
+                                if (state is IssuesError) {
+                                  return Center(
+                                    child: SelectableText(
+                                      state.message,
+                                      style: textTheme.bodySmall?.copyWith(color: colors.error),
+                                    ),
+                                  );
+                                }
+                                if (state is IssuesLoaded) {
+                                  if (state.filteredIssues.isEmpty) {
+                                    return Center(
+                                      child: Text(
+                                        'No issues found',
+                                        style: textTheme.bodySmall?.copyWith(
+                                          color: colors.onSurfaceVariant,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                  return _buildIssuesList(
+                                    state.filteredIssues,
+                                    colors,
+                                    textTheme,
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -229,106 +184,123 @@ class _ProjectViewState extends State<ProjectView> {
           right: BorderSide(color: colors.outlineVariant, width: 0.5),
         ),
       ),
-
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.small,
         vertical: AppRadius.medium,
       ),
-      child: Column(
-        spacing: AppSpacing.small,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
+      child: BlocBuilder<ProjectDetailsCubit, ProjectDetailsState>(
+        builder: (context, state) {
+          final project = state.project;
+          final projectName = project?.name ?? 'Project';
+          final projectKey = project?.projectKey ?? '...';
+          final shortKey = projectKey.length > 3 ? projectKey.substring(0, 3).toUpperCase() : projectKey.toUpperCase();
+
+          return Column(
             spacing: AppSpacing.small,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SizedBox(
-                height: 50,
-                width: 50,
-                child: Card(
-                  color: colors.onSurface,
-                  shape: RoundedRectangleBorder(borderRadius: .circular(6)),
-                  child: Column(
-                    spacing: 2,
-                    mainAxisAlignment: .spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Container(
-                          alignment: .center,
-                          child: Text(
-                            'DEM',
-                            style: textTheme.bodySmall?.copyWith(
-                              color: colors.tertiary,
+              Row(
+                spacing: AppSpacing.small,
+                children: [
+                  SizedBox(
+                    height: 50,
+                    width: 50,
+                    child: Card(
+                      color: colors.onSurface,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      child: Column(
+                        spacing: 2,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Container(
+                              alignment: Alignment.center,
+                              child: Text(
+                                shortKey,
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: colors.tertiary,
+                                ),
+                              ),
                             ),
                           ),
+                          Container(
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: colors.tertiary,
+                              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Column(
+                    spacing: 2,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        projectName,
+                        style: textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colors.onSurface,
                         ),
                       ),
-                      Container(height: 10, 
-                      decoration: BoxDecoration(
-                        color: colors.tertiary,
-                        borderRadius: .vertical(bottom: .circular(8))
-                      ),
+                      Text(
+                        projectKey.toUpperCase(),
+                        style: textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: colors.onSurfaceVariant,
+                        ),
                       ),
                     ],
                   ),
-                ),
-              ),
-              Column(
-                spacing: 2,
-                crossAxisAlignment: .start,
-                children: [
-                  Text(
-                    'Demo Project',
-                    style: TextTheme.of(context).labelLarge?.copyWith(
-                      fontWeight: .bold,
-                      color: colors.onSurface,
-                    ),
-                  ),
-                  Text(
-                    'Demo'.toUpperCase(),
-                    style: TextTheme.of(context).labelMedium?.copyWith(
-                      fontWeight: .w500,
-                      color: colors.onSurfaceVariant,
-                    ),
-                  ),
                 ],
               ),
-            ],
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: _sidebarItems.length,
-              itemBuilder: (context, index) {
-                final item = _sidebarItems[index];
-                return ListTile(
-                  minTileHeight: 25,
-                  title: Text(item.label),
-                  contentPadding: .symmetric(
-                    horizontal: AppSpacing.medium,
-                    vertical: AppSpacing.extraSmall - 2,
-                  ),
-                  hoverColor: colors.primary.withValues(alpha: 0.10),
-                  onTap: () {
-                    setState(() => _selectedIndex = index);
-                    context.go(item.route);
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _sidebarItems.length,
+                  itemBuilder: (context, index) {
+                    final item = _sidebarItems[index];
+                    return ListTile(
+                      minTileHeight: 25,
+                      title: Text(item.label),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.medium,
+                        vertical: AppSpacing.extraSmall - 2,
+                      ),
+                      hoverColor: colors.primary.withValues(alpha: 0.10),
+                      onTap: () {
+                        setState(() => _selectedIndex = index);
+                        if (index == 4) {
+                          context.go(AppRouteKeys.projectSettingsPath(widget.projectId));
+                        } else {
+                          context.go(item.route);
+                        }
+                      },
+                    );
                   },
-                );
-              },
-            ),
-          ),
-        ],
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
 
-  Widget _buildMembersList(ColorScheme colors, TextTheme textTheme) {
-    return ListView.separated(
-      itemCount: _members.length,
+  Widget _buildMembersList(
+    List<ProjectMemberEntity> members,
+    ColorScheme colors,
+    TextTheme textTheme,
+  ) {
+    return _VerticalScrollList(
+      itemCount: members.length,
       separatorBuilder: (_, _) => Divider(
         height: 1,
         color: colors.outlineVariant.withValues(alpha: 0.3),
       ),
       itemBuilder: (context, index) {
-        final member = _members[index];
+        final member = members[index];
         final initials = member.name.isNotEmpty
             ? member.name.split(' ').map((e) => e[0]).take(2).join()
             : '?';
@@ -398,14 +370,16 @@ class _ProjectViewState extends State<ProjectView> {
     );
   }
 
-  Widget _buildIssuesList(ColorScheme colors, TextTheme textTheme) {
-    return ListView.builder(
-      itemCount: _issues.length,
+  Widget _buildIssuesList(
+    List<Issue> issues,
+    ColorScheme colors,
+    TextTheme textTheme,
+  ) {
+    return _VerticalScrollList(
+      itemCount: issues.length,
       itemBuilder: (context, index) {
-        final issue = _issues[index];
-        final stateLetter = issue.state.label.isNotEmpty
-            ? issue.state.label[0]
-            : '?';
+        final issue = issues[index];
+        final stateLetter = issue.state.label.isNotEmpty ? issue.state.label[0] : '?';
         return Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.medium,
@@ -450,13 +424,15 @@ class _ProjectViewState extends State<ProjectView> {
                       ),
                     ),
                     const SizedBox(height: 2),
-                    Text(
-                      issue.title,
-                      style: textTheme.bodySmall?.copyWith(
-                        fontWeight: FontWeight.w500,
+                    Expanded(
+                      child: Text(
+                        issue.title,
+                        style: textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
                     ),
                   ],
                 ),
@@ -465,6 +441,113 @@ class _ProjectViewState extends State<ProjectView> {
           ),
         );
       },
+    );
+  }
+}
+
+class _VerticalScrollList extends StatefulWidget {
+  final int itemCount;
+  final IndexedWidgetBuilder itemBuilder;
+  final IndexedWidgetBuilder? separatorBuilder;
+
+  const _VerticalScrollList({
+    required this.itemCount,
+    required this.itemBuilder,
+    this.separatorBuilder,
+  });
+
+  @override
+  State<_VerticalScrollList> createState() => _VerticalScrollListState();
+}
+
+class _VerticalScrollListState extends State<_VerticalScrollList> {
+  final ScrollController _scrollController = ScrollController();
+  bool _showScrollbar = false;
+  Timer? _hideTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    _hideTimer?.cancel();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (!_showScrollbar) setState(() => _showScrollbar = true);
+    _hideTimer?.cancel();
+    _hideTimer = Timer(const Duration(seconds: 2), () {
+      if (mounted) setState(() => _showScrollbar = false);
+    });
+  }
+
+  void _scrollUp() {
+    _scrollController.animateTo(
+      (_scrollController.offset - 100)
+          .clamp(0.0, _scrollController.position.maxScrollExtent),
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  void _scrollDown() {
+    _scrollController.animateTo(
+      (_scrollController.offset + 100)
+          .clamp(0.0, _scrollController.position.maxScrollExtent),
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 24,
+          child: IconButton(
+            icon: Icon(Icons.keyboard_arrow_up, size: 20),
+            onPressed: _scrollUp,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+            tooltip: 'Scroll up',
+          ),
+        ),
+        Expanded(
+          child: Scrollbar(
+            controller: _scrollController,
+            thumbVisibility: _showScrollbar,
+            child: widget.separatorBuilder != null
+                ? ListView.separated(
+                    controller: _scrollController,
+                    itemCount: widget.itemCount,
+                    itemBuilder: widget.itemBuilder,
+                    separatorBuilder: widget.separatorBuilder!,
+                  )
+                : ListView.builder(
+                    controller: _scrollController,
+                    itemCount: widget.itemCount,
+                    itemBuilder: widget.itemBuilder,
+                  ),
+          ),
+        ),
+        SizedBox(
+          height: 24,
+          child: IconButton(
+            icon: Icon(Icons.keyboard_arrow_down, size: 20),
+            onPressed: _scrollDown,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 24, minHeight: 24),
+            tooltip: 'Scroll down',
+          ),
+        ),
+      ],
     );
   }
 }
@@ -489,11 +572,11 @@ class _InfoCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
 
     return Card(
-      elevation: 0,
-      color: Colors.transparent,
+      elevation: 0.20,
+      // color: Colors.transparent,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
-        side: BorderSide(color: colors.outlineVariant),
+        side: BorderSide(color: colors.outline),
       ),
       margin: EdgeInsets.zero,
       clipBehavior: Clip.antiAlias,
@@ -505,7 +588,6 @@ class _InfoCard extends StatelessWidget {
               horizontal: AppSpacing.medium,
               vertical: AppSpacing.medium,
             ),
-
             child: Row(
               spacing: AppSpacing.small,
               children: [
@@ -538,7 +620,7 @@ class _InfoCard extends StatelessWidget {
                     const SizedBox(width: 4),
                     PopupMenuButton<String>(
                       padding: AppSpacing.paddingAllSmall,
-                      borderRadius: .circular(4),
+                      borderRadius: BorderRadius.circular(4),
                       menuPadding: AppSpacing.paddingAllSmall,
                       itemBuilder: (context) => [
                         const AppPopupMenuItem(
@@ -563,9 +645,9 @@ class _InfoCard extends StatelessWidget {
                         ),
                       ],
                       onSelected: (value) {},
-                      child: Padding(
-                        padding: const EdgeInsets.all(6.0),
-                        child: const Icon(Icons.more_vert),
+                      child: const Padding(
+                        padding: EdgeInsets.all(6.0),
+                        child: Icon(Icons.more_vert),
                       ),
                     ),
                   ],

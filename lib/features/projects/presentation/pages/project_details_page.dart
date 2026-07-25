@@ -98,6 +98,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
                       padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.extraSmall,
                       ),
+
                       child: InkWell(
                         onTap: () {
                           context.read<ProjectDetailsCubit>().changeTab(index);

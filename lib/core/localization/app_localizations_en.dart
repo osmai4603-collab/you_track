@@ -137,6 +137,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noIssuesFoundBody => 'No issues found';
 
   @override
+  String get noProjectsFound => 'No projects found';
+
+  @override
   String get editSearchQueryButton => 'Edit search query';
 
   @override
@@ -204,4 +207,142 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get privacyPolicyButton => 'Privacy Policy';
+
+  @override
+  String get priorityShowStopper => 'Show Stopper';
+
+  @override
+  String get priorityCritical => 'Critical';
+
+  @override
+  String get priorityMajor => 'Major';
+
+  @override
+  String get priorityNormal => 'Normal';
+
+  @override
+  String get priorityMinor => 'Minor';
+
+  @override
+  String get typeBug => 'Bug';
+
+  @override
+  String get typeCosmetic => 'Cosmetic';
+
+  @override
+  String get typeException => 'Exception';
+
+  @override
+  String get typeFeature => 'Feature';
+
+  @override
+  String get typeTask => 'Task';
+
+  @override
+  String get typeUsabilityProblem => 'Usability Problem';
+
+  @override
+  String get typePerformanceProblem => 'Performance Problem';
+
+  @override
+  String get typeEpic => 'Epic';
+
+  @override
+  String get stateToDo => 'To Do';
+
+  @override
+  String get stateInProgress => 'In Progress';
+
+  @override
+  String get stateDone => 'Done';
+
+  @override
+  String get subsystemNoValue => 'No Value';
+
+  @override
+  String get subsystemIssueTracking => 'Issue Tracking';
+
+  @override
+  String get subsystemProjectManagement => 'Project Management';
+
+  @override
+  String get subsystemMigration => 'Migration';
+
+  @override
+  String get roleContributor => 'Contributor';
+
+  @override
+  String get roleProjectAdmin => 'Project Admin';
+
+  @override
+  String get roleSystemAdmin => 'System Admin';
+
+  @override
+  String get serverTypeGithub => 'GitHub';
+
+  @override
+  String get serverTypeGitlab => 'GitLab';
+
+  @override
+  String get serverTypeBitbucket => 'Bitbucket';
+
+  @override
+  String get serverTypeBitbucketServer => 'Bitbucket Server';
+
+  @override
+  String get serverTypeGogs => 'Gogs';
+
+  @override
+  String get serverTypeGitea => 'Gitea';
+
+  @override
+  String get serverTypeSpace => 'Space';
+
+  @override
+  String get serverTypeGenerice => 'Generic';
+
+  @override
+  String get serverTypeAzureRepos => 'Azure Repos';
+
+  @override
+  String get customFieldEnumTypeBuild => 'Build';
+
+  @override
+  String get customFieldEnumTypeEnum => 'Enum';
+
+  @override
+  String get customFieldEnumTypeGroup => 'Group';
+
+  @override
+  String get customFieldEnumTypeOwnedField => 'Owned Field';
+
+  @override
+  String get customFieldEnumTypeState => 'State';
+
+  @override
+  String get customFieldEnumTypeUser => 'User';
+
+  @override
+  String get customFieldEnumTypeVersion => 'Version';
+
+  @override
+  String get customFieldEnumTypeDate => 'Date';
+
+  @override
+  String get customFieldEnumTypeDateTime => 'Date Time';
+
+  @override
+  String get customFieldEnumTypeFloat => 'Float';
+
+  @override
+  String get customFieldEnumTypeInteger => 'Integer';
+
+  @override
+  String get customFieldEnumTypeString => 'String';
+
+  @override
+  String get customFieldEnumTypeText => 'Text';
+
+  @override
+  String get customFieldEnumTypePeriod => 'Period';
 }

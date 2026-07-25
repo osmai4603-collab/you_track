@@ -25,6 +25,16 @@ sealed class AppRouteKeys {
   static const String projectDetails = '/projects/:projectId';
   static const String addProjectMembers = '/projects/:projectId/add-members';
   static const String projectMembers = '/projects/:projectId/members';
+  static const String projectSettings = '/projects/:projectId/settings';
+  static const String projectSettingsGeneral = 'general';
+  static const String projectSettingsPeople = 'people';
+  static const String projectSettingsCustomFields = 'custom-fields';
+  static const String projectSettingsVersionControl = 'vcs';
+  static const String projectSettingsNotifications = 'notifications';
+  static const String projectSettingsBuildServers = 'builds';
+  static const String projectSettingsTimeTracking = 'time';
+  static const String projectSettingsWorkflows = 'workflows';
+  static const String projectSettingsApps = 'apps';
 
   // ── Dynamic Path Builders ───────────────────────────────────
   static String templateDetailsPath(String templateId) =>
@@ -38,4 +48,10 @@ sealed class AppRouteKeys {
 
   static String projectMembersPath(String projectId) =>
       '/projects/$projectId/members';
+
+  static String projectSettingsPath(String projectId) =>
+      '/projects/$projectId/settings';
+
+  static String projectSettingsSectionPath(String projectId, String section) =>
+      '/projects/$projectId/settings/$section';
 }
