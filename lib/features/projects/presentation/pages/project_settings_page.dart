@@ -42,41 +42,12 @@ class _ProjectSettingsPageState extends State<ProjectSettingsPage> {
     context.read<ProjectDetailsCubit>().loadProject(widget.projectId);
   }
 
-  String _getSectionTitle(int index) {
-    switch (index) {
-      case 0:
-        return 'General';
-      case 1:
-        return 'People';
-      case 2:
-        return 'Custom Fields';
-      case 3:
-        return 'Version Control';
-      case 4:
-        return 'Notifications';
-      case 5:
-        return 'Build Servers';
-      case 6:
-        return 'Time Tracking';
-      case 7:
-        return 'Workflows';
-      case 8:
-        return 'Apps';
-      default:
-        return '';
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
     final selectedIndex = _getSelectedIndex(context);
 
     return BlocBuilder<ProjectDetailsCubit, ProjectDetailsState>(
       builder: (context, state) {
-        final projectName = state.project?.name ?? '...';
-
         return Row(
           children: [
             ProjectSettingsSidebar(

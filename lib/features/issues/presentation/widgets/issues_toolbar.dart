@@ -354,8 +354,8 @@ class _ViewModeToggle extends StatelessWidget {
     return BlocBuilder<IssuesBloc, IssuesState>(
       builder: (context, state) {
         final currentMode = state is IssuesLoaded
-            ? state.viewMode
-            : IssueViewMode.table;
+            ? state.layoutType
+            : IssueLayoutType.table;
 
         return Container(
           decoration: BoxDecoration(
@@ -368,24 +368,24 @@ class _ViewModeToggle extends StatelessWidget {
               _ViewModeButton(
                 icon: Icons.table_rows,
                 tooltip: 'Table view',
-                mode: IssueViewMode.table,
-                isSelected: currentMode == IssueViewMode.table,
+                mode: IssueLayoutType.table,
+                isSelected: currentMode == IssueLayoutType.table,
                 colors: colors,
                 textTheme: textTheme,
               ),
               _ViewModeButton(
                 icon: Icons.view_list,
                 tooltip: 'List view',
-                mode: IssueViewMode.list,
-                isSelected: currentMode == IssueViewMode.list,
+                mode: IssueLayoutType.list,
+                isSelected: currentMode == IssueLayoutType.list,
                 colors: colors,
                 textTheme: textTheme,
               ),
               _ViewModeButton(
                 icon: Icons.account_tree,
                 tooltip: 'Tree view',
-                mode: IssueViewMode.tree,
-                isSelected: currentMode == IssueViewMode.tree,
+                mode: IssueLayoutType.tree,
+                isSelected: currentMode == IssueLayoutType.tree,
                 colors: colors,
                 textTheme: textTheme,
               ),
@@ -400,7 +400,7 @@ class _ViewModeToggle extends StatelessWidget {
 class _ViewModeButton extends StatelessWidget {
   final IconData icon;
   final String tooltip;
-  final IssueViewMode mode;
+  final IssueLayoutType mode;
   final bool isSelected;
   final ColorScheme colors;
   final TextTheme textTheme;
@@ -425,7 +425,7 @@ class _ViewModeButton extends StatelessWidget {
       onPressed: isSelected
           ? null
           : () {
-              context.read<IssuesBloc>().add(ChangeViewMode(mode));
+              context.read<IssuesBloc>().add(ChangeLayoutType(type: mode));
             },
       tooltip: tooltip,
       style: IconButton.styleFrom(

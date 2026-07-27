@@ -53,4 +53,5 @@ sealed class AppIcons {
   static const IconData visibilityOff = Icons.visibility_off_rounded;
 
   static const IconData star = Icons.star_rounded;
+  static const IconData versionControl = Icons.commit_rounded;
 }

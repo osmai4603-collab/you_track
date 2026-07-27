@@ -56,138 +56,157 @@ class _ProjectTemplateSelectionPageState
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return Column(
-      children: [
-        ProjectsHeader(
-          breadcrumbs: [
-            BreadcrumbItem(
-              title: localization.projectsTitle,
-              onTap: (ctx) => ctx.go(AppRouteKeys.projects),
-            ),
-            BreadcrumbItem(title: localization.selectTemplateTitle),
-          ],
-        ),
-        Expanded(
-          child: BlocBuilder<ProjectCreationCubit, ProjectCreationState>(
-            builder: (context, state) {
-              if (state.status == ProjectCreationStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (state.templates.isEmpty) {
-                return const Center(child: Text('No templates available'));
-              }
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Column(
+        crossAxisAlignment: .start,
+        children: [
+          ProjectsHeader(
+            breadcrumbs: [
+              BreadcrumbItem(
+                title: localization.projectsTitle,
+                onTap: (ctx) => ctx.go(AppRouteKeys.projects),
+              ),
+              BreadcrumbItem(title: localization.selectTemplateTitle),
+            ],
+          ),
+          Expanded(
+            child: BlocBuilder<ProjectCreationCubit, ProjectCreationState>(
+              builder: (context, state) {
+                if (state.status == ProjectCreationStatus.loading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (state.templates.isEmpty) {
+                  return const Center(child: Text('No templates available'));
+                }
 
-              return Padding(
-                padding: AppSpacing.paddingAllMedium,
-                child: Column(
-                  spacing: AppSpacing
-                  .medium,
-                  crossAxisAlignment: .start,
-                  children: [
-                    const SizedBox(height: AppSpacing.medium),
-                    Text(
-                      'Create a project with one of these templates or',
-                      style: textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    Text(
-                      "Each template defines a preconfigured project with relevant fields, agile boards, and workflows so you can get right to work. All aspects can be fully customized at any time to fit your team's specific needs.",
-                      style: textTheme.bodyMedium?.copyWith(
-                        fontWeight: .w500
-                      ),
-                    ),
-                    Expanded(
-                      child: GridView.builder(
-                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          crossAxisSpacing: AppSpacing.medium,
-                          mainAxisSpacing: AppSpacing.medium,
-                          childAspectRatio: 2.5,
+                return Padding(
+                  padding: AppSpacing.paddingAllMedium,
+                  child: Column(
+                    spacing: AppSpacing.medium,
+                    crossAxisAlignment: .start,
+                    children: [
+                      const SizedBox(height: AppSpacing.medium),
+                      Text(
+                        'Create a project with one of these templates or',
+                        style: textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w600,
                         ),
-                        itemCount: state.templates.length,
-                        itemBuilder: (context, index) {
-                          final template = state.templates[index];
-                          return Card(
-                            margin: EdgeInsets.zero,
-                            // color: colors.surfaceContainerLow,
-                            elevation: 0.2,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: AppRadius.mediumBorderRadius,
-                              side: BorderSide(
-                                color: colors.outline,
-                                width: 1,
+                      ),
+                      Text(
+                        "Each template defines a preconfigured project with relevant fields, agile boards, and workflows so you can get right to work. All aspects can be fully customized at any time to fit your team's specific needs.",
+                        style: textTheme.bodyMedium?.copyWith(
+                          fontWeight: .w500,
+                        ),
+                      ),
+                      Expanded(
+                        child: GridView.builder(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                crossAxisSpacing: AppSpacing.medium,
+                                mainAxisSpacing: AppSpacing.medium,
+                                childAspectRatio: 2.5,
                               ),
-                            ),
-                            // borderRadius: AppRadius.mediumBorderRadius,
-                            child: InkWell(
-                              borderRadius: AppRadius.mediumBorderRadius,
-                              onTap: () {
-                                context.read<ProjectCreationCubit>().selectTemplate(
-                                  template,
-                                );
-                                context.go(
-                                  AppRouteKeys.templateDetailsPath(template.id),
-                                );
-                              },
-                              child: Padding(
-                                padding: AppSpacing.paddingAllMedium,
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 40,
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                        color: colors.primaryContainer,
-                                        borderRadius: AppRadius.smallBorderRadius,
-                                      ),
-                                      child: Icon(
-                                        _getIconForKey(template.iconKey),
-                                        color: colors.onPrimaryContainer,
-                                        size: 20,
-                                      ),
+                          itemCount: state.templates.length,
+                          itemBuilder: (context, index) {
+                            final template = state.templates[index];
+                            return MouseRegion(
+                              cursor: SystemMouseCursors.click,
+                              child: Card(
+                                margin: EdgeInsets.zero,
+                                // color: colors.surfaceContainerLow,
+                                elevation: 0.2,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: AppRadius.mediumBorderRadius,
+                                  side: BorderSide(
+                                    color: colors.outline,
+                                    width: 1,
+                                  ),
+                                ),
+                                // borderRadius: AppRadius.mediumBorderRadius,
+                                child: InkWell(
+                                borderRadius: AppRadius.mediumBorderRadius,
+                                onTap: () {
+                                  context
+                                      .read<ProjectCreationCubit>()
+                                      .selectTemplate(template);
+                                  context.go(
+                                    AppRouteKeys.templateDetailsPath(
+                                      template.id,
                                     ),
-                                    const SizedBox(width: AppSpacing.medium),
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
-                                        mainAxisAlignment: MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            template.name,
-                                            style: textTheme.titleSmall?.copyWith(
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                          const SizedBox(
-                                            height: AppSpacing.extraSmall,
-                                          ),
-                                          Text(
-                                            template.description,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: textTheme.bodySmall?.copyWith(
-                                              color: colors.onSurfaceVariant,
-                                            ),
-                                          ),
-                                        ],
+                                  );
+                                },
+                                child: Padding(
+                                  padding: AppSpacing.paddingAllMedium,
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        width: 100,
+                                        height: 100,
+                                        decoration: BoxDecoration(
+                                          color: colors.secondary,
+                                          borderRadius:
+                                              AppRadius.smallBorderRadius,
+                                        ),
+                                        child: Icon(
+                                          _getIconForKey(template.iconKey),
+                                          color: colors.onSecondary,
+                                          size: 40,
+                                        ),
                                       ),
-                                    ),
-                                  ],
+                                      const SizedBox(width: AppSpacing.medium),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              template.name,
+                                              style: textTheme.titleSmall
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                            ),
+                                            const SizedBox(
+                                              height: AppSpacing.extraSmall,
+                                            ),
+                                            Text(
+                                              template.description,
+                                              maxLines: 2,
+                                              overflow: TextOverflow.ellipsis,
+                                              style: textTheme.bodySmall
+                                                  ?.copyWith(
+                                                    color:
+                                                        colors.onSurfaceVariant,
+                                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              );
-            },
+                      OutlinedButton(
+                        onPressed: () => context.go(AppRouteKeys.projects),
+                        child: Text(localization.cancelButton),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

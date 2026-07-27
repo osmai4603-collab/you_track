@@ -4,7 +4,6 @@ import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'app_color_scheme.dart';
 import 'app_text_theme.dart';
 
-
 sealed class AppTheme {
   const AppTheme._();
 
@@ -29,14 +28,20 @@ sealed class AppTheme {
       brightness: colorScheme.brightness,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: colorScheme.surface,
+      hoverColor: colorScheme.secondary.withValues(alpha: 0.05),
+      splashColor: colorScheme.primary.withValues(alpha: 0.15),
+
       dividerTheme: DividerThemeData(
         color: colorScheme.outline,
         space: 0,
+        thickness: 0.75,
       ),
+
       listTileTheme: ListTileThemeData(
         titleTextStyle: textTheme.titleSmall?.copyWith(
           color: colorScheme.onSurface,
         ),
+
         contentPadding: AppSpacing.paddingAllExtraSmall,
         dense: true,
         minTileHeight: 30,
@@ -44,10 +49,18 @@ sealed class AppTheme {
       iconTheme: IconThemeData(size: 16, color: colorScheme.onSurfaceVariant),
 
       iconButtonTheme: IconButtonThemeData(
-        style: IconButton.styleFrom(iconSize: 16, shape: _defaultShape),
+        style: IconButton.styleFrom(
+          iconSize: 16,
+          shape: _defaultShape,
+          fixedSize: Size.square(28),
+          maximumSize: Size.square(28),
+          minimumSize: Size.square(28),
+          padding: .all(4),
+        ),
       ),
 
       popupMenuTheme: PopupMenuThemeData(
+        color: colorScheme.surfaceContainerLow,
         menuPadding: AppSpacing.paddingAllExtraSmall,
         textStyle: textTheme.labelSmall,
         mouseCursor: WidgetStatePropertyAll(MouseCursor.defer),
@@ -64,7 +77,6 @@ sealed class AppTheme {
           foregroundColor: colorScheme.primary,
           backgroundColor: colorScheme.onPrimary,
           textStyle: textTheme.labelSmall?.copyWith(fontWeight: .bold),
-
         ),
       ),
 
@@ -99,6 +111,10 @@ sealed class AppTheme {
         textTheme: textTheme,
         colorScheme: colorScheme,
       ),
+
+      dialogTheme: DialogThemeData(
+        backgroundColor: colorScheme.surfaceContainer,
+      ),
     );
   }
 
@@ -121,7 +137,7 @@ sealed class AppTheme {
       border: OutlineInputBorder(borderRadius: .circular(AppRadius.extraSmall)),
       enabledBorder: OutlineInputBorder(
         borderRadius: .circular(AppRadius.extraSmall),
-        borderSide: BorderSide(color: colorScheme.outline)
+        borderSide: BorderSide(color: colorScheme.outline),
       ),
     );
   }

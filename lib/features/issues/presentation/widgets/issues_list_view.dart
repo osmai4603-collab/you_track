@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
+import 'package:issues_tracking/core/localization/app_localizations.dart';
+import 'package:issues_tracking/core/widgets/issue_state_chip.dart';
+import 'package:issues_tracking/core/widgets/issue_priority_chip.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
-import 'package:issues_tracking/features/issues/domain/entities/issue_state.dart';
+import 'package:issues_tracking/core/enums/issue_state_enum.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_state.dart';
@@ -61,7 +64,9 @@ class IssuesListView extends StatelessWidget {
                   context.read<IssuesBloc>().add(SelectIssue(issue.id));
                 },
                 onCheckboxChanged: () {
-                  context.read<IssuesBloc>().add(ToggleIssueSelection(issue.id));
+                  context.read<IssuesBloc>().add(
+                    ToggleIssueSelection(issue.id),
+                  );
                 },
                 onStarToggle: () {
                   context.read<IssuesBloc>().add(ToggleStarIssue(issue.id));
@@ -98,6 +103,8 @@ class _IssueListCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+
+    final localization = AppLocalizations.of(context)!;
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -138,10 +145,16 @@ class _IssueListCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: AppSpacing.small),
-                    PriorityIcon(priority: issue.priority),
+
+                    IssuePriorityChip(
+                      type: issue.priority,
+                      localization: localization,
+                      textTheme: textTheme,
+                      colors: colors,
+                    ),
                     const SizedBox(width: AppSpacing.small),
                     Text(
-                      issue.fullId,
+                      issue.issueKey,
                       style: textTheme.labelMedium?.copyWith(
                         color: colors.onSurfaceVariant,
                         fontFamily: 'JetBrains Mono',
@@ -149,13 +162,16 @@ class _IssueListCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: AppSpacing.small),
-                    _StateChip(state: issue.state, textTheme: textTheme),
+                    IssueStateChip(
+                      state: issue.state,
+                      textTheme: textTheme,
+                      colors: colors,
+                      localization: localization,
+                    ),
                     const Spacer(),
                     Text(
-                      issue.issueType.label,
-                      style: textTheme.labelSmall?.copyWith(
-                        color: issue.issueType.color,
-                      ),
+                      issue.issueType.displayName(localization),
+                      style: textTheme.labelSmall,
                     ),
                     const SizedBox(width: AppSpacing.small),
                     GestureDetector(
@@ -172,7 +188,7 @@ class _IssueListCard extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.small),
                 Text(
-                  issue.title,
+                  issue.summary,
                   style: textTheme.bodyMedium?.copyWith(
                     color: colors.onSurface,
                     fontWeight: FontWeight.w500,
@@ -192,26 +208,34 @@ class _IssueListCard extends StatelessWidget {
                 const SizedBox(height: AppSpacing.small),
                 Row(
                   children: [
-                    ...issue.tags.take(4).map((tag) => Padding(
-                      padding: const EdgeInsets.only(right: AppSpacing.extraSmall),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colors.primaryContainer.withValues(alpha: 0.3),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          tag,
-                          style: textTheme.labelSmall?.copyWith(
-                            fontSize: 10,
-                            color: colors.onSurface,
+                    ...issue.tags
+                        .take(4)
+                        .map(
+                          (tag) => Padding(
+                            padding: const EdgeInsets.only(
+                              right: AppSpacing.extraSmall,
+                            ),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: colors.primaryContainer.withValues(
+                                  alpha: 0.3,
+                                ),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                tag,
+                                style: textTheme.labelSmall?.copyWith(
+                                  fontSize: 10,
+                                  color: colors.onSurface,
+                                ),
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    )),
                     const Spacer(),
                     if (issue.assigneeName != null) ...[
                       CircleAvatar(
@@ -291,31 +315,5 @@ class _IssueListCard extends StatelessWidget {
     } else {
       return '${(diff.inDays / 365).floor()}y ago';
     }
-  }
-}
-
-class _StateChip extends StatelessWidget {
-  final IssueTrackState state;
-  final TextTheme textTheme;
-
-  const _StateChip({required this.state, required this.textTheme});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-      decoration: BoxDecoration(
-        color: state.backgroundColor,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        state.label,
-        style: textTheme.labelSmall?.copyWith(
-          color: state.textColor,
-          fontSize: 11,
-          fontWeight: FontWeight.w500,
-        ),
-      ),
-    );
   }
 }

@@ -376,4 +376,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get accessDeniedBody => 'You don\'t have permission to view this page';
+
+  @override
+  String get addWidgetButton => 'Add widget';
+
+  @override
+  String get createButton => 'Create';
+
+  @override
+  String get newIssueOption => 'New issue';
+
+  @override
+  String get newArticleOption => 'New article';
+
+  @override
+  String get widgetDocumentListWidget => 'Document List Widget';
+
+  @override
+  String get widgetIssueList => 'Issue List';
+
+  @override
+  String get widgetIssueDistributionReport => 'Issue Distribution Report';
+
+  @override
+  String get widgetCalendarWidget => 'Calendar Widget';
+
+  @override
+  String get widgetIssueActivityFeed => 'Issue Activity Feed';
+
+  @override
+  String get widgetProjectTeam => 'Project Team';
+
+  @override
+  String get widgetAccessEraser => 'Access Eraser';
+
+  @override
+  String get widgetQuickNotes => 'Quick Notes';
+
+  @override
+  String get widgetReport => 'Report';
+
+  @override
+  String get widgetPersonalTimeTracking => 'Personal Time Tracking';
+
+  @override
+  String get widgetTimeTrackingReport => 'Time Tracking Report';
+
+  @override
+  String get widgetWorkItemExporter => 'Work Item Exporter';
 }

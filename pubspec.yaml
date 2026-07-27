@@ -48,6 +48,11 @@ dependencies:
   reorderable_grid_view: ^2.2.8
   reorderables: ^0.6.0
   google_sign_in_all_platforms: ^2.0.3
+  flutter_markdown_plus: ^1.0.12
+  fleather: ^1.0.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  file_picker: ^11.0.2
 
 dev_dependencies:
   flutter_test:
@@ -59,6 +64,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^6.0.0
+  mocktail: ^1.0.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

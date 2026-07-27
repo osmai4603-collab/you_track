@@ -10,6 +10,8 @@ import 'package:issues_tracking/features/dashboards/presentation/pages/dashboard
 import 'package:issues_tracking/features/dashboards/presentation/widgets/youtrack_shell.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
+import 'package:issues_tracking/features/issues/presentation/cubits/issue_form_cubit.dart';
+import 'package:issues_tracking/features/issues/presentation/pages/issue_form.dart';
 import 'package:issues_tracking/features/issues/presentation/pages/issues_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/project_view_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/project_settings_page.dart';
@@ -17,17 +19,24 @@ import 'package:issues_tracking/features/projects/presentation/pages/projects_li
 import 'package:issues_tracking/features/projects/presentation/pages/project_template_selection_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/project_template_details_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/create_project_form_page.dart';
-import 'package:issues_tracking/features/projects/presentation/pages/add_project_members_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/project_members_page.dart';
 import 'package:issues_tracking/features/projects/presentation/widgets/settings_sections/project_general_settings_section.dart';
 import 'package:issues_tracking/features/projects/presentation/widgets/settings_sections/project_people_settings_section.dart';
 import 'package:issues_tracking/features/custom_fields/presentation/pages/custom_fields_settings_section.dart';
 import 'package:issues_tracking/features/custom_fields/presentation/cubits/custom_fields_cubit.dart';
+import 'package:issues_tracking/features/version_control/presentation/pages/version_control_settings_section.dart';
+import 'package:issues_tracking/features/version_control/presentation/pages/vcs_changes_page.dart';
+import 'package:issues_tracking/features/version_control/presentation/cubits/vcs_integrations_cubit.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/projects_list_cubit.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_creation_cubit.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
+import 'package:issues_tracking/features/time_tracking/presentation/cubits/time_tracking_config_cubit.dart';
+import 'package:issues_tracking/features/projects/presentation/widgets/settings_sections/project_time_tracking_settings_section.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_members_cubit.dart';
 import 'package:issues_tracking/features/auth/presentation/pages/login_page.dart';
+import 'package:issues_tracking/features/knowledge_base/presentation/pages/knowledge_base_page.dart';
+import 'package:issues_tracking/features/knowledge_base/presentation/pages/article_editor_page.dart';
+import 'package:issues_tracking/features/time_tracking/presentation/pages/time_tracking_page.dart';
 
 /// **هيكلية المسارات:**
 /// ```
@@ -43,7 +52,6 @@ import 'package:issues_tracking/features/auth/presentation/pages/login_page.dart
 ///       ├── /projects/templates/:templateId    ← ProjectTemplateDetailsPage
 ///       ├── /projects/new                      ← CreateProjectFormPage
 ///       ├── /projects/:projectId               ← ProjectDetailsPage
-///       ├── /projects/:projectId/add-members   ← AddProjectMembersPage
 ///       └── /projects/:projectId/members       ← ProjectMembersPage
 /// ```
 sealed class NavigationService {
@@ -64,8 +72,12 @@ sealed class NavigationService {
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) => MultiBlocProvider(
           providers: [
-            BlocProvider(create: (_) => sl<DashboardBloc>()..add(LoadDashboards())),
-            BlocProvider(create: (_) => sl<IssuesBloc>()..add(const LoadIssues())),
+            BlocProvider(
+              create: (_) => sl<DashboardBloc>()..add(LoadDashboards()),
+            ),
+            BlocProvider(
+              create: (_) => sl<IssuesBloc>()..add(const LoadIssues()),
+            ),
             BlocProvider(create: (_) => sl<YouTrackShellCubit>()),
           ],
           child: YouTrackShell(navigationShell: navigationShell),
@@ -74,14 +86,7 @@ sealed class NavigationService {
           // ╔════════════════════════════════════════════════════════════════════╗
           // ║                          Issues Branch                            ║
           // ╚════════════════════════════════════════════════════════════════════╝
-          StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: AppRouteKeys.issues,
-                builder: (context, state) => const IssuesPage(),
-              ),
-            ],
-          ),
+          _issuesBranch(),
 
           // ╔════════════════════════════════════════════════════════════════════╗
           // ║                        Dashboard Branch                           ║
@@ -128,7 +133,50 @@ sealed class NavigationService {
     ],
   );
 
-  
+  static StatefulShellBranch _issuesBranch() {
+    return StatefulShellBranch(
+      routes: [
+        GoRoute(
+          path: AppRouteKeys.issues,
+          builder: (context, state) {
+            return const IssuesPage();
+          },
+          routes: [
+            GoRoute(
+              path: 'new-issue',
+              pageBuilder: (_, state) {
+                final projectKey =
+                    state.uri.queryParameters['project'] ?? 'DEM';
+                return CustomTransitionPage(
+                  key: state.pageKey,
+                  child: BlocProvider(
+                    create: (context) => IssueFormCubit(repository: sl()),
+                    child: IssueForm(projectKey: projectKey),
+                  ),
+                  transitionsBuilder: _fadeTransition,
+                );
+              },
+            ),
+            GoRoute(
+              path: ':issueId/edit',
+              pageBuilder: (_, state) {
+                final issueId = state.pathParameters['issueId']!;
+                return CustomTransitionPage(
+                  key: state.pageKey,
+                  child: BlocProvider(
+                    create: (context) => IssueFormCubit(repository: sl()),
+                    child: IssueForm(issueId: issueId),
+                  ),
+                  transitionsBuilder: _fadeTransition,
+                );
+              },
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   static StatefulShellBranch _projectsBranch() {
     return StatefulShellBranch(
       routes: [
@@ -214,26 +262,6 @@ sealed class NavigationService {
                     );
                   },
                   routes: [
-                    // ── Add Project Members ────────────────────────
-                    GoRoute(
-                      path: 'add-members',
-                      redirect: (context, state) {
-                        final projectId = state.pathParameters['projectId'];
-                        if (projectId == null || projectId.isEmpty) {
-                          return AppRouteKeys.projects;
-                        }
-                        return null;
-                      },
-                      pageBuilder: (context, state) {
-                        final projectId = state.pathParameters['projectId']!;
-                        return CustomTransitionPage(
-                          key: state.pageKey,
-                          child: AddProjectMembersPage(projectId: projectId),
-                          transitionsBuilder: _fadeTransition,
-                        );
-                      },
-                    ),
-
                     // ── Project Members ────────────────────────────
                     GoRoute(
                       path: 'members',
@@ -254,6 +282,95 @@ sealed class NavigationService {
                       },
                     ),
 
+                    // ── Knowledge Base ────────────────────────────
+                    GoRoute(
+                      path: 'knowledge-base',
+                      redirect: (context, state) {
+                        final projectId = state.pathParameters['projectId'];
+                        if (projectId == null || projectId.isEmpty) {
+                          return AppRouteKeys.projects;
+                        }
+                        return null;
+                      },
+                      pageBuilder: (context, state) {
+                        final projectId = state.pathParameters['projectId']!;
+                        return CustomTransitionPage(
+                          key: state.pageKey,
+                          child: KnowledgeBasePage(projectId: projectId),
+                          transitionsBuilder: _fadeTransition,
+                        );
+                      },
+                      routes: [
+                        GoRoute(
+                          path: 'new',
+                          pageBuilder: (context, state) {
+                            final projectId =
+                                state.pathParameters['projectId']!;
+                            return CustomTransitionPage(
+                              key: state.pageKey,
+                              child: ArticleEditorPage(projectId: projectId),
+                              transitionsBuilder: _fadeTransition,
+                            );
+                          },
+                        ),
+                        GoRoute(
+                          path: ':articleId',
+                          redirect: (context, state) {
+                            final articleId = state.pathParameters['articleId'];
+                            if (articleId == null || articleId.isEmpty) {
+                              return AppRouteKeys.projectKnowledgeBasePath(
+                                state.pathParameters['projectId']!,
+                              );
+                            }
+                            return null;
+                          },
+                          pageBuilder: (context, state) {
+                            final projectId =
+                                state.pathParameters['projectId']!;
+                            final articleId =
+                                state.pathParameters['articleId']!;
+                            return CustomTransitionPage(
+                              key: state.pageKey,
+                              child: ArticleEditorPage(
+                                projectId: projectId,
+                                articleId: articleId,
+                              ),
+                              transitionsBuilder: _fadeTransition,
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+
+                    // ── Time Tracking ────────────────────────────
+                    GoRoute(
+                      path: 'time-tracking',
+                      pageBuilder: (context, state) {
+                        final projectId = state.pathParameters['projectId']!;
+                        return CustomTransitionPage(
+                          key: state.pageKey,
+                          child: TimeTrackingPage(projectId: projectId),
+                          transitionsBuilder: _fadeTransition,
+                        );
+                      },
+                    ),
+
+                    // ── VCS Changes ──────────────────────────────
+                    GoRoute(
+                      path: 'vcs-changes',
+                      pageBuilder: (context, state) {
+                        final projectId = state.pathParameters['projectId']!;
+                        return CustomTransitionPage(
+                          key: state.pageKey,
+                          child: BlocProvider<VcsIntegrationsCubit>(
+                            create: (_) => sl<VcsIntegrationsCubit>(),
+                            child: VcsChangesPage(projectId: projectId),
+                          ),
+                          transitionsBuilder: _fadeTransition,
+                        );
+                      },
+                    ),
+
                     // ── Project Settings ────────────────────────────
                     ShellRoute(
                       builder: (context, state, child) {
@@ -268,9 +385,8 @@ sealed class NavigationService {
                           path: 'settings',
                           redirect: (context, state) {
                             final projectId = state.pathParameters['projectId'];
-                            return AppRouteKeys.projectSettingsSectionPath(
+                            return AppRouteKeys.projectSettingsGeneral(
                               projectId!,
-                              AppRouteKeys.projectSettingsGeneral,
                             );
                           },
                         ),
@@ -305,7 +421,10 @@ sealed class NavigationService {
                           path: 'settings/vcs',
                           pageBuilder: (context, state) => CustomTransitionPage(
                             key: state.pageKey,
-                            child: const Center(child: Text('Version Control Settings')),
+                            child: BlocProvider<VcsIntegrationsCubit>(
+                              create: (_) => sl<VcsIntegrationsCubit>(),
+                              child: const VersionControlSettingsSection(),
+                            ),
                             transitionsBuilder: _fadeTransition,
                           ),
                         ),
@@ -313,7 +432,9 @@ sealed class NavigationService {
                           path: 'settings/notifications',
                           pageBuilder: (context, state) => CustomTransitionPage(
                             key: state.pageKey,
-                            child: const Center(child: Text('Notifications Settings')),
+                            child: const Center(
+                              child: Text('Notifications Settings'),
+                            ),
                             transitionsBuilder: _fadeTransition,
                           ),
                         ),
@@ -321,23 +442,36 @@ sealed class NavigationService {
                           path: 'settings/builds',
                           pageBuilder: (context, state) => CustomTransitionPage(
                             key: state.pageKey,
-                            child: const Center(child: Text('Build Servers Settings')),
+                            child: const Center(
+                              child: Text('Build Servers Settings'),
+                            ),
                             transitionsBuilder: _fadeTransition,
                           ),
                         ),
                         GoRoute(
                           path: 'settings/time',
-                          pageBuilder: (context, state) => CustomTransitionPage(
-                            key: state.pageKey,
-                            child: const Center(child: Text('Time Tracking Settings')),
-                            transitionsBuilder: _fadeTransition,
-                          ),
+                          pageBuilder: (context, state) {
+                            final projectId =
+                                state.pathParameters['projectId']!;
+                            return CustomTransitionPage(
+                              key: state.pageKey,
+                              child: BlocProvider<TimeTrackingConfigCubit>(
+                                create: (_) => sl<TimeTrackingConfigCubit>(),
+                                child: ProjectTimeTrackingSettingsSection(
+                                  projectId: projectId,
+                                ),
+                              ),
+                              transitionsBuilder: _fadeTransition,
+                            );
+                          },
                         ),
                         GoRoute(
                           path: 'settings/workflows',
                           pageBuilder: (context, state) => CustomTransitionPage(
                             key: state.pageKey,
-                            child: const Center(child: Text('Workflows Settings')),
+                            child: const Center(
+                              child: Text('Workflows Settings'),
+                            ),
                             transitionsBuilder: _fadeTransition,
                           ),
                         ),

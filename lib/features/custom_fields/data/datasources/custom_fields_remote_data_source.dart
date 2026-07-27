@@ -12,6 +12,22 @@ abstract class CustomFieldsRemoteDataSource {
 
   Future<void> reorderFields(
       String projectId, List<Map<String, dynamic>> orderUpdates);
+
+  Future<CustomFieldModel> updateVisibility({
+    required String fieldId,
+    required String visibility,
+  });
+
+  Future<CustomFieldModel> updateAccessControl({
+    required String fieldId,
+    required Map<String, dynamic> accessControl,
+  });
+
+  Future<void> replaceFieldValue({
+    required String fieldId,
+    required String oldValue,
+    required String newValue,
+  });
 }
 
 class CustomFieldsRemoteDataSourceImpl implements CustomFieldsRemoteDataSource {
@@ -66,5 +82,54 @@ class CustomFieldsRemoteDataSourceImpl implements CustomFieldsRemoteDataSource {
           .update({'order_index': update['order_index']})
           .eq('id', update['id']);
     }
+  }
+
+  @override
+  Future<CustomFieldModel> updateVisibility({
+    required String fieldId,
+    required String visibility,
+  }) async {
+    final response = await supabase
+        .from('custom_fields')
+        .update({'visibility': visibility})
+        .eq('id', fieldId)
+        .select()
+        .single();
+    return CustomFieldModel.fromJson(response);
+  }
+
+  @override
+  Future<CustomFieldModel> updateAccessControl({
+    required String fieldId,
+    required Map<String, dynamic> accessControl,
+  }) async {
+    final response = await supabase
+        .from('custom_fields')
+        .update({'access_control': accessControl})
+        .eq('id', fieldId)
+        .select()
+        .single();
+    return CustomFieldModel.fromJson(response);
+  }
+
+  @override
+  Future<void> replaceFieldValue({
+    required String fieldId,
+    required String oldValue,
+    required String newValue,
+  }) async {
+    final response = await supabase
+        .from('custom_fields')
+        .select('available_values')
+        .eq('id', fieldId)
+        .single();
+
+    final availableValues = List<String>.from(response['available_values'] ?? []);
+    final updatedValues = availableValues.map((v) => v == oldValue ? newValue : v).toList();
+
+    await supabase
+        .from('custom_fields')
+        .update({'available_values': updatedValues})
+        .eq('id', fieldId);
   }
 }

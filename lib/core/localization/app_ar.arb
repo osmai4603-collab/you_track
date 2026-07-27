@@ -165,5 +165,21 @@
   "removeMemberConfirmBody": "هل أنت متأكد من إزالة هذا العضو من المشروع؟",
   "emptyMembersTitle": "لا يوجد أعضاء في الفريق بعد",
   "accessDeniedTitle": "تم رفض الوصول",
-  "accessDeniedBody": "ليس لديك صلاحية لعرض هذه الصفحة"
+  "accessDeniedBody": "ليس لديك صلاحية لعرض هذه الصفحة",
+  "addWidgetButton": "إضافة أداة",
+  "createButton": "إنشاء",
+  "newIssueOption": "مشكلة جديدة",
+  "newArticleOption": "مقال جديد",
+  "widgetDocumentListWidget": "قائمة المستندات",
+  "widgetIssueList": "قائمة المشاكل",
+  "widgetIssueDistributionReport": "تقرير توزيع المشاكل",
+  "widgetCalendarWidget": "التقويم",
+  "widgetIssueActivityFeed": "سجل نشاط المشاكل",
+  "widgetProjectTeam": "فريق المشروع",
+  "widgetAccessEraser": "محذوف الوصول",
+  "widgetQuickNotes": "ملاحظات سريعة",
+  "widgetReport": "تقرير",
+  "widgetPersonalTimeTracking": "تتبع الوقت الشخصي",
+  "widgetTimeTrackingReport": "تقرير تتبع الوقت",
+  "widgetWorkItemExporter": "تصدير عناصر العمل"
 }

@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:issues_tracking/app.dart';
+import 'package:issues_tracking/features/app/presentation/widgets/app.dart';
+import 'package:issues_tracking/core/enums/article_draft.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/app_cubit.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Hive Initialization for offline draft persistence
+  await Hive.initFlutter();
+  Hive.registerAdapter(ArticleDraftAdapter());
+  await Hive.openBox('article_drafts');
 
   // Supabase Initialization
   await Supabase.initialize(

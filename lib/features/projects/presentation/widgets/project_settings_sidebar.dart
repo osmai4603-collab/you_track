@@ -55,87 +55,62 @@ class ProjectSettingsSidebar extends StatelessWidget {
               ),
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.small),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.small,
+                  ),
                   children: [
                     GeneralSidebarItem(
                       isSelected: selectedIndex == 0,
                       onTap: () => context.go(
-                        AppRouteKeys.projectSettingsSectionPath(
-                          projectId,
-                          AppRouteKeys.projectSettingsGeneral,
-                        ),
+                        AppRouteKeys.projectSettingsGeneral(projectId),
                       ),
                     ),
                     PeopleSidebarItem(
                       isSelected: selectedIndex == 1,
                       onTap: () => context.go(
-                        AppRouteKeys.projectSettingsSectionPath(
-                          projectId,
-                          AppRouteKeys.projectSettingsPeople,
-                        ),
+                        AppRouteKeys.projectSettingsPeople(projectId),
                       ),
                     ),
                     CustomFieldsSidebarItem(
                       isSelected: selectedIndex == 2,
                       onTap: () => context.go(
-                        AppRouteKeys.projectSettingsSectionPath(
-                          projectId,
-                          AppRouteKeys.projectSettingsCustomFields,
-                        ),
+                        AppRouteKeys.projectSettingsCustomFields(projectId),
                       ),
                     ),
                     VersionControlSidebarItem(
                       isSelected: selectedIndex == 3,
                       onTap: () => context.go(
-                        AppRouteKeys.projectSettingsSectionPath(
-                          projectId,
-                          AppRouteKeys.projectSettingsVersionControl,
-                        ),
+                        AppRouteKeys.projectSettingsVersionControl(projectId),
                       ),
                     ),
                     NotificationsSidebarItem(
                       isSelected: selectedIndex == 4,
                       onTap: () => context.go(
-                        AppRouteKeys.projectSettingsSectionPath(
-                          projectId,
-                          AppRouteKeys.projectSettingsNotifications,
-                        ),
+                        AppRouteKeys.projectSettingsNotifications(projectId),
                       ),
                     ),
                     BuildServersSidebarItem(
                       isSelected: selectedIndex == 5,
                       onTap: () => context.go(
-                        AppRouteKeys.projectSettingsSectionPath(
-                          projectId,
-                          AppRouteKeys.projectSettingsBuildServers,
-                        ),
+                        AppRouteKeys.projectSettingsBuildServers(projectId),
                       ),
                     ),
                     TimeTrackingSidebarItem(
                       isSelected: selectedIndex == 6,
                       onTap: () => context.go(
-                        AppRouteKeys.projectSettingsSectionPath(
-                          projectId,
-                          AppRouteKeys.projectSettingsTimeTracking,
-                        ),
+                        AppRouteKeys.projectSettingsTimeTracking(projectId),
                       ),
                     ),
                     WorkflowsSidebarItem(
                       isSelected: selectedIndex == 7,
                       onTap: () => context.go(
-                        AppRouteKeys.projectSettingsSectionPath(
-                          projectId,
-                          AppRouteKeys.projectSettingsWorkflows,
-                        ),
+                        AppRouteKeys.projectSettingsWorkflows(projectId),
                       ),
                     ),
                     AppsSidebarItem(
                       isSelected: selectedIndex == 8,
                       onTap: () => context.go(
-                        AppRouteKeys.projectSettingsSectionPath(
-                          projectId,
-                          AppRouteKeys.projectSettingsApps,
-                        ),
+                        AppRouteKeys.projectSettingsApps(projectId),
                       ),
                     ),
                   ],
@@ -148,7 +123,9 @@ class ProjectSettingsSidebar extends StatelessWidget {
                   children: [
                     RichText(
                       text: TextSpan(
-                        style: textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant),
+                        style: textTheme.labelSmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
                         children: [
                           const TextSpan(text: 'Owned by '),
                           TextSpan(
@@ -161,7 +138,9 @@ class ProjectSettingsSidebar extends StatelessWidget {
                     const SizedBox(height: 2),
                     Text(
                       'Created on ${DateFormat('MMM dd, yyyy').format(createdAt)}',
-                      style: textTheme.labelSmall?.copyWith(color: colors.onSurfaceVariant),
+                      style: textTheme.labelSmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
                     ),
                   ],
                 ),

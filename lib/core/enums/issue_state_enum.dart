@@ -10,11 +10,10 @@ sealed class IssueStateEnum extends AppEnum {
 
   static List<IssueStateEnum> get values => [toDo, inProgress, done];
 
+  int get color;
+
   static IssueStateEnum of(String name) {
-    return values.firstWhere(
-      (e) => e.name == name,
-      orElse: () => throw ArgumentError('Unknown IssueStateEnum: $name'),
-    );
+    return values.firstWhere((e) => e.name == name, orElse: () => toDo);
   }
 }
 
@@ -29,6 +28,9 @@ final class ToDoState extends IssueStateEnum {
 
   @override
   String displayName(AppLocalizations localization) => localization.stateToDo;
+
+  @override
+  int get color => 0xFF546E7A;
 }
 
 final class InProgressState extends IssueStateEnum {
@@ -43,6 +45,9 @@ final class InProgressState extends IssueStateEnum {
   @override
   String displayName(AppLocalizations localization) =>
       localization.stateInProgress;
+
+  @override
+  int get color => 0xFFFFAB40;
 }
 
 final class DoneState extends IssueStateEnum {
@@ -56,4 +61,7 @@ final class DoneState extends IssueStateEnum {
 
   @override
   String displayName(AppLocalizations localization) => localization.stateDone;
+
+  @override
+  int get color => 0xFF388E3C;
 }

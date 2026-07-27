@@ -376,4 +376,52 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get accessDeniedBody => 'ليس لديك صلاحية لعرض هذه الصفحة';
+
+  @override
+  String get addWidgetButton => 'إضافة أداة';
+
+  @override
+  String get createButton => 'إنشاء';
+
+  @override
+  String get newIssueOption => 'مشكلة جديدة';
+
+  @override
+  String get newArticleOption => 'مقال جديد';
+
+  @override
+  String get widgetDocumentListWidget => 'قائمة المستندات';
+
+  @override
+  String get widgetIssueList => 'قائمة المشاكل';
+
+  @override
+  String get widgetIssueDistributionReport => 'تقرير توزيع المشاكل';
+
+  @override
+  String get widgetCalendarWidget => 'التقويم';
+
+  @override
+  String get widgetIssueActivityFeed => 'سجل نشاط المشاكل';
+
+  @override
+  String get widgetProjectTeam => 'فريق المشروع';
+
+  @override
+  String get widgetAccessEraser => 'محذوف الوصول';
+
+  @override
+  String get widgetQuickNotes => 'ملاحظات سريعة';
+
+  @override
+  String get widgetReport => 'تقرير';
+
+  @override
+  String get widgetPersonalTimeTracking => 'تتبع الوقت الشخصي';
+
+  @override
+  String get widgetTimeTrackingReport => 'تقرير تتبع الوقت';
+
+  @override
+  String get widgetWorkItemExporter => 'تصدير عناصر العمل';
 }

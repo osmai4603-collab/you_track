@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
-import 'package:issues_tracking/features/issues/domain/entities/issue_priority.dart';
-import 'package:issues_tracking/features/issues/domain/entities/issue_state.dart';
-import 'package:issues_tracking/features/issues/domain/entities/issue_type.dart';
+import 'package:issues_tracking/core/enums/issue_type_enum.dart';
+import 'package:issues_tracking/core/enums/issue_priority_type_enum.dart';
+import 'package:issues_tracking/core/enums/issue_state_enum.dart';
 
 enum IssueSortField {
   updated,
@@ -28,9 +28,9 @@ enum IssueSortField {
 
 class IssueFilter extends Equatable {
   final String searchQuery;
-  final IssueTrackState? stateFilter;
-  final IssuePriority? priorityFilter;
-  final IssueType? typeFilter;
+  final IssueStateEnum? stateFilter;
+  final IssuePriorityTypeEnum? priorityFilter;
+  final IssueTypeEnum? typeFilter;
   final String? assigneeFilter;
   final String? tagFilter;
   final String? projectFilter;
@@ -52,11 +52,11 @@ class IssueFilter extends Equatable {
   IssueFilter copyWith({
     String? searchQuery,
     bool clearSearchQuery = false,
-    IssueTrackState? stateFilter,
+    IssueStateEnum? stateFilter,
     bool clearStateFilter = false,
-    IssuePriority? priorityFilter,
+    IssuePriorityTypeEnum? priorityFilter,
     bool clearPriorityFilter = false,
-    IssueType? typeFilter,
+    IssueTypeEnum? typeFilter,
     bool clearTypeFilter = false,
     String? assigneeFilter,
     bool clearAssigneeFilter = false,
@@ -70,11 +70,17 @@ class IssueFilter extends Equatable {
     return IssueFilter(
       searchQuery: clearSearchQuery ? '' : (searchQuery ?? this.searchQuery),
       stateFilter: clearStateFilter ? null : (stateFilter ?? this.stateFilter),
-      priorityFilter: clearPriorityFilter ? null : (priorityFilter ?? this.priorityFilter),
+      priorityFilter: clearPriorityFilter
+          ? null
+          : (priorityFilter ?? this.priorityFilter),
       typeFilter: clearTypeFilter ? null : (typeFilter ?? this.typeFilter),
-      assigneeFilter: clearAssigneeFilter ? null : (assigneeFilter ?? this.assigneeFilter),
+      assigneeFilter: clearAssigneeFilter
+          ? null
+          : (assigneeFilter ?? this.assigneeFilter),
       tagFilter: clearTagFilter ? null : (tagFilter ?? this.tagFilter),
-      projectFilter: clearProjectFilter ? null : (projectFilter ?? this.projectFilter),
+      projectFilter: clearProjectFilter
+          ? null
+          : (projectFilter ?? this.projectFilter),
       sortField: sortField ?? this.sortField,
       sortAscending: sortAscending ?? this.sortAscending,
     );

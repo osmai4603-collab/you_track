@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/features/dashboards/presentation/cubits/youtrack_shell_cubit.dart';
-import 'package:issues_tracking/features/dashboards/presentation/widgets/dashboard_body_header.dart';
-import 'package:issues_tracking/features/dashboards/presentation/widgets/dashboard_sidebar.dart';
+import 'package:issues_tracking/features/dashboards/presentation/widgets/yputrack_content_header.dart';
+import 'package:issues_tracking/features/dashboards/presentation/widgets/youtrack_sidebar.dart';
 
 class YouTrackShell extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
@@ -13,7 +13,7 @@ class YouTrackShell extends StatelessWidget {
   Widget build(BuildContext context) {
     // Update path in Cubit to sync header state
     final path = GoRouterState.of(context).uri.toString();
-    
+
     // Using post frame callback to avoid updating state during build
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (context.mounted) {
@@ -30,9 +30,7 @@ class YouTrackShell extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 const YouTrackContentHeader(),
-                Expanded(
-                  child: navigationShell,
-                ),
+                Expanded(child: navigationShell),
               ],
             ),
           ),

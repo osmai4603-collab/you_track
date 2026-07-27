@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
+import 'package:issues_tracking/core/localization/app_localizations.dart';
+import 'package:issues_tracking/core/widgets/issue_priority_chip.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
@@ -33,7 +35,9 @@ class IssuesSidebar extends StatelessWidget {
                 ),
                 BlocBuilder<IssuesBloc, IssuesState>(
                   builder: (context, state) {
-                    final count = state is IssuesLoaded ? state.issues.length : 0;
+                    final count = state is IssuesLoaded
+                        ? state.issues.length
+                        : 0;
                     return Text(
                       '$count',
                       style: textTheme.bodySmall?.copyWith(
@@ -95,6 +99,9 @@ class _IssueListTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = ColorScheme.of(context);
+    final textTheme = TextTheme.of(context);
+    final localization = AppLocalizations.of(context)!;
     return Material(
       color: Colors.transparent,
       borderRadius: BorderRadius.circular(4),
@@ -117,34 +124,35 @@ class _IssueListTile extends StatelessWidget {
                     width: 8,
                     height: 8,
                     decoration: BoxDecoration(
-                      color: issue.state.textColor,
+                      color: Color(issue.state.color),
                       shape: BoxShape.circle,
                     ),
                   ),
                   const SizedBox(width: AppSpacing.extraSmall),
                   Expanded(
                     child: Text(
-                      issue.fullId,
+                      issue.issueKey,
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
                         color: colors.onSurfaceVariant,
                       ),
                     ),
                   ),
-                  Icon(
-                    issue.priority.icon,
-                    size: 12,
-                    color: issue.priority.color,
+                  IssuePriorityChip(
+                    type: issue.priority,
+                    textTheme: textTheme,
+                    colors: colors,
+                    localization: localization,
                   ),
                 ],
               ),
               const SizedBox(height: 2),
               Text(
-                issue.title,
+                issue.summary,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: colors.onSurface,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: colors.onSurface),
               ),
             ],
           ),

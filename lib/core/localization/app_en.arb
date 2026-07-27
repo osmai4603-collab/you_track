@@ -165,5 +165,21 @@
   "removeMemberConfirmBody": "Are you sure you want to remove this member from the project?",
   "emptyMembersTitle": "No team members yet",
   "accessDeniedTitle": "Access Denied",
-  "accessDeniedBody": "You don't have permission to view this page"
+  "accessDeniedBody": "You don't have permission to view this page",
+  "addWidgetButton": "Add widget",
+  "createButton": "Create",
+  "newIssueOption": "New issue",
+  "newArticleOption": "New article",
+  "widgetDocumentListWidget": "Document List Widget",
+  "widgetIssueList": "Issue List",
+  "widgetIssueDistributionReport": "Issue Distribution Report",
+  "widgetCalendarWidget": "Calendar Widget",
+  "widgetIssueActivityFeed": "Issue Activity Feed",
+  "widgetProjectTeam": "Project Team",
+  "widgetAccessEraser": "Access Eraser",
+  "widgetQuickNotes": "Quick Notes",
+  "widgetReport": "Report",
+  "widgetPersonalTimeTracking": "Personal Time Tracking",
+  "widgetTimeTrackingReport": "Time Tracking Report",
+  "widgetWorkItemExporter": "Work Item Exporter"
 }

@@ -1,14 +1,15 @@
+import 'package:issues_tracking/core/enums/issue_priority_type_enum.dart';
+import 'package:issues_tracking/core/enums/issue_state_enum.dart';
+import 'package:issues_tracking/core/enums/issue_type_enum.dart';
+
 import '../../domain/entities/issue.dart';
-import '../../domain/entities/issue_priority.dart';
-import '../../domain/entities/issue_state.dart';
-import '../../domain/entities/issue_type.dart';
 
 class IssueModel extends Issue {
   const IssueModel({
     required super.id,
-    required super.projectKey,
+    required super.issueKey,
     required super.issueNumber,
-    required super.title,
+    required super.summary,
     super.description,
     super.state,
     super.priority,
@@ -30,18 +31,19 @@ class IssueModel extends Issue {
     super.commentsCount,
     super.isStarred,
     super.parentId,
+    super.visibility,
   });
 
   factory IssueModel.fromJson(Map<String, dynamic> json) {
     return IssueModel(
       id: (json['id'] ?? '').toString(),
-      projectKey: (json['project_key'] ?? '').toString(),
-      issueNumber: (json['issue_number'] ?? 0) as int,
-      title: (json['title'] ?? '').toString(),
+      issueKey: (json['issue_key'] ?? '').toString(),
+      issueNumber: (json['issue_sequence'] ?? 0) as int,
+      summary: (json['title'] ?? '').toString(),
       description: (json['description'] ?? '').toString(),
-      state: _parseState(json['state']),
-      priority: _parsePriority(json['priority']),
-      issueType: _parseType(json['issue_type']),
+      state: IssueStateEnum.of(json['state']),
+      priority: IssuePriorityTypeEnum.of(json['priority']),
+      issueType: IssueTypeEnum.of(json['issue_type']),
       assigneeId: json['assignee_id']?.toString(),
       assigneeName: json['assignee_name']?.toString(),
       assigneeAvatarUrl: json['assignee_avatar_url']?.toString(),
@@ -50,24 +52,31 @@ class IssueModel extends Issue {
       tags: _parseList(json['tags']),
       createdAt: _parseDate(json['created_at']),
       updatedAt: _parseDate(json['updated_at']),
-      dueDate: json['due_date'] != null ? DateTime.parse(json['due_date'].toString()) : null,
-      estimation: json['estimation'] != null ? Duration(minutes: json['estimation'] as int) : null,
-      spentTime: json['spent_time'] != null ? Duration(minutes: json['spent_time'] as int) : null,
+      dueDate: json['due_date'] != null
+          ? DateTime.parse(json['due_date'].toString())
+          : null,
+      estimation: json['estimation'] != null
+          ? Duration(minutes: json['estimation'] as int)
+          : null,
+      spentTime: json['spent_time'] != null
+          ? Duration(minutes: json['spent_time'] as int)
+          : null,
       votes: (json['votes'] ?? 0) as int,
       watchersCount: (json['watchers_count'] ?? 0) as int,
       attachmentsCount: (json['attachments_count'] ?? 0) as int,
       commentsCount: (json['comments_count'] ?? 0) as int,
       isStarred: json['is_starred'] == true,
       parentId: json['parent_id']?.toString(),
+      visibility: _parseList(json['visibility']),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'project_key': projectKey,
-      'issue_number': issueNumber,
-      'title': title,
+      'issue_key': issueKey,
+      'issue_sequence': issueNumber,
+      'title': summary,
       'description': description,
       'state': state.name,
       'priority': priority.name,
@@ -89,31 +98,8 @@ class IssueModel extends Issue {
       'comments_count': commentsCount,
       'is_starred': isStarred,
       'parent_id': parentId,
+      'visibility': visibility,
     };
-  }
-
-  static IssueTrackState _parseState(dynamic value) {
-    if (value == null) return IssueTrackState.open;
-    return IssueTrackState.values.firstWhere(
-      (e) => e.name == value.toString(),
-      orElse: () => IssueTrackState.open,
-    );
-  }
-
-  static IssuePriority _parsePriority(dynamic value) {
-    if (value == null) return IssuePriority.normal;
-    return IssuePriority.values.firstWhere(
-      (e) => e.name == value.toString(),
-      orElse: () => IssuePriority.normal,
-    );
-  }
-
-  static IssueType _parseType(dynamic value) {
-    if (value == null) return IssueType.task;
-    return IssueType.values.firstWhere(
-      (e) => e.name == value.toString(),
-      orElse: () => IssueType.task,
-    );
   }
 
   static DateTime _parseDate(dynamic value) {

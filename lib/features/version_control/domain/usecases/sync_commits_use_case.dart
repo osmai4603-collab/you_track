@@ -1,0 +1,28 @@
+import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/errors/failure.dart';
+import 'package:issues_tracking/core/usecase/usecase.dart';
+import 'package:issues_tracking/features/version_control/domain/entities/vcs_commit_entity.dart';
+import 'package:issues_tracking/features/version_control/domain/repositories/version_control_repository.dart';
+
+class SyncCommitsUseCase
+    extends UseCase<List<VcsCommitEntity>, SyncCommitsParams> {
+  final VersionControlRepository repository;
+
+  SyncCommitsUseCase(this.repository);
+
+  @override
+  Future<Either<Failure, List<VcsCommitEntity>>> call(
+      {required SyncCommitsParams params}) {
+    return repository.getCommits(params.integrationId, taskId: params.taskId);
+  }
+}
+
+class SyncCommitsParams extends Params {
+  final String integrationId;
+  final String? taskId;
+
+  const SyncCommitsParams({required this.integrationId, this.taskId});
+
+  @override
+  List<Object?> get props => [integrationId, taskId];
+}

@@ -1,7 +1,14 @@
 import 'package:equatable/equatable.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dart';
-import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
+
+enum IssueSearchType { simple, advanced }
+
+enum IssueLayoutType { table, list, tree }
+
+enum IssueStructureType { flat, hierarchical }
+
+enum IssuePreviewType { sidebar, inline }
 
 abstract class IssuesState extends Equatable {
   const IssuesState();
@@ -21,16 +28,24 @@ class IssuesLoaded extends IssuesState {
   final String? selectedIssueId;
   final Set<String> selectedIssueIds;
   final List<String> allTags;
-  final IssueViewMode viewMode;
+  final IssueSearchType searchType;
+  final IssueLayoutType layoutType;
+  final IssueStructureType structureType;
+  final bool isCollapsed;
+  final IssuePreviewType? previewType;
 
   const IssuesLoaded({
+    this.searchType = .simple,
+    this.layoutType = .table,
+    this.structureType = .hierarchical,
     required this.issues,
     required this.filteredIssues,
     this.filter = const IssueFilter(),
     this.selectedIssueId,
     this.selectedIssueIds = const {},
     this.allTags = const [],
-    this.viewMode = IssueViewMode.table,
+    this.isCollapsed = false,
+    this.previewType,
   });
 
   bool get hasSelection => selectedIssueIds.isNotEmpty;
@@ -43,17 +58,26 @@ class IssuesLoaded extends IssuesState {
     bool clearSelectedIssue = false,
     Set<String>? selectedIssueIds,
     List<String>? allTags,
-    IssueViewMode? viewMode,
+    IssueSearchType? searchType,
+    IssueLayoutType? layoutType,
+    IssueStructureType? structureType,
+    bool? isCollapsed,
+    IssuePreviewType? previewType,
   }) {
     return IssuesLoaded(
       issues: issues ?? this.issues,
       filteredIssues: filteredIssues ?? this.filteredIssues,
       filter: filter ?? this.filter,
-      selectedIssueId:
-          clearSelectedIssue ? null : (selectedIssueId ?? this.selectedIssueId),
+      selectedIssueId: clearSelectedIssue
+          ? null
+          : (selectedIssueId ?? this.selectedIssueId),
       selectedIssueIds: selectedIssueIds ?? this.selectedIssueIds,
       allTags: allTags ?? this.allTags,
-      viewMode: viewMode ?? this.viewMode,
+      searchType: searchType ?? this.searchType,
+      layoutType: layoutType ?? this.layoutType,
+      structureType: structureType ?? this.structureType,
+      isCollapsed: isCollapsed ?? this.isCollapsed,
+      previewType: previewType ?? this.previewType,
     );
   }
 
@@ -65,7 +89,11 @@ class IssuesLoaded extends IssuesState {
     selectedIssueId,
     selectedIssueIds,
     allTags,
-    viewMode,
+    searchType,
+    layoutType,
+    structureType,
+    isCollapsed,
+    previewType,
   ];
 }
 

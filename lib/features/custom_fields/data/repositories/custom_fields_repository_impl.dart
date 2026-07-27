@@ -141,4 +141,54 @@ class CustomFieldsRepositoryImpl implements CustomFieldsRepository {
       return Left(ServerFailure(e.toString()));
     }
   }
+
+  @override
+  Future<Either<Failure, CustomFieldEntity>> updateVisibility({
+    required String fieldId,
+    required String visibility,
+  }) async {
+    try {
+      final result = await remoteDataSource.updateVisibility(
+        fieldId: fieldId,
+        visibility: visibility,
+      );
+      return Right(result);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, CustomFieldEntity>> updateAccessControl({
+    required String fieldId,
+    required Map<String, dynamic> accessControl,
+  }) async {
+    try {
+      final result = await remoteDataSource.updateAccessControl(
+        fieldId: fieldId,
+        accessControl: accessControl,
+      );
+      return Right(result);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> replaceFieldValue({
+    required String fieldId,
+    required String oldValue,
+    required String newValue,
+  }) async {
+    try {
+      await remoteDataSource.replaceFieldValue(
+        fieldId: fieldId,
+        oldValue: oldValue,
+        newValue: newValue,
+      );
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
 }

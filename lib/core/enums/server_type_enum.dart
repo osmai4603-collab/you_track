@@ -1,8 +1,8 @@
 import 'app_enum.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 
-sealed class ServerType extends AppEnum {
-  const ServerType();
+sealed class VcsProviderType extends AppEnum {
+  const VcsProviderType();
 
   static const github = GitHubServerType._();
   static const gitlab = GitLabServerType._();
@@ -14,27 +14,33 @@ sealed class ServerType extends AppEnum {
   static const generice = GenericeServerType._();
   static const azureRepos = AzureReposServerType._();
 
-  static List<ServerType> get values => [
-        github,
-        gitlab,
-        bitbucket,
-        bitbucketServer,
-        gogs,
-        gitea,
-        space,
-        generice,
-        azureRepos,
-      ];
+  static List<VcsProviderType> get values => [
+    github,
+    gitlab,
+    bitbucket,
+    bitbucketServer,
+    gogs,
+    gitea,
+    space,
+    generice,
+    azureRepos,
+  ];
 
-  static ServerType of(String name) {
+  static VcsProviderType of(String name) {
     return values.firstWhere(
       (e) => e.name == name,
       orElse: () => throw ArgumentError('Unknown ServerType: $name'),
     );
   }
+
+  bool get isSelfHosted =>
+      this == bitbucketServer || this == gitea || this == github;
+
+  bool get supportsOAuth =>
+      this == github || this == gitlab || this == bitbucketServer;
 }
 
-final class GitHubServerType extends ServerType {
+final class GitHubServerType extends VcsProviderType {
   const GitHubServerType._();
 
   @override
@@ -44,10 +50,11 @@ final class GitHubServerType extends ServerType {
   int get index => 0;
 
   @override
-  String displayName(AppLocalizations localization) => localization.serverTypeGithub;
+  String displayName(AppLocalizations localization) =>
+      localization.serverTypeGithub;
 }
 
-final class GitLabServerType extends ServerType {
+final class GitLabServerType extends VcsProviderType {
   const GitLabServerType._();
 
   @override
@@ -57,10 +64,11 @@ final class GitLabServerType extends ServerType {
   int get index => 1;
 
   @override
-  String displayName(AppLocalizations localization) => localization.serverTypeGitlab;
+  String displayName(AppLocalizations localization) =>
+      localization.serverTypeGitlab;
 }
 
-final class BitbucketServerType extends ServerType {
+final class BitbucketServerType extends VcsProviderType {
   const BitbucketServerType._();
 
   @override
@@ -70,10 +78,11 @@ final class BitbucketServerType extends ServerType {
   int get index => 2;
 
   @override
-  String displayName(AppLocalizations localization) => localization.serverTypeBitbucket;
+  String displayName(AppLocalizations localization) =>
+      localization.serverTypeBitbucket;
 }
 
-final class BitbucketServerServerType extends ServerType {
+final class BitbucketServerServerType extends VcsProviderType {
   const BitbucketServerServerType._();
 
   @override
@@ -83,10 +92,11 @@ final class BitbucketServerServerType extends ServerType {
   int get index => 3;
 
   @override
-  String displayName(AppLocalizations localization) => localization.serverTypeBitbucketServer;
+  String displayName(AppLocalizations localization) =>
+      localization.serverTypeBitbucketServer;
 }
 
-final class GogsServerType extends ServerType {
+final class GogsServerType extends VcsProviderType {
   const GogsServerType._();
 
   @override
@@ -96,10 +106,11 @@ final class GogsServerType extends ServerType {
   int get index => 4;
 
   @override
-  String displayName(AppLocalizations localization) => localization.serverTypeGogs;
+  String displayName(AppLocalizations localization) =>
+      localization.serverTypeGogs;
 }
 
-final class GiteaServerType extends ServerType {
+final class GiteaServerType extends VcsProviderType {
   const GiteaServerType._();
 
   @override
@@ -109,10 +120,11 @@ final class GiteaServerType extends ServerType {
   int get index => 5;
 
   @override
-  String displayName(AppLocalizations localization) => localization.serverTypeGitea;
+  String displayName(AppLocalizations localization) =>
+      localization.serverTypeGitea;
 }
 
-final class SpaceServerType extends ServerType {
+final class SpaceServerType extends VcsProviderType {
   const SpaceServerType._();
 
   @override
@@ -122,10 +134,11 @@ final class SpaceServerType extends ServerType {
   int get index => 6;
 
   @override
-  String displayName(AppLocalizations localization) => localization.serverTypeSpace;
+  String displayName(AppLocalizations localization) =>
+      localization.serverTypeSpace;
 }
 
-final class GenericeServerType extends ServerType {
+final class GenericeServerType extends VcsProviderType {
   const GenericeServerType._();
 
   @override
@@ -135,10 +148,11 @@ final class GenericeServerType extends ServerType {
   int get index => 7;
 
   @override
-  String displayName(AppLocalizations localization) => localization.serverTypeGenerice;
+  String displayName(AppLocalizations localization) =>
+      localization.serverTypeGenerice;
 }
 
-final class AzureReposServerType extends ServerType {
+final class AzureReposServerType extends VcsProviderType {
   const AzureReposServerType._();
 
   @override
@@ -148,5 +162,6 @@ final class AzureReposServerType extends ServerType {
   int get index => 8;
 
   @override
-  String displayName(AppLocalizations localization) => localization.serverTypeAzureRepos;
+  String displayName(AppLocalizations localization) =>
+      localization.serverTypeAzureRepos;
 }

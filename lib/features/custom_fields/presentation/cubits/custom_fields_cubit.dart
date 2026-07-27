@@ -7,6 +7,9 @@ import '../../domain/usecases/delete_custom_fields_use_case.dart';
 import '../../domain/usecases/get_custom_fields_use_case.dart';
 import '../../domain/usecases/reorder_custom_fields_use_case.dart';
 import '../../domain/usecases/update_custom_field_use_case.dart';
+import '../../domain/usecases/update_field_visibility_use_case.dart';
+import '../../domain/usecases/update_field_access_control_use_case.dart';
+import '../../domain/usecases/replace_field_value_use_case.dart';
 
 sealed class CustomFieldsState extends Equatable {
   const CustomFieldsState();
@@ -47,6 +50,9 @@ class CustomFieldsCubit extends Cubit<CustomFieldsState> {
   final UpdateCustomFieldUseCase _updateFieldUseCase;
   final DeleteCustomFieldsUseCase _deleteFieldsUseCase;
   final ReorderCustomFieldsUseCase _reorderFieldsUseCase;
+  final UpdateFieldVisibilityUseCase _updateVisibilityUseCase;
+  final UpdateFieldAccessControlUseCase _updateAccessControlUseCase;
+  final ReplaceFieldValueUseCase _replaceFieldValueUseCase;
 
   CustomFieldsCubit({
     required GetCustomFieldsUseCase getFieldsUseCase,
@@ -54,11 +60,17 @@ class CustomFieldsCubit extends Cubit<CustomFieldsState> {
     required UpdateCustomFieldUseCase updateFieldUseCase,
     required DeleteCustomFieldsUseCase deleteFieldsUseCase,
     required ReorderCustomFieldsUseCase reorderFieldsUseCase,
+    required UpdateFieldVisibilityUseCase updateVisibilityUseCase,
+    required UpdateFieldAccessControlUseCase updateAccessControlUseCase,
+    required ReplaceFieldValueUseCase replaceFieldValueUseCase,
   }) : _getFieldsUseCase = getFieldsUseCase,
        _addFieldUseCase = addFieldUseCase,
        _updateFieldUseCase = updateFieldUseCase,
        _deleteFieldsUseCase = deleteFieldsUseCase,
        _reorderFieldsUseCase = reorderFieldsUseCase,
+       _updateVisibilityUseCase = updateVisibilityUseCase,
+       _updateAccessControlUseCase = updateAccessControlUseCase,
+       _replaceFieldValueUseCase = replaceFieldValueUseCase,
        super(const CustomFieldsInitial());
 
   Future<void> loadFields(String projectId) async {
@@ -204,6 +216,109 @@ class CustomFieldsCubit extends Cubit<CustomFieldsState> {
       },
       (_) {
         emit(CustomFieldsLoaded(fields: reordered, isSaving: false));
+      },
+    );
+  }
+
+  Future<void> updateVisibility({
+    required String fieldId,
+    required String visibility,
+  }) async {
+    final current = state;
+    if (current is CustomFieldsLoaded) {
+      emit(CustomFieldsLoaded(fields: current.fields, isSaving: true));
+    }
+    final result = await _updateVisibilityUseCase(
+      params: UpdateFieldVisibilityParams(
+        fieldId: fieldId,
+        visibility: visibility,
+      ),
+    );
+    result.fold(
+      (failure) {
+        final s = state;
+        if (s is CustomFieldsLoaded) {
+          emit(CustomFieldsLoaded(fields: s.fields, isSaving: false));
+        }
+        emit(CustomFieldsError(failure.message));
+      },
+      (field) {
+        final s = state;
+        if (s is CustomFieldsLoaded) {
+          emit(CustomFieldsLoaded(
+            fields:
+                s.fields.map((f) => f.id == field.id ? field : f).toList(),
+            isSaving: false,
+          ));
+        }
+      },
+    );
+  }
+
+  Future<void> updateAccessControl({
+    required String fieldId,
+    required Map<String, dynamic> accessControl,
+  }) async {
+    final current = state;
+    if (current is CustomFieldsLoaded) {
+      emit(CustomFieldsLoaded(fields: current.fields, isSaving: true));
+    }
+    final result = await _updateAccessControlUseCase(
+      params: UpdateFieldAccessControlParams(
+        fieldId: fieldId,
+        accessControl: accessControl,
+      ),
+    );
+    result.fold(
+      (failure) {
+        final s = state;
+        if (s is CustomFieldsLoaded) {
+          emit(CustomFieldsLoaded(fields: s.fields, isSaving: false));
+        }
+        emit(CustomFieldsError(failure.message));
+      },
+      (field) {
+        final s = state;
+        if (s is CustomFieldsLoaded) {
+          emit(CustomFieldsLoaded(
+            fields:
+                s.fields.map((f) => f.id == field.id ? field : f).toList(),
+            isSaving: false,
+          ));
+        }
+      },
+    );
+  }
+
+  Future<void> replaceFieldValue({
+    required String fieldId,
+    required String oldValue,
+    required String newValue,
+  }) async {
+    final current = state;
+    if (current is CustomFieldsLoaded) {
+      emit(CustomFieldsLoaded(fields: current.fields, isSaving: true));
+    }
+    final result = await _replaceFieldValueUseCase(
+      params: ReplaceFieldValueParams(
+        fieldId: fieldId,
+        oldValue: oldValue,
+        newValue: newValue,
+      ),
+    );
+    result.fold(
+      (failure) {
+        final s = state;
+        if (s is CustomFieldsLoaded) {
+          emit(CustomFieldsLoaded(fields: s.fields, isSaving: false));
+        }
+        emit(CustomFieldsError(failure.message));
+      },
+      (_) {
+        final s = state;
+        if (s is CustomFieldsLoaded) {
+          emit(CustomFieldsLoaded(fields: s.fields, isSaving: false));
+        }
       },
     );
   }

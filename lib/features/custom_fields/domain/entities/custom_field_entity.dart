@@ -17,6 +17,8 @@ class CustomFieldEntity extends Entity {
   final String? showOnlyWhen;
   final String? filterValuesBasedOn;
   final int orderIndex;
+  final String visibility;
+  final Map<String, dynamic> accessControl;
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -36,6 +38,8 @@ class CustomFieldEntity extends Entity {
     this.showOnlyWhen,
     this.filterValuesBasedOn,
     this.orderIndex = 0,
+    this.visibility = 'show',
+    this.accessControl = const {'type': 'everyone'},
     required this.createdAt,
     required this.updatedAt,
   });
@@ -57,6 +61,8 @@ class CustomFieldEntity extends Entity {
     String? showOnlyWhen,
     String? filterValuesBasedOn,
     int? orderIndex,
+    String? visibility,
+    Map<String, dynamic>? accessControl,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) {
@@ -76,6 +82,8 @@ class CustomFieldEntity extends Entity {
       showOnlyWhen: showOnlyWhen ?? this.showOnlyWhen,
       filterValuesBasedOn: filterValuesBasedOn ?? this.filterValuesBasedOn,
       orderIndex: orderIndex ?? this.orderIndex,
+      visibility: visibility ?? this.visibility,
+      accessControl: accessControl ?? this.accessControl,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -98,6 +106,8 @@ class CustomFieldEntity extends Entity {
         showOnlyWhen,
         filterValuesBasedOn,
         orderIndex,
+        visibility,
+        accessControl,
         createdAt,
         updatedAt,
       ];

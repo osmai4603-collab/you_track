@@ -44,9 +44,9 @@ CREATE TABLE public.issues (
     description TEXT,
     reporter_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
     assignee_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
-    state TEXT DEFAULT 'Open', -- Open, In Progress, Resolved, Closed
-    priority TEXT DEFAULT 'Normal', -- Low, Normal, High, Critical
-    issue_type TEXT DEFAULT 'Task', -- Bug, Task, Feature
+    state TEXT DEFAULT 'to-do', -- Open, In Progress, Resolved, Closed
+    priority TEXT DEFAULT 'normal', -- Low, Normal, High, Critical
+    issue_type TEXT DEFAULT 'task', -- Bug, Task, Feature
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

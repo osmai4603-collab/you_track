@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
+import 'package:issues_tracking/core/localization/app_localizations.dart';
+import 'package:issues_tracking/core/widgets/issue_state_chip.dart';
+import 'package:issues_tracking/core/widgets/issue_priority_chip.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
-import 'package:issues_tracking/features/issues/domain/entities/issue_state.dart';
+import 'package:issues_tracking/core/enums/issue_state_enum.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_state.dart';
@@ -22,26 +25,23 @@ class IssueDetailPanel extends StatelessWidget {
           return const SizedBox.shrink();
         }
 
-        final issue = state.filteredIssues.firstWhere(
+        final issueIndex = state.filteredIssues.indexWhere(
           (i) => i.id == state.selectedIssueId,
-          orElse: () => state.filteredIssues.first,
         );
+        if (issueIndex == -1) {
+          return const SizedBox.shrink();
+        }
+        final issue = state.filteredIssues[issueIndex];
 
         return Container(
           width: 500,
           decoration: BoxDecoration(
             color: colors.surface,
-            border: Border(
-              left: BorderSide(color: colors.outlineVariant),
-            ),
+            border: Border(left: BorderSide(color: colors.outlineVariant)),
           ),
           child: Column(
             children: [
-              _DetailHeader(
-                issue: issue,
-                colors: colors,
-                textTheme: textTheme,
-              ),
+              _DetailHeader(issue: issue, colors: colors, textTheme: textTheme),
               const Divider(height: 1),
               Expanded(
                 child: SingleChildScrollView(
@@ -105,7 +105,7 @@ class _DetailHeader extends StatelessWidget {
       child: Row(
         children: [
           Text(
-            issue.fullId,
+            issue.issueKey,
             style: textTheme.labelMedium?.copyWith(
               color: colors.onSurfaceVariant,
               fontFamily: 'JetBrains Mono',
@@ -120,9 +120,7 @@ class _DetailHeader extends StatelessWidget {
             child: Icon(
               issue.isStarred ? Icons.star : Icons.star_border,
               size: 18,
-              color: issue.isStarred
-                  ? Colors.amber
-                  : colors.onSurfaceVariant,
+              color: issue.isStarred ? Colors.amber : colors.onSurfaceVariant,
             ),
           ),
           const Spacer(),
@@ -154,7 +152,7 @@ class _IssueTitle extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Text(
-      issue.title,
+      issue.summary,
       style: textTheme.titleMedium?.copyWith(
         fontWeight: FontWeight.w600,
         color: colors.onSurface,
@@ -176,6 +174,7 @@ class _FieldsSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.all(AppSpacing.medium),
       decoration: BoxDecoration(
@@ -186,46 +185,52 @@ class _FieldsSection extends StatelessWidget {
         children: [
           _FieldRow(
             label: 'State',
-            child: _StateChip(state: issue.state, textTheme: textTheme),
             colors: colors,
             textTheme: textTheme,
+            child: IssueStateChip(
+              state: issue.state,
+              textTheme: textTheme,
+              colors: colors,
+              localization: localization,
+            ),
           ),
           _FieldRow(
             label: 'Priority',
+            colors: colors,
+            textTheme: textTheme,
             child: Row(
               children: [
-                PriorityIcon(priority: issue.priority, size: 14),
+                IssuePriorityChip(
+                  type: issue.priority,
+                  localization: localization,
+                  textTheme: textTheme,
+                  colors: colors,
+                ),
                 const SizedBox(width: 6),
                 Text(
-                  issue.priority.label,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colors.onSurface,
-                  ),
+                  issue.priority.displayName(localization),
+                  style: textTheme.bodySmall?.copyWith(color: colors.onSurface),
                 ),
               ],
             ),
-            colors: colors,
-            textTheme: textTheme,
           ),
           _FieldRow(
             label: 'Type',
+            colors: colors,
+            textTheme: textTheme,
             child: Row(
               children: [
-                Icon(issue.issueType.icon, size: 14, color: issue.issueType.color),
-                const SizedBox(width: 6),
                 Text(
-                  issue.issueType.label,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colors.onSurface,
-                  ),
+                  issue.issueType.displayName(localization),
+                  style: textTheme.bodySmall?.copyWith(color: colors.onSurface),
                 ),
               ],
             ),
-            colors: colors,
-            textTheme: textTheme,
           ),
           _FieldRow(
             label: 'Assignee',
+            colors: colors,
+            textTheme: textTheme,
             child: issue.assigneeName != null
                 ? Row(
                     children: [
@@ -256,11 +261,11 @@ class _FieldsSection extends StatelessWidget {
                       fontStyle: FontStyle.italic,
                     ),
                   ),
-            colors: colors,
-            textTheme: textTheme,
           ),
           _FieldRow(
             label: 'Reporter',
+            colors: colors,
+            textTheme: textTheme,
             child: Row(
               children: [
                 CircleAvatar(
@@ -277,70 +282,70 @@ class _FieldsSection extends StatelessWidget {
                 const SizedBox(width: 6),
                 Text(
                   issue.reporterName,
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colors.onSurface,
-                  ),
+                  style: textTheme.bodySmall?.copyWith(color: colors.onSurface),
                 ),
               ],
             ),
-            colors: colors,
-            textTheme: textTheme,
           ),
           if (issue.tags.isNotEmpty)
             _FieldRow(
               label: 'Tags',
+              colors: colors,
+              textTheme: textTheme,
               child: Wrap(
                 spacing: 4,
                 runSpacing: 4,
-                children: issue.tags.map((tag) => Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: colors.primaryContainer.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Text(
-                    tag,
-                    style: textTheme.labelSmall?.copyWith(
-                      color: colors.onSurface,
-                    ),
-                  ),
-                )).toList(),
+                children: issue.tags
+                    .map(
+                      (tag) => Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colors.primaryContainer.withValues(alpha: 0.3),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          tag,
+                          style: textTheme.labelSmall?.copyWith(
+                            color: colors.onSurface,
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
               ),
-              colors: colors,
-              textTheme: textTheme,
             ),
           if (issue.estimation != null)
             _FieldRow(
               label: 'Estimation',
+              colors: colors,
+              textTheme: textTheme,
               child: Text(
                 _formatDuration(issue.estimation!),
                 style: textTheme.bodySmall?.copyWith(color: colors.onSurface),
               ),
-              colors: colors,
-              textTheme: textTheme,
             ),
           if (issue.spentTime != null)
             _FieldRow(
               label: 'Spent time',
+              colors: colors,
+              textTheme: textTheme,
               child: Text(
                 _formatDuration(issue.spentTime!),
                 style: textTheme.bodySmall?.copyWith(color: colors.onSurface),
               ),
-              colors: colors,
-              textTheme: textTheme,
             ),
           _FieldRow(
             label: 'Created',
+            colors: colors,
+            textTheme: textTheme,
+            isLast: true,
             child: Text(
               _formatDate(issue.createdAt),
               style: textTheme.bodySmall?.copyWith(color: colors.onSurface),
             ),
-            colors: colors,
-            textTheme: textTheme,
-            isLast: true,
           ),
         ],
       ),
@@ -378,9 +383,7 @@ class _FieldRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.only(
-        bottom: isLast ? 0 : AppSpacing.small,
-      ),
+      padding: EdgeInsets.only(bottom: isLast ? 0 : AppSpacing.small),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -533,9 +536,7 @@ class _ActivityTab extends StatelessWidget {
               const SizedBox(width: AppSpacing.small),
               Text(
                 label,
-                style: textTheme.bodySmall?.copyWith(
-                  color: colors.onSurface,
-                ),
+                style: textTheme.bodySmall?.copyWith(color: colors.onSurface),
               ),
               if (count > 0) ...[
                 const SizedBox(width: 6),
@@ -565,31 +566,6 @@ class _ActivityTab extends StatelessWidget {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-}
-
-class _StateChip extends StatelessWidget {
-  final IssueTrackState state;
-  final TextTheme textTheme;
-
-  const _StateChip({required this.state, required this.textTheme});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: state.backgroundColor,
-        borderRadius: BorderRadius.circular(4),
-      ),
-      child: Text(
-        state.label,
-        style: textTheme.labelSmall?.copyWith(
-          color: state.textColor,
-          fontWeight: FontWeight.w500,
         ),
       ),
     );

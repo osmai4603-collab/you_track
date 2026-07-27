@@ -1,7 +1,7 @@
 <!-- Sync Impact Report
-  Version change: N/A → 1.0.0 (initial ratification)
-  Modified principles: N/A (first version)
-  Added sections: Core Principles (5), Security & Data Governance, Development Workflow, Governance
+  Version change: 1.0.0 → 1.1.0
+  Modified principles: I (expanded naming and completeness guidance)
+  Added sections: VI. Routing & Navigation Governance
   Removed sections: N/A
   Templates requiring updates:
     ✅ .specify/templates/plan-template.md - Constitution Check section aligns with principles
@@ -31,6 +31,17 @@ service in `lib/core/`.
 Each feature MUST define a repository interface in `lib/features/<feature>/domain/`
 with an implementation in `lib/features/<feature>/data/`. Dependency injection
 MUST use `get_it` and be registered in a central service locator file.
+
+**Feature naming**: Feature directory names MUST be lowercase, use underscores
+for multi-word names, and be unique within `lib/features/`. Do not create two
+features with nearly identical names (e.g., `custom_field` and `custom_fields`);
+consolidate into a single feature where the domain overlap is significant.
+
+**Feature completeness**: Every new feature MUST include all three layers (data,
+domain, presentation) at creation time. Empty feature directories MUST NOT be
+committed to the repository. A feature may have minimal implementations
+(e.g., a single empty repository interface and a stub use case) but MUST
+conform to the full structure before merge.
 
 **Rationale**: Enforces clear boundaries, enables parallel development,
 and keeps features independently testable and replaceable.
@@ -112,6 +123,20 @@ three-layer architecture is the maximum, not the minimum.
 **Rationale**: Over-engineering slows delivery and increases maintenance burden.
 Simplicity is a feature, not a compromise.
 
+### VI. Routing & Navigation Governance
+
+All navigation MUST use `go_router` configured through `NavigationService`:
+
+- Routes MUST be declared in `lib/core/services/navigation_service.dart`
+- Named routes MUST follow the pattern `/<feature>/<action>` (e.g.,
+  `/projects/:id`, `/issues/create`)
+- Feature-specific route guards (authentication checks, permissions) MUST be
+  implemented as `GoRouter` redirect functions, not scattered across widgets
+- Deep link handling MUST be supported for all main navigation targets
+
+**Rationale**: Centralized routing enables consistent navigation patterns,
+deep linking, and predictable URL structures for the user.
+
 ## Security & Data Governance
 
 - Authentication MUST use Supabase Auth; custom auth flows MUST NOT bypass
@@ -136,6 +161,9 @@ Simplicity is a feature, not a compromise.
   documented rationale
 - **Localization**: User-facing strings MUST use the `intl` l10n system defined in
   `l10n.yaml`; hardcoded strings in widgets MUST NOT be merged
+- **Feature naming**: Feature directories MUST use lowercase_snake_case; MUST be
+  unique across the codebase; MUST not be renamed without updating all references
+  in `init_dependencies.dart` and navigation configuration
 
 ## Governance
 
@@ -160,4 +188,4 @@ and require justification or remediation before approval.
 constitution, refer to `lib/` code conventions, existing patterns, and the
 Flutter style guide.
 
-**Version**: 1.0.0 | **Ratified**: 2026-07-25 | **Last Amended**: 2026-07-25
+**Version**: 1.1.0 | **Ratified**: 2026-07-25 | **Last Amended**: 2026-07-26

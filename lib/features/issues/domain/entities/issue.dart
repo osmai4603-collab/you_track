@@ -1,17 +1,17 @@
 import 'package:issues_tracking/core/entities/entity.dart';
-import 'package:issues_tracking/features/issues/domain/entities/issue_priority.dart';
-import 'package:issues_tracking/features/issues/domain/entities/issue_state.dart';
-import 'package:issues_tracking/features/issues/domain/entities/issue_type.dart';
+import 'package:issues_tracking/core/enums/issue_priority_type_enum.dart';
+import 'package:issues_tracking/core/enums/issue_state_enum.dart';
+import 'package:issues_tracking/core/enums/issue_type_enum.dart';
 
 class Issue extends Entity {
   final String id;
-  final String projectKey;
+  final String issueKey;
   final int issueNumber;
-  final String title;
+  final String summary;
   final String description;
-  final IssueTrackState state;
-  final IssuePriority priority;
-  final IssueType issueType;
+  final IssueStateEnum state;
+  final IssuePriorityTypeEnum priority;
+  final IssueTypeEnum issueType;
   final String? assigneeId;
   final String? assigneeName;
   final String? assigneeAvatarUrl;
@@ -29,16 +29,17 @@ class Issue extends Entity {
   final int commentsCount;
   final bool isStarred;
   final String? parentId;
+  final List<String> visibility;
 
   const Issue({
     required this.id,
-    required this.projectKey,
+    required this.issueKey,
     required this.issueNumber,
-    required this.title,
+    required this.summary,
     this.description = '',
-    this.state = IssueTrackState.open,
-    this.priority = IssuePriority.normal,
-    this.issueType = IssueType.task,
+    this.state = IssueStateEnum.toDo,
+    this.priority = IssuePriorityTypeEnum.normal,
+    this.issueType = IssueTypeEnum.task,
     this.assigneeId,
     this.assigneeName,
     this.assigneeAvatarUrl,
@@ -56,20 +57,19 @@ class Issue extends Entity {
     this.commentsCount = 0,
     this.isStarred = false,
     this.parentId,
+    this.visibility = const ['team'],
   });
-
-  String get fullId => '$projectKey-$issueNumber';
 
   @override
   Issue copyWith({
     String? id,
-    String? projectKey,
+    String? issueKey,
     int? issueNumber,
     String? title,
     String? description,
-    IssueTrackState? state,
-    IssuePriority? priority,
-    IssueType? issueType,
+    IssueStateEnum? state,
+    IssuePriorityTypeEnum? priority,
+    IssueTypeEnum? issueType,
     String? assigneeId,
     String? assigneeName,
     String? assigneeAvatarUrl,
@@ -91,19 +91,22 @@ class Issue extends Entity {
     bool? isStarred,
     String? parentId,
     bool clearParentId = false,
+    List<String>? visibility,
   }) {
     return Issue(
       id: id ?? this.id,
-      projectKey: projectKey ?? this.projectKey,
+      issueKey: issueKey ?? this.issueKey,
       issueNumber: issueNumber ?? this.issueNumber,
-      title: title ?? this.title,
+      summary: title ?? this.summary,
       description: description ?? this.description,
       state: state ?? this.state,
       priority: priority ?? this.priority,
       issueType: issueType ?? this.issueType,
       assigneeId: clearAssignee ? null : (assigneeId ?? this.assigneeId),
       assigneeName: clearAssignee ? null : (assigneeName ?? this.assigneeName),
-      assigneeAvatarUrl: clearAssignee ? null : (assigneeAvatarUrl ?? this.assigneeAvatarUrl),
+      assigneeAvatarUrl: clearAssignee
+          ? null
+          : (assigneeAvatarUrl ?? this.assigneeAvatarUrl),
       reporterId: reporterId ?? this.reporterId,
       reporterName: reporterName ?? this.reporterName,
       tags: tags ?? this.tags,
@@ -118,15 +121,16 @@ class Issue extends Entity {
       commentsCount: commentsCount ?? this.commentsCount,
       isStarred: isStarred ?? this.isStarred,
       parentId: clearParentId ? null : (parentId ?? this.parentId),
+      visibility: visibility ?? this.visibility,
     );
   }
 
   @override
   List<Object?> get props => [
     id,
-    projectKey,
+    issueKey,
     issueNumber,
-    title,
+    summary,
     description,
     state,
     priority,
@@ -148,5 +152,6 @@ class Issue extends Entity {
     commentsCount,
     isStarred,
     parentId,
+    visibility,
   ];
 }

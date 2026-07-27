@@ -18,6 +18,8 @@ class CustomFieldModel extends CustomFieldEntity {
     super.showOnlyWhen,
     super.filterValuesBasedOn,
     super.orderIndex,
+    super.visibility,
+    super.accessControl,
     required super.createdAt,
     required super.updatedAt,
   });
@@ -39,6 +41,8 @@ class CustomFieldModel extends CustomFieldEntity {
       showOnlyWhen: entity.showOnlyWhen,
       filterValuesBasedOn: entity.filterValuesBasedOn,
       orderIndex: entity.orderIndex,
+      visibility: entity.visibility,
+      accessControl: entity.accessControl,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     );
@@ -61,6 +65,8 @@ class CustomFieldModel extends CustomFieldEntity {
       showOnlyWhen: json['show_only_when']?.toString(),
       filterValuesBasedOn: json['filter_values_based_on']?.toString(),
       orderIndex: (json['order_index'] as num?)?.toInt() ?? 0,
+      visibility: (json['visibility'] ?? 'show').toString(),
+      accessControl: _parseAccessControl(json['access_control']),
       createdAt: _parseDate(json['created_at']),
       updatedAt: _parseDate(json['updated_at']),
     );
@@ -83,6 +89,8 @@ class CustomFieldModel extends CustomFieldEntity {
       'show_only_when': showOnlyWhen,
       'filter_values_based_on': filterValuesBasedOn,
       'order_index': orderIndex,
+      'visibility': visibility,
+      'access_control': accessControl,
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
     };
@@ -104,6 +112,8 @@ class CustomFieldModel extends CustomFieldEntity {
       'show_only_when': showOnlyWhen,
       'filter_values_based_on': filterValuesBasedOn,
       'order_index': orderIndex,
+      'visibility': visibility,
+      'access_control': accessControl,
     };
   }
 
@@ -122,5 +132,13 @@ class CustomFieldModel extends CustomFieldEntity {
       return value.map((e) => e.toString()).toList();
     }
     return null;
+  }
+
+  static Map<String, dynamic> _parseAccessControl(dynamic value) {
+    if (value == null) return {'type': 'everyone'};
+    if (value is Map) {
+      return Map<String, dynamic>.from(value);
+    }
+    return {'type': 'everyone'};
   }
 }

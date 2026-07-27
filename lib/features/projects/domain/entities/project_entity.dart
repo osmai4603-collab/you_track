@@ -31,7 +31,7 @@ class ProjectEntity extends Entity {
   ProjectEntity copyWith({
     String? id,
     String? name,
-    String? projectKey,
+    String? issueKey,
     String? description,
     bool? isArchived,
     bool? isTemplate,
@@ -44,7 +44,7 @@ class ProjectEntity extends Entity {
     return ProjectEntity(
       id: id ?? this.id,
       name: name ?? this.name,
-      projectKey: projectKey ?? this.projectKey,
+      projectKey: issueKey ?? this.projectKey,
       description: description ?? this.description,
       isArchived: isArchived ?? this.isArchived,
       isTemplate: isTemplate ?? this.isTemplate,
@@ -58,16 +58,16 @@ class ProjectEntity extends Entity {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        projectKey,
-        description,
-        isArchived,
-        isTemplate,
-        templateId,
-        owner,
-        createdAt,
-        isFavorite,
-        memberInitials,
-      ];
+    id,
+    name,
+    projectKey,
+    description,
+    isArchived,
+    isTemplate,
+    templateId,
+    owner,
+    createdAt,
+    isFavorite,
+    memberInitials,
+  ];
 }

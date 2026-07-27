@@ -3,6 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/enums/custom_field_type_enum.dart';
 import 'package:issues_tracking/features/custom_fields/presentation/widgets/panel_overlay.dart';
 import 'package:issues_tracking/features/custom_fields/presentation/widgets/sliding_panel.dart';
+import 'package:issues_tracking/features/custom_fields/presentation/widgets/field_table_header.dart';
+import 'package:issues_tracking/features/custom_fields/presentation/widgets/field_table_row.dart';
+import 'package:issues_tracking/features/custom_fields/presentation/widgets/replace_value_popup.dart';
+import 'package:issues_tracking/features/custom_fields/presentation/widgets/make_private_dialog.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
@@ -21,6 +25,7 @@ class _CustomFieldsSettingsSectionState
     extends State<CustomFieldsSettingsSection> {
   final Set<String> _selectedFieldIds = {};
   bool _isPanelOpen = false;
+  bool _showDetails = true;
   final _fieldNameController = TextEditingController();
   final _defaultValueController = TextEditingController();
   CustomFieldEnumType _selectedType = CustomFieldEnumType.string;
@@ -68,7 +73,7 @@ class _CustomFieldsSettingsSectionState
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildHeader(colors, textTheme, state),
+                  _buildToolbar(colors, textTheme, state),
                   const SizedBox(height: AppSpacing.medium),
                   if (_selectedFieldIds.isNotEmpty)
                     _buildSelectionBar(colors, textTheme),
@@ -87,107 +92,7 @@ class _CustomFieldsSettingsSectionState
             // Sliding panel
             SlidingPanel(
               isOpen: _isPanelOpen,
-              child: Container(
-                color: Colors.white,
-                child: Column(
-                  children: [
-                    // Header
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Text(
-                            'Add Custom Field',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: _closePanel,
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Divider(),
-                    // Form content
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            TextField(
-                              controller: _fieldNameController,
-                              decoration: const InputDecoration(
-                                labelText: 'Field name',
-                                hintText: 'e.g. Priority',
-                                isDense: true,
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-                            const SizedBox(height: AppSpacing.medium),
-                            DropdownButtonFormField<CustomFieldEnumType>(
-                              initialValue: _selectedType,
-                              decoration: const InputDecoration(
-                                labelText: 'Type',
-                                isDense: true,
-                                border: OutlineInputBorder(),
-                              ),
-                              items: CustomFieldEnumType.values.map((type) {
-                                return DropdownMenuItem(
-                                  value: type,
-                                  child: Text(_typeDisplayName(type)),
-                                );
-                              }).toList(),
-                              onChanged: (type) {
-                                if (type != null) {
-                                  setState(() {
-                                    _selectedType = type;
-                                  });
-                                }
-                              },
-                            ),
-                            const SizedBox(height: AppSpacing.medium),
-                            TextField(
-                              controller: _defaultValueController,
-                              decoration: const InputDecoration(
-                                labelText: 'Default value (optional)',
-                                isDense: true,
-                                border: OutlineInputBorder(),
-                              ),
-                            ),
-                            if (_isSubmitting) ...[
-                              const SizedBox(height: AppSpacing.medium),
-                              const LinearProgressIndicator(),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ),
-                    // Action buttons
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: _isSubmitting ? null : _closePanel,
-                            child: const Text('Cancel'),
-                          ),
-                          const SizedBox(width: AppSpacing.small),
-                          FilledButton(
-                            onPressed: _isSubmitting ? null : _submitAddField,
-                            child: const Text('Add'),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+              child: _buildAddFieldPanel(colors, textTheme),
             ),
             if (state is CustomFieldsLoaded && state.isSaving)
               Positioned(
@@ -204,29 +109,56 @@ class _CustomFieldsSettingsSectionState
     );
   }
 
-  Widget _buildHeader(ColorScheme colors, TextTheme textTheme,
+  Widget _buildToolbar(ColorScheme colors, TextTheme textTheme,
       CustomFieldsState state) {
+    final hasSelection = _selectedFieldIds.isNotEmpty;
+    final canEdit = _selectedFieldIds.length == 1;
+
     return Row(
       children: [
-        Text(
-          'Custom Fields',
-          style:
-              textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+        FilledButton.icon(
+          onPressed: _openPanel,
+          icon: const Icon(Icons.add, size: 18),
+          label: const Text('Add field to project ...'),
+        ),
+        const SizedBox(width: AppSpacing.small),
+        IconButton(
+          onPressed: canEdit ? _editSelectedField : null,
+          icon: const Icon(Icons.edit_outlined, size: 20),
+          tooltip: 'Edit',
+        ),
+        IconButton(
+          onPressed: hasSelection ? () => _confirmDeleteSelected(context) : null,
+          icon: Icon(Icons.delete_outline, size: 20, color: hasSelection ? colors.error : null),
+          tooltip: 'Delete',
+        ),
+        const SizedBox(width: AppSpacing.small),
+        OutlinedButton(
+          onPressed: hasSelection && _selectedFieldIds.length == 1
+              ? _showReplacePopup
+              : null,
+          child: const Text('Replace'),
+        ),
+        const SizedBox(width: AppSpacing.small),
+        OutlinedButton(
+          onPressed: hasSelection && _selectedFieldIds.length == 1
+              ? _showMakePrivateDialog
+              : null,
+          child: const Text('Make private'),
         ),
         const Spacer(),
-        if (state is CustomFieldsLoaded) ...[
-          FilledButton.icon(
-            onPressed: _openPanel,
-            icon: const Icon(Icons.add, size: 18),
-            label: const Text('Add field'),
+        TextButton.icon(
+          onPressed: () {
+            setState(() {
+              _showDetails = !_showDetails;
+            });
+          },
+          icon: Icon(
+            _showDetails ? Icons.visibility_off : Icons.visibility,
+            size: 18,
           ),
-          const SizedBox(width: AppSpacing.small),
-          IconButton(
-            onPressed: _refresh,
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh',
-          ),
-        ],
+          label: Text(_showDetails ? 'Hide details' : 'Show details'),
+        ),
       ],
     );
   }
@@ -307,42 +239,19 @@ class _CustomFieldsSettingsSectionState
     final fields = (state as CustomFieldsLoaded).fields;
 
     if (fields.isEmpty) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.list_alt_outlined, size: 64, color: colors.onSurfaceVariant.withValues(alpha: 0.4)),
-            const SizedBox(height: AppSpacing.medium),
-            Text(
-              'No custom fields yet',
-              style: textTheme.titleMedium?.copyWith(
-                color: colors.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.small),
-            Text(
-              'Add your first custom field to start capturing\nproject-specific data on issues.',
-              style: textTheme.bodySmall?.copyWith(
-                color: colors.onSurfaceVariant,
-              ),
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: AppSpacing.large),
-            FilledButton.icon(
-              onPressed: _openPanel,
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text('Add field'),
-            ),
-          ],
-        ),
-      );
+      return _buildEmptyState(colors, textTheme);
     }
 
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildTableHeader(colors, textTheme),
+          FieldTableHeader(
+            selectedCount: _selectedFieldIds.length,
+            totalCount: fields.length,
+            onSelectAll: _toggleSelectAll,
+            showDetails: _showDetails,
+          ),
           const Divider(height: 1),
           _buildTableBody(fields, colors, textTheme),
         ],
@@ -350,52 +259,36 @@ class _CustomFieldsSettingsSectionState
     );
   }
 
-  Widget _buildTableHeader(ColorScheme colors, TextTheme textTheme) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.small),
-      child: Row(
+  Widget _buildEmptyState(ColorScheme colors, TextTheme textTheme) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            width: 40,
-            child: Checkbox(
-              value: _selectedFieldIds.length ==
-                      (context.read<CustomFieldsCubit>().state
-                              is CustomFieldsLoaded
-                          ? (context.read<CustomFieldsCubit>().state
-                                  as CustomFieldsLoaded)
-                              .fields
-                              .length
-                          : 0) &&
-                  _selectedFieldIds.isNotEmpty,
-              tristate: true,
-              onChanged: _toggleSelectAll,
+          Icon(
+            Icons.list_alt_outlined,
+            size: 64,
+            color: colors.onSurfaceVariant.withValues(alpha: 0.4),
+          ),
+          const SizedBox(height: AppSpacing.medium),
+          Text(
+            'No custom fields yet',
+            style: textTheme.titleMedium?.copyWith(
+              color: colors.onSurfaceVariant,
             ),
           ),
-          const SizedBox(width: 8),
-          const SizedBox(width: 32),
-          Expanded(
-            flex: 3,
-            child: Text(
-              'Name',
-              style:
-                  textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+          const SizedBox(height: AppSpacing.small),
+          Text(
+            'Add your first custom field to start capturing\nproject-specific data on issues.',
+            style: textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
             ),
+            textAlign: TextAlign.center,
           ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              'Type',
-              style:
-                  textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              'Default Value',
-              style:
-                  textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
-            ),
+          const SizedBox(height: AppSpacing.large),
+          FilledButton.icon(
+            onPressed: _openPanel,
+            icon: const Icon(Icons.add, size: 18),
+            label: const Text('Add field to project ...'),
           ),
         ],
       ),
@@ -419,94 +312,133 @@ class _CustomFieldsSettingsSectionState
       children: fields.asMap().entries.map((entry) {
         final index = entry.key;
         final field = entry.value;
-        return _buildFieldRow(
-          field,
-          index,
-          colors,
-          textTheme,
+        return FieldTableRow(
+          key: ValueKey(field.id),
+          field: field,
+          index: index,
+          isSelected: _selectedFieldIds.contains(field.id),
+          showDetails: _showDetails,
+          onCheckboxChanged: (checked) {
+            setState(() {
+              if (checked == true) {
+                _selectedFieldIds.add(field.id);
+              } else {
+                _selectedFieldIds.remove(field.id);
+              }
+            });
+          },
+          onNameTap: () => _showEditFieldDialog(context, field),
+          onVisibilityTap: (newVisibility) {
+            context.read<CustomFieldsCubit>().updateVisibility(
+                  fieldId: field.id,
+                  visibility: newVisibility,
+                );
+          },
         );
       }).toList(),
     );
   }
 
-  Widget _buildFieldRow(CustomFieldEntity field, int index,
-      ColorScheme colors, TextTheme textTheme) {
-    final isSelected = _selectedFieldIds.contains(field.id);
-
-    return Material(
-      key: ValueKey(field.id),
-      type: MaterialType.transparency,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: AppSpacing.small),
-        child: Row(
-          children: [
-            SizedBox(
-              width: 40,
-              child: Checkbox(
-                value: isSelected,
-                onChanged: (checked) {
-                  setState(() {
-                    if (checked == true) {
-                      _selectedFieldIds.add(field.id);
-                    } else {
-                      _selectedFieldIds.remove(field.id);
-                    }
-                  });
-                },
-              ),
-            ),
-            ReorderableDragStartListener(
-              index: index,
-              child: const Icon(Icons.drag_handle),
-            ),
-            const SizedBox(width: AppSpacing.small),
-            Expanded(
-              flex: 3,
-              child: GestureDetector(
-                onTap: () => _showEditFieldDialog(context, field),
-                child: Text(
-                  field.name,
-                  style: textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w500,
+  Widget _buildAddFieldPanel(ColorScheme colors, TextTheme textTheme) {
+    return Container(
+      color: Colors.white,
+      child: Column(
+        children: [
+          // Header
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text(
+                  'Add Custom Field',
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
-              ),
-            ),
-            Expanded(
-              flex: 2,
-              child: _buildTypeChip(field.fieldType, colors, textTheme),
-            ),
-            Expanded(
-              flex: 2,
-              child: Text(
-                field.defaultValue ?? '—',
-                style: textTheme.bodySmall?.copyWith(
-                  color: colors.onSurfaceVariant,
+                IconButton(
+                  icon: const Icon(Icons.close),
+                  onPressed: _closePanel,
                 ),
+              ],
+            ),
+          ),
+          const Divider(),
+          // Form content
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  TextField(
+                    controller: _fieldNameController,
+                    decoration: const InputDecoration(
+                      labelText: 'Field name',
+                      hintText: 'e.g. Priority',
+                      isDense: true,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.medium),
+                  DropdownButtonFormField<CustomFieldEnumType>(
+                    initialValue: _selectedType,
+                    decoration: const InputDecoration(
+                      labelText: 'Type',
+                      isDense: true,
+                      border: OutlineInputBorder(),
+                    ),
+                    items: CustomFieldEnumType.values.map((type) {
+                      return DropdownMenuItem(
+                        value: type,
+                        child: Text(_typeDisplayName(type)),
+                      );
+                    }).toList(),
+                    onChanged: (type) {
+                      if (type != null) {
+                        setState(() {
+                          _selectedType = type;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.medium),
+                  TextField(
+                    controller: _defaultValueController,
+                    decoration: const InputDecoration(
+                      labelText: 'Default value (optional)',
+                      isDense: true,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  if (_isSubmitting) ...[
+                    const SizedBox(height: AppSpacing.medium),
+                    const LinearProgressIndicator(),
+                  ],
+                ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTypeChip(
-      CustomFieldEnumType type, ColorScheme colors, TextTheme textTheme) {
-    final label = _typeDisplayName(type);
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.small,
-        vertical: 2,
-      ),
-      decoration: BoxDecoration(
-        color: colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: colors.outlineVariant),
-      ),
-      child: Text(
-        label,
-        style: textTheme.labelSmall?.copyWith(fontSize: 11),
+          ),
+          // Action buttons
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: _isSubmitting ? null : _closePanel,
+                  child: const Text('Cancel'),
+                ),
+                const SizedBox(width: AppSpacing.small),
+                FilledButton(
+                  onPressed: _isSubmitting ? null : _submitAddField,
+                  child: const Text('Add'),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -514,35 +446,35 @@ class _CustomFieldsSettingsSectionState
   String _typeDisplayName(CustomFieldEnumType type) {
     switch (type) {
       case CustomFieldEnumType.build:
-        return 'Build';
+        return 'build (single)';
       case CustomFieldEnumType.enumField:
-        return 'Enum';
+        return 'enum (single)';
       case CustomFieldEnumType.group:
-        return 'Group';
+        return 'group (single)';
       case CustomFieldEnumType.ownedField:
-        return 'Owned Field';
+        return 'ownedField (single)';
       case CustomFieldEnumType.state:
-        return 'State';
+        return 'state (single)';
       case CustomFieldEnumType.user:
-        return 'User';
+        return 'user (single)';
       case CustomFieldEnumType.version:
-        return 'Version';
+        return 'version (multi)';
       case CustomFieldEnumType.date:
-        return 'Date';
+        return 'date';
       case CustomFieldEnumType.dateTime:
-        return 'Date Time';
+        return 'date time';
       case CustomFieldEnumType.float:
-        return 'Float';
+        return 'float';
       case CustomFieldEnumType.integer:
-        return 'Integer';
+        return 'integer';
       case CustomFieldEnumType.string:
-        return 'String';
+        return 'string';
       case CustomFieldEnumType.text:
-        return 'Text';
+        return 'text';
       case CustomFieldEnumType.period:
-        return 'Period';
-        default:
-        return 'Period';
+        return 'period';
+      default:
+        return 'period';
     }
   }
 
@@ -556,6 +488,15 @@ class _CustomFieldsSettingsSectionState
           _selectedFieldIds.clear();
         }
       });
+    }
+  }
+
+  void _editSelectedField() {
+    if (_selectedFieldIds.length != 1) return;
+    final state = context.read<CustomFieldsCubit>().state;
+    if (state is CustomFieldsLoaded) {
+      final field = state.fields.firstWhere((f) => f.id == _selectedFieldIds.first);
+      _showEditFieldDialog(context, field);
     }
   }
 
@@ -603,8 +544,6 @@ class _CustomFieldsSettingsSectionState
                         if (type != null && type != selectedType) {
                           setDialogState(() {
                             selectedType = type;
-                            // selectedDefault =
-                            //     type.firstAvailableOrDefault(null);
                           });
                         }
                       },
@@ -703,7 +642,31 @@ class _CustomFieldsSettingsSectionState
       },
     );
   }
-  
+
+  void _showReplacePopup() {
+    if (_selectedFieldIds.length != 1) return;
+    final state = context.read<CustomFieldsCubit>().state;
+    if (state is CustomFieldsLoaded) {
+      final field = state.fields.firstWhere((f) => f.id == _selectedFieldIds.first);
+      showDialog(
+        context: context,
+        builder: (context) => ReplaceValuePopup(field: field),
+      );
+    }
+  }
+
+  void _showMakePrivateDialog() {
+    if (_selectedFieldIds.length != 1) return;
+    final state = context.read<CustomFieldsCubit>().state;
+    if (state is CustomFieldsLoaded) {
+      final field = state.fields.firstWhere((f) => f.id == _selectedFieldIds.first);
+      showDialog(
+        context: context,
+        builder: (context) => MakePrivateDialog(field: field),
+      );
+    }
+  }
+
   void _closePanel() {
     setState(() {
       _isPanelOpen = false;

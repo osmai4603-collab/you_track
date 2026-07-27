@@ -7,6 +7,7 @@ import 'package:issues_tracking/core/constants/app_icons.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
+import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dart';
@@ -31,11 +32,41 @@ class _ProjectViewState extends State<ProjectView> {
   int _selectedIndex = 0;
 
   final List<_SidebarItem> _sidebarItems = [
-    _SidebarItem('Issues', AppIcons.issues, AppRouteKeys.issues),
-    _SidebarItem('Agile Board', AppIcons.board, AppRouteKeys.agileBoards),
-    _SidebarItem('Gantt Chart', AppIcons.ganttChart, '/gantt-chart'),
-    _SidebarItem('Knowledge Base', AppIcons.knowledgeBase, '/knowledge-base'),
-    _SidebarItem('Setting', AppIcons.settings, '/settings'),
+    _SidebarItem(
+      'Issues',
+      AppIcons.issues,
+      (projectId) => AppRouteKeys.projectIssuesPath(projectId),
+    ),
+    _SidebarItem(
+      'Agile Board',
+      AppIcons.board,
+      (projectId) => AppRouteKeys.projectAgileBoardsPath(projectId),
+    ),
+    _SidebarItem(
+      'VCS Changes',
+      AppIcons.versionControl,
+      (projectId) => AppRouteKeys.projectVersionControlChanges(projectId),
+    ),
+    _SidebarItem(
+      'Gantt Chart',
+      AppIcons.ganttChart,
+      (projectId) => AppRouteKeys.projectGanttChartPath(projectId),
+    ),
+    _SidebarItem(
+      'Knowledge Base',
+      AppIcons.knowledgeBase,
+      (projectId) => AppRouteKeys.projectKnowledgeBasePath(projectId),
+    ),
+    _SidebarItem(
+      'Time Tracking',
+      Icons.timer_outlined,
+      (projectId) => AppRouteKeys.projectTimeTrackingPath(projectId),
+    ),
+    _SidebarItem(
+      'Setting',
+      AppIcons.settings,
+      (projectId) => AppRouteKeys.projectSettingsPath(projectId),
+    ),
   ];
 
   late final ProjectMembersCubit _membersCubit;
@@ -46,7 +77,8 @@ class _ProjectViewState extends State<ProjectView> {
   void initState() {
     super.initState();
     _membersCubit = sl<ProjectMembersCubit>()..loadMembers(widget.projectId);
-    _projectDetailsCubit = sl<ProjectDetailsCubit>()..loadProject(widget.projectId);
+    _projectDetailsCubit = sl<ProjectDetailsCubit>()
+      ..loadProject(widget.projectId);
     _issuesBloc = sl<IssuesBloc>()
       ..add(UpdateFilter(IssueFilter(projectFilter: widget.projectId)));
   }
@@ -55,6 +87,7 @@ class _ProjectViewState extends State<ProjectView> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final localization = AppLocalizations.of(context)!;
 
     return MultiBlocProvider(
       providers: [
@@ -89,8 +122,7 @@ class _ProjectViewState extends State<ProjectView> {
                       );
                     },
                   ),
-                  SizedBox(
-                    height: 400,
+                  Expanded(
                     child: Row(
                       spacing: AppSpacing.large,
                       crossAxisAlignment: CrossAxisAlignment.center,
@@ -98,32 +130,47 @@ class _ProjectViewState extends State<ProjectView> {
                         Expanded(
                           child: _InfoCard(
                             title: 'Team Members',
-                            child: BlocBuilder<ProjectMembersCubit, ProjectMembersState>(
-                              builder: (context, state) {
-                                if (state.status == ProjectMembersStatus.loading) {
-                                  return const Center(child: CircularProgressIndicator());
-                                }
-                                if (state.status == ProjectMembersStatus.failure) {
-                                  return Center(
-                                    child: SelectableText(
-                                      state.errorMessage ?? 'Failed to load members',
-                                      style: textTheme.bodySmall?.copyWith(color: colors.error),
-                                    ),
-                                  );
-                                }
-                                if (state.members.isEmpty) {
-                                  return Center(
-                                    child: Text(
-                                      'No members yet',
-                                      style: textTheme.bodySmall?.copyWith(
-                                        color: colors.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  );
-                                }
-                                return _buildMembersList(state.members, colors, textTheme);
-                              },
-                            ),
+                            child:
+                                BlocBuilder<
+                                  ProjectMembersCubit,
+                                  ProjectMembersState
+                                >(
+                                  builder: (context, state) {
+                                    if (state.status ==
+                                        ProjectMembersStatus.loading) {
+                                      return const Center(
+                                        child: CircularProgressIndicator(),
+                                      );
+                                    }
+                                    if (state.status ==
+                                        ProjectMembersStatus.failure) {
+                                      return Center(
+                                        child: SelectableText(
+                                          state.errorMessage ??
+                                              'Failed to load members',
+                                          style: textTheme.bodySmall?.copyWith(
+                                            color: colors.error,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    if (state.members.isEmpty) {
+                                      return Center(
+                                        child: Text(
+                                          'No members yet',
+                                          style: textTheme.bodySmall?.copyWith(
+                                            color: colors.onSurfaceVariant,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                    return _buildMembersList(
+                                      state.members,
+                                      colors,
+                                      textTheme,
+                                    );
+                                  },
+                                ),
                           ),
                         ),
                         Expanded(
@@ -132,13 +179,17 @@ class _ProjectViewState extends State<ProjectView> {
                             child: BlocBuilder<IssuesBloc, IssuesState>(
                               builder: (context, state) {
                                 if (state is IssuesLoading) {
-                                  return const Center(child: CircularProgressIndicator());
+                                  return const Center(
+                                    child: CircularProgressIndicator(),
+                                  );
                                 }
                                 if (state is IssuesError) {
                                   return Center(
                                     child: SelectableText(
                                       state.message,
-                                      style: textTheme.bodySmall?.copyWith(color: colors.error),
+                                      style: textTheme.bodySmall?.copyWith(
+                                        color: colors.error,
+                                      ),
                                     ),
                                   );
                                 }
@@ -157,6 +208,7 @@ class _ProjectViewState extends State<ProjectView> {
                                     state.filteredIssues,
                                     colors,
                                     textTheme,
+                                    localization,
                                   );
                                 }
                                 return const SizedBox.shrink();
@@ -193,7 +245,9 @@ class _ProjectViewState extends State<ProjectView> {
           final project = state.project;
           final projectName = project?.name ?? 'Project';
           final projectKey = project?.projectKey ?? '...';
-          final shortKey = projectKey.length > 3 ? projectKey.substring(0, 3).toUpperCase() : projectKey.toUpperCase();
+          final shortKey = projectKey.length > 3
+              ? projectKey.substring(0, 3).toUpperCase()
+              : projectKey.toUpperCase();
 
           return Column(
             spacing: AppSpacing.small,
@@ -207,7 +261,9 @@ class _ProjectViewState extends State<ProjectView> {
                     width: 50,
                     child: Card(
                       color: colors.onSurface,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(6),
+                      ),
                       child: Column(
                         spacing: 2,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -227,7 +283,9 @@ class _ProjectViewState extends State<ProjectView> {
                             height: 10,
                             decoration: BoxDecoration(
                               color: colors.tertiary,
-                              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(8)),
+                              borderRadius: const BorderRadius.vertical(
+                                bottom: Radius.circular(8),
+                              ),
                             ),
                           ),
                         ],
@@ -271,11 +329,18 @@ class _ProjectViewState extends State<ProjectView> {
                       hoverColor: colors.primary.withValues(alpha: 0.10),
                       onTap: () {
                         setState(() => _selectedIndex = index);
-                        if (index == 4) {
-                          context.go(AppRouteKeys.projectSettingsPath(widget.projectId));
-                        } else {
-                          context.go(item.route);
-                        }
+                        context.go(item.getRoute(widget.projectId));
+                        // if (index == 5) {
+                        //   context.go(
+                        //     AppRouteKeys.projectSettingsPath(widget.projectId),
+                        //   );
+                        // } else if (index == 2) {
+                        //   context.go(
+                        //     '/projects/${widget.projectId}/vcs-changes',
+                        //   );
+                        // } else {
+                        //   context.go(item.getRoute(widget.projectId));
+                        // }
                       },
                     );
                   },
@@ -374,12 +439,13 @@ class _ProjectViewState extends State<ProjectView> {
     List<Issue> issues,
     ColorScheme colors,
     TextTheme textTheme,
+    AppLocalizations localization,
   ) {
     return _VerticalScrollList(
       itemCount: issues.length,
       itemBuilder: (context, index) {
         final issue = issues[index];
-        final stateLetter = issue.state.label.isNotEmpty ? issue.state.label[0] : '?';
+        final stateLetter = issue.state.displayName(localization)[0];
         return Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppSpacing.medium,
@@ -391,17 +457,17 @@ class _ProjectViewState extends State<ProjectView> {
                 width: 28,
                 height: 28,
                 decoration: BoxDecoration(
-                  color: issue.state.backgroundColor,
+                  color: Color(issue.state.color),
                   borderRadius: BorderRadius.circular(6),
                   border: Border.all(
-                    color: issue.state.textColor.withValues(alpha: 0.3),
+                    color: colors.onSurface.withValues(alpha: 0.3),
                   ),
                 ),
                 child: Center(
                   child: Text(
                     stateLetter,
                     style: textTheme.labelSmall?.copyWith(
-                      color: issue.state.textColor,
+                      color: colors.onSurface,
                       fontWeight: FontWeight.w600,
                       fontSize: 12,
                     ),
@@ -415,7 +481,7 @@ class _ProjectViewState extends State<ProjectView> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      issue.fullId,
+                      issue.issueKey,
                       style: textTheme.labelSmall?.copyWith(
                         color: colors.onSurfaceVariant,
                         fontFamily: 'JetBrains Mono',
@@ -426,7 +492,7 @@ class _ProjectViewState extends State<ProjectView> {
                     const SizedBox(height: 2),
                     Expanded(
                       child: Text(
-                        issue.title,
+                        issue.summary,
                         style: textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.w500,
                         ),
@@ -489,8 +555,10 @@ class _VerticalScrollListState extends State<_VerticalScrollList> {
 
   void _scrollUp() {
     _scrollController.animateTo(
-      (_scrollController.offset - 100)
-          .clamp(0.0, _scrollController.position.maxScrollExtent),
+      (_scrollController.offset - 100).clamp(
+        0.0,
+        _scrollController.position.maxScrollExtent,
+      ),
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
     );
@@ -498,8 +566,10 @@ class _VerticalScrollListState extends State<_VerticalScrollList> {
 
   void _scrollDown() {
     _scrollController.animateTo(
-      (_scrollController.offset + 100)
-          .clamp(0.0, _scrollController.position.maxScrollExtent),
+      (_scrollController.offset + 100).clamp(
+        0.0,
+        _scrollController.position.maxScrollExtent,
+      ),
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
     );
@@ -555,9 +625,9 @@ class _VerticalScrollListState extends State<_VerticalScrollList> {
 class _SidebarItem {
   final String label;
   final IconData icon;
-  final String route;
+  final String Function(String projectId) getRoute;
 
-  const _SidebarItem(this.label, this.icon, this.route);
+  const _SidebarItem(this.label, this.icon, this.getRoute);
 }
 
 class _InfoCard extends StatelessWidget {

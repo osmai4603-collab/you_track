@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_issues.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/issues_repository.dart';
@@ -10,16 +12,19 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
   final IssuesRepository repository;
 
   IssuesBloc({required this.getIssues, required this.repository})
-      : super(IssuesInitial()) {
+    : super(IssuesInitial()) {
     on<LoadIssues>(_onLoadIssues);
     on<SelectIssue>(_onSelectIssue);
     on<UpdateFilter>(_onUpdateFilter);
     on<ChangeSort>(_onChangeSort);
-    on<ChangeViewMode>(_onChangeViewMode);
     on<ToggleStarIssue>(_onToggleStarIssue);
     on<ToggleIssueSelection>(_onToggleIssueSelection);
     on<SelectAllIssues>(_onSelectAllIssues);
     on<DeselectAllIssues>(_onDeselectAllIssues);
+    on<ChangeSeachType>(_onSearchTypeChanged);
+    on<ChangeLayoutType>(_onLayouyTypeChanged);
+    on<ChangeStructureType>(_onStrcutureTypeChanged);
+    on<ChangePreviewType>(_onPreviewTypeChnaged);
   }
 
   IssueFilter get _currentFilter {
@@ -36,15 +41,15 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
     emit(IssuesLoading());
     final tagsResult = await repository.getAllTags();
     final tags = tagsResult.fold((_) => <String>[], (t) => t);
-    final result = await getIssues(params: GetIssuesParams(filter: _currentFilter));
+    final result = await getIssues(
+      params: GetIssuesParams(filter: _currentFilter),
+    );
 
     result.fold(
       (failure) => emit(IssuesError(failure.message)),
-      (issues) => emit(IssuesLoaded(
-        issues: issues,
-        filteredIssues: issues,
-        allTags: tags,
-      )),
+      (issues) => emit(
+        IssuesLoaded(issues: issues, filteredIssues: issues, allTags: tags),
+      ),
     );
   }
 
@@ -54,10 +59,12 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
   ) async {
     if (state is IssuesLoaded) {
       final current = state as IssuesLoaded;
-      emit(current.copyWith(
-        selectedIssueId: event.issueId,
-        clearSelectedIssue: event.issueId == null,
-      ));
+      emit(
+        current.copyWith(
+          selectedIssueId: event.issueId,
+          clearSelectedIssue: event.issueId == null,
+        ),
+      );
     }
   }
 
@@ -77,14 +84,20 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
 
     result.fold(
       (failure) => emit(IssuesError(failure.message)),
-      (issues) => emit(IssuesLoaded(
-        issues: issues,
-        filteredIssues: issues,
-        filter: event.filter,
-        selectedIssueId: current is IssuesLoaded ? current.selectedIssueId : null,
-        selectedIssueIds: current is IssuesLoaded ? current.selectedIssueIds : {},
-        allTags: tags,
-      )),
+      (issues) => emit(
+        IssuesLoaded(
+          issues: issues,
+          filteredIssues: issues,
+          filter: event.filter,
+          selectedIssueId: current is IssuesLoaded
+              ? current.selectedIssueId
+              : null,
+          selectedIssueIds: current is IssuesLoaded
+              ? current.selectedIssueIds
+              : {},
+          allTags: tags,
+        ),
+      ),
     );
   }
 
@@ -104,16 +117,6 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
       );
 
       add(UpdateFilter(newFilter));
-    }
-  }
-
-  void _onChangeViewMode(
-    ChangeViewMode event,
-    Emitter<IssuesState> emit,
-  ) {
-    if (state is IssuesLoaded) {
-      final current = state as IssuesLoaded;
-      emit(current.copyWith(viewMode: event.viewMode));
     }
   }
 
@@ -168,6 +171,46 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
     if (state is IssuesLoaded) {
       final current = state as IssuesLoaded;
       emit(current.copyWith(selectedIssueIds: {}));
+    }
+  }
+
+  FutureOr<void> _onSearchTypeChanged(
+    ChangeSeachType event,
+    Emitter<IssuesState> emit,
+  ) {
+    if (state is IssuesLoaded) {
+      final current = state as IssuesLoaded;
+      emit(current.copyWith(searchType: event.type));
+    }
+  }
+
+  FutureOr<void> _onLayouyTypeChanged(
+    ChangeLayoutType event,
+    Emitter<IssuesState> emit,
+  ) {
+    if (state is IssuesLoaded) {
+      final current = state as IssuesLoaded;
+      emit(current.copyWith(layoutType: event.type));
+    }
+  }
+
+  FutureOr<void> _onStrcutureTypeChanged(
+    ChangeStructureType event,
+    Emitter<IssuesState> emit,
+  ) {
+    if (state is IssuesLoaded) {
+      final current = state as IssuesLoaded;
+      emit(current.copyWith(structureType: event.type));
+    }
+  }
+
+  FutureOr<void> _onPreviewTypeChnaged(
+    ChangePreviewType event,
+    Emitter<IssuesState> emit,
+  ) {
+    if (state is IssuesLoaded) {
+      final current = state as IssuesLoaded;
+      emit(current.copyWith(previewType: event.type));
     }
   }
 }

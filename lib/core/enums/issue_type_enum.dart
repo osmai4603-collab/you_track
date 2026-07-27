@@ -25,10 +25,7 @@ sealed class IssueTypeEnum extends AppEnum {
   ];
 
   static IssueTypeEnum of(String name) {
-    return values.firstWhere(
-      (e) => e.name == name,
-      orElse: () => throw ArgumentError('Unknown IssueTypeEnum: $name'),
-    );
+    return values.firstWhere((e) => e.name == name, orElse: () => task);
   }
 }
 

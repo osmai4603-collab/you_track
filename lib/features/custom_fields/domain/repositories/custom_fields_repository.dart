@@ -27,4 +27,20 @@ abstract class CustomFieldsRepository {
     required int oldIndex,
     required int newIndex,
   });
+
+  Future<Either<Failure, CustomFieldEntity>> updateVisibility({
+    required String fieldId,
+    required String visibility,
+  });
+
+  Future<Either<Failure, CustomFieldEntity>> updateAccessControl({
+    required String fieldId,
+    required Map<String, dynamic> accessControl,
+  });
+
+  Future<Either<Failure, void>> replaceFieldValue({
+    required String fieldId,
+    required String oldValue,
+    required String newValue,
+  });
 }

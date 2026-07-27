@@ -7,9 +7,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:issues_tracking/core/errors/failure.dart';
+import 'package:issues_tracking/core/enums/issue_priority_type_enum.dart';
+import 'package:issues_tracking/core/enums/issue_state_enum.dart';
+import 'package:issues_tracking/core/enums/issue_type_enum.dart';
 import 'package:issues_tracking/features/dashboards/presentation/cubits/youtrack_shell_cubit.dart';
-import 'package:issues_tracking/features/dashboards/presentation/widgets/dashboard_body_header.dart';
+import 'package:issues_tracking/features/dashboards/presentation/widgets/yputrack_content_header.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
+import 'package:issues_tracking/features/issues/domain/entities/issue_attachment.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/issues_repository.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_issues.dart';
@@ -26,6 +30,64 @@ class DummyIssuesRepository implements IssuesRepository {
 
   @override
   Future<Either<Failure, List<String>>> getAllTags() async => const Right([]);
+
+  @override
+  Future<Either<Failure, Issue>> createIssue({
+    required String projectKey,
+    required String title,
+    required String description,
+    required IssuePriorityTypeEnum priority,
+    required IssueStateEnum state,
+    required IssueTypeEnum issueType,
+    String? assigneeId,
+    String? subsystem,
+    String? fixVersions,
+    String? fixedInBuild,
+    Duration? estimation,
+    List<String> visibility = const ['team'],
+    String? parentId,
+  }) async => const Left(ServerFailure('not implemented'));
+
+  @override
+  Future<Either<Failure, Issue>> updateIssue({
+    required String issueId,
+    String? title,
+    String? description,
+    IssuePriorityTypeEnum? priority,
+    IssueStateEnum? state,
+    IssueTypeEnum? issueType,
+    String? assigneeId,
+    bool clearAssignee = false,
+    String? subsystem,
+    String? fixVersions,
+    String? fixedInBuild,
+    Duration? estimation,
+    Duration? spentTime,
+    List<String>? visibility,
+  }) async => const Left(ServerFailure('not implemented'));
+
+  @override
+  Future<Either<Failure, void>> deleteIssue(String issueId) async =>
+      const Right(null);
+
+  @override
+  Future<Either<Failure, String>> uploadAttachment({
+    required String issueId,
+    required String filePath,
+    required String fileName,
+    void Function(double progress)? onProgress,
+  }) async => const Left(ServerFailure('not implemented'));
+
+  @override
+  Future<Either<Failure, void>> deleteAttachment({
+    required String issueId,
+    required String storagePath,
+  }) async => const Right(null);
+
+  @override
+  Future<Either<Failure, List<IssueAttachment>>> getAttachments(
+    String issueId,
+  ) async => const Right([]);
 }
 
 void main() {

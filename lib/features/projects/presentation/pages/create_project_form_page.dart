@@ -70,7 +70,7 @@ class _CreateProjectFormPageState extends State<CreateProjectFormPage> {
             state.createdProject!,
           );
           context.go(
-            AppRouteKeys.addProjectMembersPath(state.createdProject!.id),
+            AppRouteKeys.projectDetailsPath(state.createdProject!.id),
           );
         }
       },

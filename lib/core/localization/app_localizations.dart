@@ -823,6 +823,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You don\'t have permission to view this page'**
   String get accessDeniedBody;
+
+  /// No description provided for @addWidgetButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Add widget'**
+  String get addWidgetButton;
+
+  /// No description provided for @createButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get createButton;
+
+  /// No description provided for @newIssueOption.
+  ///
+  /// In en, this message translates to:
+  /// **'New issue'**
+  String get newIssueOption;
+
+  /// No description provided for @newArticleOption.
+  ///
+  /// In en, this message translates to:
+  /// **'New article'**
+  String get newArticleOption;
+
+  /// No description provided for @widgetDocumentListWidget.
+  ///
+  /// In en, this message translates to:
+  /// **'Document List Widget'**
+  String get widgetDocumentListWidget;
+
+  /// No description provided for @widgetIssueList.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue List'**
+  String get widgetIssueList;
+
+  /// No description provided for @widgetIssueDistributionReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue Distribution Report'**
+  String get widgetIssueDistributionReport;
+
+  /// No description provided for @widgetCalendarWidget.
+  ///
+  /// In en, this message translates to:
+  /// **'Calendar Widget'**
+  String get widgetCalendarWidget;
+
+  /// No description provided for @widgetIssueActivityFeed.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue Activity Feed'**
+  String get widgetIssueActivityFeed;
+
+  /// No description provided for @widgetProjectTeam.
+  ///
+  /// In en, this message translates to:
+  /// **'Project Team'**
+  String get widgetProjectTeam;
+
+  /// No description provided for @widgetAccessEraser.
+  ///
+  /// In en, this message translates to:
+  /// **'Access Eraser'**
+  String get widgetAccessEraser;
+
+  /// No description provided for @widgetQuickNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Notes'**
+  String get widgetQuickNotes;
+
+  /// No description provided for @widgetReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Report'**
+  String get widgetReport;
+
+  /// No description provided for @widgetPersonalTimeTracking.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Time Tracking'**
+  String get widgetPersonalTimeTracking;
+
+  /// No description provided for @widgetTimeTrackingReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Time Tracking Report'**
+  String get widgetTimeTrackingReport;
+
+  /// No description provided for @widgetWorkItemExporter.
+  ///
+  /// In en, this message translates to:
+  /// **'Work Item Exporter'**
+  String get widgetWorkItemExporter;
 }
 
 class _AppLocalizationsDelegate

@@ -7,11 +7,11 @@ sealed class AppRouteKeys {
 
   // ── Auth Branch ───────────────────────────────────
   static const String login = '/login';
-  static const String register = '/register';
 
   // ── Main Dashboard Branch ───────────────────────────────────
   static const String dashboard = '/dashboard';
   static const String issues = '/issues';
+  static const String createIssue = '/issues/new-issue';
   static const String board = '/board';
   static const String notifications = '/notifications';
   static const String agileBoards = '/agile-boards';
@@ -19,39 +19,97 @@ sealed class AppRouteKeys {
 
   // ── Projects Branch ───────────────────────────────────
   static const String projects = '/projects';
-  static const String projectTemplates = '/projects/templates';
-  static const String templateDetails = '/projects/templates/:templateId';
-  static const String createProject = '/projects/new';
-  static const String projectDetails = '/projects/:projectId';
-  static const String addProjectMembers = '/projects/:projectId/add-members';
-  static const String projectMembers = '/projects/:projectId/members';
-  static const String projectSettings = '/projects/:projectId/settings';
-  static const String projectSettingsGeneral = 'general';
-  static const String projectSettingsPeople = 'people';
-  static const String projectSettingsCustomFields = 'custom-fields';
-  static const String projectSettingsVersionControl = 'vcs';
-  static const String projectSettingsNotifications = 'notifications';
-  static const String projectSettingsBuildServers = 'builds';
-  static const String projectSettingsTimeTracking = 'time';
-  static const String projectSettingsWorkflows = 'workflows';
-  static const String projectSettingsApps = 'apps';
+  static const String projectTemplates = '$projects/templates';
+  static const String createProject = '$projects/new';
+
+  static const String knowldgeBase = '/knowldge-base';
+
+  static const String timeSheets = '/time-sheets';
+
+  static const whiteBoards = '/white-boards';
+
+  static const ganttChart = '/gantt-chart';
 
   // ── Dynamic Path Builders ───────────────────────────────────
   static String templateDetailsPath(String templateId) =>
-      '/projects/templates/$templateId';
+      '$projects/templates/$templateId';
 
-  static String projectDetailsPath(String projectId) =>
-      '/projects/$projectId';
+  static String projectDetailsPath(String projectId) {
+    return '$projects/$projectId';
+  }
 
-  static String addProjectMembersPath(String projectId) =>
-      '/projects/$projectId/add-members';
+  static String projectIssuesPath(String projectId) {
+    return '$projects/$projectId/issues';
+  }
 
-  static String projectMembersPath(String projectId) =>
-      '/projects/$projectId/members';
+  static String projectAgileBoardsPath(String projectId) {
+    return '$projects/$projectId/agile-boards';
+  }
 
-  static String projectSettingsPath(String projectId) =>
-      '/projects/$projectId/settings';
+  static String projectGanttChartPath(String projectId) {
+    return '$projects/$projectId/gantt-chart';
+  }
 
-  static String projectSettingsSectionPath(String projectId, String section) =>
-      '/projects/$projectId/settings/$section';
+  static String projectSettingsWorkflows(String projectId) {
+    return projectSettingsSectionPath(projectId, 'workflows');
+  }
+
+  static String projectSettingsTimeTracking(String projectId) {
+    return projectSettingsSectionPath(projectId, 'time-tracking');
+  }
+
+  static String projectSettingsPeople(String projectId) {
+    return projectSettingsSectionPath(projectId, 'people');
+  }
+
+  static String projectSettingsNotifications(String projectId) {
+    return projectSettingsSectionPath(projectId, 'notifications');
+  }
+
+  static String projectSettingsCustomFields(String projectId) {
+    return projectSettingsSectionPath(projectId, 'custom-fields');
+  }
+
+  static String projectSettingsGeneral(String projectId) {
+    return projectSettingsSectionPath(projectId, 'general');
+  }
+
+  static String projectSettingsVersionControl(String projectId) {
+    return projectSettingsSectionPath(projectId, 'vc');
+  }
+
+  static String projectSettingsApps(String projectId) {
+    return projectSettingsSectionPath(projectId, 'apps');
+  }
+
+  static String projectSettingsBuildServers(String projectId) {
+    return projectSettingsSectionPath(projectId, 'builds');
+  }
+
+  static String projectSettingsPath(String projectId) {
+    return '$projects/$projectId/settings';
+  }
+
+  static String projectSettingsSectionPath(String projectId, String section) {
+    return '${projectSettingsPath(projectId)}/$section';
+  }
+
+  static String projectKnowledgeBasePath(String projectId) {
+    return '$projects/$projectId/knowledge-base';
+  }
+
+  static String projectKnowledgeBaseArticlePath(
+    String projectId,
+    String articleId,
+  ) {
+    return '$projects/$projectId/knowledge-base/$articleId';
+  }
+
+  static String projectVersionControlChanges(String projectId) {
+    return 'projects/$projectId/vc-changes';
+  }
+
+  static String projectTimeTrackingPath(String projectId) {
+    return '$projects/$projectId/time-tracking';
+  }
 }
