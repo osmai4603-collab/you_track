@@ -9,6 +9,9 @@ import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
+import 'package:issues_tracking/core/widgets/project_chip.dart';
+import 'package:issues_tracking/core/widgets/text_hover_widget.dart';
+import 'package:issues_tracking/core/widgets/youtrack_state.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
@@ -17,7 +20,7 @@ import 'package:issues_tracking/features/issues/presentation/bloc/issues_state.d
 import 'package:issues_tracking/features/projects/domain/entities/project_member_entity.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_members_cubit.dart';
-import 'package:issues_tracking/core/init_dependencies.dart' show sl;
+import 'package:issues_tracking/core/init_dependencies.dart' show get_it;
 
 class ProjectView extends StatefulWidget {
   final String projectId;
@@ -29,46 +32,6 @@ class ProjectView extends StatefulWidget {
 }
 
 class _ProjectViewState extends State<ProjectView> {
-  int _selectedIndex = 0;
-
-  final List<_SidebarItem> _sidebarItems = [
-    _SidebarItem(
-      'Issues',
-      AppIcons.issues,
-      (projectId) => AppRouteKeys.projectIssuesPath(projectId),
-    ),
-    _SidebarItem(
-      'Agile Board',
-      AppIcons.board,
-      (projectId) => AppRouteKeys.projectAgileBoardsPath(projectId),
-    ),
-    _SidebarItem(
-      'VCS Changes',
-      AppIcons.versionControl,
-      (projectId) => AppRouteKeys.projectVersionControlChanges(projectId),
-    ),
-    _SidebarItem(
-      'Gantt Chart',
-      AppIcons.ganttChart,
-      (projectId) => AppRouteKeys.projectGanttChartPath(projectId),
-    ),
-    _SidebarItem(
-      'Knowledge Base',
-      AppIcons.knowledgeBase,
-      (projectId) => AppRouteKeys.projectKnowledgeBasePath(projectId),
-    ),
-    _SidebarItem(
-      'Time Tracking',
-      Icons.timer_outlined,
-      (projectId) => AppRouteKeys.projectTimeTrackingPath(projectId),
-    ),
-    _SidebarItem(
-      'Setting',
-      AppIcons.settings,
-      (projectId) => AppRouteKeys.projectSettingsPath(projectId),
-    ),
-  ];
-
   late final ProjectMembersCubit _membersCubit;
   late final ProjectDetailsCubit _projectDetailsCubit;
   late final IssuesBloc _issuesBloc;
@@ -76,10 +39,11 @@ class _ProjectViewState extends State<ProjectView> {
   @override
   void initState() {
     super.initState();
-    _membersCubit = sl<ProjectMembersCubit>()..loadMembers(widget.projectId);
-    _projectDetailsCubit = sl<ProjectDetailsCubit>()
+    _membersCubit = get_it<ProjectMembersCubit>()
+      ..loadMembers(widget.projectId);
+    _projectDetailsCubit = get_it<ProjectDetailsCubit>()
       ..loadProject(widget.projectId);
-    _issuesBloc = sl<IssuesBloc>()
+    _issuesBloc = get_it<IssuesBloc>()
       ..add(UpdateFilter(IssueFilter(projectFilter: widget.projectId)));
   }
 
@@ -97,7 +61,7 @@ class _ProjectViewState extends State<ProjectView> {
       ],
       child: Row(
         children: [
-          _buildSidebar(colors, textTheme),
+          _ProjectViewSideBar(projectId: widget.projectId),
           const VerticalDivider(thickness: 1, width: 0),
           Expanded(
             child: Padding(
@@ -224,131 +188,6 @@ class _ProjectViewState extends State<ProjectView> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSidebar(ColorScheme colors, TextTheme textTheme) {
-    return Container(
-      width: 220,
-      decoration: BoxDecoration(
-        border: Border(
-          right: BorderSide(color: colors.outlineVariant, width: 0.5),
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.small,
-        vertical: AppRadius.medium,
-      ),
-      child: BlocBuilder<ProjectDetailsCubit, ProjectDetailsState>(
-        builder: (context, state) {
-          final project = state.project;
-          final projectName = project?.name ?? 'Project';
-          final projectKey = project?.projectKey ?? '...';
-          final shortKey = projectKey.length > 3
-              ? projectKey.substring(0, 3).toUpperCase()
-              : projectKey.toUpperCase();
-
-          return Column(
-            spacing: AppSpacing.small,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Row(
-                spacing: AppSpacing.small,
-                children: [
-                  SizedBox(
-                    height: 50,
-                    width: 50,
-                    child: Card(
-                      color: colors.onSurface,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Column(
-                        spacing: 2,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Container(
-                              alignment: Alignment.center,
-                              child: Text(
-                                shortKey,
-                                style: textTheme.bodySmall?.copyWith(
-                                  color: colors.tertiary,
-                                ),
-                              ),
-                            ),
-                          ),
-                          Container(
-                            height: 10,
-                            decoration: BoxDecoration(
-                              color: colors.tertiary,
-                              borderRadius: const BorderRadius.vertical(
-                                bottom: Radius.circular(8),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  Column(
-                    spacing: 2,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        projectName,
-                        style: textTheme.labelLarge?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: colors.onSurface,
-                        ),
-                      ),
-                      Text(
-                        projectKey.toUpperCase(),
-                        style: textTheme.labelMedium?.copyWith(
-                          fontWeight: FontWeight.w500,
-                          color: colors.onSurfaceVariant,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _sidebarItems.length,
-                  itemBuilder: (context, index) {
-                    final item = _sidebarItems[index];
-                    return ListTile(
-                      minTileHeight: 25,
-                      title: Text(item.label),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.medium,
-                        vertical: AppSpacing.extraSmall - 2,
-                      ),
-                      hoverColor: colors.primary.withValues(alpha: 0.10),
-                      onTap: () {
-                        setState(() => _selectedIndex = index);
-                        context.go(item.getRoute(widget.projectId));
-                        // if (index == 5) {
-                        //   context.go(
-                        //     AppRouteKeys.projectSettingsPath(widget.projectId),
-                        //   );
-                        // } else if (index == 2) {
-                        //   context.go(
-                        //     '/projects/${widget.projectId}/vcs-changes',
-                        //   );
-                        // } else {
-                        //   context.go(item.getRoute(widget.projectId));
-                        // }
-                      },
-                    );
-                  },
-                ),
-              ),
-            ],
-          );
-        },
       ),
     );
   }
@@ -507,6 +346,126 @@ class _ProjectViewState extends State<ProjectView> {
           ),
         );
       },
+    );
+  }
+}
+
+class _ProjectViewSideBar extends StatefulWidget {
+  final String projectId;
+  const _ProjectViewSideBar({required this.projectId});
+
+  @override
+  State<_ProjectViewSideBar> createState() => _ProjectViewSideBarState();
+}
+
+class _ProjectViewSideBarState extends YouTrackState<_ProjectViewSideBar> {
+  final List<_SidebarItem> _sidebarItems = [
+    _SidebarItem(
+      'Issues',
+      AppIcons.issues,
+      (projectId) => AppRouteKeys.projectIssuesPath(projectId),
+    ),
+    _SidebarItem(
+      'Agile Board',
+      AppIcons.board,
+      (projectId) => AppRouteKeys.projectAgileBoardsPath(projectId),
+    ),
+    _SidebarItem(
+      'Gantt Chart',
+      AppIcons.ganttChart,
+      (projectId) => AppRouteKeys.projectGanttChartPath(projectId),
+    ),
+    _SidebarItem(
+      'Knowledge Base',
+      AppIcons.knowledgeBase,
+      (projectId) => AppRouteKeys.projectKnowledgeBasePath(projectId),
+    ),
+    _SidebarItem(
+      'Setting',
+      AppIcons.settings,
+      (projectId) => AppRouteKeys.projectSettingsPath(projectId),
+    ),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 220,
+      decoration: BoxDecoration(
+        border: Border(
+          right: BorderSide(color: colors.outlineVariant, width: 0.5),
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.small,
+        vertical: AppRadius.medium,
+      ),
+      child: BlocBuilder<ProjectDetailsCubit, ProjectDetailsState>(
+        builder: (context, state) {
+          final project = state.project;
+
+          return Column(
+            spacing: AppSpacing.small,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Row(
+                spacing: AppSpacing.small,
+                children: [
+                  ProjectChip(
+                    shortKey: project?.projectKey ?? '',
+                    colors: colors,
+                    textTheme: textTheme,
+                  ),
+                  Column(
+                    spacing: 2,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextHoverWidget(
+                        text: project?.name ?? 'Project',
+                        style: textTheme.labelLarge!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colors.onSurface,
+                        ),
+                        styleHover: textTheme.labelLarge!.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: colors.secondary,
+                        ),
+                      ),
+                      Text(
+                        project?.projectKey ?? '...'.toUpperCase(),
+                        style: textTheme.labelMedium?.copyWith(
+                          fontWeight: FontWeight.w500,
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _sidebarItems.length,
+                  itemBuilder: (context, index) {
+                    final item = _sidebarItems[index];
+                    return ListTile(
+                      minTileHeight: 25,
+                      title: Text(item.label),
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.medium,
+                        vertical: AppSpacing.extraSmall - 2,
+                      ),
+                      hoverColor: colors.primary.withValues(alpha: 0.10),
+                      onTap: () {
+                        context.go(item.getRoute(widget.projectId));
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          );
+        },
+      ),
     );
   }
 }

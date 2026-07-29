@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_icons.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
+import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
+import 'package:issues_tracking/core/init_dependencies.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/theme/app_fonts.dart';
+import 'package:issues_tracking/features/auth/data/models/user_model.dart';
+import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 /// بطاقة نموذج تسجيل الدخول بتصميم YouTrack.
 ///
@@ -25,6 +31,7 @@ class _LoginFormCardState extends State<LoginFormCard> {
   final _passwordController = TextEditingController();
   bool _rememberMe = true;
   bool _obscurePassword = true;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -199,7 +206,7 @@ class _LoginFormCardState extends State<LoginFormCard> {
             SizedBox(
               height: 44,
               child: FilledButton(
-                onPressed: _handleLogin,
+                onPressed: _isLoading ? null : _handleLogin,
                 style: FilledButton.styleFrom(
                   backgroundColor: colors.primary,
                   foregroundColor: colors.onPrimary,
@@ -207,14 +214,23 @@ class _LoginFormCardState extends State<LoginFormCard> {
                     borderRadius: BorderRadius.circular(AppRadius.extraSmall),
                   ),
                 ),
-                child: Text(
-                  localization.loginButton,
-                  style: textTheme.labelLarge?.copyWith(
-                    fontFamily: AppFonts.primary,
-                    fontWeight: FontWeight.w600,
-                    color: colors.onPrimary,
-                  ),
-                ),
+                child: _isLoading
+                    ? SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: colors.onPrimary,
+                        ),
+                      )
+                    : Text(
+                        localization.loginButton,
+                        style: textTheme.labelLarge?.copyWith(
+                          fontFamily: AppFonts.primary,
+                          fontWeight: FontWeight.w600,
+                          color: colors.onPrimary,
+                        ),
+                      ),
               ),
             ),
             const SizedBox(height: AppSpacing.small),
@@ -224,15 +240,41 @@ class _LoginFormCardState extends State<LoginFormCard> {
     );
   }
 
-  void _handleLogin() {
-    // TODO: تنفيذ منطق تسجيل الدخول
-    final username = _usernameController.text.trim();
+  Future<void> _handleLogin() async {
+    final email = _usernameController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (username.isEmpty || password.isEmpty) {
-      return;
-    }
+    if (email.isEmpty || password.isEmpty) return;
 
-    // سيتم ربط هذا مع الـ Bloc/Cubit لاحقاً
+    setState(() => _isLoading = true);
+
+    try {
+      final supabase = get_it<SupabaseClient>();
+      final authResponse = await supabase.auth.signInWithPassword(
+        email: email,
+        password: password,
+      );
+      final authUser = authResponse.user;
+      if (authUser == null) return;
+
+      final userData = await supabase
+          .from('users')
+          .select()
+          .eq('id', authUser.id)
+          .single();
+
+      final userEntity = UserModel.fromJson(userData);
+      get_it<UserSession>().setUser(userEntity);
+
+      if (context.mounted) context.go(AppRouteKeys.dashboard);
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: SelectableText(e.toString())),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 }

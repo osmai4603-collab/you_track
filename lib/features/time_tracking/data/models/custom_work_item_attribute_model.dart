@@ -44,7 +44,7 @@ class CustomWorkItemAttributeModel extends CustomWorkItemAttributeEntity {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id.isNotEmpty) 'id': id,
       'project_id': projectId,
       'name': name,
       'field_type': fieldType.value,

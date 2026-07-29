@@ -2,6 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:issues_tracking/core/enums/tag_permission_scope_enum.dart';
 import 'package:issues_tracking/core/enums/tag_subscription_event_enum.dart';
 import '../../domain/entities/project_member.dart';
+import '../../domain/entities/tag.dart';
 
 enum NewTagStatus { initial, loading, submitting, success, failure }
 
@@ -25,6 +26,8 @@ class NewTagState extends Equatable {
   // Subscriptions
   final List<TagSubscriptionEvent> subscriptions;
 
+  final Tag? createdTag;
+
   const NewTagState({
     this.name = '',
     this.nameError,
@@ -42,6 +45,7 @@ class NewTagState extends Equatable {
     },
     this.specificUserIds = const [],
     this.subscriptions = const [],
+    this.createdTag,
   });
 
   NewTagState copyWith({
@@ -58,6 +62,7 @@ class NewTagState extends Equatable {
     Map<String, TagPermissionScope>? permissions,
     List<String>? specificUserIds,
     List<TagSubscriptionEvent>? subscriptions,
+    Tag? createdTag,
   }) {
     return NewTagState(
       name: name ?? this.name,
@@ -72,6 +77,7 @@ class NewTagState extends Equatable {
       permissions: permissions ?? this.permissions,
       specificUserIds: specificUserIds ?? this.specificUserIds,
       subscriptions: subscriptions ?? this.subscriptions,
+      createdTag: createdTag ?? this.createdTag,
     );
   }
 
@@ -89,5 +95,6 @@ class NewTagState extends Equatable {
         permissions,
         specificUserIds,
         subscriptions,
+        createdTag,
       ];
 }

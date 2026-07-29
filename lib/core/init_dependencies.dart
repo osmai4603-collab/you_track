@@ -12,6 +12,7 @@ import "package:issues_tracking/features/dashboards/presentation/cubits/youtrack
 import 'package:issues_tracking/features/issues/data/datasources/issues_remote_data_source.dart';
 import 'package:issues_tracking/features/issues/data/repositories/issues_repository_impl.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/issues_repository.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/get_builds_use_case.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_issues.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_issue_by_id.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
@@ -23,13 +24,12 @@ import 'package:issues_tracking/features/app/domain/repositories/app_settings_re
 import 'package:issues_tracking/features/app/domain/usecases/get_app_settings.dart';
 import 'package:issues_tracking/features/app/domain/usecases/save_app_settings.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/app_cubit.dart';
-
 import 'package:issues_tracking/features/projects/data/datasources/projects_local_data_source.dart';
 import 'package:issues_tracking/features/projects/data/datasources/projects_remote_data_source.dart';
 import 'package:issues_tracking/features/projects/data/repositories/projects_repository_impl.dart';
 import 'package:issues_tracking/features/projects/domain/repositories/projects_repository.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/get_projects_use_case.dart';
-import 'package:issues_tracking/features/projects/domain/usecases/get_project_templates_use_case.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/get_sprints_use_case.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/get_project_by_id_use_case.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/create_project_use_case.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/update_project_use_case.dart';
@@ -55,11 +55,11 @@ import 'package:issues_tracking/features/custom_fields/domain/usecases/update_fi
 import 'package:issues_tracking/features/custom_fields/domain/usecases/replace_field_value_use_case.dart';
 import 'package:issues_tracking/features/custom_fields/presentation/cubits/custom_fields_cubit.dart';
 
-import 'package:issues_tracking/features/custom_field/data/datasources/custom_field_remote_data_source.dart';
-import 'package:issues_tracking/features/custom_field/data/repositories/custom_field_repository_impl.dart';
-import 'package:issues_tracking/features/custom_field/domain/repositories/custom_field_repository.dart';
-import 'package:issues_tracking/features/custom_field/domain/usecases/validate_custom_field_name.dart';
-import 'package:issues_tracking/features/custom_field/domain/usecases/create_custom_field.dart';
+import 'package:issues_tracking/features/custom_fields/data/datasources/custom_field_remote_data_source.dart';
+import 'package:issues_tracking/features/custom_fields/data/repositories/custom_field_repository_impl.dart';
+import 'package:issues_tracking/features/custom_fields/domain/repositories/custom_field_repository.dart';
+import 'package:issues_tracking/features/custom_fields/domain/usecases/validate_custom_field_name.dart';
+import 'package:issues_tracking/features/custom_fields/domain/usecases/create_custom_field.dart';
 import 'package:issues_tracking/features/custom_fields/presentation/cubits/cubits/custom_field_panel_cubit.dart';
 import 'package:issues_tracking/features/custom_fields/presentation/cubits/cubits/tab_selection_cubit.dart';
 import 'package:issues_tracking/features/custom_fields/presentation/cubits/cubits/form_state_cubit.dart';
@@ -126,14 +126,32 @@ import 'package:issues_tracking/features/knowledge_base/presentation/cubits/arti
 import 'package:issues_tracking/features/knowledge_base/presentation/cubits/article_search_cubit.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/cubits/article_notification_cubit.dart';
 
-final sl = GetIt.instance;
+import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/issues/data/datasources/tag_remote_datasource.dart';
+import 'package:issues_tracking/features/issues/data/repositories/tags_repository_impl.dart';
+import 'package:issues_tracking/features/issues/domain/repositories/tags_repository.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/create_tag.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/get_project_members.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/is_tag_name_unique.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/associate_tag_with_issue.dart';
+import 'package:issues_tracking/features/issues/presentation/cubits/new_tag_cubit.dart';
+
+import 'package:issues_tracking/features/agile_boards/data/datasources/agile_boards_supabase_data_source.dart';
+import 'package:issues_tracking/features/agile_boards/data/repositories/agile_boards_repository_impl.dart';
+import 'package:issues_tracking/features/agile_boards/domain/repositories/agile_boards_repository.dart';
+import 'package:issues_tracking/features/agile_boards/domain/use_cases/get_board_details_use_case.dart';
+import 'package:issues_tracking/features/agile_boards/domain/use_cases/move_card_use_case.dart';
+import 'package:issues_tracking/features/agile_boards/presentation/bloc/agile_boards_bloc.dart';
+
+// ignore: non_constant_identifier_names
+final get_it = GetIt.instance;
 
 Future<void> initDependencies() async {
   // 1. Core Services
   final sharedPreferences = await SharedPreferences.getInstance();
-  sl.registerLazySingleton(() => sharedPreferences);
-  sl.registerLazySingleton(() => Supabase.instance.client);
-  sl.registerLazySingleton<Box<dynamic>>(() => Hive.box('article_drafts'));
+  get_it.registerLazySingleton(() => sharedPreferences);
+  get_it.registerLazySingleton(() => Supabase.instance.client);
+  get_it.registerLazySingleton<Box<dynamic>>(() => Hive.box('article_drafts'));
 
   // 2. App Feature Initialization
   _initAppFeature();
@@ -141,305 +159,368 @@ Future<void> initDependencies() async {
   _initIssuesFeature();
   _initProjectsFeature();
   _initCustomFieldsFeature();
-  _initCustomFieldFeature();
   _initVersionControlFeature();
   _initTimeTrackingFeature();
+  _initAuthFeature();
   _initKnowledgeBaseFeature();
+  _initAgileBoardsFeature();
 }
 
 void _initAppFeature() {
   // Data Sources
-  sl.registerLazySingleton<AppSettingsLocalDataSource>(
-    () => AppSettingsLocalDataSourceImpl(sl()),
+  get_it.registerLazySingleton<AppSettingsLocalDataSource>(
+    () => AppSettingsLocalDataSourceImpl(get_it()),
   );
 
   // Repositories
-  sl.registerLazySingleton<AppSettingsRepository>(
-    () => AppSettingsRepositoryImpl(sl()),
+  get_it.registerLazySingleton<AppSettingsRepository>(
+    () => AppSettingsRepositoryImpl(get_it()),
   );
 
   // UseCases
-  sl.registerLazySingleton(() => GetAppSettings(sl()));
-  sl.registerLazySingleton(() => SaveAppSettings(sl()));
+  get_it.registerLazySingleton(() => GetAppSettings(get_it()));
+  get_it.registerLazySingleton(() => SaveAppSettings(get_it()));
 
   // Cubits
-  sl.registerFactory(
-    () => AppCubit(getAppSettings: sl(), saveAppSettings: sl()),
+  get_it.registerFactory(
+    () => AppCubit(getAppSettings: get_it(), saveAppSettings: get_it()),
   );
 }
 
 void _initDashboardsFeature() {
   // Data Sources
-  sl.registerLazySingleton<DashboardRemoteDataSource>(
-    () => DashboardRemoteDataSourceImpl(sl()),
+  get_it.registerLazySingleton<DashboardRemoteDataSource>(
+    () => DashboardRemoteDataSourceImpl(get_it()),
   );
 
   // Repositories
-  sl.registerLazySingleton<DashboardRepository>(
-    () => DashboardRepositoryImpl(sl()),
+  get_it.registerLazySingleton<DashboardRepository>(
+    () => DashboardRepositoryImpl(get_it()),
   );
 
   // UseCases
-  sl.registerLazySingleton(() => GetDashboards(sl()));
+  get_it.registerLazySingleton(() => GetDashboards(get_it()));
 
   // Blocs
-  sl.registerFactory(
-    () => DashboardBloc(getDashboards: sl(), repository: sl()),
+  get_it.registerFactory(
+    () => DashboardBloc(getDashboards: get_it(), repository: get_it()),
   );
 
-  sl.registerFactory(() => YouTrackShellCubit());
+  get_it.registerFactory(() => YouTrackShellCubit());
 }
 
 void _initIssuesFeature() {
   // Data Sources
-  sl.registerLazySingleton<IssuesRemoteDataSource>(
-    () => IssuesRemoteDataSourceImpl(sl()),
+  get_it.registerLazySingleton<IssuesRemoteDataSource>(
+    () => IssuesRemoteDataSourceImpl(get_it()),
+  );
+  get_it.registerLazySingleton<TagRemoteDatasource>(
+    () => TagRemoteDatasourceImpl(get_it()),
   );
 
   // Repositories
-  sl.registerLazySingleton<IssuesRepository>(() => IssuesRepositoryImpl(sl()));
+  get_it.registerLazySingleton<IssuesRepository>(
+    () => IssuesRepositoryImpl(get_it()),
+  );
+  get_it.registerLazySingleton<TagsRepository>(
+    () => TagsRepositoryImpl(get_it()),
+  );
 
   // UseCases
-  sl.registerLazySingleton(() => GetIssues(sl()));
-  sl.registerLazySingleton(() => GetIssueById(sl()));
+  get_it.registerLazySingleton(() => GetIssues(get_it()));
+  get_it.registerLazySingleton(() => GetIssueById(get_it()));
+  get_it.registerLazySingleton(() => CreateTag(get_it()));
+  get_it.registerLazySingleton(() => GetProjectMembers(get_it()));
+  get_it.registerLazySingleton(() => IsTagNameUnique(get_it()));
+  get_it.registerLazySingleton(() => AssociateTagWithIssue(get_it()));
 
   // Blocs
-  sl.registerFactory(() => IssuesBloc(getIssues: sl(), repository: sl()));
-  sl.registerFactory(() => IssueFormCubit(repository: sl()));
+  get_it.registerFactory(
+    () => IssuesBloc(getIssues: get_it(), repository: get_it()),
+  );
+  get_it.registerFactory(
+    () => IssueFormCubit(
+      repository: get_it(),
+      getSprintsUseCase: get_it(),
+      getBuildsUseCase: get_it(),
+      getProjectsUseCase: get_it(),
+      getProjectMembersUseCase: get_it(),
+    ),
+  );
+  get_it.registerFactory(
+    () => NewTagCubit(
+      createTagUseCase: get_it(),
+      getProjectMembersUseCase: get_it(),
+      isTagNameUniqueUseCase: get_it(),
+      associateTagUseCase: get_it(),
+    ),
+  );
 }
 
 void _initProjectsFeature() {
   // Data Sources
-  sl.registerLazySingleton<ProjectsLocalDataSource>(
+  get_it.registerLazySingleton<ProjectsLocalDataSource>(
     () => ProjectsLocalDataSourceImpl(),
   );
-  sl.registerLazySingleton<ProjectsRemoteDataSource>(
-    () => ProjectsRemoteDataSourceImpl(sl()),
+  get_it.registerLazySingleton<ProjectsRemoteDataSource>(
+    () => ProjectsRemoteDataSourceImpl(get_it()),
   );
 
   // Repositories
-  sl.registerLazySingleton<ProjectsRepository>(
-    () => ProjectsRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
+  get_it.registerLazySingleton<ProjectsRepository>(
+    () => ProjectsRepositoryImpl(
+      remoteDataSource: get_it(),
+      localDataSource: get_it(),
+    ),
   );
 
   // UseCases
-  sl.registerLazySingleton(() => GetProjectsUseCase(sl()));
-  sl.registerLazySingleton(() => GetProjectTemplatesUseCase(sl()));
-  sl.registerLazySingleton(() => GetProjectByIdUseCase(sl()));
-  sl.registerLazySingleton(() => CreateProjectUseCase(sl()));
-  sl.registerLazySingleton(() => UpdateProjectUseCase(sl()));
-  sl.registerLazySingleton(() => ArchiveProjectUseCase(sl()));
-  sl.registerLazySingleton(() => DeleteProjectUseCase(sl()));
-  sl.registerLazySingleton(() => GetProjectMembersUseCase(sl()));
-  sl.registerLazySingleton(() => AddProjectMemberUseCase(sl()));
+  get_it.registerLazySingleton(() => GetProjectsUseCase(get_it()));
+  get_it.registerLazySingleton(() => GetProjectMembersUseCase(get_it()));
+  get_it.registerLazySingleton(() => GetSprintsUseCase(get_it()));
+  get_it.registerLazySingleton(() => GetBuildsUseCase(get_it()));
+  get_it.registerLazySingleton(() => GetProjectByIdUseCase(get_it()));
+  get_it.registerLazySingleton(() => CreateProjectUseCase(get_it()));
+  get_it.registerLazySingleton(() => UpdateProjectUseCase(get_it()));
+  get_it.registerLazySingleton(() => ArchiveProjectUseCase(get_it()));
+  get_it.registerLazySingleton(() => DeleteProjectUseCase(get_it()));
+  get_it.registerLazySingleton(() => AddProjectMemberUseCase(get_it()));
 
   // Cubits
-  sl.registerFactory(
+  get_it.registerFactory(
     () => ProjectsListCubit(
-      getProjectsUseCase: sl(),
-      archiveProjectUseCase: sl(),
-      deleteProjectUseCase: sl(),
-      updateProjectUseCase: sl(),
+      getProjectsUseCase: get_it(),
+      archiveProjectUseCase: get_it(),
+      deleteProjectUseCase: get_it(),
+      updateProjectUseCase: get_it(),
     ),
   );
-  sl.registerFactory(
+  get_it.registerFactory(
     () => ProjectCreationCubit(
-      getProjectTemplatesUseCase: sl(),
-      createProjectUseCase: sl(),
-      addProjectMemberUseCase: sl(),
+      getProjectTemplatesUseCase: get_it(),
+      createProjectUseCase: get_it(),
+      addProjectMemberUseCase: get_it(),
     ),
   );
-  sl.registerFactory(() => ProjectDetailsCubit(getProjectByIdUseCase: sl()));
-  sl.registerFactory(
+  get_it.registerFactory(
+    () => ProjectDetailsCubit(getProjectByIdUseCase: get_it()),
+  );
+  get_it.registerFactory(
     () => ProjectMembersCubit(
-      getProjectMembersUseCase: sl(),
-      addProjectMemberUseCase: sl(),
+      getProjectMembersUseCase: get_it(),
+      addProjectMemberUseCase: get_it(),
     ),
   );
 }
 
 void _initCustomFieldsFeature() {
-  sl.registerLazySingleton<CustomFieldsRemoteDataSource>(
-    () => CustomFieldsRemoteDataSourceImpl(sl()),
+  get_it.registerLazySingleton<CustomFieldsRemoteDataSource>(
+    () => CustomFieldsRemoteDataSourceImpl(get_it()),
   );
 
-  sl.registerLazySingleton<CustomFieldsRepository>(
-    () => CustomFieldsRepositoryImpl(sl()),
+  get_it.registerLazySingleton<CustomFieldsRepository>(
+    () => CustomFieldsRepositoryImpl(get_it()),
   );
 
-  sl.registerLazySingleton(() => GetCustomFieldsUseCase(sl()));
-  sl.registerLazySingleton(() => AddCustomFieldUseCase(sl()));
-  sl.registerLazySingleton(() => UpdateCustomFieldUseCase(sl()));
-  sl.registerLazySingleton(() => DeleteCustomFieldsUseCase(sl()));
-  sl.registerLazySingleton(() => ReorderCustomFieldsUseCase(sl()));
-  sl.registerLazySingleton(() => UpdateFieldVisibilityUseCase(sl()));
-  sl.registerLazySingleton(() => UpdateFieldAccessControlUseCase(sl()));
-  sl.registerLazySingleton(() => ReplaceFieldValueUseCase(sl()));
+  get_it.registerLazySingleton(() => GetCustomFieldsUseCase(get_it()));
+  get_it.registerLazySingleton(() => AddCustomFieldUseCase(get_it()));
+  get_it.registerLazySingleton(() => UpdateCustomFieldUseCase(get_it()));
+  get_it.registerLazySingleton(() => DeleteCustomFieldsUseCase(get_it()));
+  get_it.registerLazySingleton(() => ReorderCustomFieldsUseCase(get_it()));
+  get_it.registerLazySingleton(() => UpdateFieldVisibilityUseCase(get_it()));
+  get_it.registerLazySingleton(() => UpdateFieldAccessControlUseCase(get_it()));
+  get_it.registerLazySingleton(() => ReplaceFieldValueUseCase(get_it()));
 
-  sl.registerFactory(
+  get_it.registerFactory(
     () => CustomFieldsCubit(
-      getFieldsUseCase: sl(),
-      addFieldUseCase: sl(),
-      updateFieldUseCase: sl(),
-      deleteFieldsUseCase: sl(),
-      reorderFieldsUseCase: sl(),
-      updateVisibilityUseCase: sl(),
-      updateAccessControlUseCase: sl(),
-      replaceFieldValueUseCase: sl(),
+      getFieldsUseCase: get_it(),
+      addFieldUseCase: get_it(),
+      updateFieldUseCase: get_it(),
+      deleteFieldsUseCase: get_it(),
+      reorderFieldsUseCase: get_it(),
+      updateVisibilityUseCase: get_it(),
+      updateAccessControlUseCase: get_it(),
+      replaceFieldValueUseCase: get_it(),
     ),
   );
-}
 
-void _initCustomFieldFeature() {
-  // Data Sources
-  sl.registerLazySingleton<CustomFieldRemoteDataSource>(
-    () => CustomFieldRemoteDataSourceImpl(sl()),
+  get_it.registerLazySingleton<CustomFieldRemoteDataSource>(
+    () => CustomFieldRemoteDataSourceImpl(get_it()),
   );
 
-  // Repositories
-  sl.registerLazySingleton<CustomFieldRepository>(
-    () => CustomFieldRepositoryImpl(sl()),
+  get_it.registerLazySingleton<CustomFieldRepository>(
+    () => CustomFieldRepositoryImpl(get_it()),
   );
 
-  // Use Cases
-  sl.registerLazySingleton(() => ValidateCustomFieldName(sl()));
-  sl.registerLazySingleton(() => CreateCustomField(sl()));
+  get_it.registerLazySingleton(() => ValidateCustomFieldName(get_it()));
+  get_it.registerLazySingleton(() => CreateCustomField(get_it()));
 
-  // Cubits
-  sl.registerFactory(() => CustomFieldPanelCubit());
-  sl.registerFactory(() => TabSelectionCubit());
-  sl.registerFactory(
-    () => FormStateCubit(validateFieldName: sl(), createCustomField: sl()),
+  get_it.registerFactory(() => CustomFieldPanelCubit());
+  get_it.registerFactory(() => TabSelectionCubit());
+  get_it.registerFactory(
+    () => FormStateCubit(
+      validateFieldName: get_it(),
+      createCustomField: get_it(),
+    ),
   );
-  sl.registerFactory(() => PrivacyStateCubit());
+  get_it.registerFactory(() => PrivacyStateCubit());
 }
 
 void _initVersionControlFeature() {
-  sl.registerLazySingleton<VersionControlRemoteDataSource>(
-    () => VersionControlRemoteDataSourceImpl(sl()),
+  get_it.registerLazySingleton<VersionControlRemoteDataSource>(
+    () => VersionControlRemoteDataSourceImpl(get_it()),
   );
 
-  sl.registerLazySingleton<VersionControlRepository>(
-    () => VersionControlRepositoryImpl(sl()),
+  get_it.registerLazySingleton<VersionControlRepository>(
+    () => VersionControlRepositoryImpl(get_it()),
   );
 
-  sl.registerLazySingleton(() => GetIntegrationsUseCase(sl()));
-  sl.registerLazySingleton(() => CreateIntegrationUseCase(sl()));
-  sl.registerLazySingleton(() => UpdateIntegrationUseCase(sl()));
-  sl.registerLazySingleton(() => DeleteIntegrationUseCase(sl()));
-  sl.registerLazySingleton(() => TestConnectionUseCase(sl()));
-  sl.registerLazySingleton(() => ManageUserMappingUseCase(sl()));
-  sl.registerLazySingleton(() => SyncCommitsUseCase(sl()));
+  get_it.registerLazySingleton(() => GetIntegrationsUseCase(get_it()));
+  get_it.registerLazySingleton(() => CreateIntegrationUseCase(get_it()));
+  get_it.registerLazySingleton(() => UpdateIntegrationUseCase(get_it()));
+  get_it.registerLazySingleton(() => DeleteIntegrationUseCase(get_it()));
+  get_it.registerLazySingleton(() => TestConnectionUseCase(get_it()));
+  get_it.registerLazySingleton(() => ManageUserMappingUseCase(get_it()));
+  get_it.registerLazySingleton(() => SyncCommitsUseCase(get_it()));
 
-  sl.registerFactory(
+  get_it.registerFactory(
     () => VcsIntegrationsCubit(
-      getIntegrationsUseCase: sl(),
-      createIntegrationUseCase: sl(),
-      updateIntegrationUseCase: sl(),
-      deleteIntegrationUseCase: sl(),
-      testConnectionUseCase: sl(),
-      manageUserMappingUseCase: sl(),
-      syncCommitsUseCase: sl(),
+      getIntegrationsUseCase: get_it(),
+      createIntegrationUseCase: get_it(),
+      updateIntegrationUseCase: get_it(),
+      deleteIntegrationUseCase: get_it(),
+      testConnectionUseCase: get_it(),
+      manageUserMappingUseCase: get_it(),
+      syncCommitsUseCase: get_it(),
     ),
   );
 }
 
 void _initTimeTrackingFeature() {
-  sl.registerLazySingleton<TimeTrackingRemoteDataSource>(
-    () => TimeTrackingRemoteDataSourceImpl(sl()),
+  get_it.registerLazySingleton<TimeTrackingRemoteDataSource>(
+    () => TimeTrackingRemoteDataSourceImpl(get_it()),
   );
 
-  sl.registerLazySingleton<TimeTrackingRepository>(
-    () => TimeTrackingRepositoryImpl(sl()),
+  get_it.registerLazySingleton<TimeTrackingRepository>(
+    () => TimeTrackingRepositoryImpl(get_it()),
   );
 
-  sl.registerLazySingleton(() => GetTimeTrackingConfig(sl()));
-  sl.registerLazySingleton(() => SaveTimeTrackingConfig(sl()));
-  sl.registerLazySingleton(() => GetAvailablePeriodFields(sl()));
-  sl.registerLazySingleton(() => GetWorkTypes(sl()));
-  sl.registerLazySingleton(() => AddWorkType(sl()));
-  sl.registerLazySingleton(() => UpdateWorkType(sl()));
-  sl.registerLazySingleton(() => DeleteWorkType(sl()));
-  sl.registerLazySingleton(() => ReorderWorkTypes(sl()));
-  sl.registerLazySingleton(() => GetCustomAttributes(sl()));
-  sl.registerLazySingleton(() => AddCustomAttribute(sl()));
-  sl.registerLazySingleton(() => UpdateCustomAttribute(sl()));
-  sl.registerLazySingleton(() => DeleteCustomAttribute(sl()));
+  get_it.registerLazySingleton(() => GetTimeTrackingConfig(get_it()));
+  get_it.registerLazySingleton(() => SaveTimeTrackingConfig(get_it()));
+  get_it.registerLazySingleton(() => GetAvailablePeriodFields(get_it()));
+  get_it.registerLazySingleton(() => GetWorkTypes(get_it()));
+  get_it.registerLazySingleton(() => AddWorkType(get_it()));
+  get_it.registerLazySingleton(() => UpdateWorkType(get_it()));
+  get_it.registerLazySingleton(() => DeleteWorkType(get_it()));
+  get_it.registerLazySingleton(() => ReorderWorkTypes(get_it()));
+  get_it.registerLazySingleton(() => GetCustomAttributes(get_it()));
+  get_it.registerLazySingleton(() => AddCustomAttribute(get_it()));
+  get_it.registerLazySingleton(() => UpdateCustomAttribute(get_it()));
+  get_it.registerLazySingleton(() => DeleteCustomAttribute(get_it()));
 
-  sl.registerFactory(
+  get_it.registerFactory(
     () => TimeTrackingConfigCubit(
-      getConfigUseCase: sl(),
-      saveConfigUseCase: sl(),
-      getAvailablePeriodFieldsUseCase: sl(),
+      getConfigUseCase: get_it(),
+      saveConfigUseCase: get_it(),
+      getAvailablePeriodFieldsUseCase: get_it(),
     ),
   );
 }
 
 void _initKnowledgeBaseFeature() {
-  sl.registerLazySingleton<ArticleRemoteDataSource>(
-    () => ArticleRemoteDataSourceImpl(sl()),
+  get_it.registerLazySingleton<ArticleRemoteDataSource>(
+    () => ArticleRemoteDataSourceImpl(get_it()),
   );
-  sl.registerLazySingleton<ArticleLocalDataSource>(
-    () => ArticleLocalDataSourceImpl(sl()),
+  get_it.registerLazySingleton<ArticleLocalDataSource>(
+    () => ArticleLocalDataSourceImpl(get_it()),
   );
-  sl.registerLazySingleton<ArticleCommentRemoteDataSource>(
-    () => ArticleCommentRemoteDataSourceImpl(sl()),
+  get_it.registerLazySingleton<ArticleCommentRemoteDataSource>(
+    () => ArticleCommentRemoteDataSourceImpl(get_it()),
   );
-  sl.registerLazySingleton<ArticleNotificationRemoteDataSource>(
-    () => ArticleNotificationRemoteDataSourceImpl(sl()),
-  );
-
-  sl.registerLazySingleton<ArticleRepository>(
-    () => ArticleRepositoryImpl(remoteDataSource: sl(), localDataSource: sl()),
-  );
-  sl.registerLazySingleton<ArticleCommentRepository>(
-    () => ArticleCommentRepositoryImpl(remoteDataSource: sl()),
-  );
-  sl.registerLazySingleton<ArticleNotificationRepository>(
-    () => ArticleNotificationRepositoryImpl(remoteDataSource: sl()),
+  get_it.registerLazySingleton<ArticleNotificationRemoteDataSource>(
+    () => ArticleNotificationRemoteDataSourceImpl(get_it()),
   );
 
-  sl.registerLazySingleton(() => GetArticleTree(sl()));
-  sl.registerLazySingleton(() => GetArticleById(sl()));
-  sl.registerLazySingleton(() => CreateArticle(sl()));
-  sl.registerLazySingleton(() => UpdateArticle(sl()));
-  sl.registerLazySingleton(() => PublishArticle(sl()));
-  sl.registerLazySingleton(() => DeleteArticle(sl()));
-  sl.registerLazySingleton(() => ReorderArticles(sl()));
-  sl.registerLazySingleton(() => SearchArticles(sl()));
-  sl.registerLazySingleton(() => SaveDraft(sl()));
-  sl.registerLazySingleton(() => GetDraft(sl()));
-  sl.registerLazySingleton(() => AddComment(sl()));
-  sl.registerLazySingleton(() => ResolveComment(sl()));
-  sl.registerLazySingleton(() => DeleteComment(sl()));
-  sl.registerLazySingleton(() => GetCommentsForArticle(sl()));
-  sl.registerLazySingleton(() => SubscribeToNotifications(sl()));
+  get_it.registerLazySingleton<ArticleRepository>(
+    () => ArticleRepositoryImpl(
+      remoteDataSource: get_it(),
+      localDataSource: get_it(),
+    ),
+  );
+  get_it.registerLazySingleton<ArticleCommentRepository>(
+    () => ArticleCommentRepositoryImpl(remoteDataSource: get_it()),
+  );
+  get_it.registerLazySingleton<ArticleNotificationRepository>(
+    () => ArticleNotificationRepositoryImpl(remoteDataSource: get_it()),
+  );
 
-  sl.registerFactory(
+  get_it.registerLazySingleton(() => GetArticleTree(get_it()));
+  get_it.registerLazySingleton(() => GetArticleById(get_it()));
+  get_it.registerLazySingleton(() => CreateArticle(get_it()));
+  get_it.registerLazySingleton(() => UpdateArticle(get_it()));
+  get_it.registerLazySingleton(() => PublishArticle(get_it()));
+  get_it.registerLazySingleton(() => DeleteArticle(get_it()));
+  get_it.registerLazySingleton(() => ReorderArticles(get_it()));
+  get_it.registerLazySingleton(() => SearchArticles(get_it()));
+  get_it.registerLazySingleton(() => SaveDraft(get_it()));
+  get_it.registerLazySingleton(() => GetDraft(get_it()));
+  get_it.registerLazySingleton(() => AddComment(get_it()));
+  get_it.registerLazySingleton(() => ResolveComment(get_it()));
+  get_it.registerLazySingleton(() => DeleteComment(get_it()));
+  get_it.registerLazySingleton(() => GetCommentsForArticle(get_it()));
+  get_it.registerLazySingleton(() => SubscribeToNotifications(get_it()));
+
+  get_it.registerFactory(
     () => ArticleTreeBloc(
-      getArticleTree: sl(),
-      deleteArticle: sl(),
-      reorderArticles: sl(),
+      getArticleTree: get_it(),
+      deleteArticle: get_it(),
+      reorderArticles: get_it(),
     ),
   );
-  sl.registerFactory(
+  get_it.registerFactory(
     () => ArticleEditorBloc(
-      createArticle: sl(),
-      updateArticle: sl(),
-      publishArticle: sl(),
-      saveDraft: sl(),
-      getDraft: sl(),
+      createArticle: get_it(),
+      updateArticle: get_it(),
+      publishArticle: get_it(),
+      saveDraft: get_it(),
+      getDraft: get_it(),
     ),
   );
-  sl.registerFactory(() => ArticleCommentBloc(
-        getComments: sl(),
-        addComment: sl(),
-        resolveComment: sl(),
-        deleteComment: sl(),
-      ));
-  sl.registerFactory(() => ArticleTocCubit());
-  sl.registerFactory(() => ArticleSearchCubit(searchArticles: sl()));
-  sl.registerFactory(() => ArticleNotificationCubit(
-        subscribeToNotifications: sl(),
-      ));
+  get_it.registerFactory(
+    () => ArticleCommentBloc(
+      getComments: get_it(),
+      addComment: get_it(),
+      resolveComment: get_it(),
+      deleteComment: get_it(),
+    ),
+  );
+  get_it.registerFactory(() => ArticleTocCubit());
+  get_it.registerFactory(() => ArticleSearchCubit(searchArticles: get_it()));
+  get_it.registerFactory(
+    () => ArticleNotificationCubit(subscribeToNotifications: get_it()),
+  );
+}
+
+void _initAuthFeature() {
+  get_it.registerLazySingleton<UserSession>(() => UserSession());
+}
+
+void _initAgileBoardsFeature() {
+  get_it.registerLazySingleton<AgileBoardsRemoteDataSource>(
+    () => AgileBoardsSupabaseDataSource(get_it()),
+  );
+
+  get_it.registerLazySingleton<AgileBoardsRepository>(
+    () => AgileBoardsRepositoryImpl(get_it()),
+  );
+
+  get_it.registerLazySingleton(() => GetBoardDetailsUseCase(get_it()));
+  get_it.registerLazySingleton(() => MoveCardUseCase(get_it()));
+
+  get_it.registerFactory(
+    () => AgileBoardsBloc(
+      getBoardDetailsUseCase: get_it(),
+      moveCardUseCase: get_it(),
+    ),
+  );
 }

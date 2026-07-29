@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/issue_priority_chip.dart';
@@ -82,19 +83,22 @@ class _IssueTableRowState extends State<IssueTableRow> {
                       activeColor: colors.primary,
                     ),
                     const SizedBox(width: 10),
-                    TextHoverWidget(
-                      text: issue.issueType.name.toString(),
-                      style: textTheme.labelMedium!.copyWith(
-                        color: colors.onSurfaceVariant,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      styleHover: textTheme.labelMedium!.copyWith(
-                        color: colors.secondary,
+                    GestureDetector(
+                      onTap: () => context.go('/issues/${issue.id}/edit'),
+                      child: TextHoverWidget(
+                        text: issue.issueKey,
+                        style: textTheme.labelMedium!.copyWith(
+                          color: colors.onSurfaceVariant,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        styleHover: textTheme.labelMedium!.copyWith(
+                          color: colors.secondary,
 
-                        fontWeight: FontWeight.w500,
-                        decoration: TextDecoration.underline,
-                        decorationColor: colors.secondary,
-                        decorationThickness: 1.2,
+                          fontWeight: FontWeight.w500,
+                          decoration: TextDecoration.underline,
+                          decorationColor: colors.secondary,
+                          decorationThickness: 1.2,
+                        ),
                       ),
                     ),
                   ],
@@ -129,7 +133,10 @@ class _IssueTableRowState extends State<IssueTableRow> {
                 width: 100,
                 child: TextHoverWidget(
                   text: issue.state.displayName(widget.localization),
-                  style: textTheme.bodyMedium!.copyWith(fontWeight: .w600),
+                  style: textTheme.bodyMedium!.copyWith(
+                    fontWeight: .w600,
+                    color: colors.primary,
+                  ),
                   styleHover: textTheme.bodyMedium!.copyWith(
                     fontWeight: FontWeight.w500,
                     color: colors.secondary,
@@ -149,6 +156,7 @@ class _IssueTableRowState extends State<IssueTableRow> {
                         text: issue.issueType.displayName(widget.localization),
                         style: textTheme.bodyMedium!.copyWith(
                           fontWeight: .w600,
+                          color: colors.primary,
                         ),
                         styleHover: textTheme.bodyMedium!.copyWith(
                           fontWeight: FontWeight.w500,
@@ -184,6 +192,7 @@ class _IssueTableRowState extends State<IssueTableRow> {
                               text: issue.assigneeName ?? 'Unassigned',
                               style: textTheme.bodyMedium!.copyWith(
                                 fontWeight: .w600,
+                                color: colors.primary,
                               ),
                               styleHover: textTheme.bodyMedium!.copyWith(
                                 fontWeight: FontWeight.w500,
@@ -200,6 +209,7 @@ class _IssueTableRowState extends State<IssueTableRow> {
                         text: issue.assigneeName ?? 'Unassigned',
                         style: textTheme.bodyMedium!.copyWith(
                           fontWeight: .w600,
+                          color: colors.primary,
                         ),
                         styleHover: textTheme.bodyMedium!.copyWith(
                           fontWeight: FontWeight.w500,
@@ -223,7 +233,10 @@ class _IssueTableRowState extends State<IssueTableRow> {
                 width: 100,
                 child: TextHoverWidget(
                   text: issue.priority.displayName(localization),
-                  style: textTheme.bodyMedium!.copyWith(fontWeight: .w600),
+                  style: textTheme.bodyMedium!.copyWith(
+                    fontWeight: .w500,
+                    color: colors.primary,
+                  ),
                   styleHover: textTheme.bodyMedium!.copyWith(
                     fontWeight: FontWeight.w500,
                     color: colors.secondary,

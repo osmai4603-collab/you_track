@@ -46,7 +46,7 @@ class TimeEntryModel extends TimeEntryEntity {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id.isNotEmpty) 'id': id,
       'task_id': taskId,
       'user_id': userId,
       'work_type_id': workTypeId,

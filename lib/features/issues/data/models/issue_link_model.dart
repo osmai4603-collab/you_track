@@ -12,18 +12,18 @@ class IssueLinkModel extends IssueLink {
   factory IssueLinkModel.fromJson(Map<String, dynamic> json) {
     return IssueLinkModel(
       id: (json['id'] ?? '').toString(),
-      issueId: (json['issue_id'] ?? '').toString(),
+      issueId: (json['source_issue_id'] ?? json['issue_id'] ?? '').toString(),
       linkType: IssueLinkType.of(json['link_type']?.toString() ?? ''),
-      issueLinkedId: (json['issue_linked_id'] ?? '').toString(),
+      issueLinkedId: (json['target_issue_id'] ?? json['issue_linked_id'] ?? '').toString(),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       if (id.isNotEmpty) 'id': id,
-      'issue_id': issueId,
+      'source_issue_id': issueId,
       'link_type': linkType.name,
-      'issue_linked_id': issueLinkedId,
+      'target_issue_id': issueLinkedId,
     };
   }
 }

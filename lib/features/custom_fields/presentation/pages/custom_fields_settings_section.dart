@@ -10,6 +10,7 @@ import 'package:issues_tracking/features/custom_fields/presentation/widgets/make
 import 'package:reorderables/reorderables.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
+import 'package:issues_tracking/features/custom_fields/presentation/widgets/custom_field_details_panel.dart';
 import '../../domain/entities/custom_field_entity.dart';
 import '../cubits/custom_fields_cubit.dart';
 
@@ -25,6 +26,7 @@ class _CustomFieldsSettingsSectionState
     extends State<CustomFieldsSettingsSection> {
   final Set<String> _selectedFieldIds = {};
   bool _isPanelOpen = false;
+  bool _isDetailsPanelOpen = false;
   bool _showDetails = true;
   final _fieldNameController = TextEditingController();
   final _defaultValueController = TextEditingController();
@@ -34,16 +36,14 @@ class _CustomFieldsSettingsSectionState
   @override
   void initState() {
     super.initState();
-    final projectId =
-        context.read<ProjectDetailsCubit>().state.project?.id;
+    final projectId = context.read<ProjectDetailsCubit>().state.project?.id;
     if (projectId != null) {
       context.read<CustomFieldsCubit>().loadFields(projectId);
     }
   }
 
   void _refresh() {
-    final projectId =
-        context.read<ProjectDetailsCubit>().state.project?.id;
+    final projectId = context.read<ProjectDetailsCubit>().state.project?.id;
     if (projectId != null) {
       context.read<CustomFieldsCubit>().loadFields(projectId);
     }
@@ -59,7 +59,7 @@ class _CustomFieldsSettingsSectionState
         if (state is CustomFieldsError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: SelectableText(state.message),
               backgroundColor: colors.error,
             ),
           );
@@ -78,22 +78,29 @@ class _CustomFieldsSettingsSectionState
                   if (_selectedFieldIds.isNotEmpty)
                     _buildSelectionBar(colors, textTheme),
                   const SizedBox(height: AppSpacing.medium),
-                  Expanded(
-                    child: _buildContent(state, colors, textTheme),
-                  ),
+                  Expanded(child: _buildContent(state, colors, textTheme)),
                 ],
               ),
             ),
             // Overlay
-            PanelOverlay(
-              isVisible: _isPanelOpen,
-              onTap: _closePanel,
-            ),
+            PanelOverlay(isVisible: _isPanelOpen, onTap: _closePanel),
             // Sliding panel
             SlidingPanel(
               isOpen: _isPanelOpen,
               child: _buildAddFieldPanel(colors, textTheme),
             ),
+            // Details Sliding panel
+            if (state is CustomFieldsLoaded)
+              SlidingPanel(
+                isOpen: _isDetailsPanelOpen && _selectedFieldIds.length == 1,
+                child: CustomFieldDetailsPanel(
+                  field: _selectedFieldIds.isNotEmpty
+                      ? state.fields.firstWhere((f) => f.id == _selectedFieldIds.first)
+                      : state.fields.first,
+                  onClose: _closeDetailsPanel,
+                  onEdit: _editSelectedField,
+                ),
+              ),
             if (state is CustomFieldsLoaded && state.isSaving)
               Positioned(
                 top: 0,
@@ -109,8 +116,11 @@ class _CustomFieldsSettingsSectionState
     );
   }
 
-  Widget _buildToolbar(ColorScheme colors, TextTheme textTheme,
-      CustomFieldsState state) {
+  Widget _buildToolbar(
+    ColorScheme colors,
+    TextTheme textTheme,
+    CustomFieldsState state,
+  ) {
     final hasSelection = _selectedFieldIds.isNotEmpty;
     final canEdit = _selectedFieldIds.length == 1;
 
@@ -128,8 +138,14 @@ class _CustomFieldsSettingsSectionState
           tooltip: 'Edit',
         ),
         IconButton(
-          onPressed: hasSelection ? () => _confirmDeleteSelected(context) : null,
-          icon: Icon(Icons.delete_outline, size: 20, color: hasSelection ? colors.error : null),
+          onPressed: hasSelection
+              ? () => _confirmDeleteSelected(context)
+              : null,
+          icon: Icon(
+            Icons.delete_outline,
+            size: 20,
+            color: hasSelection ? colors.error : null,
+          ),
           tooltip: 'Delete',
         ),
         const SizedBox(width: AppSpacing.small),
@@ -146,18 +162,37 @@ class _CustomFieldsSettingsSectionState
               : null,
           child: const Text('Make private'),
         ),
+        const SizedBox(width: AppSpacing.small),
+        FilledButton(
+          onPressed: hasSelection && _selectedFieldIds.length == 1
+              ? _makeFieldPublic
+              : null,
+          child: const Text('Make public'),
+        ),
         const Spacer(),
         TextButton.icon(
-          onPressed: () {
-            setState(() {
-              _showDetails = !_showDetails;
-            });
-          },
+          onPressed: canEdit
+              ? () {
+                  setState(() {
+                    _isDetailsPanelOpen = !_isDetailsPanelOpen;
+                  });
+                }
+              : () {
+                  setState(() {
+                    _showDetails = !_showDetails;
+                  });
+                },
           icon: Icon(
-            _showDetails ? Icons.visibility_off : Icons.visibility,
+            canEdit
+                ? (_isDetailsPanelOpen ? Icons.visibility_off : Icons.visibility)
+                : (_showDetails ? Icons.visibility_off : Icons.visibility),
             size: 18,
           ),
-          label: Text(_showDetails ? 'Hide details' : 'Show details'),
+          label: Text(
+            canEdit
+                ? (_isDetailsPanelOpen ? 'Hide details' : 'Show details')
+                : (_showDetails ? 'Hide columns' : 'Show columns'),
+          ),
         ),
       ],
     );
@@ -178,9 +213,7 @@ class _CustomFieldsSettingsSectionState
         children: [
           Text(
             '${_selectedFieldIds.length} selected',
-            style: textTheme.labelMedium?.copyWith(
-              fontWeight: FontWeight.w500,
-            ),
+            style: textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w500),
           ),
           const Spacer(),
           TextButton.icon(
@@ -194,10 +227,7 @@ class _CustomFieldsSettingsSectionState
           TextButton.icon(
             onPressed: () => _confirmDeleteSelected(context),
             icon: Icon(Icons.delete_outline, size: 16, color: colors.error),
-            label: Text(
-              'Delete',
-              style: TextStyle(color: colors.error),
-            ),
+            label: Text('Delete', style: TextStyle(color: colors.error)),
           ),
         ],
       ),
@@ -205,7 +235,10 @@ class _CustomFieldsSettingsSectionState
   }
 
   Widget _buildContent(
-      CustomFieldsState state, ColorScheme colors, TextTheme textTheme) {
+    CustomFieldsState state,
+    ColorScheme colors,
+    TextTheme textTheme,
+  ) {
     if (state is CustomFieldsInitial || state is CustomFieldsLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -217,20 +250,16 @@ class _CustomFieldsSettingsSectionState
           children: [
             Icon(Icons.error_outline, size: 48, color: colors.error),
             const SizedBox(height: AppSpacing.medium),
-            Text(
-              'Failed to load custom fields',
-              style: textTheme.bodyMedium,
-            ),
+            Text('Failed to load custom fields', style: textTheme.bodyMedium),
             const SizedBox(height: AppSpacing.small),
-            Text(
+            SelectableText(
               state.message,
-              style: textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+              style: textTheme.bodySmall?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: AppSpacing.medium),
-            FilledButton(
-              onPressed: _refresh,
-              child: const Text('Retry'),
-            ),
+            FilledButton(onPressed: _refresh, child: const Text('Retry')),
           ],
         ),
       );
@@ -295,18 +324,20 @@ class _CustomFieldsSettingsSectionState
     );
   }
 
-  Widget _buildTableBody(List<CustomFieldEntity> fields,
-      ColorScheme colors, TextTheme textTheme) {
+  Widget _buildTableBody(
+    List<CustomFieldEntity> fields,
+    ColorScheme colors,
+    TextTheme textTheme,
+  ) {
     return ReorderableColumn(
       onReorder: (int oldIndex, int newIndex) {
-        final projectId =
-            context.read<ProjectDetailsCubit>().state.project?.id;
+        final projectId = context.read<ProjectDetailsCubit>().state.project?.id;
         if (projectId != null) {
           context.read<CustomFieldsCubit>().reorderField(
-                projectId: projectId,
-                oldIndex: oldIndex,
-                newIndex: newIndex,
-              );
+            projectId: projectId,
+            oldIndex: oldIndex,
+            newIndex: newIndex,
+          );
         }
       },
       children: fields.asMap().entries.map((entry) {
@@ -322,17 +353,29 @@ class _CustomFieldsSettingsSectionState
             setState(() {
               if (checked == true) {
                 _selectedFieldIds.add(field.id);
+                if (_selectedFieldIds.length > 1) {
+                  _isDetailsPanelOpen = false;
+                }
               } else {
                 _selectedFieldIds.remove(field.id);
+                if (_selectedFieldIds.isEmpty) {
+                  _isDetailsPanelOpen = false;
+                }
               }
             });
           },
-          onNameTap: () => _showEditFieldDialog(context, field),
+          onNameTap: () {
+            setState(() {
+              _selectedFieldIds.clear();
+              _selectedFieldIds.add(field.id);
+              _isDetailsPanelOpen = true;
+            });
+          },
           onVisibilityTap: (newVisibility) {
             context.read<CustomFieldsCubit>().updateVisibility(
-                  fieldId: field.id,
-                  visibility: newVisibility,
-                );
+              fieldId: field.id,
+              visibility: newVisibility,
+            );
           },
         );
       }).toList(),
@@ -352,10 +395,7 @@ class _CustomFieldsSettingsSectionState
               children: [
                 const Text(
                   'Add Custom Field',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
@@ -495,7 +535,9 @@ class _CustomFieldsSettingsSectionState
     if (_selectedFieldIds.length != 1) return;
     final state = context.read<CustomFieldsCubit>().state;
     if (state is CustomFieldsLoaded) {
-      final field = state.fields.firstWhere((f) => f.id == _selectedFieldIds.first);
+      final field = state.fields.firstWhere(
+        (f) => f.id == _selectedFieldIds.first,
+      );
       _showEditFieldDialog(context, field);
     }
   }
@@ -562,10 +604,7 @@ class _CustomFieldsSettingsSectionState
                           child: Text('None'),
                         ),
                         ...selectedType.availableValues.map((v) {
-                          return DropdownMenuItem(
-                            value: v,
-                            child: Text(v),
-                          );
+                          return DropdownMenuItem(value: v, child: Text(v));
                         }),
                       ],
                       onChanged: (value) {
@@ -585,18 +624,16 @@ class _CustomFieldsSettingsSectionState
                     final name = nameController.text.trim();
                     if (name.isEmpty) {
                       ScaffoldMessenger.of(dialogContext).showSnackBar(
-                        const SnackBar(
-                          content: Text('Field name is required'),
-                        ),
+                        const SnackBar(content: Text('Field name is required')),
                       );
                       return;
                     }
                     context.read<CustomFieldsCubit>().updateField(
-                          fieldId: field.id,
-                          name: name,
-                          fieldType: selectedType,
-                          defaultValue: selectedDefault,
-                        );
+                      fieldId: field.id,
+                      name: name,
+                      fieldType: selectedType,
+                      defaultValue: selectedDefault,
+                    );
                     Navigator.of(dialogContext).pop();
                   },
                   child: const Text('Save'),
@@ -629,10 +666,13 @@ class _CustomFieldsSettingsSectionState
                 backgroundColor: Theme.of(context).colorScheme.error,
               ),
               onPressed: () {
-                context
-                    .read<CustomFieldsCubit>()
-                    .deleteFields(_selectedFieldIds.toList());
-                setState(() => _selectedFieldIds.clear());
+                context.read<CustomFieldsCubit>().deleteFields(
+                  _selectedFieldIds.toList(),
+                );
+                setState(() {
+                  _selectedFieldIds.clear();
+                  _isDetailsPanelOpen = false;
+                });
                 Navigator.of(dialogContext).pop();
               },
               child: const Text('Delete'),
@@ -647,7 +687,9 @@ class _CustomFieldsSettingsSectionState
     if (_selectedFieldIds.length != 1) return;
     final state = context.read<CustomFieldsCubit>().state;
     if (state is CustomFieldsLoaded) {
-      final field = state.fields.firstWhere((f) => f.id == _selectedFieldIds.first);
+      final field = state.fields.firstWhere(
+        (f) => f.id == _selectedFieldIds.first,
+      );
       showDialog(
         context: context,
         builder: (context) => ReplaceValuePopup(field: field),
@@ -659,7 +701,9 @@ class _CustomFieldsSettingsSectionState
     if (_selectedFieldIds.length != 1) return;
     final state = context.read<CustomFieldsCubit>().state;
     if (state is CustomFieldsLoaded) {
-      final field = state.fields.firstWhere((f) => f.id == _selectedFieldIds.first);
+      final field = state.fields.firstWhere(
+        (f) => f.id == _selectedFieldIds.first,
+      );
       showDialog(
         context: context,
         builder: (context) => MakePrivateDialog(field: field),
@@ -667,9 +711,38 @@ class _CustomFieldsSettingsSectionState
     }
   }
 
+  void _makeFieldPublic() {
+    if (_selectedFieldIds.length != 1) return;
+    final state = context.read<CustomFieldsCubit>().state;
+    if (state is CustomFieldsLoaded) {
+      final field = state.fields.firstWhere(
+        (f) => f.id == _selectedFieldIds.first,
+      );
+      context.read<CustomFieldsCubit>().updateAccessControl(
+        fieldId: field.id,
+        accessControl: const {'type': 'everyone'},
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Field is now visible to everyone')),
+      );
+    }
+  }
+
   void _closePanel() {
     setState(() {
       _isPanelOpen = false;
+    });
+  }
+
+  void _openDetailsPanel() {
+    setState(() {
+      _isDetailsPanelOpen = true;
+    });
+  }
+
+  void _closeDetailsPanel() {
+    setState(() {
+      _isDetailsPanelOpen = false;
     });
   }
 
@@ -682,27 +755,24 @@ class _CustomFieldsSettingsSectionState
   void _submitAddField() {
     final name = _fieldNameController.text.trim();
     if (name.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Field name is required'),
-        ),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Field name is required')));
       return;
     }
-    final projectId =
-        context.read<ProjectDetailsCubit>().state.project?.id;
+    final projectId = context.read<ProjectDetailsCubit>().state.project?.id;
     if (projectId != null) {
       setState(() {
         _isSubmitting = true;
       });
       context.read<CustomFieldsCubit>().addField(
-            projectId: projectId,
-            name: name,
-            fieldType: _selectedType,
-            defaultValue: _defaultValueController.text.trim().isEmpty
-                ? null
-                : _defaultValueController.text.trim(),
-          );
+        projectId: projectId,
+        name: name,
+        fieldType: _selectedType,
+        defaultValue: _defaultValueController.text.trim().isEmpty
+            ? null
+            : _defaultValueController.text.trim(),
+      );
       _fieldNameController.clear();
       _defaultValueController.clear();
       setState(() {

@@ -9,10 +9,17 @@ sealed class IssueSubsystemEnum extends AppEnum {
   static const projectManagement = ProjectManagementSubsystem._();
   static const migration = MigrationSubsystem._();
 
-  static List<IssueSubsystemEnum> get values =>
-      [noValue, issueTracking, projectManagement, migration];
+  static List<IssueSubsystemEnum> get values => [
+    noValue,
+    issueTracking,
+    projectManagement,
+    migration,
+  ];
 
   static IssueSubsystemEnum of(String name) {
+    if (name == 'noValue') {
+      return noValue;
+    }
     return values.firstWhere(
       (e) => e.name == name,
       orElse: () => throw ArgumentError('Unknown IssueSubsystemEnum: $name'),

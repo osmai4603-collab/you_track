@@ -238,7 +238,7 @@ class _FieldsSection extends StatelessWidget {
                         radius: 10,
                         backgroundColor: colors.primaryContainer,
                         child: Text(
-                          issue.assigneeName![0].toUpperCase(),
+                          issue.assigneeName!.isNotEmpty ? issue.assigneeName![0].toUpperCase() : '?',
                           style: textTheme.labelSmall?.copyWith(
                             color: colors.onPrimaryContainer,
                             fontSize: 10,
@@ -272,7 +272,7 @@ class _FieldsSection extends StatelessWidget {
                   radius: 10,
                   backgroundColor: colors.tertiaryContainer,
                   child: Text(
-                    issue.reporterName[0].toUpperCase(),
+                    issue.reporterName.isNotEmpty ? issue.reporterName[0].toUpperCase() : '?',
                     style: textTheme.labelSmall?.copyWith(
                       color: colors.onTertiaryContainer,
                       fontSize: 10,
@@ -307,7 +307,7 @@ class _FieldsSection extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          tag,
+                          tag.name,
                           style: textTheme.labelSmall?.copyWith(
                             color: colors.onSurface,
                           ),

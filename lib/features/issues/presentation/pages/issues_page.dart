@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_state.dart';
+import 'package:issues_tracking/features/issues/presentation/widgets/issue_detail_panel.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/issues_table_view.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/issues_list_view.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/issues_tree_view.dart';
 
 class IssuesPage extends StatefulWidget {
-  const IssuesPage({super.key});
+  final String? projectId;
+  const IssuesPage({super.key, this.projectId});
 
   @override
   State<IssuesPage> createState() => _IssuesPageState();
@@ -20,20 +23,53 @@ class _IssuesPageState extends State<IssuesPage> {
   final _menuController = MenuController();
 
   @override
+  void initState() {
+    super.initState();
+    if (widget.projectId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          context.read<IssuesBloc>().add(
+            UpdateFilter(IssueFilter(projectFilter: widget.projectId)),
+          );
+        }
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return BlocBuilder<IssuesBloc, IssuesState>(
       builder: (context, state) {
+        final showPanel = state is IssuesLoaded && state.selectedIssueId != null;
         if (state is IssuesLoading) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is IssuesError) {
           return Center(child: SelectableText(state.message));
         } else if (state is IssuesLoaded) {
-          return Column(
+          return Stack(
             children: [
-              const SizedBox(height: 16),
-              _buildTextField(state),
-              const SizedBox(height: 8),
-              Expanded(child: _buildView(state.layoutType)),
+              Column(
+                children: [
+                  const SizedBox(height: 16),
+                  _buildTextField(state),
+                  const SizedBox(height: 8),
+                  Expanded(child: _buildView(state.layoutType)),
+                ],
+              ),
+              AnimatedPositioned(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeInOut,
+                right: showPanel ? 0 : -500,
+                top: 0,
+                bottom: 0,
+                width: 500,
+                child: Material(
+                  elevation: 8,
+                  shadowColor: Colors.black26,
+                  color: Colors.transparent,
+                  child: const IssueDetailPanel(),
+                ),
+              ),
             ],
           );
         }

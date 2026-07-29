@@ -15,11 +15,9 @@ class TimeTrackingPage extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => sl<ProjectDetailsCubit>()..loadProject(projectId),
+          create: (_) => get_it<ProjectDetailsCubit>()..loadProject(projectId),
         ),
-        BlocProvider(
-          create: (_) => sl<TimeTrackingConfigCubit>(),
-        ),
+        BlocProvider(create: (_) => get_it<TimeTrackingConfigCubit>()),
       ],
       child: ProjectTimeTrackingSettingsSection(projectId: projectId),
     );

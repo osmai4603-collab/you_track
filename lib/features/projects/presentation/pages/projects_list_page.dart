@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
@@ -7,6 +9,10 @@ import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
+import 'package:issues_tracking/core/widgets/project_chip.dart';
+import 'package:issues_tracking/core/widgets/text_hover_widget.dart';
+import 'package:issues_tracking/core/widgets/youtrack_state.dart';
+import 'package:issues_tracking/features/projects/domain/entities/project_member_entity.dart';
 import '../cubits/projects_list_cubit.dart';
 import '../cubits/project_details_cubit.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
@@ -27,7 +33,7 @@ class ProjectsListPage extends StatefulWidget {
   State<ProjectsListPage> createState() => _ProjectsListPageState();
 }
 
-class _ProjectsListPageState extends State<ProjectsListPage> {
+class _ProjectsListPageState extends YouTrackState<ProjectsListPage> {
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -44,268 +50,192 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
 
   @override
   Widget build(BuildContext context) {
-    final localization = AppLocalizations.of(context)!;
-    final colors = Theme.of(context).colorScheme;
-    final textTheme = Theme.of(context).textTheme;
+    return BlocBuilder<ProjectsListCubit, ProjectsListState>(
+      builder: (context, state) {
+        if (state.status == ProjectsListStatus.loading) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (state.status == ProjectsListStatus.failure) {
+          return Center(
+            child: SelectableText(
+              state.errorMessage ?? '',
+              style: textTheme.bodyMedium?.copyWith(color: colors.error),
+            ),
+          );
+        }
 
-    return Column(
-      children: [
-        // ProjectsHeader(
-        //   breadcrumbs: [BreadcrumbItem(title: localization.projectsTitle)],
-        //   trailing: Row(
-        //     spacing: AppSpacing.small,
-        //     children: [
-        //       SizedBox(
-        //         width: 300,
-        //         height: 32,
-        //         child: TextField(
-        //           controller: _searchController,
-        //           onChanged: (value) {
-        //             context.read<ProjectsListCubit>().searchProjects(value);
-        //           },
-        //           decoration: InputDecoration(
-        //             hintText: localization.filterProjectsHint,
-        //             prefixIcon: const Icon(AppIcons.search, size: 16),
-        //             contentPadding: const EdgeInsets.symmetric(
-        //               horizontal: AppSpacing.small,
-        //             ),
-        //             border: OutlineInputBorder(
-        //               borderRadius: AppRadius.smallBorderRadius,
-        //               borderSide: BorderSide(color: colors.outlineVariant),
-        //             ),
-        //           ),
-        //         ),
-        //       ),
-        //       FilledButton(
-        //         onPressed: () => context.go(AppRouteKeys.projectTemplates),
-        //         child: Text(localization.createProject),
-        //       ),
-        //     ],
-        //   ),
-        // ),
-        Expanded(
-          child: BlocBuilder<ProjectsListCubit, ProjectsListState>(
-            builder: (context, state) {
-              if (state.status == ProjectsListStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (state.status == ProjectsListStatus.failure) {
-                return Center(
-                  child: SelectableText(
-                    state.errorMessage ?? '',
-                    style: textTheme.bodyMedium?.copyWith(color: colors.error),
+        final projects = state.filteredProjects;
+        if (projects.isEmpty) {
+          return Center(
+            child: Text(
+              localization.noProjectsFound,
+              style: textTheme.bodyMedium?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+          );
+        }
+
+        return Align(
+          child: SizedBox(
+            width: 800,
+            child: ListView.separated(
+              padding: const EdgeInsets.symmetric(
+                vertical: AppSpacing.extraSmall,
+              ),
+              itemCount: projects.length,
+              separatorBuilder: (_, _) => Divider(
+                height: 1,
+                color: colors.outlineVariant.withValues(alpha: 0.3),
+              ),
+              itemBuilder: (context, index) {
+                return ProjectListTile(projectEntity: projects[index]);
+              },
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+class ProjectListTile extends StatefulWidget {
+  final ProjectEntity projectEntity;
+  const ProjectListTile({super.key, required this.projectEntity});
+
+  @override
+  State<ProjectListTile> createState() => _ProjectListTileState();
+}
+
+class _ProjectListTileState extends YouTrackState<ProjectListTile> {
+  late ProjectEntity project;
+  bool isStarred = false;
+
+  @override
+  void initState() {
+    super.initState();
+    project = widget.projectEntity;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: colors.surface,
+      child: InkWell(
+        onTap: _onTapProject,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.medium,
+            vertical: AppSpacing.small,
+          ),
+          child: Row(
+            children: [
+              // المفضلة
+              IconButton(
+                icon: Icon(
+                  project.isFavorite
+                      ? Icons.star_rounded
+                      : Icons.star_outline_rounded,
+                  color: project.isFavorite
+                      ? Colors.amber
+                      : colors.onSurfaceVariant.withValues(alpha: 0.5),
+                  size: 20,
+                ),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                onPressed: () {
+                  context.read<ProjectsListCubit>().toggleFavorite(project);
+                },
+              ),
+              const SizedBox(width: AppSpacing.small),
+              // أيقونة المشروع
+              ProjectChip(
+                colors: colors,
+                textTheme: textTheme,
+                shortKey: project.projectKey,
+                textColor:
+                    _projectColors[Random(0).nextInt(_projectColors.length)],
+              ),
+
+              const SizedBox(width: AppSpacing.small),
+              // اسم المشروع والمعرف
+              Expanded(
+                child: TextHoverWidget(
+                  text: project.name,
+                  style: textTheme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.w500,
                   ),
-                );
-              }
-
-              final projects = state.filteredProjects;
-              if (projects.isEmpty) {
-                return Center(
-                  child: Text(
-                    localization.noProjectsFound,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colors.onSurfaceVariant,
-                    ),
-                  ),
-                );
-              }
-
-              return Align(
-                child: SizedBox(
-                  width: 800,
-                  child: ListView.separated(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: AppSpacing.extraSmall,
-                    ),
-                    itemCount: projects.length,
-                    separatorBuilder: (_, _) => Divider(
-                      height: 1,
-                      color: colors.outlineVariant.withValues(alpha: 0.3),
-                    ),
-                    itemBuilder: (context, index) {
-                      final project = projects[index];
-                      return Material(
-                        color: colors.surface,
-                        child: InkWell(
-                          onTap: () {
-                            context.read<ProjectDetailsCubit>().loadProject(
-                              project.id,
-                            );
-                            context.go(
-                              AppRouteKeys.projectDetailsPath(project.id),
-                            );
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: AppSpacing.medium,
-                              vertical: AppSpacing.small,
-                            ),
-                            child: Row(
-                              children: [
-                                // المفضلة
-                                IconButton(
-                                  icon: Icon(
-                                    project.isFavorite
-                                        ? Icons.star_rounded
-                                        : Icons.star_outline_rounded,
-                                    color: project.isFavorite
-                                        ? Colors.amber
-                                        : colors.onSurfaceVariant.withValues(
-                                            alpha: 0.5,
-                                          ),
-                                    size: 20,
-                                  ),
-                                  padding: EdgeInsets.zero,
-                                  constraints: const BoxConstraints(
-                                    minWidth: 32,
-                                    minHeight: 32,
-                                  ),
-                                  onPressed: () {
-                                    context
-                                        .read<ProjectsListCubit>()
-                                        .toggleFavorite(project);
-                                  },
-                                ),
-                                const SizedBox(width: AppSpacing.small),
-                                // أيقونة المشروع
-                                Container(
-                                  width: 32,
-                                  height: 32,
-                                  decoration: BoxDecoration(
-                                    color:
-                                        _projectColors[project.id.hashCode
-                                                .abs() %
-                                            _projectColors.length],
-                                    borderRadius: AppRadius.smallBorderRadius,
-                                  ),
-                                  child: Center(
-                                    child: Text(
-                                      project.name.isNotEmpty
-                                          ? project.name
-                                                .substring(
-                                                  0,
-                                                  project.name.length > 2
-                                                      ? 2
-                                                      : project.name.length,
-                                                )
-                                                .toUpperCase()
-                                          : '',
-                                      style: textTheme.labelSmall?.copyWith(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: AppSpacing.small),
-                                // اسم المشروع والمعرف
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        project.name,
-                                        style: textTheme.bodyMedium?.copyWith(
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                      Text(
-                                        project.projectKey,
-                                        style: textTheme.labelSmall?.copyWith(
-                                          color: colors.onSurfaceVariant,
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                // الأعضاء
-                                if (project.memberInitials.isNotEmpty)
-                                  _buildMembersAvatars(
-                                    project.memberInitials,
-                                    textTheme,
-                                    colors,
-                                  ),
-                                const SizedBox(width: AppSpacing.small),
-                                // القائمة المنسدلة للإجراءات
-                                _buildProjectMenu(
-                                  project,
-                                  localization,
-                                  colors,
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+                  styleHover: textTheme.bodyMedium!.copyWith(
+                    fontWeight: FontWeight.w500,
+                    color: colors.secondary,
                   ),
                 ),
-              );
-            },
+              ),
+              // الأعضاء
+              if (project.members.isNotEmpty)
+                _buildMembersAvatars(project.members, textTheme, colors),
+              const SizedBox(width: AppSpacing.small),
+              // القائمة المنسدلة للإجراءات
+              _buildProjectMenu(project, localization, colors),
+            ],
           ),
         ),
-      ],
+      ),
     );
   }
 
   Widget _buildMembersAvatars(
-    List<String> initials,
+    List<ProjectMemberEntity> initials,
     TextTheme textTheme,
     ColorScheme colors,
   ) {
-    const double avatarSize = 24.0;
-    const double overlap = 8.0;
-    final displayCount = initials.length > 3 ? 3 : initials.length;
-    final extraCount = initials.length > 3 ? initials.length - 3 : 0;
+    const double avatarSize = 40.0;
 
     return SizedBox(
       height: avatarSize,
-      width:
-          (avatarSize * displayCount) -
-          (overlap * (displayCount - 1)) +
-          (extraCount > 0 ? avatarSize - overlap : 0),
-      child: Stack(
+
+      child: Row(
+        spacing: 8,
         children: [
-          for (int i = 0; i < displayCount; i++)
-            Positioned(
-              left: i * (avatarSize - overlap),
-              child: Container(
-                width: avatarSize,
-                height: avatarSize,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color:
-                      _projectColors[(initials[i].hashCode).abs() %
-                          _projectColors.length],
-                  border: Border.all(color: colors.surface, width: 2),
-                ),
-                child: Center(
-                  child: Text(
-                    initials[i],
-                    style: textTheme.labelSmall?.copyWith(
-                      fontSize: 10,
-                      color: Colors.white,
-                    ),
+          ...List.generate(initials.length <= 3 ? initials.length : 3, (index) {
+            final member = initials[index];
+            return Container(
+              width: avatarSize,
+              height: avatarSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: _projectColors[initials.length % _projectColors.length],
+                border: Border.all(color: colors.surface, width: 2),
+              ),
+
+              child: Center(
+                child: Text(
+                  member.name,
+                  style: textTheme.labelSmall?.copyWith(
+                    fontSize: 10,
+                    color: Colors.white,
                   ),
                 ),
               ),
-            ),
-          if (extraCount > 0)
-            Positioned(
-              left: displayCount * (avatarSize - overlap),
-              child: Container(
-                width: avatarSize,
-                height: avatarSize,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: colors.surfaceContainerHighest,
-                  border: Border.all(color: colors.surface, width: 2),
-                ),
-                child: Center(
-                  child: Text(
-                    '+$extraCount',
-                    style: textTheme.labelSmall?.copyWith(fontSize: 10),
+            );
+          }),
+          if (initials.length > 3)
+            Container(
+              width: avatarSize,
+              height: avatarSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color:
+                    _projectColors[(initials.length + 1) %
+                        _projectColors.length],
+                border: Border.all(color: colors.surface, width: 2),
+              ),
+              child: Center(
+                child: Text(
+                  '+ ${initials.length - 3}',
+                  style: textTheme.labelSmall?.copyWith(
+                    fontSize: 10,
+                    color: Colors.white,
                   ),
                 ),
               ),
@@ -341,7 +271,7 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
           child: Text(localization.issues, style: style),
         ),
         AppPopupMenuItem(
-          value: 'agileBoards',
+          value: 'agile-boards',
           child: Text(localization.agileBoardsTitle, style: style),
         ),
         AppPopupMenuItem(
@@ -349,7 +279,7 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
           child: Text(localization.ganttCharts, style: style),
         ),
         AppPopupMenuItem(
-          value: 'knowledgeBase',
+          value: 'knowledge-base',
           child: Text(localization.knowledgeBase, style: style),
         ),
         AppPopupMenuItem(
@@ -428,6 +358,21 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
   void _handleAction(String action, String projectId) {
     final cubit = context.read<ProjectsListCubit>();
     switch (action) {
+      case 'overview':
+        context.go(AppRouteKeys.projectDetailsPath(projectId));
+        break;
+      case 'issues':
+        context.go(AppRouteKeys.projectIssuesPath(projectId));
+        break;
+      case 'agile-boards':
+        context.go(AppRouteKeys.projectAgileBoardsPath(projectId));
+        break;
+      case 'knowledge-base':
+        context.go(AppRouteKeys.projectKnowledgeBasePath(projectId));
+        break;
+      case 'settings':
+        context.go(AppRouteKeys.projectSettingsPath(projectId));
+        break;
       case 'archive':
         cubit.archiveProject(projectId);
         break;
@@ -436,5 +381,10 @@ class _ProjectsListPageState extends State<ProjectsListPage> {
         break;
       // edit, clone, convertToTemplate يمكن إضافتها لاحقاً
     }
+  }
+
+  void _onTapProject() {
+    context.read<ProjectDetailsCubit>().loadProject(project.id);
+    context.go(AppRouteKeys.projectDetailsPath(project.id));
   }
 }

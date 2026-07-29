@@ -35,7 +35,7 @@ class ArticleCommentModel extends ArticleComment {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id.isNotEmpty) 'id': id,
       'article_id': articleId,
       'author_id': authorId,
       'comment_text': commentText,

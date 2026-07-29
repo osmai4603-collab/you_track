@@ -75,7 +75,7 @@ sealed class AppRouteKeys {
   }
 
   static String projectSettingsVersionControl(String projectId) {
-    return projectSettingsSectionPath(projectId, 'vc');
+    return projectSettingsSectionPath(projectId, 'vcs');
   }
 
   static String projectSettingsApps(String projectId) {

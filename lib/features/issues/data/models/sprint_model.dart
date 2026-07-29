@@ -31,7 +31,7 @@ class SprintModel extends Sprint {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id.isNotEmpty) 'id': id,
       'name': name,
       'start_date': startDate?.toIso8601String(),
       'release_date': releaseDate?.toIso8601String(),

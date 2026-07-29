@@ -25,13 +25,13 @@ class ArticleEditorBloc extends Bloc<ArticleEditorEvent, ArticleEditorState> {
     SaveDraft? saveDraft,
     GetDraft? getDraft,
     GetArticleById? getArticleById,
-  })  : createArticle = createArticle ?? sl<CreateArticle>(),
-        updateArticle = updateArticle ?? sl<UpdateArticle>(),
-        publishArticle = publishArticle ?? sl<PublishArticle>(),
-        saveDraft = saveDraft ?? sl<SaveDraft>(),
-        getDraft = getDraft ?? sl<GetDraft>(),
-        getArticleById = getArticleById ?? sl<GetArticleById>(),
-        super(ArticleEditorInitial()) {
+  }) : createArticle = createArticle ?? get_it<CreateArticle>(),
+       updateArticle = updateArticle ?? get_it<UpdateArticle>(),
+       publishArticle = publishArticle ?? get_it<PublishArticle>(),
+       saveDraft = saveDraft ?? get_it<SaveDraft>(),
+       getDraft = getDraft ?? get_it<GetDraft>(),
+       getArticleById = getArticleById ?? get_it<GetArticleById>(),
+       super(ArticleEditorInitial()) {
     on<CreateNewArticle>(_onCreateNewArticle);
     on<UpdateArticleTitle>(_onUpdateArticleTitle);
     on<UpdateArticleContent>(_onUpdateArticleContent);
@@ -121,11 +121,13 @@ class ArticleEditorBloc extends Bloc<ArticleEditorEvent, ArticleEditorState> {
 
           publishResult.fold(
             (failure) => emit(ArticleEditorError(failure.message)),
-            (_) => emit(currentState.copyWith(
-              article: updated.copyWith(status: 'published'),
-              isSaving: false,
-              isSaved: true,
-            )),
+            (_) => emit(
+              currentState.copyWith(
+                article: updated.copyWith(status: 'published'),
+                isSaving: false,
+                isSaved: true,
+              ),
+            ),
           );
         },
       );
@@ -159,10 +161,12 @@ class ArticleEditorBloc extends Bloc<ArticleEditorEvent, ArticleEditorState> {
     final draft = await getDraft(articleId: event.articleId);
 
     if (draft != null) {
-      emit(ArticleEditorLoaded(
-        title: draft['title'] as String? ?? '',
-        content: draft['content'] as String? ?? '',
-      ));
+      emit(
+        ArticleEditorLoaded(
+          title: draft['title'] as String? ?? '',
+          content: draft['content'] as String? ?? '',
+        ),
+      );
     } else {
       emit(ArticleEditorLoaded());
     }
@@ -180,11 +184,13 @@ class ArticleEditorBloc extends Bloc<ArticleEditorEvent, ArticleEditorState> {
 
     result.fold(
       (failure) => emit(ArticleEditorError(failure.message)),
-      (article) => emit(ArticleEditorLoaded(
-        article: article,
-        title: article.title,
-        content: article.contentMarkdown,
-      )),
+      (article) => emit(
+        ArticleEditorLoaded(
+          article: article,
+          title: article.title,
+          content: article.contentMarkdown,
+        ),
+      ),
     );
   }
 }

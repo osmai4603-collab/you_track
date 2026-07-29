@@ -131,10 +131,9 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
       isArchived: false,
       isTemplate: false,
       templateId: 'demo',
-      owner: 'admin',
+      ownerId: 'admin',
       createdAt: DateTime(2026, 7, 20),
       isFavorite: true,
-      memberInitials: ['AD', 'OS'],
     ),
     ProjectModel(
       id: 'proj_fingerprint',
@@ -144,10 +143,9 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
       isArchived: false,
       isTemplate: false,
       templateId: 'default',
-      owner: 'admin',
+      ownerId: 'admin',
       createdAt: DateTime(2026, 7, 22),
       isFavorite: false,
-      memberInitials: ['AD', 'TR'],
     ),
     ProjectModel(
       id: 'proj_test',
@@ -157,10 +155,9 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
       isArchived: false,
       isTemplate: false,
       templateId: 'default',
-      owner: 'admin',
+      ownerId: 'admin',
       createdAt: DateTime(2026, 7, 24),
       isFavorite: false,
-      memberInitials: ['AD'],
     ),
   ];
 
@@ -231,10 +228,9 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
         isArchived: true,
         isTemplate: p.isTemplate,
         templateId: p.templateId,
-        owner: p.owner,
+        ownerId: p.ownerId,
         createdAt: p.createdAt,
         isFavorite: p.isFavorite,
-        memberInitials: p.memberInitials,
       );
     }
   }

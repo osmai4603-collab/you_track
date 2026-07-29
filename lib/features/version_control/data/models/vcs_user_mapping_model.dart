@@ -31,7 +31,7 @@ class VcsUserMappingModel extends VcsUserMappingEntity {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id.isNotEmpty) 'id': id,
       'integration_id': integrationId,
       'vcs_username_or_email': vcsUsernameOrEmail,
       'youtrack_user_id': youtrackUserId,

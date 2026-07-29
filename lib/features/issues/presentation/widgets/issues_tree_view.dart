@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/issue_state_chip.dart';
 import 'package:issues_tracking/core/widgets/issue_priority_chip.dart';
+import 'package:issues_tracking/features/dashboards/presentation/cubits/youtrack_shell_cubit.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
@@ -207,12 +209,19 @@ class _TreeNodeWidget extends StatelessWidget {
                     colors: colors,
                   ),
                   const SizedBox(width: AppSpacing.small),
-                  Text(
-                    issue.issueKey,
-                    style: textTheme.labelMedium?.copyWith(
-                      color: colors.onSurfaceVariant,
-                      fontFamily: 'JetBrains Mono',
-                      fontWeight: FontWeight.w500,
+                  GestureDetector(
+                    onTap: () {
+                      context.read<YouTrackShellCubit>().setCurrentIssue(issue);
+                      context.go('/issues/${issue.id}/edit');
+                    },
+                    child: Text(
+                      issue.issueKey,
+                      style: textTheme.labelMedium?.copyWith(
+                        color: colors.primary,
+                        fontFamily: 'JetBrains Mono',
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.underline,
+                      ),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.small),

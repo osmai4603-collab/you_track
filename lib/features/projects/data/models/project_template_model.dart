@@ -20,39 +20,6 @@ class ProjectTemplateModel extends ProjectTemplateEntity {
     );
   }
 
-  factory ProjectTemplateModel.fromMap(Map<String, dynamic> map) {
-    final fieldsRaw = map['defaultFields'] ?? map['default_fields'];
-    Map<String, String> parsedFields = {};
-    if (fieldsRaw is String) {
-      try {
-        final decoded = jsonDecode(fieldsRaw) as Map<String, dynamic>;
-        parsedFields = decoded.map((k, v) => MapEntry(k, v.toString()));
-      } catch (_) {
-        parsedFields = {};
-      }
-    } else if (fieldsRaw is Map) {
-      parsedFields = fieldsRaw.map((k, v) => MapEntry(k.toString(), v.toString()));
-    }
-
-    return ProjectTemplateModel(
-      id: (map['id'] ?? '').toString(),
-      name: (map['name'] ?? '').toString(),
-      description: (map['description'] ?? '').toString(),
-      iconKey: (map['iconKey'] ?? map['icon_key'] ?? '').toString(),
-      defaultFields: parsedFields,
-    );
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      'id': id,
-      'name': name,
-      'description': description,
-      'iconKey': iconKey,
-      'defaultFields': jsonEncode(defaultFields),
-    };
-  }
-
   factory ProjectTemplateModel.fromJson(Map<String, dynamic> json) {
     final fieldsRaw = json['default_fields'] ?? json['defaultFields'];
     Map<String, String> parsedFields = {};
@@ -78,7 +45,7 @@ class ProjectTemplateModel extends ProjectTemplateEntity {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id.isNotEmpty) 'id': id,
       'name': name,
       'description': description,
       'icon_key': iconKey,

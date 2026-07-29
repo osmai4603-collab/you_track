@@ -319,7 +319,7 @@ class _MakePrivateDialogState extends State<MakePrivateDialog> {
 
     switch (_accessLevel) {
       case AccessLevel.everyone:
-        accessControl = null;
+        accessControl = {'type': 'everyone'};
         break;
       case AccessLevel.adminsOnly:
         accessControl = {'admins_only': true};

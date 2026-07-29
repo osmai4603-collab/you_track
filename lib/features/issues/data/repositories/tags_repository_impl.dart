@@ -61,12 +61,15 @@ class TagsRepositoryImpl implements TagsRepository {
   }) async {
     try {
       final membersData = await dataSource.getProjectMembers(projectId: projectId);
-      final members = membersData.map((e) => ProjectMember(
-        id: e['user_id']?.toString() ?? e['id']?.toString() ?? '',
-        name: e['user_name']?.toString() ?? e['name']?.toString() ?? 'Unknown',
-        email: e['email']?.toString(),
-        avatarUrl: e['avatar_url']?.toString(),
-      )).toList();
+      final members = membersData.map((e) {
+        final userData = e['users'] as Map<String, dynamic>?;
+        return ProjectMember(
+          id: e['user_id']?.toString() ?? e['id']?.toString() ?? '',
+          name: userData?['full_name']?.toString() ?? e['name']?.toString() ?? 'Unknown',
+          email: userData?['email']?.toString() ?? e['email']?.toString(),
+          avatarUrl: userData?['avatar_url']?.toString() ?? e['avatar_url']?.toString(),
+        );
+      }).toList();
       return Right(members);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

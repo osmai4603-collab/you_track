@@ -4,4 +4,8 @@
 - [x] Wire `TextEditingController` for summary in `IssueForm` and `IssueFormTopBar`.
 - [x] Wire `FleatherController` for description in `IssueForm`.
 - [x] Ensure `IssueFormActionBar` correctly triggers `submit` and handles success navigation.
-- [ ] Verify creation and update logic with manual tests.
+- [x] Add `subsystem`, `fixVersions`, and `fixedInBuild` to `Issue` entity.
+- [x] Update `IssueModel` to handle new fields.
+- [x] Update `IssueFormState` to use `IssueSubsystemEnum`.
+- [x] Implement missing pickers in `IssueFormSidebar`.
+- [x] Verify creation and update logic with manual tests.

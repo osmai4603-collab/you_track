@@ -153,6 +153,7 @@ class IssueForm extends StatefulWidget {
 
 class _IssueFormState extends State<IssueForm> {
   late FleatherController _editorController;
+  late TextEditingController _summaryController;
   late FocusNode _editorFocusNode;
   List<IssueLink> links = [];
   List<Issue> issuesLinked = [];
@@ -161,21 +162,37 @@ class _IssueFormState extends State<IssueForm> {
   void initState() {
     super.initState();
     _editorController = FleatherController();
+    _summaryController = TextEditingController();
     _editorFocusNode = FocusNode();
+
+    _editorController.addListener(_onEditorChanged);
+    _summaryController.addListener(_onSummaryChanged);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final cubit = context.read<IssueFormCubit>();
       if (widget.issueId != null) {
-        // TODO: Load issue from repository and call initWithIssue
+        cubit.loadIssue(widget.issueId!);
       } else {
         cubit.initWithProject(widget.projectKey);
       }
     });
   }
 
+  void _onEditorChanged() {
+    final description = _editorController.document.toPlainText().trim();
+    context.read<IssueFormCubit>().updateDescription(description);
+  }
+
+  void _onSummaryChanged() {
+    context.read<IssueFormCubit>().updateSummary(_summaryController.text);
+  }
+
   @override
   void dispose() {
+    _editorController.removeListener(_onEditorChanged);
+    _summaryController.removeListener(_onSummaryChanged);
     _editorController.dispose();
+    _summaryController.dispose();
     _editorFocusNode.dispose();
     super.dispose();
   }
@@ -183,59 +200,92 @@ class _IssueFormState extends State<IssueForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Builder(
-        builder: (context) {
-          return BlocListener<IssueFormCubit, IssueFormState>(
-            listenWhen: (prev, curr) =>
-                prev.isSubmitting &&
-                !curr.isSubmitting &&
-                curr.errorMessage == null,
-            listener: (context, state) {
-              if (!state.isEditing && state.issueId != null) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Issue created successfully')),
-                );
-                Navigator.pop(context);
-              } else if (state.isEditing) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Issue updated successfully')),
-                );
-              }
-            },
-            child: BlocListener<IssueFormCubit, IssueFormState>(
-              listenWhen: (prev, curr) => curr.errorMessage != null,
+      body: BlocListener<IssueFormCubit, IssueFormState>(
+        listenWhen: (prev, curr) =>
+            prev.isLoading && !curr.isLoading && curr.errorMessage == null,
+        listener: (context, state) {
+          if (state.isEditing) {
+            _summaryController.removeListener(_onSummaryChanged);
+            _summaryController.text = state.summary;
+            _summaryController.addListener(_onSummaryChanged);
+
+            // Fleather document needs to be updated if description is not empty
+            if (state.description.isNotEmpty) {
+              _editorController.removeListener(_onEditorChanged);
+              _editorController.replaceText(
+                0,
+                _editorController.document.length,
+                state.description,
+                selection: const TextSelection.collapsed(offset: 0),
+              );
+              _editorController.addListener(_onEditorChanged);
+            }
+          }
+        },
+        child: Builder(
+          builder: (context) {
+            return BlocListener<IssueFormCubit, IssueFormState>(
+              listenWhen: (prev, curr) =>
+                  prev.isSubmitting &&
+                  !curr.isSubmitting &&
+                  curr.errorMessage == null,
               listener: (context, state) {
-                if (state.errorMessage != null) {
+                if (!state.isEditing && state.issueId != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(state.errorMessage!),
-                      backgroundColor: Colors.red,
-                    ),
+                    const SnackBar(content: Text('Issue created successfully')),
+                  );
+                  Navigator.pop(context);
+                } else if (state.isEditing) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Issue updated successfully')),
                   );
                 }
               },
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Row(
-                  spacing: 16,
-                  children: [
-                    Expanded(
-                      child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            IssueFormTopBar(),
-                            Expanded(child: _buildMainContent(context)),
-                          ],
-                        ),
+              child: BlocListener<IssueFormCubit, IssueFormState>(
+                listenWhen: (prev, curr) => curr.errorMessage != null,
+                listener: (context, state) {
+                  if (state.errorMessage != null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: SelectableText(state.errorMessage!),
+                        backgroundColor: Colors.red,
                       ),
-                    ),
-                    const IssueFormSidebar(),
-                  ],
+                    );
+                  }
+                },
+                child: BlocBuilder<IssueFormCubit, IssueFormState>(
+                  builder: (context, state) {
+                    return Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        spacing: 16,
+                        children: [
+                          Expanded(
+                            child: state.isLoading
+                                ? const Center(
+                                    child: CircularProgressIndicator(),
+                                  )
+                                : SingleChildScrollView(
+                                    child: Column(
+                                      children: [
+                                        IssueFormTopBar(
+                                          summaryController: _summaryController,
+                                        ),
+                                        _buildMainContent(context),
+                                      ],
+                                    ),
+                                  ),
+                          ),
+                          const IssueFormSidebar(),
+                        ],
+                      ),
+                    );
+                  },
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
@@ -260,13 +310,11 @@ class _IssueFormState extends State<IssueForm> {
               child: Column(
                 children: [
                   IssueFormToolbar(controller: _editorController),
-                  Expanded(
-                    child: FleatherEditor(
-                      controller: _editorController,
-                      focusNode: _editorFocusNode,
-                      padding: const EdgeInsets.all(16),
-                      // placeholder: 'Type or paste a description...',
-                    ),
+                  FleatherEditor(
+                    controller: _editorController,
+                    focusNode: _editorFocusNode,
+                    padding: const EdgeInsets.all(16),
+                    // placeholder: 'Type or paste a description...',
                   ),
                 ],
               ),
@@ -305,73 +353,69 @@ class _IssueFormState extends State<IssueForm> {
               ),
               Divider(height: 8),
               ...links.map((link) => link.linkType).toSet().map((linkType) {
-                return Container(
-                  child: Column(
-                    spacing: 8,
-                    children: [
-                      Row(
-                        children: [
-                          Text(linkType.displayName(localization)),
-                          IconButton(
-                            icon: Icon(Icons.navigate_next),
-                            iconSize: 14,
-                            onPressed: () {},
-                          ),
-                        ],
-                      ),
-                      ...links.where((link) => link.linkType == linkType).map((
-                        link,
-                      ) {
-                        final issue = issuesLinked.firstWhere(
-                          (iss) => iss.id == link.issueId,
-                        );
-                        return HoverWidget(
-                          builder: (context, isHovered) {
-                            return ListTile(
-                              leading: HoverWidget(
-                                builder: (_, isHovered) {
-                                  return InkWell(
-                                    child: Icon(
-                                      issue.isStarred
-                                          ? Icons.star_rounded
-                                          : Icons.star_outline,
-                                      color: isHovered
-                                          ? colors.secondary
-                                          : null,
-                                    ),
-                                    onTap: () {},
-                                  );
-                                },
-                              ),
-                              title: Row(
-                                spacing: 8,
-                                children: [
-                                  IssuePriorityChip(
-                                    type: issue.priority,
-                                    textTheme: textTheme,
-                                    colors: colors,
-                                    localization: localization,
+                return Column(
+                  spacing: 8,
+                  children: [
+                    Row(
+                      children: [
+                        Text(linkType.displayName(localization)),
+                        IconButton(
+                          icon: Icon(Icons.navigate_next),
+                          iconSize: 14,
+                          onPressed: () {},
+                        ),
+                      ],
+                    ),
+                    ...links.where((link) => link.linkType == linkType).map((
+                      link,
+                    ) {
+                      final issue = issuesLinked.firstWhere(
+                        (iss) => iss.id == link.issueId,
+                      );
+                      return HoverWidget(
+                        builder: (context, isHovered) {
+                          return ListTile(
+                            leading: HoverWidget(
+                              builder: (_, isHovered) {
+                                return InkWell(
+                                  child: Icon(
+                                    issue.isStarred
+                                        ? Icons.star_rounded
+                                        : Icons.star_outline,
+                                    color: isHovered ? colors.secondary : null,
                                   ),
-                                  Text(issue.issueKey),
-                                  const SizedBox(width: 8),
-                                  Text(issue.summary),
-                                ],
-                              ),
-                              trailing: !isHovered
-                                  ? null
-                                  : FilledButton(
-                                      child: Text('Remove link'),
-                                      onPressed: () {},
-                                    ),
-                              tileColor: isHovered
-                                  ? colors.primary.withValues(alpha: 020)
-                                  : null,
-                            );
-                          },
-                        );
-                      }),
-                    ],
-                  ),
+                                  onTap: () {},
+                                );
+                              },
+                            ),
+                            title: Row(
+                              spacing: 8,
+                              children: [
+                                IssuePriorityChip(
+                                  type: issue.priority,
+                                  textTheme: textTheme,
+                                  colors: colors,
+                                  localization: localization,
+                                ),
+                                Text(issue.issueKey),
+                                const SizedBox(width: 8),
+                                Text(issue.summary),
+                              ],
+                            ),
+                            trailing: !isHovered
+                                ? null
+                                : FilledButton(
+                                    child: Text('Remove link'),
+                                    onPressed: () {},
+                                  ),
+                            tileColor: isHovered
+                                ? colors.primary.withValues(alpha: 020)
+                                : null,
+                          );
+                        },
+                      );
+                    }),
+                  ],
                 );
               }),
             ],

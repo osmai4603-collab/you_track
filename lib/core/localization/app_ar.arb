@@ -181,5 +181,12 @@
   "widgetReport": "تقرير",
   "widgetPersonalTimeTracking": "تتبع الوقت الشخصي",
   "widgetTimeTrackingReport": "تقرير تتبع الوقت",
-  "widgetWorkItemExporter": "تصدير عناصر العمل"
+  "widgetWorkItemExporter": "تصدير عناصر العمل",
+  "relatesToOption": "يرتبط بـ",
+  "isRequiredForOption": "مطلوب لـ",
+  "dependsOnOption": "يعتمد على",
+  "isDuplicatedByOption": "مكرر بواسطة",
+  "duplicatesOption": "يكرر",
+  "parentForOption": "أب لـ",
+  "subtaskOfOption": "مهمة فرعية لـ"
 }

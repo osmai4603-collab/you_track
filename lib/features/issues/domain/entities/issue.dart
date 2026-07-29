@@ -2,6 +2,11 @@ import 'package:issues_tracking/core/entities/entity.dart';
 import 'package:issues_tracking/core/enums/issue_priority_type_enum.dart';
 import 'package:issues_tracking/core/enums/issue_state_enum.dart';
 import 'package:issues_tracking/core/enums/issue_type_enum.dart';
+import 'package:issues_tracking/core/enums/issue_subsystem_enum.dart';
+import 'package:issues_tracking/features/issues/domain/entities/build.dart';
+import 'package:issues_tracking/features/issues/domain/entities/sprint.dart';
+import 'package:issues_tracking/features/issues/domain/entities/tag.dart';
+import 'package:issues_tracking/features/issues/domain/entities/issue_link.dart';
 
 class Issue extends Entity {
   final String id;
@@ -17,7 +22,10 @@ class Issue extends Entity {
   final String? assigneeAvatarUrl;
   final String reporterId;
   final String reporterName;
-  final List<String> tags;
+  final IssueSubsystemEnum subsystem;
+  final String fixVersions;
+  final Build? build;
+  final List<Tag> tags;
   final DateTime createdAt;
   final DateTime updatedAt;
   final DateTime? dueDate;
@@ -30,6 +38,8 @@ class Issue extends Entity {
   final bool isStarred;
   final String? parentId;
   final List<String> visibility;
+  final List<Sprint> sprints;
+  final List<IssueLink> links;
 
   const Issue({
     required this.id,
@@ -45,6 +55,9 @@ class Issue extends Entity {
     this.assigneeAvatarUrl,
     required this.reporterId,
     required this.reporterName,
+    this.subsystem = IssueSubsystemEnum.noValue,
+    this.fixVersions = '',
+    this.build,
     this.tags = const [],
     required this.createdAt,
     required this.updatedAt,
@@ -58,6 +71,8 @@ class Issue extends Entity {
     this.isStarred = false,
     this.parentId,
     this.visibility = const ['team'],
+    this.sprints = const [],
+    this.links = const [],
   });
 
   @override
@@ -65,7 +80,7 @@ class Issue extends Entity {
     String? id,
     String? issueKey,
     int? issueNumber,
-    String? title,
+    String? summary,
     String? description,
     IssueStateEnum? state,
     IssuePriorityTypeEnum? priority,
@@ -76,7 +91,11 @@ class Issue extends Entity {
     bool clearAssignee = false,
     String? reporterId,
     String? reporterName,
-    List<String>? tags,
+    IssueSubsystemEnum? subsystem,
+    String? fixVersions,
+    Build? build,
+    bool clearBuild = false,
+    List<Tag>? tags,
     DateTime? createdAt,
     DateTime? updatedAt,
     DateTime? dueDate,
@@ -92,12 +111,14 @@ class Issue extends Entity {
     String? parentId,
     bool clearParentId = false,
     List<String>? visibility,
+    List<Sprint>? sprints,
+    List<IssueLink>? links,
   }) {
     return Issue(
       id: id ?? this.id,
       issueKey: issueKey ?? this.issueKey,
       issueNumber: issueNumber ?? this.issueNumber,
-      summary: title ?? this.summary,
+      summary: summary ?? this.summary,
       description: description ?? this.description,
       state: state ?? this.state,
       priority: priority ?? this.priority,
@@ -109,6 +130,9 @@ class Issue extends Entity {
           : (assigneeAvatarUrl ?? this.assigneeAvatarUrl),
       reporterId: reporterId ?? this.reporterId,
       reporterName: reporterName ?? this.reporterName,
+      subsystem: subsystem ?? this.subsystem,
+      fixVersions: fixVersions ?? this.fixVersions,
+      build: clearBuild ? null : (build ?? this.build),
       tags: tags ?? this.tags,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -122,6 +146,8 @@ class Issue extends Entity {
       isStarred: isStarred ?? this.isStarred,
       parentId: clearParentId ? null : (parentId ?? this.parentId),
       visibility: visibility ?? this.visibility,
+      sprints: sprints ?? this.sprints,
+      links: links ?? this.links,
     );
   }
 
@@ -140,6 +166,9 @@ class Issue extends Entity {
     assigneeAvatarUrl,
     reporterId,
     reporterName,
+    subsystem,
+    fixVersions,
+    build,
     tags,
     createdAt,
     updatedAt,
@@ -153,5 +182,7 @@ class Issue extends Entity {
     isStarred,
     parentId,
     visibility,
+    sprints,
+    links,
   ];
 }

@@ -48,3 +48,6 @@ app.*.map.json
 mcp-supabase/node_modules/
 mcp-supabase/dist/
 mcp-supabase/.env
+
+.gemini/
+gha-creds-*.json

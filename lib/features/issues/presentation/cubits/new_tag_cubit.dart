@@ -145,7 +145,7 @@ class NewTagCubit extends Cubit<NewTagState> {
             ),
           );
         }
-        emit(state.copyWith(status: NewTagStatus.success));
+        emit(state.copyWith(status: NewTagStatus.success, createdTag: tag));
       },
     );
   }

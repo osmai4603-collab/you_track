@@ -4,19 +4,105 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/enums/issue_priority_type_enum.dart';
 import 'package:issues_tracking/core/enums/issue_state_enum.dart';
 import 'package:issues_tracking/core/enums/issue_type_enum.dart';
+import 'package:issues_tracking/features/issues/domain/entities/build.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_attachment.dart';
+import 'package:issues_tracking/features/issues/domain/entities/issue_link.dart';
+import 'package:issues_tracking/features/issues/domain/entities/sprint.dart';
+import 'package:issues_tracking/features/issues/domain/entities/tag.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/issues_repository.dart';
+import 'package:issues_tracking/core/init_dependencies.dart';
+import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
+import 'package:issues_tracking/features/projects/domain/usecases/get_projects_use_case.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/get_project_members_use_case.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/get_builds_use_case.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/get_sprints_use_case.dart';
+import '../../../../core/usecase/usecase.dart';
+
+import '../../../../core/enums/issue_subsystem_enum.dart';
 import 'issue_form_state.dart';
 
 class IssueFormCubit extends Cubit<IssueFormState> {
   final IssuesRepository repository;
+  final GetProjectsUseCase getProjectsUseCase;
+  final GetProjectMembersUseCase getProjectMembersUseCase;
+  final GetBuildsUseCase getBuildsUseCase;
+  final GetSprintsUseCase getSprintsUseCase;
 
-  IssueFormCubit({required this.repository}) : super(const IssueFormState());
+  IssueFormCubit({
+    required this.repository,
+    required this.getProjectsUseCase,
+    required this.getProjectMembersUseCase,
+    required this.getBuildsUseCase,
+    required this.getSprintsUseCase,
+  }) : super(const IssueFormState());
 
   void initWithProject(String projectKey) {
     emit(state.copyWith(projectKey: projectKey));
+    _loadProjects();
+  }
+
+  Future<void> _loadProjects() async {
+    final result = await getProjectsUseCase(params: NoParams());
+    result.fold(
+      (failure) => null, // Silently ignore or handle error if needed
+      (projects) {
+        emit(state.copyWith(availableProjects: projects));
+        _loadProjectDependenciesFor(state.projectKey, projects);
+      },
+    );
+  }
+
+  Future<void> _loadProjectDependenciesFor(
+    String? projectKey,
+    List<ProjectEntity> projects,
+  ) async {
+    if (projectKey == null || projects.isEmpty) return;
+    try {
+      final project = projects.firstWhere((p) => p.projectKey == projectKey);
+
+      final membersResult = await getProjectMembersUseCase(
+        params: GetProjectMembersParams(projectId: project.id),
+      );
+      membersResult.fold(
+        (failure) => null,
+        (members) => emit(state.copyWith(projectMembers: members)),
+      );
+
+      final sprintsResult = await getSprintsUseCase(
+        params: GetSprintsParams(projectId: project.id),
+      );
+      sprintsResult.fold(
+        (failure) => null,
+        (sprints) => emit(state.copyWith(availableSprints: sprints)),
+      );
+
+      final buildsResult = await getBuildsUseCase(
+        params: GetBuildsParams(projectId: project.id),
+      );
+      buildsResult.fold(
+        (failure) => null,
+        (builds) => emit(state.copyWith(availableBuilds: builds)),
+      );
+    } catch (e) {
+      // Ignore if project not found
+    }
+  }
+
+  Future<void> loadIssue(String issueId) async {
+    emit(state.copyWith(isLoading: true, clearErrorMessage: true));
+    final result = await repository.getIssueById(issueId);
+    result.fold(
+      (failure) =>
+          emit(state.copyWith(isLoading: false, errorMessage: failure.message)),
+      (issue) {
+        initWithIssue(issue);
+        emit(state.copyWith(isLoading: false));
+        _loadProjects();
+      },
+    );
   }
 
   void initWithIssue(Issue issue) {
@@ -32,6 +118,10 @@ class IssueFormCubit extends Cubit<IssueFormState> {
         estimation: issue.estimation,
         spentTime: issue.spentTime,
         visibility: issue.visibility,
+        tags: issue.tags,
+        sprints: issue.sprints,
+        links: issue.links,
+        build: issue.build,
         isEditing: true,
         issueId: issue.id,
         projectKey: issue.issueKey,
@@ -41,6 +131,11 @@ class IssueFormCubit extends Cubit<IssueFormState> {
 
   void updateSummary(String value) {
     emit(state.copyWith(summary: value));
+  }
+
+  void updateProjectKey(String value) {
+    emit(state.copyWith(projectKey: value, clearAssignee: true));
+    _loadProjectDependenciesFor(value, state.availableProjects);
   }
 
   void updateDescription(String value) {
@@ -71,7 +166,7 @@ class IssueFormCubit extends Cubit<IssueFormState> {
     emit(state.copyWith(clearAssignee: true));
   }
 
-  void updateSubsystem(String value) {
+  void updateSubsystem(IssueSubsystemEnum value) {
     emit(state.copyWith(subsystem: value));
   }
 
@@ -79,8 +174,15 @@ class IssueFormCubit extends Cubit<IssueFormState> {
     emit(state.copyWith(fixVersions: value));
   }
 
-  void updateFixedInBuild(String value) {
-    emit(state.copyWith(fixedInBuild: value));
+  void updateBuild(Build? value) {
+    emit(state.copyWith(build: value));
+  }
+
+  void addBuild(Build build) {
+    emit(state.copyWith(
+      build: build,
+      availableBuilds: [...state.availableBuilds, build],
+    ));
   }
 
   void updateEstimation(Duration? value) {
@@ -93,6 +195,50 @@ class IssueFormCubit extends Cubit<IssueFormState> {
 
   void updateVisibility(List<String> value) {
     emit(state.copyWith(visibility: value));
+  }
+
+  void updateTags(List<Tag> value) {
+    emit(state.copyWith(tags: value));
+  }
+
+  void addTag(Tag tag) {
+    if (!state.tags.any((t) => t.id == tag.id)) {
+      emit(state.copyWith(tags: [...state.tags, tag]));
+    }
+  }
+
+  void removeTag(String tagId) {
+    emit(state.copyWith(tags: state.tags.where((t) => t.id != tagId).toList()));
+  }
+
+  void addLink(IssueLink link) {
+    if (!state.links.any((l) => l.id == link.id)) {
+      emit(state.copyWith(links: [...state.links, link]));
+    }
+  }
+
+  void removeLink(String linkId) {
+    emit(
+      state.copyWith(links: state.links.where((l) => l.id != linkId).toList()),
+    );
+  }
+
+  void updateSprints(List<Sprint> value) {
+    emit(state.copyWith(sprints: value));
+  }
+
+  void addSprint(Sprint sprint) {
+    if (!state.sprints.any((s) => s.id == sprint.id)) {
+      emit(state.copyWith(sprints: [...state.sprints, sprint]));
+    }
+  }
+
+  void removeSprint(String sprintId) {
+    emit(
+      state.copyWith(
+        sprints: state.sprints.where((s) => s.id != sprintId).toList(),
+      ),
+    );
   }
 
   void addAttachment(IssueAttachment attachment) {
@@ -146,19 +292,37 @@ class IssueFormCubit extends Cubit<IssueFormState> {
 
     emit(state.copyWith(isSubmitting: true, clearErrorMessage: true));
 
+    final user = get_it<SupabaseClient>().auth.currentUser;
+    final now = DateTime.now();
+
+    final issue = Issue(
+      id: state.issueId ?? '',
+      issueKey: state.projectKey ?? '',
+      issueNumber: 0,
+      summary: state.summary.trim(),
+      description: state.description,
+      priority: state.priority,
+      state: state.state,
+      issueType: state.issueType,
+      assigneeId: state.assigneeId,
+      assigneeName: state.assigneeName,
+      reporterId: user?.id ?? 'anonymous',
+      reporterName: user?.email ?? 'Anonymous',
+      subsystem: state.subsystem,
+      fixVersions: state.fixVersions,
+      build: state.build,
+      tags: state.tags,
+      createdAt: now,
+      updatedAt: now,
+      estimation: state.estimation,
+      spentTime: state.spentTime,
+      visibility: state.visibility,
+      sprints: state.sprints,
+      links: state.links,
+    );
+
     if (state.isEditing && state.issueId != null) {
-      final result = await repository.updateIssue(
-        issueId: state.issueId!,
-        title: state.summary.trim(),
-        description: state.description,
-        priority: state.priority,
-        state: state.state,
-        issueType: state.issueType,
-        assigneeId: state.assigneeId,
-        estimation: state.estimation,
-        spentTime: state.spentTime,
-        visibility: state.visibility,
-      );
+      final result = await repository.updateIssue(issue);
       result.fold(
         (failure) => emit(
           state.copyWith(isSubmitting: false, errorMessage: failure.message),
@@ -166,17 +330,7 @@ class IssueFormCubit extends Cubit<IssueFormState> {
         (_) => emit(state.copyWith(isSubmitting: false)),
       );
     } else {
-      final result = await repository.createIssue(
-        projectKey: state.projectKey ?? '',
-        title: state.summary.trim(),
-        description: state.description,
-        priority: state.priority,
-        state: state.state,
-        issueType: state.issueType,
-        assigneeId: state.assigneeId,
-        estimation: state.estimation,
-        visibility: state.visibility,
-      );
+      final result = await repository.createIssue(issue);
       result.fold(
         (failure) => emit(
           state.copyWith(isSubmitting: false, errorMessage: failure.message),

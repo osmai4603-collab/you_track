@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/localization/app_locale.dart';
-import 'package:issues_tracking/core/services/navigation_service.dart';
+import 'package:issues_tracking/core/services/navigation/navigation_service.dart';
 import 'package:issues_tracking/core/theme/app_theme.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/app_cubit.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/app_state.dart';

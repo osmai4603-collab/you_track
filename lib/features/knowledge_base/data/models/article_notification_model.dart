@@ -27,7 +27,7 @@ class ArticleNotificationModel extends ArticleNotification {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id.isNotEmpty) 'id': id,
       'recipient_id': recipientId,
       'sender_id': senderId,
       'article_id': articleId,

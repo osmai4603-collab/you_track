@@ -33,7 +33,7 @@ class ArticleModel extends Article {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id.isNotEmpty) 'id': id,
       'project_id': projectId,
       'parent_id': parentId,
       'title': title,

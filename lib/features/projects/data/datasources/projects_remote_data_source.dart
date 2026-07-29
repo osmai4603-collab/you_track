@@ -24,7 +24,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   Future<List<ProjectModel>> getProjects() async {
     final response = await supabase
         .from('projects')
-        .select()
+        .select('*, project_members(*, users(*))')
         .order('created_at', ascending: false);
     return (response as List).map((e) => ProjectModel.fromJson(e)).toList();
   }
@@ -44,7 +44,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   Future<ProjectModel> getProjectById(String id) async {
     final response = await supabase
         .from('projects')
-        .select()
+        .select('*, project_members(*, users(*))')
         .eq('id', id)
         .single();
     return ProjectModel.fromJson(response);
@@ -87,7 +87,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
   Future<List<ProjectMemberModel>> getProjectMembers(String projectId) async {
     final response = await supabase
         .from('project_members')
-        .select()
+        .select('*, users(*)')
         .eq('project_id', projectId);
     return (response as List)
         .map((e) => ProjectMemberModel.fromJson(e))

@@ -424,4 +424,94 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get widgetWorkItemExporter => 'Work Item Exporter';
+
+  @override
+  String get relatesToOption => 'Relates to';
+
+  @override
+  String get isRequiredForOption => 'Is required for';
+
+  @override
+  String get dependsOnOption => 'Depends on';
+
+  @override
+  String get isDuplicatedByOption => 'Is duplicated by';
+
+  @override
+  String get duplicatesOption => 'Duplicates';
+
+  @override
+  String get parentForOption => 'Parent for';
+
+  @override
+  String get subtaskOfOption => 'Subtask of';
+
+  @override
+  String get newTagTitle => 'New Tag';
+
+  @override
+  String get tagNameLabel => 'Tag Name';
+
+  @override
+  String get tagNameHint => 'Enter tag name';
+
+  @override
+  String get removeOnResolutionLabel => 'Remove on resolution';
+
+  @override
+  String get sharedLabel => 'Shared';
+
+  @override
+  String get favoriteLabel => 'Mark as favorite for all viewers';
+
+  @override
+  String get subscriptionsTitle => 'Subscriptions';
+
+  @override
+  String get tagScopeOwner => 'Owner';
+
+  @override
+  String get tagScopeAdmin => 'Admin';
+
+  @override
+  String get tagScopeDeveloper => 'Developer';
+
+  @override
+  String get tagScopeViewer => 'Viewer';
+
+  @override
+  String get tagScopeAllMembers => 'All Members';
+
+  @override
+  String get tagScopeSpecificUsers => 'Specific Users';
+
+  @override
+  String get tagPermissionView => 'Can view';
+
+  @override
+  String get tagPermissionUse => 'Can use';
+
+  @override
+  String get tagPermissionEdit => 'Can edit';
+
+  @override
+  String get tagEventUpdates => 'Updates';
+
+  @override
+  String get tagEventComments => 'Comments';
+
+  @override
+  String get tagEventTagAdded => 'Tag added';
+
+  @override
+  String get tagEventSpentTime => 'Spent time';
+
+  @override
+  String get tagEventIssueResolved => 'Issue resolved';
+
+  @override
+  String get tagEventVotes => 'Votes';
+
+  @override
+  String get tagEventTagRemoved => 'Tag removed';
 }

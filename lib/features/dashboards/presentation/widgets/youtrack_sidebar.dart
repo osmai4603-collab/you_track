@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
-import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
+import 'package:issues_tracking/core/widgets/user_icon_widget.dart';
 
 class YouTrackSidebar extends StatefulWidget {
   const YouTrackSidebar({super.key});
@@ -14,6 +14,10 @@ class YouTrackSidebar extends StatefulWidget {
 
 class _YouTrackSidebarState extends State<YouTrackSidebar> {
   bool _isCollapsed = false;
+  final MenuController _adminMenuController = MenuController();
+  final MenuController _moreOptionController = MenuController();
+  final MenuController _helpController = MenuController();
+  final MenuController _createController = MenuController();
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +35,7 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
-      width: _isCollapsed ? 80 : 240,
+      width: _isCollapsed ? 80 : 200,
       decoration: const BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
@@ -168,45 +172,13 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
                   selectedTextColor: selectedTextColor,
                   selectedBgColor: selectedBgColor,
                 ),
-                _buildNavItem(
-                  context: context,
-                  icon: Icons.grid_view,
-                  label: 'Knowldge Base',
-                  route: AppRouteKeys.knowldgeBase,
-                  currentRoute: currentRoute,
-                  textColor: textColor,
-                  selectedTextColor: selectedTextColor,
-                  selectedBgColor: selectedBgColor,
-                ),
-                _buildNavItem(
-                  context: context,
-                  icon: Icons.grid_view,
-                  label: 'Time Sheets',
-                  route: AppRouteKeys.timeSheets,
-                  currentRoute: currentRoute,
-                  textColor: textColor,
-                  selectedTextColor: selectedTextColor,
-                  selectedBgColor: selectedBgColor,
-                ),
-                _buildNavItem(
-                  context: context,
-                  icon: Icons.grid_view,
-                  label: 'Gantt Chart',
-                  route: AppRouteKeys.ganttChart,
-                  currentRoute: currentRoute,
-                  textColor: textColor,
-                  selectedTextColor: selectedTextColor,
-                  selectedBgColor: selectedBgColor,
-                ),
-                _buildNavItem(
-                  context: context,
-                  icon: Icons.grid_view,
-                  label: 'White Boards',
-                  route: AppRouteKeys.whiteBoards,
-                  currentRoute: currentRoute,
-                  textColor: textColor,
-                  selectedTextColor: selectedTextColor,
-                  selectedBgColor: selectedBgColor,
+
+                _buildMoreOptionsWidget(
+                  context,
+                  currentRoute,
+                  selectedTextColor,
+                  selectedBgColor,
+                  textColor,
                 ),
               ],
             ),
@@ -219,208 +191,636 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 // زر Create المخصص
-                Container(
-                  margin: const EdgeInsets.symmetric(
-                    vertical: AppSpacing.small,
-                  ),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF2E3139),
-                    borderRadius: AppRadius.smallBorderRadius,
-                  ),
-                  child: InkWell(
-                    borderRadius: AppRadius.smallBorderRadius,
-                    onTap: () {
-                      showMenu(
-                        context: context,
-                        position: RelativeRect.fill,
-                        color: const Color(0xFF2E3139),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: AppRadius.smallBorderRadius,
-                        ),
-                        items: const [
-                          AppPopupMenuItem<String>(
-                            value: 'new_issue',
-                            child: Text(
-                              'New Issue',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                          AppPopupMenuItem<String>(
-                            value: 'new_article',
-                            child: Text(
-                              'New Article',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ),
-                        ],
-                      ).then((value) {
-                        if (value == 'new_issue') {
-                          // TODO: Navigate to new issue
-                        } else if (value == 'new_article') {
-                          // TODO: Navigate to new article
-                        }
-                      });
-                    },
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: _isCollapsed ? 0 : AppSpacing.medium,
-                        vertical: AppSpacing.small,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: _isCollapsed
-                            ? MainAxisAlignment.center
-                            : MainAxisAlignment.start,
-                        children: [
-                          Icon(Icons.add, size: 20, color: textColor),
-                          if (!_isCollapsed) ...[
-                            const SizedBox(width: AppSpacing.medium),
-                            Expanded(
-                              child: Text(
-                                'Create',
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 14,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
+                _buildCreateMore(
+                  currentRoute,
+                  selectedTextColor,
+                  selectedBgColor,
+                  textColor,
                 ),
 
-                _buildNavItem(
-                  context: context,
-                  icon: Icons.settings_outlined,
-                  label: 'Administration',
-                  route: '/admin',
-                  currentRoute: currentRoute,
-                  textColor: textColor,
-                  selectedTextColor: selectedTextColor,
-                  selectedBgColor: selectedBgColor,
+                _buildAdministration(
+                  context,
+                  currentRoute,
+                  textColor,
+                  selectedTextColor,
+                  selectedBgColor,
                 ),
-                _buildNavItem(
-                  context: context,
-                  icon: Icons.help_outline,
-                  label: 'Help',
-                  route: '/help',
-                  currentRoute: currentRoute,
-                  textColor: textColor,
-                  selectedTextColor: selectedTextColor,
-                  selectedBgColor: selectedBgColor,
+                _buildHelpMenuWidget(
+                  context,
+                  textColor,
+                  selectedBgColor,
+                  selectedTextColor,
                 ),
-                _buildNavItem(
-                  context: context,
-                  icon: Icons.notifications_outlined,
-                  label: 'Notifications',
-                  route: '/notifications',
-                  currentRoute: currentRoute,
-                  textColor: textColor,
-                  selectedTextColor: selectedTextColor,
-                  selectedBgColor: selectedBgColor,
-                  trailing: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: Colors.redAccent,
-                      shape: BoxShape.circle,
-                    ),
-                  ),
+                _buildNotificationWidget(
+                  context,
+                  currentRoute,
+                  textColor,
+                  selectedTextColor,
+                  selectedBgColor,
                 ),
                 const SizedBox(height: AppSpacing.small),
 
                 // الملف الشخصي
-                Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.small,
-                    vertical: AppSpacing.small,
-                  ),
-                  child: Row(
-                    mainAxisAlignment: _isCollapsed
-                        ? MainAxisAlignment.center
-                        : MainAxisAlignment.start,
-                    children: [
-                      const CircleAvatar(
-                        radius: 14,
-                        backgroundColor: Color(0xFF4CAF50),
-                        child: Text(
-                          'AD',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                      if (!_isCollapsed) ...[
-                        const SizedBox(width: AppSpacing.medium),
-                        Expanded(
-                          child: Text(
-                            'admin',
-                            style: TextStyle(color: textColor, fontSize: 14),
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
+                _buildAdminWidget(textColor),
 
                 // زر Collapse
-                Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: AppSpacing.medium,
-                    top: AppSpacing.small,
-                  ),
-                  child: InkWell(
-                    onTap: () {
-                      setState(() {
-                        _isCollapsed = !_isCollapsed;
-                      });
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.small,
-                        vertical: AppSpacing.small,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: _isCollapsed
-                            ? MainAxisAlignment.center
-                            : MainAxisAlignment.start,
-                        children: [
-                          Icon(
-                            _isCollapsed
-                                ? Icons.keyboard_double_arrow_right
-                                : Icons.keyboard_double_arrow_left,
-                            size: 20,
-                            color: textColor,
-                          ),
-                          if (!_isCollapsed) ...[
-                            const SizedBox(width: AppSpacing.medium),
-                            Expanded(
-                              child: Text(
-                                'Collapse',
-                                style: TextStyle(
-                                  color: textColor,
-                                  fontSize: 14,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+                _buildCollapsedWidget(textColor),
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  MenuAnchor _buildAdministration(
+    BuildContext context,
+    String currentRoute,
+    Color textColor,
+    Color selectedTextColor,
+    Color selectedBgColor,
+  ) {
+    return MenuAnchor(
+      controller: _adminMenuController,
+      alignmentOffset: Offset(_isCollapsed ? 80 : 200, -40),
+      menuChildren: _buildAdminMenu(context),
+      style: MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(Colors.blueGrey.shade900),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: AppRadius.smallBorderRadius),
+        ),
+      ),
+      builder: (context, controller, child) {
+        return _buildNavItem(
+          context: context,
+          icon: Icons.settings_outlined,
+          label: 'Administration',
+          route: '',
+          currentRoute: currentRoute,
+          textColor: textColor,
+          selectedTextColor: selectedTextColor,
+          selectedBgColor: selectedBgColor,
+          onTap: () {
+            if (controller.isOpen) {
+              controller.close();
+            } else {
+              controller.open();
+            }
+          },
+        );
+      },
+    );
+  }
+
+  MenuAnchor _buildMoreOptionsWidget(
+    BuildContext context,
+    String currentRoute,
+    Color selectedTextColor,
+    Color selectedBgColor,
+    Color textColor,
+  ) {
+    return MenuAnchor(
+      controller: _moreOptionController,
+      alignmentOffset: Offset(_isCollapsed ? 80 : 200, -40),
+      menuChildren: [
+        _menuItem(
+          icon: Icons.grid_4x4_rounded,
+          currentRoute: currentRoute,
+          selectedTextColor: selectedTextColor,
+          textColor: textColor,
+          selectedBgColor: selectedBgColor,
+          route: AppRouteKeys.knowldgeBase,
+          label: 'Knowldge Base',
+        ),
+        _menuItem(
+          icon: Icons.schedule_send_outlined,
+          currentRoute: currentRoute,
+          selectedTextColor: selectedTextColor,
+          textColor: textColor,
+          selectedBgColor: selectedBgColor,
+          route: AppRouteKeys.timeSheets,
+          label: 'Time Sheet',
+        ),
+        _menuItem(
+          icon: Icons.chat_rounded,
+          currentRoute: currentRoute,
+          selectedTextColor: selectedTextColor,
+          textColor: textColor,
+          selectedBgColor: selectedBgColor,
+          route: AppRouteKeys.ganttChart,
+          label: 'Gantt Chart',
+        ),
+        _menuItem(
+          icon: Icons.grid_view,
+          label: 'White Boards',
+          route: AppRouteKeys.whiteBoards,
+          currentRoute: currentRoute,
+          textColor: textColor,
+          selectedTextColor: selectedTextColor,
+          selectedBgColor: selectedBgColor,
+        ),
+      ],
+      style: MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(const Color(0xFF2E3139)),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: AppRadius.smallBorderRadius),
+        ),
+      ),
+      builder: (context, controller, child) {
+        return _buildNavItem(
+          context: context,
+          icon: Icons.more_horiz_rounded,
+          label: 'More',
+          route: '/admin',
+          currentRoute: currentRoute,
+          textColor: textColor,
+          selectedTextColor: selectedTextColor,
+          selectedBgColor: selectedBgColor,
+          onTap: () {
+            if (controller.isOpen) {
+              controller.close();
+            } else {
+              controller.open();
+            }
+          },
+        );
+      },
+    );
+  }
+
+  MenuAnchor _buildCreateMore(
+    String currentRoute,
+    Color selectedTextColor,
+    Color selectedBgColor,
+    Color textColor,
+  ) {
+    return MenuAnchor(
+      controller: _createController,
+      alignmentOffset: Offset(_isCollapsed ? 80 : 200, -40),
+      menuChildren: [
+        _menuItem(
+          currentRoute: currentRoute,
+          selectedTextColor: selectedTextColor,
+          textColor: textColor,
+          selectedBgColor: selectedBgColor,
+          route: AppRouteKeys.createIssue,
+          label: 'New Issue',
+          icon: Icons.task_rounded,
+          onTap: () {},
+        ),
+
+        _menuItem(
+          currentRoute: currentRoute,
+          selectedTextColor: selectedTextColor,
+          textColor: textColor,
+          selectedBgColor: selectedBgColor,
+          route: AppRouteKeys.createIssue,
+          label: 'New Article',
+          icon: Icons.article_rounded,
+          onTap: () {},
+        ),
+      ],
+      style: MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(const Color(0xFF2E3139)),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: AppRadius.smallBorderRadius),
+        ),
+      ),
+      builder: (context, controller, child) {
+        return _menuItem(
+          currentRoute: currentRoute,
+          selectedTextColor: selectedTextColor,
+          textColor: textColor,
+          selectedBgColor: selectedBgColor,
+          backColor: Colors.grey.shade800,
+          route: '',
+          canCollapse: _isCollapsed,
+          label: _isCollapsed ? '' : 'Create',
+          icon: Icons.add_rounded,
+          iconSize: 22,
+          onTap: () {
+            if (controller.isOpen) {
+              controller.close();
+            } else {
+              controller.open();
+            }
+          },
+        );
+      },
+    );
+  }
+
+  Padding _buildCollapsedWidget(Color textColor) {
+    return Padding(
+      padding: const EdgeInsets.only(
+        bottom: AppSpacing.medium,
+        top: AppSpacing.small,
+      ),
+      child: InkWell(
+        onTap: () {
+          setState(() {
+            _isCollapsed = !_isCollapsed;
+          });
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.small,
+            vertical: AppSpacing.small,
+          ),
+          child: Row(
+            mainAxisAlignment: _isCollapsed
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.start,
+            children: [
+              Icon(
+                _isCollapsed
+                    ? Icons.keyboard_double_arrow_right
+                    : Icons.keyboard_double_arrow_left,
+                size: 20,
+                color: textColor,
+              ),
+              if (!_isCollapsed) ...[
+                const SizedBox(width: AppSpacing.medium),
+                Expanded(
+                  child: Text(
+                    'Collapse',
+                    style: TextStyle(color: textColor, fontSize: 14),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Padding _buildAdminWidget(Color textColor) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.small,
+        vertical: AppSpacing.small,
+      ),
+      child: Row(
+        mainAxisAlignment: _isCollapsed
+            ? MainAxisAlignment.center
+            : MainAxisAlignment.start,
+        children: [
+          UserIconWidget(),
+          if (!_isCollapsed) ...[
+            const SizedBox(width: AppSpacing.medium),
+            Expanded(
+              child: Text(
+                'admin',
+                style: TextStyle(color: textColor, fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildNotificationWidget(
+    BuildContext context,
+    String currentRoute,
+    Color textColor,
+    Color selectedTextColor,
+    Color selectedBgColor,
+  ) {
+    return _buildNavItem(
+      context: context,
+      icon: Icons.notifications_outlined,
+      label: 'Notifications',
+      route: '/notifications',
+      currentRoute: currentRoute,
+      textColor: textColor,
+      selectedTextColor: selectedTextColor,
+      selectedBgColor: selectedBgColor,
+      trailing: Container(
+        width: 8,
+        height: 8,
+        decoration: const BoxDecoration(
+          color: Colors.redAccent,
+          shape: BoxShape.circle,
+        ),
+      ),
+    );
+  }
+
+  MenuAnchor _buildHelpMenuWidget(
+    BuildContext context,
+    Color textColor,
+    Color selectedBgColor,
+    Color selectedTextColor,
+  ) {
+    return MenuAnchor(
+      alignmentOffset: Offset(_isCollapsed ? 80 : 200, -40),
+      menuChildren: _buildHelpMenu(context),
+      style: MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(const Color(0xFF2E3139)),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: AppRadius.smallBorderRadius),
+        ),
+      ),
+      controller: _helpController,
+      builder: (_, controller, child) {
+        return _menuItem(
+          icon: Icons.help_rounded,
+          currentRoute: '',
+          textColor: textColor,
+          canCollapse: _isCollapsed,
+          selectedBgColor: Colors.transparent,
+          selectedTextColor: selectedTextColor,
+          route: '',
+          backColor: Colors.transparent,
+          iconSize: 22,
+          label: 'Help',
+          onTap: () {
+            if (controller.isOpen) {
+              controller.close();
+            } else {
+              controller.open();
+            }
+          },
+          
+        );
+      },
+    );
+  }
+
+  Widget _menuItem({
+    required String currentRoute,
+    required Color selectedTextColor,
+    required Color textColor,
+    required Color selectedBgColor,
+    required String route,
+    required String label,
+    required IconData icon,
+    void Function()? onTap,
+    bool canCollapse = false,
+    double iconSize = 16,
+    Color? backColor,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: ListTile(
+        tileColor: backColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
+        selected: currentRoute == route,
+        selectedColor: selectedTextColor,
+        selectedTileColor: selectedBgColor,
+        hoverColor: textColor.withValues(alpha: 0.10),
+        onTap: onTap ?? () => context.go(route),
+        leading: canCollapse
+            ? null
+            : Icon(icon, color: textColor, size: iconSize),
+        title: canCollapse
+            ? Icon(icon, color: textColor, size: iconSize)
+            : Text(label, style: TextStyle(color: textColor)),
+        minTileHeight: 40,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
+      ),
+    );
+  }
+
+  List<Widget> _buildAdminMenu(BuildContext context) {
+    const textColor = Color(0xFFC0C1C7);
+    final itemStyle = ButtonStyle(
+      foregroundColor: WidgetStatePropertyAll(textColor),
+
+      overlayColor: WidgetStatePropertyAll(Colors.white.withValues(alpha: 0.1)),
+      padding: const WidgetStatePropertyAll(
+        EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
+      shape: WidgetStatePropertyAll(
+        RoundedRectangleBorder(borderRadius: AppRadius.smallBorderRadius),
+      ),
+    );
+    return [
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {},
+        child: const Text('Custom Fields'),
+      ),
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {},
+        child: const Text('Link Types'),
+      ),
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {},
+        child: const Text('Time Tracking'),
+      ),
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {},
+        child: const Text('Workflows'),
+      ),
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {},
+        child: const Text('Apps'),
+      ),
+      const Divider(color: Colors.white24, height: 1),
+      SubmenuButton(
+        style: itemStyle,
+        menuStyle: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(const Color(0xFF2E3139)),
+        ),
+        menuChildren: [
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('Users'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('Organizations'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('Groups'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('Roles'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('Auth Modules'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('SAML 2.0'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('OAuth Clients'),
+          ),
+        ],
+        child: const Text('Access Management'),
+      ),
+      SubmenuButton(
+        style: itemStyle,
+        menuStyle: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(const Color(0xFF2E3139)),
+        ),
+        menuChildren: [
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('imports'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('Mailbox integrations'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('Build server integrations'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('VCS Integration'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('Zendesk Integration'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('Jetbrains AI'),
+          ),
+        ],
+        child: const Text('Integrations'),
+      ),
+      SubmenuButton(
+        style: itemStyle,
+        menuStyle: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(const Color(0xFF2E3139)),
+        ),
+        menuChildren: [
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('Global Settings'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('user Agreement'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('Database Export'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('SSL Certificates'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('SSL Keys'),
+          ),
+          MenuItemButton(
+            style: itemStyle,
+            onPressed: () {},
+            child: const Text('Audit Events'),
+          ),
+        ],
+        child: const Text('Server Settings'),
+      ),
+    ];
+  }
+
+  List<Widget> _buildHelpMenu(BuildContext context) {
+    const textColor = Color(0xFFC0C1C7);
+    final itemStyle = ButtonStyle(
+      foregroundColor: WidgetStatePropertyAll(textColor),
+
+      overlayColor: WidgetStatePropertyAll(Colors.white.withValues(alpha: 0.1)),
+      padding: const WidgetStatePropertyAll(
+        EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
+      shape: WidgetStatePropertyAll(
+        RoundedRectangleBorder(borderRadius: AppRadius.smallBorderRadius),
+      ),
+    );
+    return [
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {},
+        child: const Text('Feedback'),
+      ),
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {},
+        child: const Text('Markdown Reference'),
+      ),
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {},
+        child: const Text('FAQ'),
+      ),
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {},
+        child: const Text('Documentation'),
+      ),
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {},
+        child: const Text('Video Demos'),
+      ),
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {},
+        child: const Text('Service Status'),
+      ),
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {},
+        child: const Text('Maintainance Calendar'),
+      ),
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {},
+        child: const Text('Support'),
+      ),
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {},
+        child: const Text('About YoutTrack'),
+      ),
+      const Divider(color: Colors.white24, height: 1),
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+        child: Text(
+          'YouTrack — powerful project management\nfor all your teams by JetBrains\nBuild 2026.2.17765\nWednesday, July 15, 2026',
+          style: TextTheme.of(context).bodyMedium?.copyWith(
+            color: Theme.of(context).colorScheme.surfaceContainerHigh,
+          ),
+        ),
+      ),
+    ];
   }
 
   Widget _buildNavItem({
@@ -432,6 +832,7 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
     required Color textColor,
     required Color selectedTextColor,
     required Color selectedBgColor,
+    VoidCallback? onTap,
     Widget? trailing,
   }) {
     // التأكد من أن المسار الحالي يتطابق مع العنصر
@@ -440,22 +841,24 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
     return Material(
       color: Colors.transparent,
       child: ListTile(
-        shape: RoundedRectangleBorder(borderRadius: .circular(4.0)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4.0)),
         selected: isSelected,
         selectedColor: selectedTextColor,
         selectedTileColor: selectedBgColor,
         hoverColor: textColor.withValues(alpha: 0.10),
-        onTap: () => context.go(route),
+        onTap: onTap ?? () => context.go(route),
         leading: _isCollapsed ? null : Icon(icon, size: 22),
         title: _isCollapsed
-            ? Icon(icon, size: 22)
+            ? Icon(icon, size: 22, color: textColor)
             : Text(
                 label,
-                style: isSelected ? null : TextStyle(color: textColor),
+                style: isSelected
+                    ? null
+                    : TextStyle(color: textColor, fontSize: 15),
               ),
         dense: true,
         minTileHeight: 40,
-        contentPadding: .all(4.0),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
       ),
     );
   }

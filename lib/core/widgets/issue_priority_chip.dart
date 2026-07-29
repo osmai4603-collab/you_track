@@ -19,6 +19,8 @@ class IssuePriorityChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      width: 25,
+      height: 25,
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
       decoration: BoxDecoration(
         color: Color(type.color),

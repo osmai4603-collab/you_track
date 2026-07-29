@@ -46,7 +46,7 @@ class VcsCommitModel extends VcsCommitEntity {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id.isNotEmpty) 'id': id,
       'integration_id': integrationId,
       'task_id': taskId,
       'commit_sha': commitSha,

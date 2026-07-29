@@ -1,5 +1,5 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:issues_tracking/core/error/failures.dart';
+import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/enums/tag_permission_scope_enum.dart';
 import 'package:issues_tracking/core/enums/tag_subscription_event_enum.dart';
 import '../entities/tag.dart';

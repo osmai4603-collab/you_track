@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../custom_field/domain/entities/field_type.dart';
+import '../../domain/entities/field_type.dart';
 
 class CustomTabBar extends StatelessWidget {
   final FieldType selectedType;

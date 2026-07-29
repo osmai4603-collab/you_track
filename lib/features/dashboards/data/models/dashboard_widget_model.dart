@@ -33,7 +33,7 @@ class DashboardWidgetModel extends DashboardWidget {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id.isNotEmpty) 'id': id,
       'dashboard_id': dashboardId,
       'widget_type': widgetType,
       'title': title,

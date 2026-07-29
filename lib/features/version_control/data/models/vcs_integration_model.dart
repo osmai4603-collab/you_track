@@ -87,7 +87,7 @@ class VcsIntegrationModel extends VcsIntegrationEntity {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id.isNotEmpty) 'id': id,
       'project_id': projectId,
       'integration_name': integrationName,
       'provider_type': providerType.name,

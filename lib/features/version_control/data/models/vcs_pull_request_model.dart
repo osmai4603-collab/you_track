@@ -56,7 +56,7 @@ class VcsPullRequestModel extends VcsPullRequestEntity {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id.isNotEmpty) 'id': id,
       'integration_id': integrationId,
       'task_id': taskId,
       'pr_number': prNumber,

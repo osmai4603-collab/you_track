@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:issues_tracking/features/issues/domain/entities/tag.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_issues.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/issues_repository.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dart';
@@ -40,7 +41,7 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
   ) async {
     emit(IssuesLoading());
     final tagsResult = await repository.getAllTags();
-    final tags = tagsResult.fold((_) => <String>[], (t) => t);
+    final tags = tagsResult.fold((_) => <Tag>[], (t) => t);
     final result = await getIssues(
       params: GetIssuesParams(filter: _currentFilter),
     );
@@ -76,7 +77,7 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
     emit(IssuesLoading());
 
     final tagsResult = await repository.getAllTags();
-    final tags = tagsResult.fold((_) => <String>[], (t) => t);
+    final tags = tagsResult.fold((_) => <Tag>[], (t) => t);
 
     final result = await getIssues(
       params: GetIssuesParams(filter: event.filter),

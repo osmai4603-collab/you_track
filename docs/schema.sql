@@ -26,6 +26,14 @@ CREATE TABLE public.projects (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- جدول البناء (Builds)
+CREATE TABLE public.builds (
+    id UUID DEFAULT uuid_generate_v4() PRIMARY KEY,
+    name TEXT NOT NULL,
+    date TIMESTAMPTZ,
+    project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE NOT NULL
+);
+
 -- جدول أعضاء المشروع (Roles: admin, developer, reporter)
 CREATE TABLE public.project_members (
     project_id UUID REFERENCES public.projects(id) ON DELETE CASCADE,
@@ -47,6 +55,7 @@ CREATE TABLE public.issues (
     state TEXT DEFAULT 'to-do', -- Open, In Progress, Resolved, Closed
     priority TEXT DEFAULT 'normal', -- Low, Normal, High, Critical
     issue_type TEXT DEFAULT 'task', -- Bug, Task, Feature
+    build_id UUID REFERENCES public.builds(id) ON DELETE SET NULL,
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );

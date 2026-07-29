@@ -5,42 +5,42 @@ This plan outlines the steps to activate the `IssueForm` for both adding and edi
 ## User Review Required
 
 > [!IMPORTANT]
-> - The form uses `Fleather` for rich text editing. We will save the description as plain text/markdown for now as per the current `IssueModel` structure.
-> - Deletion logic is implemented but requires a confirmation dialog (already present in `IssueFormActionBar`).
-> - The `projectKey` is currently defaulted to 'DEM'. This should be passed from the navigation context.
+> - The form uses `Fleather` for rich text editing. We will save the description as plain text for now.
+> - Deletion logic is implemented but requires a confirmation dialog.
+> - The `projectKey` is currently defaulted to 'DEM'.
+> - **New Fields**: `subsystem`, `fixVersions`, and `fixedInBuild` will be added to the `Issue` entity and database model to ensure full form persistence.
+> - **Enums**: `subsystem` will be changed from `String` to `IssueSubsystemEnum`.
 
 ## Proposed Changes
 
-### Issue Feature
+### Domain & Data Layer
 
-#### [MODIFY] [issue_form.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/lib/features/issues/presentation/pages/issue_form.dart)
-- Implement `initState` logic to load an existing issue if `issueId` is provided.
-- Wire `FleatherController` to `IssueFormCubit` to sync description changes.
-- Sync `summary` text field with `IssueFormCubit` state for initial values when editing.
-- Ensure `IssueFormTopBar` and `IssueFormSidebar` are fully functional and updating the Cubit.
+#### [MODIFY] [issue.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/lib/features/issues/domain/entities/issue.dart)
+- Add `subsystem`, `fixVersions`, and `fixedInBuild` fields to the `Issue` class and its `copyWith` and `props`.
+
+#### [MODIFY] [issue_model.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/lib/features/issues/data/models/issue_model.dart)
+- Update `fromJson`, `toJson`, and `fromEntity` to include the new fields.
+
+### Presentation Layer
+
+#### [MODIFY] [issue_form_state.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/lib/features/issues/presentation/cubits/issue_form_state.dart)
+- Change `subsystem` type to `IssueSubsystemEnum`.
+- Ensure all fields are correctly initialized.
 
 #### [MODIFY] [issue_form_cubit.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/lib/features/issues/presentation/cubits/issue_form_cubit.dart)
-- Ensure all fields are correctly mapped from the state to the `Issue` entity in `submit()`.
-- Implement a method to fetch an issue by ID and initialize the state.
+- Update `updateSubsystem` to accept `IssueSubsystemEnum`.
+- Map all `state` fields (including new ones) to the `Issue` entity in the `submit()` method.
 
-#### [MODIFY] [issue_form_top_bar.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/lib/features/issues/presentation/widgets/issue_form_top_bar.dart)
-- Use a `TextEditingController` for the summary to set its initial value from the Cubit state when editing.
+#### [MODIFY] [issue_form_sidebar.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/lib/features/issues/presentation/widgets/issue_form_sidebar.dart)
+- Implement `_showSubsystemPicker` using `IssueSubsystemEnum.values`.
+- Implement placeholders for Assignee, Fix versions, and Fixed in build pickers.
+
+#### [MODIFY] [issue_form.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/lib/features/issues/presentation/pages/issue_form.dart)
+- (Already implemented) Load existing issue, sync summary and description controllers.
 
 ## Verification Plan
 
 ### Manual Verification
-1. **Create Issue**:
-   - Open the form in "Add" mode.
-   - Fill in Summary, Description, Priority, and State.
-   - Click "Create".
-   - Verify the issue appears in the list and is saved in Supabase.
-2. **Edit Issue**:
-   - Open an existing issue in the form.
-   - Verify fields are pre-populated.
-   - Change some values (e.g., Priority, Summary).
-   - Click "Update".
-   - Verify changes are reflected in the list and database.
-3. **Delete Issue**:
-   - Open an existing issue.
-   - Click "Delete" and confirm.
-   - Verify the issue is removed.
+1. **Create Issue**: Fill all fields (including sidebar properties) and verify they are saved in Supabase.
+2. **Edit Issue**: Verify all fields are correctly pre-populated and updates are persisted.
+3. **Delete Issue**: Confirm deletion works as expected.

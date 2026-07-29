@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
 import 'package:issues_tracking/features/issues/presentation/cubits/issue_form_cubit.dart';
 import 'package:issues_tracking/features/issues/presentation/cubits/issue_form_state.dart';
+import 'package:issues_tracking/features/issues/presentation/widgets/add_link_dialog.dart';
 
 class IssueFormTopBar extends StatelessWidget {
+  final TextEditingController? summaryController;
   final VoidCallback? onPaperclipTap;
   final VoidCallback? onMentionTap;
   final VoidCallback? onMenuTap;
@@ -12,6 +14,7 @@ class IssueFormTopBar extends StatelessWidget {
 
   const IssueFormTopBar({
     super.key,
+    this.summaryController,
     this.onPaperclipTap,
     this.onMentionTap,
     this.onMenuTap,
@@ -31,6 +34,7 @@ class IssueFormTopBar extends StatelessWidget {
             children: [
               Expanded(
                 child: TextField(
+                  controller: summaryController,
                   maxLength: 255,
                   buildCounter: _buildCounterField,
                   decoration: InputDecoration(
@@ -55,9 +59,6 @@ class IssueFormTopBar extends StatelessWidget {
                     fontSize: 20,
                     fontWeight: FontWeight.w500,
                   ),
-                  onChanged: (value) {
-                    context.read<IssueFormCubit>().updateSummary(value);
-                  },
                 ),
               ),
               IconButton(
@@ -69,7 +70,15 @@ class IssueFormTopBar extends StatelessWidget {
                 icon: const Icon(Icons.link_rounded),
                 tooltip: 'Add Link',
                 padding: .all(2),
-                onPressed: () {},
+                onPressed: () {
+                  AddLinkDialog.show(
+                    context,
+                    currentIssueId: state.issueId,
+                    onSave: (link) {
+                      context.read<IssueFormCubit>().addLink(link);
+                    },
+                  );
+                },
               ),
               PopupMenuButton<String>(
                 borderRadius: .circular(4),

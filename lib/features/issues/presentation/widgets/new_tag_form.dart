@@ -5,6 +5,9 @@ import 'package:issues_tracking/core/widgets/skeleton_shimmer.dart';
 import '../cubits/new_tag_cubit.dart';
 import '../cubits/new_tag_state.dart';
 
+import 'tag_permissions_section.dart';
+import 'tag_subscriptions_section.dart';
+
 class NewTagForm extends StatefulWidget {
   final String projectId;
   final String? currentIssueId;
@@ -58,7 +61,16 @@ class _NewTagFormState extends State<NewTagForm> {
             ),
             _buildOwnerDropdown(context, state, localization),
             SwitchListTile(
-              title: Text(localization.removeOnResolutionLabel),
+              title: Row(
+                children: [
+                  Text(localization.removeOnResolutionLabel),
+                  const SizedBox(width: 8),
+                  const Tooltip(
+                    message: 'Auto-remove tag from issue when it is resolved',
+                    child: Icon(Icons.help_outline, size: 16, color: Colors.grey),
+                  ),
+                ],
+              ),
               value: state.removeOnResolution,
               onChanged: (value) =>
                   context.read<NewTagCubit>().updateRemoveOnResolution(value),
@@ -76,10 +88,10 @@ class _NewTagFormState extends State<NewTagForm> {
               onChanged: (value) =>
                   context.read<NewTagCubit>().updateFavorite(value ?? false),
               contentPadding: EdgeInsets.zero,
-              controlType: ListTileControlType.leading,
+              controlAffinity: ListTileControlAffinity.leading,
             ),
-            // TODO: TagPermissionsSection (Phase 4)
-            // TODO: TagSubscriptionsSection (Phase 5)
+            const TagPermissionsSection(),
+            const TagSubscriptionsSection(),
           ],
         );
       },

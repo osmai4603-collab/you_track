@@ -8,6 +8,7 @@ import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
 import 'package:issues_tracking/features/dashboards/presentation/cubits/youtrack_shell_cubit.dart';
 import 'package:issues_tracking/features/dashboards/presentation/widgets/breadcrumbs.dart';
+import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_state.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/add_project_members_page.dart';
@@ -39,19 +40,21 @@ class YouTrackContentHeader extends StatelessWidget {
 class _SectionOne extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final shellState = context.watch<YouTrackShellCubit>().state;
+    final currentIssue = shellState.currentIssue;
     final issuesState = context.watch<IssuesBloc>().state;
     final currentUserId = Supabase.instance.client.auth.currentUser?.id;
 
-    if (issuesState is! IssuesLoaded || currentUserId == null) {
+    final hasUserIssues = issuesState is IssuesLoaded && currentUserId != null;
+    final userIssues = hasUserIssues
+        ? issuesState.issues
+            .where((issue) => issue.reporterId == currentUserId)
+            .toList()
+        : <Issue>[];
+
+    if (currentIssue == null && userIssues.isEmpty) {
       return const SizedBox.shrink();
     }
-
-    // Filter issues reported by current user
-    final userIssues = issuesState.issues
-        .where((issue) => issue.reporterId == currentUserId)
-        .toList();
-
-    if (userIssues.isEmpty) return const SizedBox.shrink();
 
     final displayIssues = userIssues.take(5).toList();
     final remainingIssues = userIssues.skip(5).toList();
@@ -67,25 +70,45 @@ class _SectionOne extends StatelessWidget {
             child: Wrap(
               spacing: 8,
               runSpacing: 4,
-              children: displayIssues.map((issue) {
-                return Chip(
-                  label: Text(
-                    issue.issueKey,
-                    style: const TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.blueAccent,
+              children: [
+                if (currentIssue != null)
+                  Chip(
+                    label: Text(
+                      currentIssue.issueKey,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    backgroundColor: Colors.blue.shade700,
+                    side: BorderSide.none,
+                    padding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.compact,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
                     ),
                   ),
-                  backgroundColor: Colors.blue.shade50,
-                  side: BorderSide.none,
-                  padding: EdgeInsets.zero,
-                  visualDensity: VisualDensity.compact,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                );
-              }).toList(),
+                ...displayIssues.map((issue) {
+                  return Chip(
+                    label: Text(
+                      issue.issueKey,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.blueAccent,
+                      ),
+                    ),
+                    backgroundColor: Colors.blue.shade50,
+                    side: BorderSide.none,
+                    padding: EdgeInsets.zero,
+                    visualDensity: VisualDensity.compact,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                  );
+                }),
+              ],
             ),
           ),
           if (remainingIssues.isNotEmpty)
@@ -160,6 +183,15 @@ class _SectionTwo extends StatelessWidget {
               onPressed: () => context.go(AppRouteKeys.createIssue),
               icon: Icons.add,
               label: 'New Issue',
+            ),
+          ],
+          if (currentPath.contains('agile-boards')) ...[
+            _SearchField(hint: 'Filter cards on the boards'),
+            const SizedBox(width: 16),
+            _ActionButton(
+              onPressed: () => context.go(AppRouteKeys.createIssue),
+              icon: Icons.add,
+              label: 'New card',
             ),
           ],
           if (projectId != null &&

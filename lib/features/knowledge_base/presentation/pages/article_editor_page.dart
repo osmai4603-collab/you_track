@@ -103,7 +103,7 @@ class _ArticleEditorPageState extends State<ArticleEditorPage> {
             body: state is ArticleEditorLoading
                 ? const Center(child: CircularProgressIndicator())
                 : state is ArticleEditorError
-                ? Center(child: Text(state.message))
+                ? Center(child: SelectableText(state.message))
                 : _buildEditorBody(state),
           );
         },

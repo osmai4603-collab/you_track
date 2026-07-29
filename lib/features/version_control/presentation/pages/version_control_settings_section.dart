@@ -20,24 +20,21 @@ class _VersionControlSettingsSectionState
   @override
   void initState() {
     super.initState();
-    final projectId =
-        context.read<ProjectDetailsCubit>().state.project?.id;
+    final projectId = context.read<ProjectDetailsCubit>().state.project?.id;
     if (projectId != null) {
       context.read<VcsIntegrationsCubit>().loadIntegrations(projectId);
     }
   }
 
   void _refresh() {
-    final projectId =
-        context.read<ProjectDetailsCubit>().state.project?.id;
+    final projectId = context.read<ProjectDetailsCubit>().state.project?.id;
     if (projectId != null) {
       context.read<VcsIntegrationsCubit>().loadIntegrations(projectId);
     }
   }
 
   void _showAddIntegrationDialog() {
-    final projectId =
-        context.read<ProjectDetailsCubit>().state.project?.id;
+    final projectId = context.read<ProjectDetailsCubit>().state.project?.id;
     if (projectId == null) return;
 
     showDialog(
@@ -59,7 +56,7 @@ class _VersionControlSettingsSectionState
         if (state is VcsIntegrationsError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(state.message),
+              content: SelectableText(state.message),
               backgroundColor: colors.error,
             ),
           );
@@ -67,8 +64,7 @@ class _VersionControlSettingsSectionState
       },
       builder: (context, state) {
         return Padding(
-          padding:
-              const EdgeInsets.symmetric(horizontal: AppSpacing.large),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.large),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -83,7 +79,10 @@ class _VersionControlSettingsSectionState
   }
 
   Widget _buildHeader(
-      ColorScheme colors, TextTheme textTheme, VcsIntegrationsState state) {
+    ColorScheme colors,
+    TextTheme textTheme,
+    VcsIntegrationsState state,
+  ) {
     final isLoaded = state is VcsIntegrationsLoaded;
     final count = isLoaded ? state.integrations.length : 0;
 
@@ -121,7 +120,10 @@ class _VersionControlSettingsSectionState
   }
 
   Widget _buildContent(
-      VcsIntegrationsState state, ColorScheme colors, TextTheme textTheme) {
+    VcsIntegrationsState state,
+    ColorScheme colors,
+    TextTheme textTheme,
+  ) {
     if (state is VcsIntegrationsInitial || state is VcsIntegrationsLoading) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -133,21 +135,16 @@ class _VersionControlSettingsSectionState
           children: [
             Icon(Icons.error_outline, size: 48, color: colors.error),
             const SizedBox(height: AppSpacing.medium),
-            Text(
-              'Failed to load integrations',
-              style: textTheme.bodyMedium,
-            ),
+            Text('Failed to load integrations', style: textTheme.bodyMedium),
             const SizedBox(height: AppSpacing.small),
-            Text(
+            SelectableText(
               state.message,
-              style: textTheme.bodySmall
-                  ?.copyWith(color: colors.onSurfaceVariant),
+              style: textTheme.bodySmall?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
             ),
             const SizedBox(height: AppSpacing.medium),
-            FilledButton(
-              onPressed: _refresh,
-              child: const Text('Retry'),
-            ),
+            FilledButton(onPressed: _refresh, child: const Text('Retry')),
           ],
         ),
       );
@@ -211,8 +208,7 @@ class _VersionControlSettingsSectionState
   }
 
   void _showEditDialog(VcsIntegrationEntity integration) {
-    final projectId =
-        context.read<ProjectDetailsCubit>().state.project?.id;
+    final projectId = context.read<ProjectDetailsCubit>().state.project?.id;
     if (projectId == null) return;
 
     showDialog(
@@ -247,9 +243,9 @@ class _VersionControlSettingsSectionState
                 backgroundColor: Theme.of(context).colorScheme.error,
               ),
               onPressed: () {
-                context
-                    .read<VcsIntegrationsCubit>()
-                    .deleteIntegration(integration.id);
+                context.read<VcsIntegrationsCubit>().deleteIntegration(
+                  integration.id,
+                );
                 Navigator.of(dialogContext).pop();
               },
               child: const Text('Delete'),

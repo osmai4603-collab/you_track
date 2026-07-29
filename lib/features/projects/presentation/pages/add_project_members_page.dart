@@ -13,7 +13,7 @@ class AddProjectMembersPage extends StatefulWidget {
     showDialog(
       context: context,
       builder: (_) => BlocProvider(
-        create: (_) => sl<ProjectMembersCubit>(),
+        create: (_) => get_it<ProjectMembersCubit>(),
         child: AddProjectMembersPage(projectId: projectId),
       ),
     );
@@ -34,11 +34,7 @@ class _SelectedMember {
     required this.isGroup,
   });
 
-  _SelectedMember copyWith({
-    bool? isSelected,
-    String? role,
-    bool? isGroup,
-  }) {
+  _SelectedMember copyWith({bool? isSelected, String? role, bool? isGroup}) {
     return _SelectedMember(
       isSelected: isSelected ?? this.isSelected,
       role: role ?? this.role,
@@ -60,10 +56,7 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
     'System Admin',
   ];
 
-  static const _groups = [
-    'Registered Users',
-    'All Users',
-  ];
+  static const _groups = ['Registered Users', 'All Users'];
 
   @override
   void initState() {
@@ -116,7 +109,8 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
     }).toList();
   }
 
-  bool get _hasResults => _filteredUsers.isNotEmpty || _filteredGroups.isNotEmpty;
+  bool get _hasResults =>
+      _filteredUsers.isNotEmpty || _filteredGroups.isNotEmpty;
 
   bool get _isTyping => _controller.text.isNotEmpty;
 
@@ -124,7 +118,9 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
     setState(() {
       final current = _selectedMembers[id];
       if (current != null) {
-        _selectedMembers[id] = current.copyWith(isSelected: !current.isSelected);
+        _selectedMembers[id] = current.copyWith(
+          isSelected: !current.isSelected,
+        );
       }
     });
   }
@@ -227,9 +223,7 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
                 children: [
                   FilledButton(
                     onPressed: _invite,
-                    style: FilledButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                    ),
+                    style: FilledButton.styleFrom(backgroundColor: Colors.blue),
                     child: const Text('Invite'),
                   ),
                   const SizedBox(width: 8),
@@ -411,7 +405,10 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
           ),
           Expanded(
             flex: 2,
-            child: _buildRoleDropdown(memberData.id, selected?.role ?? 'Contributor'),
+            child: _buildRoleDropdown(
+              memberData.id,
+              selected?.role ?? 'Contributor',
+            ),
           ),
           SizedBox(
             width: 32,
@@ -483,10 +480,7 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
       underline: const SizedBox(),
       style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
       items: _availableRoles.map((role) {
-        return DropdownMenuItem(
-          value: role,
-          child: Text(role),
-        );
+        return DropdownMenuItem(value: role, child: Text(role));
       }).toList(),
       onChanged: (newRole) {
         if (newRole != null) {

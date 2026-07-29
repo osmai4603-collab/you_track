@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:issues_tracking/features/issues/domain/entities/sprint.dart';
-import 'package:uuid/uuid.dart';
+
 
 class AddSprintDialog extends StatefulWidget {
   final Sprint? sprint;
@@ -227,7 +227,9 @@ class _AddSprintDialogState extends State<AddSprintDialog> {
                   onPressed: () {
                     if (_nameController.text.isEmpty) return;
                     final sprint = Sprint(
-                      id: widget.sprint?.id ?? const Uuid().v4(),
+                      id: widget.sprint?.id?.isNotEmpty == true 
+                          ? widget.sprint!.id 
+                          : DateTime.now().millisecondsSinceEpoch.toString(),
                       name: _nameController.text,
                       startDate: _startDate,
                       releaseDate: _releaseDate,

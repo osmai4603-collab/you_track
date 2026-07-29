@@ -1,3 +1,4 @@
+import 'package:issues_tracking/features/projects/domain/entities/project_member_entity.dart';
 import '../../../../core/entities/entity.dart';
 
 class ProjectEntity extends Entity {
@@ -8,10 +9,10 @@ class ProjectEntity extends Entity {
   final bool isArchived;
   final bool isTemplate;
   final String? templateId;
-  final String owner;
+  final String ownerId;
   final DateTime createdAt;
   final bool isFavorite;
-  final List<String> memberInitials;
+  final List<ProjectMemberEntity> members;
 
   const ProjectEntity({
     required this.id,
@@ -21,10 +22,10 @@ class ProjectEntity extends Entity {
     this.isArchived = false,
     this.isTemplate = false,
     this.templateId,
-    required this.owner,
+    required this.ownerId,
     required this.createdAt,
     this.isFavorite = false,
-    this.memberInitials = const [],
+    this.members = const [],
   });
 
   @override
@@ -40,6 +41,7 @@ class ProjectEntity extends Entity {
     DateTime? createdAt,
     bool? isFavorite,
     List<String>? memberInitials,
+    List<ProjectMemberEntity>? members,
   }) {
     return ProjectEntity(
       id: id ?? this.id,
@@ -49,10 +51,10 @@ class ProjectEntity extends Entity {
       isArchived: isArchived ?? this.isArchived,
       isTemplate: isTemplate ?? this.isTemplate,
       templateId: templateId ?? this.templateId,
-      owner: owner ?? this.owner,
+      ownerId: owner ?? this.ownerId,
       createdAt: createdAt ?? this.createdAt,
       isFavorite: isFavorite ?? this.isFavorite,
-      memberInitials: memberInitials ?? this.memberInitials,
+      members: members ?? this.members,
     );
   }
 
@@ -65,9 +67,9 @@ class ProjectEntity extends Entity {
     isArchived,
     isTemplate,
     templateId,
-    owner,
+    ownerId,
     createdAt,
     isFavorite,
-    memberInitials,
+    members,
   ];
 }

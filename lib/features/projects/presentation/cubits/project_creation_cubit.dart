@@ -8,7 +8,13 @@ import '../../domain/usecases/add_project_member_use_case.dart';
 import '../../domain/usecases/create_project_use_case.dart';
 import '../../domain/usecases/get_project_templates_use_case.dart';
 
-enum ProjectCreationStatus { initial, loading, templatesLoaded, projectCreated, failure }
+enum ProjectCreationStatus {
+  initial,
+  loading,
+  templatesLoaded,
+  projectCreated,
+  failure,
+}
 
 class ProjectCreationState extends Equatable {
   final ProjectCreationStatus status;
@@ -63,17 +69,17 @@ class ProjectCreationState extends Equatable {
 
   @override
   List<Object?> get props => [
-        status,
-        templates,
-        selectedTemplate,
-        projectName,
-        projectKey,
-        projectDescription,
-        startingNumber,
-        createdProject,
-        pendingMembers,
-        errorMessage,
-      ];
+    status,
+    templates,
+    selectedTemplate,
+    projectName,
+    projectKey,
+    projectDescription,
+    startingNumber,
+    createdProject,
+    pendingMembers,
+    errorMessage,
+  ];
 }
 
 class ProjectCreationCubit extends Cubit<ProjectCreationState> {
@@ -85,24 +91,28 @@ class ProjectCreationCubit extends Cubit<ProjectCreationState> {
     required GetProjectTemplatesUseCase getProjectTemplatesUseCase,
     required CreateProjectUseCase createProjectUseCase,
     required AddProjectMemberUseCase addProjectMemberUseCase,
-  })  : _getProjectTemplatesUseCase = getProjectTemplatesUseCase,
-        _createProjectUseCase = createProjectUseCase,
-        _addProjectMemberUseCase = addProjectMemberUseCase,
-        super(const ProjectCreationState());
+  }) : _getProjectTemplatesUseCase = getProjectTemplatesUseCase,
+       _createProjectUseCase = createProjectUseCase,
+       _addProjectMemberUseCase = addProjectMemberUseCase,
+       super(const ProjectCreationState());
 
   Future<void> loadTemplates() async {
     emit(state.copyWith(status: ProjectCreationStatus.loading));
     final result = await _getProjectTemplatesUseCase(params: const NoParams());
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: ProjectCreationStatus.failure,
-        errorMessage: failure.message,
-      )),
-      (templates) => emit(state.copyWith(
-        status: ProjectCreationStatus.templatesLoaded,
-        templates: templates,
-        selectedTemplate: templates.isNotEmpty ? templates.first : null,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: ProjectCreationStatus.failure,
+          errorMessage: failure.message,
+        ),
+      ),
+      (templates) => emit(
+        state.copyWith(
+          status: ProjectCreationStatus.templatesLoaded,
+          templates: templates,
+          selectedTemplate: templates.isNotEmpty ? templates.first : null,
+        ),
+      ),
     );
   }
 
@@ -110,21 +120,30 @@ class ProjectCreationCubit extends Cubit<ProjectCreationState> {
     emit(state.copyWith(selectedTemplate: template));
   }
 
-  void updateFormInfo({required String name, required String key, String? description, int? startingNumber}) {
-    emit(state.copyWith(
-      projectName: name,
-      projectKey: key.toUpperCase(),
-      projectDescription: description,
-      startingNumber: startingNumber,
-    ));
+  void updateFormInfo({
+    required String name,
+    required String key,
+    String? description,
+    int? startingNumber,
+  }) {
+    emit(
+      state.copyWith(
+        projectName: name,
+        projectKey: key.toUpperCase(),
+        projectDescription: description,
+        startingNumber: startingNumber,
+      ),
+    );
   }
 
   Future<void> submitCreateProject() async {
     if (state.projectName.trim().isEmpty || state.projectKey.trim().isEmpty) {
-      emit(state.copyWith(
-        status: ProjectCreationStatus.failure,
-        errorMessage: 'الرجاء إدخال اسم ومعرف المشروع',
-      ));
+      emit(
+        state.copyWith(
+          status: ProjectCreationStatus.failure,
+          errorMessage: 'الرجاء إدخال اسم ومعرف المشروع',
+        ),
+      );
       return;
     }
 
@@ -140,21 +159,27 @@ class ProjectCreationCubit extends Cubit<ProjectCreationState> {
       isArchived: false,
       isTemplate: false,
       templateId: state.selectedTemplate?.id ?? 'default',
-      owner: 'admin',
+      ownerId: 'admin',
       createdAt: DateTime.now(),
     );
 
-    final result = await _createProjectUseCase(params: CreateProjectParams(project: newProject));
+    final result = await _createProjectUseCase(
+      params: CreateProjectParams(project: newProject),
+    );
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: ProjectCreationStatus.failure,
-        errorMessage: failure.message,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: ProjectCreationStatus.failure,
+          errorMessage: failure.message,
+        ),
+      ),
       (created) {
-        emit(state.copyWith(
-          status: ProjectCreationStatus.projectCreated,
-          createdProject: created,
-        ));
+        emit(
+          state.copyWith(
+            status: ProjectCreationStatus.projectCreated,
+            createdProject: created,
+          ),
+        );
       },
     );
   }
@@ -164,8 +189,12 @@ class ProjectCreationCubit extends Cubit<ProjectCreationState> {
     final member = ProjectMemberEntity(
       id: 'm_${DateTime.now().millisecondsSinceEpoch}',
       projectId: state.createdProject!.id,
-      name: emailOrName.contains('@') ? emailOrName.split('@').first : emailOrName,
-      email: emailOrName.contains('@') ? emailOrName : '$emailOrName@youtrack.local',
+      name: emailOrName.contains('@')
+          ? emailOrName.split('@').first
+          : emailOrName,
+      email: emailOrName.contains('@')
+          ? emailOrName
+          : '$emailOrName@youtrack.local',
       roles: const ['Contributor'],
     );
     final updated = [...state.pendingMembers, member];

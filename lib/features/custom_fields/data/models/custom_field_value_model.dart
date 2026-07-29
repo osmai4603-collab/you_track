@@ -28,7 +28,7 @@ class CustomFieldValueModel extends CustomFieldValueEntity {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id.isNotEmpty) 'id': id,
       'issue_id': issueId,
       'custom_field_id': customFieldId,
       'value': value,

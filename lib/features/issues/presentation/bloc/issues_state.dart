@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dart';
+import 'package:issues_tracking/features/issues/domain/entities/tag.dart';
 
 enum IssueSearchType { simple, advanced }
 
@@ -27,7 +28,7 @@ class IssuesLoaded extends IssuesState {
   final IssueFilter filter;
   final String? selectedIssueId;
   final Set<String> selectedIssueIds;
-  final List<String> allTags;
+  final List<Tag> allTags;
   final IssueSearchType searchType;
   final IssueLayoutType layoutType;
   final IssueStructureType structureType;
@@ -57,7 +58,7 @@ class IssuesLoaded extends IssuesState {
     String? selectedIssueId,
     bool clearSelectedIssue = false,
     Set<String>? selectedIssueIds,
-    List<String>? allTags,
+    List<Tag>? allTags,
     IssueSearchType? searchType,
     IssueLayoutType? layoutType,
     IssueStructureType? structureType,

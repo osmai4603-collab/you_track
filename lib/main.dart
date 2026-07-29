@@ -37,7 +37,7 @@ void main() async {
 
   runApp(
     BlocProvider(
-      create: (context) => sl<AppCubit>()..init(),
+      create: (context) => get_it<AppCubit>()..init(),
       child: const Application(),
     ),
   );

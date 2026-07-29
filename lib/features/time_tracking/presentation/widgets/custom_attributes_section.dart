@@ -43,7 +43,7 @@ class _CustomAttributesSectionState extends State<CustomAttributesSection> {
             if (state is CustomAttributesLoading)
               const Center(child: CircularProgressIndicator())
             else if (state is CustomAttributesError)
-              Center(child: Text(state.message))
+              Center(child: SelectableText(state.message))
             else if (state is CustomAttributesLoaded) ...[
               if (state.attributes.isEmpty)
                 _buildEmptyState(context)

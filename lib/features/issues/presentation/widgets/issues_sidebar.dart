@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/issue_priority_chip.dart';
+import 'package:issues_tracking/features/issues/presentation/widgets/add_sprint_dialog.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
@@ -10,6 +11,7 @@ import 'package:issues_tracking/features/issues/presentation/bloc/issues_state.d
 
 class IssuesSidebar extends StatelessWidget {
   const IssuesSidebar({super.key});
+
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +49,32 @@ class IssuesSidebar extends StatelessWidget {
                   },
                 ),
               ],
+            ),
+          ),
+          const Divider(height: 1),
+          ListTile(
+            dense: true,
+            title: Text(
+              'Sprints',
+              style: textTheme.labelLarge?.copyWith(
+                color: colors.onSurfaceVariant,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            trailing: IconButton(
+              icon: const Icon(Icons.add, size: 18),
+              onPressed: () {
+                AddSprintDialog.show(
+                  context,
+                  onSave: (sprint) {
+                    // TODO: Handle saving sprint globally if needed, 
+                    // or just show the dialog to demonstrate.
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Sprint "${sprint.name}" saved')),
+                    );
+                  },
+                );
+              },
             ),
           ),
           const Divider(height: 1),

@@ -18,7 +18,7 @@ class ArticleTreeSidebar extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         if (state is ArticleTreeError) {
-          return Center(child: Text(state.message));
+          return Center(child: SelectableText(state.message));
         }
         if (state is ArticleTreeLoaded) {
           final rootArticles = state.tree['root'] ?? [];

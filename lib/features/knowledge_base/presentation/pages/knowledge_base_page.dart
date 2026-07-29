@@ -29,14 +29,15 @@ class KnowledgeBasePage extends StatelessWidget {
     return MultiBlocProvider(
       providers: [
         BlocProvider(
-          create: (_) => sl<ArticleTreeBloc>()..add(LoadArticleTree(projectId)),
+          create: (_) =>
+              get_it<ArticleTreeBloc>()..add(LoadArticleTree(projectId)),
         ),
-        BlocProvider(create: (_) => sl<ArticleTocCubit>()),
+        BlocProvider(create: (_) => get_it<ArticleTocCubit>()),
         BlocProvider(
           create: (_) =>
-              sl<ArticleNotificationCubit>()..subscribe('current-user-id'),
+              get_it<ArticleNotificationCubit>()..subscribe('current-user-id'),
         ),
-        BlocProvider(create: (_) => sl<ArticleSearchCubit>()),
+        BlocProvider(create: (_) => get_it<ArticleSearchCubit>()),
       ],
       child: Scaffold(
         appBar: AppBar(

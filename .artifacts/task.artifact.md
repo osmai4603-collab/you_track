@@ -1,3 +1,4 @@
-- [ ] Update `IssueLinkModel` to match DB schema (`source_issue_id`, `target_issue_id`)
-- [ ] Update `IssuesRemoteDataSourceImpl` select queries with explicit relationship
-- [ ] Verify creation and update logic for links in `IssuesRemoteDataSourceImpl`
+- [x] Update `ProjectEntity` to include `members`
+- [x] Update `ProjectMemberModel` to handle nested user data in `fromJson`
+- [x] Update `ProjectModel` to include `members` and handle parsing
+- [x] Update `ProjectsRemoteDataSourceImpl` select query to fetch members and users

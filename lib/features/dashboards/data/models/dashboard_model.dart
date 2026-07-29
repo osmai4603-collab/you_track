@@ -28,7 +28,7 @@ class DashboardModel extends Dashboard {
 
   Map<String, dynamic> toJson() {
     return {
-      'id': id,
+      if (id.isNotEmpty) 'id': id,
       'name': name,
       'owner_id': ownerId,
       'is_default': isDefault,

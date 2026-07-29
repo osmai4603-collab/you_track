@@ -19,7 +19,7 @@ class DashboardPage extends StatelessWidget {
               if (state is DashboardLoading) {
                 return const Center(child: CircularProgressIndicator());
               } else if (state is DashboardError) {
-                return Center(child: Text(state.message));
+                return Center(child: SelectableText(state.message));
               } else if (state is DashboardLoaded) {
                 if (state.selectedDashboard == null) {
                   return const Center(

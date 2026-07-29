@@ -919,6 +919,186 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Work Item Exporter'**
   String get widgetWorkItemExporter;
+
+  /// No description provided for @relatesToOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Relates to'**
+  String get relatesToOption;
+
+  /// No description provided for @isRequiredForOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Is required for'**
+  String get isRequiredForOption;
+
+  /// No description provided for @dependsOnOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Depends on'**
+  String get dependsOnOption;
+
+  /// No description provided for @isDuplicatedByOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Is duplicated by'**
+  String get isDuplicatedByOption;
+
+  /// No description provided for @duplicatesOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Duplicates'**
+  String get duplicatesOption;
+
+  /// No description provided for @parentForOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Parent for'**
+  String get parentForOption;
+
+  /// No description provided for @subtaskOfOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtask of'**
+  String get subtaskOfOption;
+
+  /// No description provided for @newTagTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Tag'**
+  String get newTagTitle;
+
+  /// No description provided for @tagNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag Name'**
+  String get tagNameLabel;
+
+  /// No description provided for @tagNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter tag name'**
+  String get tagNameHint;
+
+  /// No description provided for @removeOnResolutionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove on resolution'**
+  String get removeOnResolutionLabel;
+
+  /// No description provided for @sharedLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Shared'**
+  String get sharedLabel;
+
+  /// No description provided for @favoriteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as favorite for all viewers'**
+  String get favoriteLabel;
+
+  /// No description provided for @subscriptionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Subscriptions'**
+  String get subscriptionsTitle;
+
+  /// No description provided for @tagScopeOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner'**
+  String get tagScopeOwner;
+
+  /// No description provided for @tagScopeAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Admin'**
+  String get tagScopeAdmin;
+
+  /// No description provided for @tagScopeDeveloper.
+  ///
+  /// In en, this message translates to:
+  /// **'Developer'**
+  String get tagScopeDeveloper;
+
+  /// No description provided for @tagScopeViewer.
+  ///
+  /// In en, this message translates to:
+  /// **'Viewer'**
+  String get tagScopeViewer;
+
+  /// No description provided for @tagScopeAllMembers.
+  ///
+  /// In en, this message translates to:
+  /// **'All Members'**
+  String get tagScopeAllMembers;
+
+  /// No description provided for @tagScopeSpecificUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Specific Users'**
+  String get tagScopeSpecificUsers;
+
+  /// No description provided for @tagPermissionView.
+  ///
+  /// In en, this message translates to:
+  /// **'Can view'**
+  String get tagPermissionView;
+
+  /// No description provided for @tagPermissionUse.
+  ///
+  /// In en, this message translates to:
+  /// **'Can use'**
+  String get tagPermissionUse;
+
+  /// No description provided for @tagPermissionEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Can edit'**
+  String get tagPermissionEdit;
+
+  /// No description provided for @tagEventUpdates.
+  ///
+  /// In en, this message translates to:
+  /// **'Updates'**
+  String get tagEventUpdates;
+
+  /// No description provided for @tagEventComments.
+  ///
+  /// In en, this message translates to:
+  /// **'Comments'**
+  String get tagEventComments;
+
+  /// No description provided for @tagEventTagAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag added'**
+  String get tagEventTagAdded;
+
+  /// No description provided for @tagEventSpentTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Spent time'**
+  String get tagEventSpentTime;
+
+  /// No description provided for @tagEventIssueResolved.
+  ///
+  /// In en, this message translates to:
+  /// **'Issue resolved'**
+  String get tagEventIssueResolved;
+
+  /// No description provided for @tagEventVotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Votes'**
+  String get tagEventVotes;
+
+  /// No description provided for @tagEventTagRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Tag removed'**
+  String get tagEventTagRemoved;
 }
 
 class _AppLocalizationsDelegate

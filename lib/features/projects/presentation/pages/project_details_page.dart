@@ -40,7 +40,7 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
         }
         if (state.status == ProjectDetailsStatus.failure) {
           return Center(
-            child: Text(
+            child: SelectableText(
               state.errorMessage ?? 'Error',
               style: textTheme.bodyMedium?.copyWith(color: colors.error),
             ),

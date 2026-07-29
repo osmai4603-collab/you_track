@@ -43,7 +43,7 @@ class _WorkTypesSectionState extends State<WorkTypesSection> {
             if (state is WorkTypesLoading)
               const Center(child: CircularProgressIndicator())
             else if (state is WorkTypesError)
-              Center(child: Text(state.message))
+              Center(child: SelectableText(state.message))
             else if (state is WorkTypesLoaded) ...[
               if (state.workTypes.isEmpty)
                 _buildEmptyState(context)
