@@ -1,0 +1,7 @@
+- [x] Refine `IssueFormState` to include `isLoading` state.
+- [x] Update `IssueFormCubit` to include `loadIssue` method.
+- [x] Modify `IssueForm` to handle `isLoading` and fetch issue data in `initState`.
+- [x] Wire `TextEditingController` for summary in `IssueForm` and `IssueFormTopBar`.
+- [x] Wire `FleatherController` for description in `IssueForm`.
+- [x] Ensure `IssueFormActionBar` correctly triggers `submit` and handles success navigation.
+- [ ] Verify creation and update logic with manual tests.

@@ -1,0 +1,3 @@
+- [ ] Update `IssueLinkModel` to match DB schema (`source_issue_id`, `target_issue_id`)
+- [ ] Update `IssuesRemoteDataSourceImpl` select queries with explicit relationship
+- [ ] Verify creation and update logic for links in `IssuesRemoteDataSourceImpl`

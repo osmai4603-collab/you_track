@@ -1,0 +1,3 @@
+- `[x]` Fix `ProjectModel.fromMap` to correctly cast members list
+- `[x]` Fix `ProjectModel.fromJson` to correctly cast members list
+- `[ ]` Verify changes

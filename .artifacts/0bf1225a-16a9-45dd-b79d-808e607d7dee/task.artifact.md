@@ -1,0 +1,44 @@
+# Tasks: New Tag Dialog
+
+- [ ] **Phase 1: Setup (Shared Infrastructure)**
+    - [ ] T001 Create `TagPermissionScope` enum in `lib/core/enums/tag_permission_scope_enum.dart`
+    - [ ] T002 Create `TagPermissionType` enum in `lib/core/enums/tag_permission_type_enum.dart`
+    - [ ] T003 Create `TagSubscriptionEvent` enum in `lib/core/enums/tag_subscription_event_enum.dart`
+    - [ ] T004 Create `Tag` entity in `lib/features/issues/domain/entities/tag.dart`
+    - [ ] T005 Create `TagPermission` entity in `lib/features/issues/domain/entities/tag_permission.dart`
+    - [ ] T006 Create `TagSubscription` entity in `lib/features/issues/domain/entities/tag_subscription.dart`
+    - [ ] T007 Create `ProjectMember` entity in `lib/features/issues/domain/entities/project_member.dart`
+    - [ ] T008 Create skeleton shimmer widget in `lib/core/widgets/skeleton_shimmer.dart`
+- [ ] **Phase 2: Foundational Layer**
+    - [ ] T009 Create `TagsRepository` abstract class in `lib/features/issues/domain/repositories/tags_repository.dart`
+    - [ ] T010 Create `TagModel` in `lib/features/issues/data/models/tag_model.dart`
+    - [ ] T011 Create `TagRemoteDatasource` in `lib/features/issues/data/datasources/tag_remote_datasource.dart`
+    - [ ] T012 Create `TagsRepositoryImpl` in `lib/features/issues/data/repositories/tags_repository_impl.dart`
+    - [ ] T013 Create `CreateTag` use case in `lib/features/issues/domain/usecases/create_tag.dart`
+    - [ ] T014 Create `GetProjectMembers` use case in `lib/features/issues/domain/usecases/get_project_members.dart`
+    - [ ] T015 Create `IsTagNameUnique` use case in `lib/features/issues/domain/usecases/is_tag_name_unique.dart`
+    - [ ] T016 Create `AssociateTagWithIssue` use case in `lib/features/issues/domain/usecases/associate_tag_with_issue.dart`
+    - [ ] T017 Register `TagsRepository` in `lib/core/init_dependencies.dart`
+- [ ] **Phase 3: User Story 1 — Create a Tag with Default Settings**
+    - [ ] T018 Create `NewTagState` in `lib/features/issues/presentation/cubits/new_tag_state.dart`
+    - [ ] T019 Create `NewTagCubit` in `lib/features/issues/presentation/cubits/new_tag_cubit.dart`
+    - [ ] T020 Create `NewTagForm` widget in `lib/features/issues/presentation/widgets/new_tag_form.dart`
+    - [ ] T021 Create `NewTagDialog` widget in `lib/features/issues/presentation/widgets/new_tag_dialog.dart`
+    - [ ] T022 Integrate `NewTagDialog` into `issue_form_sidebar.dart`
+- [ ] **Phase 4: User Story 2 — Configure Tag Permissions**
+    - [ ] T023 Create `TagPermissionsSection` widget in `lib/features/issues/presentation/widgets/tag_permissions_section.dart`
+    - [ ] T024 Create `SpecificUsersPicker` dialog widget in `lib/features/issues/presentation/widgets/specific_users_picker.dart`
+    - [ ] T025 Integrate `TagPermissionsSection` into `NewTagForm`
+    - [ ] T026 Add permission state fields to `NewTagState` and update cubit logic
+- [ ] **Phase 5: User Story 3 — Configure Tag Options and Subscriptions**
+    - [ ] T027 Create `TagSubscriptionsSection` widget in `lib/features/issues/presentation/widgets/tag_subscriptions_section.dart`
+    - [ ] T028 Add options and subscription state fields to `NewTagState`
+    - [ ] T029 Integrate `TagSubscriptionsSection` and options into `NewTagForm`
+    - [ ] T030 Add validation logic for empty/duplicate name in `NewTagCubit`
+- [ ] **Phase 6: User Story 4 — Cancel Tag Creation**
+    - [ ] T031 Add dismiss handling to `NewTagDialog`
+    - [ ] T032 Add scrollable behavior to `NewTagDialog`
+- [ ] **Phase 7: Polish & Cross-Cutting Concerns**
+    - [ ] T033 Add skeleton/shimmer loading state to Owner dropdown
+    - [ ] T034 Add inline validation error display and help icon tooltip
+    - [ ] T035 Run validation scenarios

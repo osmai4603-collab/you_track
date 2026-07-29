@@ -1,0 +1,5 @@
+- `[ ]` Define styling constants for the Admin menu in `youtrack_sidebar.dart`
+- `[ ]` Implement `_buildAdminMenu` method to return a list of `Widget` (Menu items)
+- `[ ]` Update `Administration` navigation item to use `MenuAnchor`
+- `[ ]` Handle navigation for menu items (placeholders for now)
+- `[ ]` Verify appearance and hierarchy in both expanded and collapsed states
