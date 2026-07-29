@@ -22,16 +22,6 @@ void main() async {
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZGdlZW1zZGhodHJnbmlldW10Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ4MTE2MjUsImV4cCI6MjEwMDM4NzYyNX0.GaHm8zhNVXemvqZOsXApTocqLJquOFmDE5Dv9bfMLUw',
   );
 
-  // Anonymous Sign-in
-  final supabase = Supabase.instance.client;
-  if (supabase.auth.currentUser == null) {
-    try {
-      await supabase.auth.signInAnonymously();
-    } catch (e) {
-      debugPrint('Anonymous sign-in failed (non-critical): $e');
-    }
-  }
-
   // Core Dependencies
   await initDependencies();
 

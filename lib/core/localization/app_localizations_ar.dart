@@ -514,4 +514,200 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get tagEventTagRemoved => 'Tag removed';
+
+  @override
+  String get templateDefault => 'افتراضي';
+
+  @override
+  String get templateScrum => 'سكرُم';
+
+  @override
+  String get templateKanban => 'كانبان';
+
+  @override
+  String get templateTaskManagement => 'إدارة المهام';
+
+  @override
+  String get templateHelpdesk => 'الدعم الفني';
+
+  @override
+  String get templateProjectManagement => 'إدارة المشاريع';
+
+  @override
+  String get templateDemo => 'تجريبي';
+
+  @override
+  String get templateMarketing => 'تسويق';
+
+  @override
+  String get permissionProjectReadProjectBasic =>
+      'قراءة بيانات المشروع الأساسية';
+
+  @override
+  String get permissionProjectCreateProject => 'إنشاء مشروع جديد';
+
+  @override
+  String get permissionProjectReadProjectFull => 'قراءة تفاصيل المشروع بالكامل';
+
+  @override
+  String get permissionProjectUpdateProject => 'تعديل إعدادات المشروع';
+
+  @override
+  String get permissionProjectDeleteProject => 'حذف المشروع';
+
+  @override
+  String get permissionOrganizationReadOrganization => 'عرض بيانات المؤسسة';
+
+  @override
+  String get permissionOrganizationUpdateOrganization => 'تعديل بيانات المؤسسة';
+
+  @override
+  String get permissionOrganizationCreateOrganization => 'إنشاء مؤسسة جديدة';
+
+  @override
+  String get permissionOrganizationDeleteOrganization => 'حذف المؤسسة';
+
+  @override
+  String get permissionUserProfileUpdateSelf => 'تعديل الملف الشخصي';
+
+  @override
+  String get permissionUserReadUserBasic => 'عرض بيانات المستخدمين الأساسية';
+
+  @override
+  String get permissionUserReadUserDetails => 'عرض تفاصيل الحسابات الشاملة';
+
+  @override
+  String get permissionUserUpdateUser => 'تعديل حسابات المستخدمين';
+
+  @override
+  String get permissionUserCreateUser => 'إنشاء حساب مستخدم جديد';
+
+  @override
+  String get permissionUserDeleteUser => 'حذف حساب مستخدم';
+
+  @override
+  String get permissionSystemLowLevelAdminRead =>
+      'قراءة إعدادات النظام المتقدمة';
+
+  @override
+  String get permissionSystemLowLevelAdminWrite =>
+      'تعديل إعدادات النظام المتقدمة';
+
+  @override
+  String get permissionIssueReadIssue => 'قراءة بيانات المهام العامة';
+
+  @override
+  String get permissionIssueReadIssuePrivateFields =>
+      'قراءة الحقول الخاصة بالمهام';
+
+  @override
+  String get permissionIssueUpdateIssue => 'تعديل المهام';
+
+  @override
+  String get permissionIssueCreateIssue => 'إنشاء مهام جديدة';
+
+  @override
+  String get permissionIssueDeleteIssue => 'حذف المهام';
+
+  @override
+  String get permissionIssueLinkIssues => 'ربط المهام ببعضها';
+
+  @override
+  String get permissionIssueUpdateIssuePrivateFields =>
+      'تعديل الحقول الخاصة بالمهام';
+
+  @override
+  String get permissionIssueApplyCommandsSilently =>
+      'تطبيق أوامر على المهام دون تنبيهات';
+
+  @override
+  String get permissionIssueViewWatchers => 'عرض متابعي المهمة';
+
+  @override
+  String get permissionIssueUpdateWatchers => 'إدارة متابعي المهمة';
+
+  @override
+  String get permissionIssueViewVoters => 'عرض المصوتين للمهمة';
+
+  @override
+  String get permissionAttachmentAddAttachment => 'إضافة مرفقات للمهمة';
+
+  @override
+  String get permissionAttachmentUpdateAttachment => 'تعديل المرفقات والرؤية';
+
+  @override
+  String get permissionAttachmentDeleteAttachment => 'حذف المرفقات';
+
+  @override
+  String get permissionCommentCreateIssueComment => 'إضافة تعليق على المهمة';
+
+  @override
+  String get permissionCommentReadIssueComment => 'قراءة تعليقات المهمة';
+
+  @override
+  String get permissionCommentUpdateIssueComment => 'تعديل التعليق الشخصي';
+
+  @override
+  String get permissionCommentDeleteIssueComment => 'حذف التعليق الشخصي';
+
+  @override
+  String get permissionCommentUpdateNotOwnIssueComment =>
+      'تعديل تعليقات الآخرين';
+
+  @override
+  String get permissionCommentDeleteNotOwnCommentAndPermanentCommentDelete =>
+      'حذف تعليقات الآخرين نهائياً';
+
+  @override
+  String get permissionCommentReadArticleComment => 'قراءة تعليقات المقالات';
+
+  @override
+  String get permissionCommentCreateArticleComment =>
+      'كتابة تعليق على المقالات';
+
+  @override
+  String get permissionCommentUpdateArticleComment => 'تعديل تعليق على مقال';
+
+  @override
+  String get permissionCommentDeleteArticleComment => 'حذف تعليق على مقال';
+
+  @override
+  String get permissionVisibilityOverrideVisibilityRestrictions =>
+      'تجاوز قيود رؤية العناصر';
+
+  @override
+  String get permissionIssueWorkItemReadWorkItem => 'عرض سجلات الوقت والعمل';
+
+  @override
+  String get permissionIssueWorkItemUpdateWorkItem =>
+      'تعديل سجلات العمل الخاصة';
+
+  @override
+  String get permissionIssueWorkItemUpdateNotOwnWorkItem =>
+      'تعديل سجلات عمل الآخرين';
+
+  @override
+  String get permissionIssueWorkItemCreateWorkItem => 'إضافة سجل عمل جديد';
+
+  @override
+  String get permissionIssueWorkItemCreateNotOwnWorkItem =>
+      'إضافة سجل عمل باسم شخص آخر';
+
+  @override
+  String get permissionArticleReadArticle => 'قراءة مقالات قاعدة المعرفة';
+
+  @override
+  String get permissionArticleCreateArticle => 'إنشاء مقال جديد';
+
+  @override
+  String get permissionArticleUpdateArticle => 'تعديل مقال';
+
+  @override
+  String get permissionArticleDeleteArticle => 'حذف مقال';
+
+  @override
+  String get permissionAppReadAppContent => 'عرض محتوى التطبيقات المضافة';
+
+  @override
+  String get permissionAppUpdateAppContent => 'تعديل محتوى التطبيقات المضافة';
 }

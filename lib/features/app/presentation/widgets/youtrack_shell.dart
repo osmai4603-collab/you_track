@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:issues_tracking/features/dashboards/presentation/cubits/youtrack_shell_cubit.dart';
-import 'package:issues_tracking/features/dashboards/presentation/widgets/yputrack_content_header.dart';
-import 'package:issues_tracking/features/dashboards/presentation/widgets/youtrack_sidebar.dart';
+import 'package:issues_tracking/features/app/presentation/cubit/youtrack_shell_cubit.dart';
+import 'package:issues_tracking/features/app/presentation/widgets/yputrack_content_header.dart';
+import 'package:issues_tracking/features/app/presentation/widgets/youtrack_sidebar.dart';
 
 class YouTrackShell extends StatelessWidget {
   final StatefulNavigationShell navigationShell;

@@ -23,6 +23,11 @@ CREATE TABLE public.projects (
     name TEXT NOT NULL,
     description TEXT,
     owner_id UUID REFERENCES public.users(id) ON DELETE SET NULL,
+    is_archived BOOLEAN NOT NULL DEFAULT false,
+    is_template BOOLEAN NOT NULL DEFAULT false,
+    template_id TEXT,
+    is_favorite BOOLEAN NOT NULL DEFAULT false,
+    starting_number INTEGER DEFAULT 1,
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 

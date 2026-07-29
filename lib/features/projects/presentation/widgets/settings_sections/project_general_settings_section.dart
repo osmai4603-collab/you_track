@@ -59,7 +59,7 @@ class _ProjectGeneralSettingsSectionState
         if (state.status == ProjectDetailsStatus.success &&
             state.project != null) {
           _nameController.text = state.project!.name;
-          _idController.text = state.project!.projectKey;
+          _idController.text = state.project!.projectId;
           _descriptionController.text = state.project!.description ?? '';
         }
       },
@@ -165,7 +165,7 @@ class _ProjectGeneralSettingsSectionState
   ) {
     return Row(
       children: [
-        ProjectIcon(projectCode: state.project?.projectKey ?? ''),
+        ProjectIcon(projectCode: state.project?.projectId ?? ''),
         const SizedBox(width: AppSpacing.medium),
         Expanded(
           child: Column(
@@ -340,7 +340,9 @@ class _ProjectGeneralSettingsSectionState
           const SizedBox(height: 4),
           Text(
             helperText,
-            style: textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+            style: textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
+            ),
           ),
         ],
         const SizedBox(height: AppSpacing.small),
@@ -368,11 +370,8 @@ class _ProjectGeneralSettingsSectionState
 
   Widget _buildVisibilitySection(ColorScheme colors, TextTheme textTheme) {
     final membersState = context.watch<ProjectMembersCubit>().state;
-    final projectRoles = membersState.members
-        .expand((m) => m.roles)
-        .toSet()
-        .toList()
-      ..sort();
+    final projectRoles =
+        membersState.members.expand((m) => m.roles).toSet().toList()..sort();
     final defaultItems = ['None', 'All Users', ...projectRoles];
 
     return Column(
@@ -422,14 +421,16 @@ class _ProjectGeneralSettingsSectionState
   Widget _buildActionButtons(ColorScheme colors, TextTheme textTheme) {
     return Row(
       children: [
-        FilledButton(
-          onPressed: _onSave,
-          child: const Text('Save'),
-        ),
+        FilledButton(onPressed: _onSave, child: const Text('Save')),
         const SizedBox(width: AppSpacing.medium),
         OutlinedButton(
           onPressed: _onCancel,
-          child: Text('Cancel', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant)),
+          child: Text(
+            'Cancel',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+            ),
+          ),
         ),
       ],
     );

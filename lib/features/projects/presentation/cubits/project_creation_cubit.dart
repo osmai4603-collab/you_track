@@ -1,6 +1,9 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../../core/usecase/usecase.dart';
+import 'package:issues_tracking/core/enums/project_template_enum.dart';
+import 'package:issues_tracking/core/init_dependencies.dart';
+import 'package:issues_tracking/core/usecase/usecase.dart';
+import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
 import '../../domain/entities/project_entity.dart';
 import '../../domain/entities/project_member_entity.dart';
 import '../../domain/entities/project_template_entity.dart';
@@ -18,8 +21,7 @@ enum ProjectCreationStatus {
 
 class ProjectCreationState extends Equatable {
   final ProjectCreationStatus status;
-  final List<ProjectTemplateEntity> templates;
-  final ProjectTemplateEntity? selectedTemplate;
+  final ProjectTemplateType selectedTemplate;
   final String projectName;
   final String projectKey;
   final String projectDescription;
@@ -30,8 +32,7 @@ class ProjectCreationState extends Equatable {
 
   const ProjectCreationState({
     this.status = ProjectCreationStatus.initial,
-    this.templates = const [],
-    this.selectedTemplate,
+    this.selectedTemplate = .kanban,
     this.projectName = '',
     this.projectKey = '',
     this.projectDescription = '',
@@ -43,8 +44,7 @@ class ProjectCreationState extends Equatable {
 
   ProjectCreationState copyWith({
     ProjectCreationStatus? status,
-    List<ProjectTemplateEntity>? templates,
-    ProjectTemplateEntity? selectedTemplate,
+    ProjectTemplateType? selectedTemplate,
     String? projectName,
     String? projectKey,
     String? projectDescription,
@@ -55,7 +55,6 @@ class ProjectCreationState extends Equatable {
   }) {
     return ProjectCreationState(
       status: status ?? this.status,
-      templates: templates ?? this.templates,
       selectedTemplate: selectedTemplate ?? this.selectedTemplate,
       projectName: projectName ?? this.projectName,
       projectKey: projectKey ?? this.projectKey,
@@ -70,7 +69,6 @@ class ProjectCreationState extends Equatable {
   @override
   List<Object?> get props => [
     status,
-    templates,
     selectedTemplate,
     projectName,
     projectKey,
@@ -83,40 +81,15 @@ class ProjectCreationState extends Equatable {
 }
 
 class ProjectCreationCubit extends Cubit<ProjectCreationState> {
-  final GetProjectTemplatesUseCase _getProjectTemplatesUseCase;
   final CreateProjectUseCase _createProjectUseCase;
   final AddProjectMemberUseCase _addProjectMemberUseCase;
 
   ProjectCreationCubit({
-    required GetProjectTemplatesUseCase getProjectTemplatesUseCase,
-    required CreateProjectUseCase createProjectUseCase,
-    required AddProjectMemberUseCase addProjectMemberUseCase,
-  }) : _getProjectTemplatesUseCase = getProjectTemplatesUseCase,
-       _createProjectUseCase = createProjectUseCase,
-       _addProjectMemberUseCase = addProjectMemberUseCase,
-       super(const ProjectCreationState());
+    required this._createProjectUseCase,
+    required this._addProjectMemberUseCase,
+  }) : super(const ProjectCreationState());
 
-  Future<void> loadTemplates() async {
-    emit(state.copyWith(status: ProjectCreationStatus.loading));
-    final result = await _getProjectTemplatesUseCase(params: const NoParams());
-    result.fold(
-      (failure) => emit(
-        state.copyWith(
-          status: ProjectCreationStatus.failure,
-          errorMessage: failure.message,
-        ),
-      ),
-      (templates) => emit(
-        state.copyWith(
-          status: ProjectCreationStatus.templatesLoaded,
-          templates: templates,
-          selectedTemplate: templates.isNotEmpty ? templates.first : null,
-        ),
-      ),
-    );
-  }
-
-  void selectTemplate(ProjectTemplateEntity template) {
+  void selectTemplate(ProjectTemplateType template) {
     emit(state.copyWith(selectedTemplate: template));
   }
 
@@ -149,17 +122,19 @@ class ProjectCreationCubit extends Cubit<ProjectCreationState> {
 
     emit(state.copyWith(status: ProjectCreationStatus.loading));
 
+    final userSession = get_it<UserSession>();
+
     final newProject = ProjectEntity(
       id: 'proj_${DateTime.now().millisecondsSinceEpoch}',
       name: state.projectName.trim(),
-      projectKey: state.projectKey.trim().toUpperCase(),
+      projectId: state.projectKey.trim().toUpperCase(),
       description: state.projectDescription.isNotEmpty
           ? state.projectDescription.trim()
-          : state.selectedTemplate?.description,
+          : state.selectedTemplate.description,
       isArchived: false,
-      isTemplate: false,
-      templateId: state.selectedTemplate?.id ?? 'default',
-      ownerId: 'admin',
+
+      templateType: state.selectedTemplate,
+      ownerId: userSession.currentUser?.id ?? 'unknown',
       createdAt: DateTime.now(),
     );
 
@@ -189,13 +164,15 @@ class ProjectCreationCubit extends Cubit<ProjectCreationState> {
     final member = ProjectMemberEntity(
       id: 'm_${DateTime.now().millisecondsSinceEpoch}',
       projectId: state.createdProject!.id,
-      name: emailOrName.contains('@')
-          ? emailOrName.split('@').first
-          : emailOrName,
-      email: emailOrName.contains('@')
-          ? emailOrName
-          : '$emailOrName@youtrack.local',
+      // name: emailOrName.contains('@')
+      //     ? emailOrName.split('@').first
+      //     : emailOrName,
+      // email: emailOrName.contains('@')
+      //     ? emailOrName
+      //     : '$emailOrName@youtrack.local',
+      isOwner: false,
       roles: const ['Contributor'],
+      userId: '',
     );
     final updated = [...state.pendingMembers, member];
     emit(state.copyWith(pendingMembers: updated));

@@ -24,6 +24,15 @@ sealed class AppRouteKeys {
 
   static const String knowldgeBase = '/knowldge-base';
 
+  static const String groups = '/groups';
+  static const String createGroup = '$groups/new';
+
+  static const String roles = '/roles';
+  static const String createRole = '$roles/new';
+
+  static const String users = '/users';
+  static const String createUser = '$users/new';
+
   static const String timeSheets = '/time-sheets';
 
   static const whiteBoards = '/white-boards';

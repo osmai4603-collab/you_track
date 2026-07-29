@@ -266,10 +266,10 @@ class IssueFormSidebar extends StatelessWidget {
                   ),
                   child: Center(
                     child: Text(
-                      p.projectKey
+                      p.projectId
                           .substring(
                             0,
-                            p.projectKey.length > 3 ? 3 : p.projectKey.length,
+                            p.projectId.length > 3 ? 3 : p.projectId.length,
                           )
                           .toUpperCase(),
                       style: const TextStyle(
@@ -281,12 +281,12 @@ class IssueFormSidebar extends StatelessWidget {
                   ),
                 ),
                 title: Text(p.name),
-                subtitle: Text(p.projectKey),
-                trailing: p.projectKey == state.projectKey
+                subtitle: Text(p.projectId),
+                trailing: p.projectId == state.projectKey
                     ? const Icon(Icons.check)
                     : null,
                 onTap: () {
-                  context.read<IssueFormCubit>().updateProjectKey(p.projectKey);
+                  context.read<IssueFormCubit>().updateProjectKey(p.projectId);
                   Navigator.pop(context);
                 },
               ),
@@ -321,18 +321,25 @@ class IssueFormSidebar extends StatelessWidget {
                 (m) => ListTile(
                   leading: CircleAvatar(
                     radius: 12,
-                    backgroundImage: m.avatarUrl != null ? NetworkImage(m.avatarUrl!) : null,
+                    backgroundImage: m.avatarUrl != null
+                        ? NetworkImage(m.avatarUrl!)
+                        : null,
                     backgroundColor: YTColors.mainColor,
                     child: m.avatarUrl == null
                         ? Text(
                             m.name.isNotEmpty ? m.name[0].toUpperCase() : '?',
-                            style: const TextStyle(color: Colors.white, fontSize: 10),
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                            ),
                           )
                         : null,
                   ),
                   title: Text(m.name),
                   subtitle: Text(m.email),
-                  trailing: m.id == state.assigneeId ? const Icon(Icons.check) : null,
+                  trailing: m.id == state.assigneeId
+                      ? const Icon(Icons.check)
+                      : null,
                   onTap: () {
                     context.read<IssueFormCubit>().updateAssignee(m.id, m.name);
                     Navigator.pop(sheetContext);

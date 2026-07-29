@@ -21,8 +21,12 @@
 | `name` | `text` |  |
 | `description` | `text` |  Nullable |
 | `owner_id` | `uuid` |  Nullable |
+| `is_archived` | `boolean` | Not Null, Default false |
+| `is_template` | `boolean` | Not Null, Default false |
+| `template_id` | `text` |  Nullable |
+| `is_favorite` | `boolean` | Not Null, Default false |
+| `starting_number` | `int4` | Default 1 |
 | `created_at` | `timestamptz` |  Nullable |
-| `project_id` | `text` |  |
 
 ## Table `builds`
 
@@ -330,6 +334,34 @@
 | `name` | `text` |  |
 | `date` | `timestamptz` |  |
 | `projectId` | `uuid` |  |
+
+## Table `groups`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `name` | `text` | Not Null |
+| `description` | `text` | Nullable |
+| `logo` | `text` | Nullable |
+| `auto_join` | `bool` | Not Null, Default false |
+| `auto_join_domains` | `_text` | Default '{}' |
+| `two_factor_auth` | `text` | Not Null, Default 'optional', Check 'required' or 'optional' |
+| `visible_to` | `jsonb` | Default '[]' |
+| `updatable_by` | `text` | Not Null, Default 'all_users' |
+| `group_type` | `text` | Not Null, Default 'users', Check 'users' or 'teams' |
+| `created_at` | `timestamptz` | Not Null |
+| `updated_at` | `timestamptz` | Not Null |
+
+## Table `roles`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `name` | `text` | Primary, Unique |
+| `permissions` | `_text` | Not Null, Default '{}' |
 
 ## RLS Policies
 

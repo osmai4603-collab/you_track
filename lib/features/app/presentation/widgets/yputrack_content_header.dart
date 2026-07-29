@@ -6,12 +6,14 @@ import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/enums/project_widget_enum.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
-import 'package:issues_tracking/features/dashboards/presentation/cubits/youtrack_shell_cubit.dart';
+import 'package:issues_tracking/features/app/presentation/cubit/youtrack_shell_cubit.dart';
 import 'package:issues_tracking/features/dashboards/presentation/widgets/breadcrumbs.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_state.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/add_project_members_page.dart';
+import 'package:issues_tracking/features/roles/presentation/bloc/roles_bloc.dart';
+import 'package:issues_tracking/features/roles/presentation/bloc/roles_event.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/constants/app_spacing.dart';
 
@@ -48,8 +50,8 @@ class _SectionOne extends StatelessWidget {
     final hasUserIssues = issuesState is IssuesLoaded && currentUserId != null;
     final userIssues = hasUserIssues
         ? issuesState.issues
-            .where((issue) => issue.reporterId == currentUserId)
-            .toList()
+              .where((issue) => issue.reporterId == currentUserId)
+              .toList()
         : <Issue>[];
 
     if (currentIssue == null && userIssues.isEmpty) {
@@ -184,6 +186,25 @@ class _SectionTwo extends StatelessWidget {
               icon: Icons.add,
               label: 'New Issue',
             ),
+          ],
+          if (AppRouteKeys.groups == currentPath) ...[
+            _ActionButton(
+              onPressed: () {},
+              icon: Icons.add,
+              label: 'New Group',
+            ),
+          ],
+          if (AppRouteKeys.roles == currentPath) ...[
+            _ActionButton(
+              onPressed: () {
+                context.read<RolesBloc>().add(const SelectRole('new'));
+              },
+              icon: Icons.add,
+              label: 'New Role',
+            ),
+          ],
+          if (AppRouteKeys.users == currentPath) ...[
+            _ActionButton(onPressed: () {}, icon: Icons.add, label: 'New User'),
           ],
           if (currentPath.contains('agile-boards')) ...[
             _SearchField(hint: 'Filter cards on the boards'),

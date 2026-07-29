@@ -51,22 +51,25 @@ class ProjectMembersCubit extends Cubit<ProjectMembersState> {
   ProjectMembersCubit({
     required GetProjectMembersUseCase getProjectMembersUseCase,
     required AddProjectMemberUseCase addProjectMemberUseCase,
-  })  : _getProjectMembersUseCase = getProjectMembersUseCase,
-        _addProjectMemberUseCase = addProjectMemberUseCase,
-        super(const ProjectMembersState());
+  }) : _getProjectMembersUseCase = getProjectMembersUseCase,
+       _addProjectMemberUseCase = addProjectMemberUseCase,
+       super(const ProjectMembersState());
 
   Future<void> loadMembers(String projectId) async {
     emit(state.copyWith(status: ProjectMembersStatus.loading));
-    final result = await _getProjectMembersUseCase(params: GetProjectMembersParams(projectId: projectId));
+    final result = await _getProjectMembersUseCase(
+      params: GetProjectMembersParams(projectId: projectId),
+    );
     result.fold(
-      (failure) => emit(state.copyWith(
-        status: ProjectMembersStatus.failure,
-        errorMessage: failure.message,
-      )),
-      (members) => emit(state.copyWith(
-        status: ProjectMembersStatus.success,
-        members: members,
-      )),
+      (failure) => emit(
+        state.copyWith(
+          status: ProjectMembersStatus.failure,
+          errorMessage: failure.message,
+        ),
+      ),
+      (members) => emit(
+        state.copyWith(status: ProjectMembersStatus.success, members: members),
+      ),
     );
   }
 
@@ -74,16 +77,20 @@ class ProjectMembersCubit extends Cubit<ProjectMembersState> {
     required String projectId,
     required String name,
     required String email,
+    required String userId,
     required List<String> roles,
   }) async {
     final newMember = ProjectMemberEntity(
       id: 'm_${DateTime.now().millisecondsSinceEpoch}',
       projectId: projectId,
-      name: name,
-      email: email,
+      // name: name,
+      // email: email,
       roles: roles,
+      userId: userId,
     );
-    final result = await _addProjectMemberUseCase(params: AddProjectMemberParams(member: newMember));
+    final result = await _addProjectMemberUseCase(
+      params: AddProjectMemberParams(member: newMember),
+    );
     result.fold(
       (failure) => emit(state.copyWith(errorMessage: failure.message)),
       (added) => emit(state.addMemberLocal(added)),

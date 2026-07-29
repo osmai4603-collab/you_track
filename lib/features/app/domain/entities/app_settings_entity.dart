@@ -1,22 +1,23 @@
+import 'package:flutter/material.dart';
 import 'package:issues_tracking/core/entities/entity.dart';
 
 class AppSettingsEntity extends Entity {
-  final bool isDarkMode;
+  final ThemeMode themeMode;
   final String languageCode;
 
   const AppSettingsEntity({
-    required this.isDarkMode,
+    required this.themeMode,
     required this.languageCode,
   });
 
   @override
-  AppSettingsEntity copyWith({bool? isDarkMode, String? languageCode}) {
+  AppSettingsEntity copyWith({ThemeMode? themeMode, String? languageCode}) {
     return AppSettingsEntity(
-      isDarkMode: isDarkMode ?? this.isDarkMode,
+      themeMode: themeMode ?? this.themeMode,
       languageCode: languageCode ?? this.languageCode,
     );
   }
 
   @override
-  List<Object?> get props => [isDarkMode, languageCode];
+  List<Object?> get props => [themeMode, languageCode];
 }

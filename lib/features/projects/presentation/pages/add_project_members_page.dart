@@ -153,7 +153,8 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
           projectId: widget.projectId,
           name: value.split('@').first,
           email: value,
-          roles: const ['Contributor'],
+          roles: const ['contributor'],
+          userId: '',
         );
       }
     } else {
@@ -167,6 +168,7 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
             name: memberData.name,
             email: memberData.email,
             roles: [member.role],
+            userId: memberData.userId,
           );
         }
       }

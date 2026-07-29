@@ -37,7 +37,7 @@ class ProjectsListState extends Equatable {
         ? newProjects
         : newProjects.where((p) {
             return p.name.toLowerCase().contains(query.toLowerCase()) ||
-                p.projectKey.toLowerCase().contains(query.toLowerCase());
+                p.projectId.toLowerCase().contains(query.toLowerCase());
           }).toList();
 
     return ProjectsListState(

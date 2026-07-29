@@ -1,0 +1,37 @@
+import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/errors/failure.dart';
+import 'package:issues_tracking/core/usecase/usecase.dart';
+import 'package:issues_tracking/features/groups/domain/entities/group_entity.dart';
+import 'package:issues_tracking/features/groups/domain/repositories/groups_repository.dart';
+
+class UpdateGroupParams extends Params {
+  final String id;
+  final String name;
+  final String? description;
+
+  const UpdateGroupParams({
+    required this.id,
+    required this.name,
+    this.description,
+  });
+
+  @override
+  List<Object?> get props => [id, name, description];
+}
+
+class UpdateGroup extends UseCase<GroupEntity, UpdateGroupParams> {
+  final GroupsRepository repository;
+
+  UpdateGroup(this.repository);
+
+  @override
+  Future<Either<Failure, GroupEntity>> call({required UpdateGroupParams params}) {
+    return repository.updateGroup(
+      GroupEntity(
+        id: params.id,
+        name: params.name,
+        description: params.description,
+      ),
+    );
+  }
+}

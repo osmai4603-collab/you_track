@@ -44,7 +44,7 @@ class _AgileBoardsListPageState extends State<AgileBoardsListPage> {
                   final project = projects[index];
                   return ListTile(
                     title: Text(project.name),
-                    subtitle: Text(project.projectKey),
+                    subtitle: Text(project.projectId),
                     trailing: const Icon(Icons.arrow_forward_ios),
                     onTap: () {
                       context.push(

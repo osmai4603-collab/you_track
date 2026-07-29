@@ -1,14 +1,14 @@
+import 'package:issues_tracking/core/enums/project_template_enum.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_member_entity.dart';
 import '../../../../core/entities/entity.dart';
 
 class ProjectEntity extends Entity {
   final String id;
   final String name;
-  final String projectKey;
+  final String projectId;
   final String? description;
   final bool isArchived;
-  final bool isTemplate;
-  final String? templateId;
+  final ProjectTemplateType templateType;
   final String ownerId;
   final DateTime createdAt;
   final bool isFavorite;
@@ -17,11 +17,10 @@ class ProjectEntity extends Entity {
   const ProjectEntity({
     required this.id,
     required this.name,
-    required this.projectKey,
+    required this.projectId,
     this.description,
     this.isArchived = false,
-    this.isTemplate = false,
-    this.templateId,
+    required this.templateType,
     required this.ownerId,
     required this.createdAt,
     this.isFavorite = false,
@@ -35,9 +34,8 @@ class ProjectEntity extends Entity {
     String? issueKey,
     String? description,
     bool? isArchived,
-    bool? isTemplate,
-    String? templateId,
-    String? owner,
+    ProjectTemplateType? templateType,
+    String? ownerId,
     DateTime? createdAt,
     bool? isFavorite,
     List<String>? memberInitials,
@@ -46,12 +44,11 @@ class ProjectEntity extends Entity {
     return ProjectEntity(
       id: id ?? this.id,
       name: name ?? this.name,
-      projectKey: issueKey ?? this.projectKey,
+      projectId: issueKey ?? this.projectId,
       description: description ?? this.description,
       isArchived: isArchived ?? this.isArchived,
-      isTemplate: isTemplate ?? this.isTemplate,
-      templateId: templateId ?? this.templateId,
-      ownerId: owner ?? this.ownerId,
+      templateType: templateType ?? this.templateType,
+      ownerId: ownerId ?? this.ownerId,
       createdAt: createdAt ?? this.createdAt,
       isFavorite: isFavorite ?? this.isFavorite,
       members: members ?? this.members,
@@ -62,11 +59,10 @@ class ProjectEntity extends Entity {
   List<Object?> get props => [
     id,
     name,
-    projectKey,
+    projectId,
     description,
     isArchived,
-    isTemplate,
-    templateId,
+    templateType,
     ownerId,
     createdAt,
     isFavorite,

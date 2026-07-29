@@ -74,8 +74,9 @@ class BoardCardWidget extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: AppSpacing.medium),
-                  Row(
+                  Wrap(
                     spacing: 8,
+                    runSpacing: 4,
                     children: [
                       if (card.assigneeAvatarUrl != null)
                         CircleAvatar(

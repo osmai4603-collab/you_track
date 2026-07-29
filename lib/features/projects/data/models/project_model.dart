@@ -1,3 +1,5 @@
+import 'package:issues_tracking/core/enums/project_template_enum.dart';
+
 import '../../domain/entities/project_entity.dart';
 import '../../data/models/project_member_model.dart';
 
@@ -5,11 +7,10 @@ class ProjectModel extends ProjectEntity {
   const ProjectModel({
     required super.id,
     required super.name,
-    required super.projectKey,
+    required super.projectId,
     super.description,
     super.isArchived,
-    super.isTemplate,
-    super.templateId,
+    required super.templateType,
     required super.ownerId,
     required super.createdAt,
     super.isFavorite,
@@ -20,11 +21,10 @@ class ProjectModel extends ProjectEntity {
     return ProjectModel(
       id: entity.id,
       name: entity.name,
-      projectKey: entity.projectKey,
+      projectId: entity.projectId,
       description: entity.description,
       isArchived: entity.isArchived,
-      isTemplate: entity.isTemplate,
-      templateId: entity.templateId,
+      templateType: entity.templateType,
       ownerId: entity.ownerId,
       createdAt: entity.createdAt,
       isFavorite: entity.isFavorite,
@@ -35,20 +35,17 @@ class ProjectModel extends ProjectEntity {
   }
 
   factory ProjectModel.fromJson(Map<String, dynamic> json) {
+    // print('project: $json');
     return ProjectModel(
-      id: (json['id'] ?? '').toString(),
-      name: (json['name'] ?? '').toString(),
-      projectKey: (json['key'] ?? json['projectKey'] ?? '').toString(),
-      description: json['description']?.toString(),
-      isArchived:
-          json['is_archived'] == true || (json['is_archived'] ?? 0) == 1,
-      isTemplate:
-          json['is_template'] == true || (json['is_template'] ?? 0) == 1,
-      templateId: json['template_id']?.toString(),
-      ownerId: (json['owner_id'] ?? json['owner'] ?? '').toString(),
-      createdAt: _parseDate(json['created_at']),
-      isFavorite:
-          json['is_favorite'] == true || (json['is_favorite'] ?? 0) == 1,
+      id: json['id'],
+      name: json['name'],
+      projectId: json['project_id'],
+      description: json['description'],
+      isArchived: json['is_archived'] == true,
+      templateType: ProjectTemplateType.of(json['template_type']),
+      ownerId: json['owner_id'] ?? '',
+      createdAt: DateTime.tryParse(json['created_at']) ?? DateTime.now(),
+      isFavorite: json['is_favorite'] == true,
       members: (json['project_members'] ?? json['members'] as List? ?? [])
           .map<ProjectMemberModel>(
             (m) => ProjectMemberModel.fromJson(m as Map<String, dynamic>),
@@ -61,11 +58,10 @@ class ProjectModel extends ProjectEntity {
     return {
       if (id.isNotEmpty) 'id': id,
       'name': name,
-      'key': projectKey,
+      'project_id': projectId,
       'description': description,
       'is_archived': isArchived,
-      'is_template': isTemplate,
-      'template_id': templateId,
+      'template_type': templateType.name,
       'owner_id': ownerId,
       'created_at': createdAt.toIso8601String(),
       'is_favorite': isFavorite,
@@ -73,14 +69,5 @@ class ProjectModel extends ProjectEntity {
           .map((m) => (m as ProjectMemberModel).toJson())
           .toList(),
     };
-  }
-
-  static DateTime _parseDate(dynamic value) {
-    if (value == null) return DateTime.now();
-    try {
-      return DateTime.parse(value.toString());
-    } catch (_) {
-      return DateTime.now();
-    }
   }
 }

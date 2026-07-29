@@ -21,19 +21,17 @@ class AppCubit extends Cubit<AppState> {
       emit(
         AppSettingsLoaded(
           settings: settings,
-          themeMode: settings.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          themeMode: settings.themeMode,
           locale: Locale(settings.languageCode),
         ),
       );
     });
   }
 
-  Future<void> toggleTheme() async {
+  Future<void> setThemeMode(ThemeMode mode) async {
     if (state is AppSettingsLoaded) {
       final currentState = state as AppSettingsLoaded;
-      final newSettings = currentState.settings.copyWith(
-        isDarkMode: !currentState.settings.isDarkMode,
-      );
+      final newSettings = currentState.settings.copyWith(themeMode: mode);
 
       final result = await saveAppSettings(
         params: SaveAppSettingsParams(newSettings),
@@ -44,13 +42,21 @@ class AppCubit extends Cubit<AppState> {
         (_) => emit(
           AppSettingsLoaded(
             settings: newSettings,
-            themeMode: newSettings.isDarkMode
-                ? ThemeMode.dark
-                : ThemeMode.light,
+            themeMode: mode,
             locale: currentState.locale,
           ),
         ),
       );
+    }
+  }
+
+  Future<void> toggleTheme() async {
+    if (state is AppSettingsLoaded) {
+      final currentState = state as AppSettingsLoaded;
+      final newMode = currentState.themeMode == ThemeMode.dark
+          ? ThemeMode.light
+          : ThemeMode.dark;
+      await setThemeMode(newMode);
     }
   }
 

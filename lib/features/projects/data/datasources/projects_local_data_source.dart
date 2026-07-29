@@ -1,3 +1,4 @@
+import 'package:issues_tracking/core/enums/project_template_enum.dart';
 import '../models/project_model.dart';
 import '../models/project_member_model.dart';
 import '../models/project_template_model.dart';
@@ -15,122 +16,27 @@ abstract class ProjectsLocalDataSource {
 }
 
 class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
-  final List<ProjectTemplateModel> _templates = [
-    const ProjectTemplateModel(
-      id: 'default',
-      name: 'Default',
-      description:
-          'Standard issue tracking template with default system fields.',
-      iconKey: 'folder',
-      defaultFields: {
-        'Priority': 'Normal',
-        'Type': 'Task',
-        'State': 'Submitted',
-        'Assignee': 'Unassigned',
-        'Subsystem': 'No Subsystem',
-        'Fix Versions': 'Unscheduled',
-        'Affected versions': 'Unknown',
-        'Fixed in build': 'Next Build',
-      },
-    ),
-    const ProjectTemplateModel(
-      id: 'scrum',
-      name: 'Scrum',
-      description:
-          'Scrum agile development template with sprints, backlog, and story points.',
-      iconKey: 'view_week',
-      defaultFields: {
-        'Priority': 'Normal',
-        'Type': 'User Story',
-        'State': 'Backlog',
-        'Sprint': 'Sprint 1',
-        'Story Points': '0',
-      },
-    ),
-    const ProjectTemplateModel(
-      id: 'kanban',
-      name: 'Kanban',
-      description:
-          'Kanban continuous workflow management template with WIP limits.',
-      iconKey: 'view_kanban',
-      defaultFields: {
-        'Priority': 'Normal',
-        'Type': 'Task',
-        'State': 'To Do',
-        'WIP Limit': '5',
-      },
-    ),
-    const ProjectTemplateModel(
-      id: 'task_management',
-      name: 'Task Management',
-      description:
-          'Simplified project management template for teams tracking simple tasks.',
-      iconKey: 'check_box',
-      defaultFields: {
-        'Priority': 'Normal',
-        'Type': 'Task',
-        'State': 'Open',
-        'Due Date': 'Not Set',
-      },
-    ),
-    const ProjectTemplateModel(
-      id: 'helpdesk',
-      name: 'Helpdesk',
-      description: 'Customer support and ticket management template.',
-      iconKey: 'headset_mic',
-      defaultFields: {
-        'Priority': 'High',
-        'Type': 'Ticket',
-        'State': 'New',
-        'SLA': '24 Hours',
-      },
-    ),
-    const ProjectTemplateModel(
-      id: 'project_management',
-      name: 'Project Management',
-      description:
-          'Comprehensive project management with milestones and dependencies.',
-      iconKey: 'account_tree',
-      defaultFields: {
-        'Priority': 'Normal',
-        'Type': 'Feature',
-        'State': 'Planning',
-      },
-    ),
-    const ProjectTemplateModel(
-      id: 'demo',
-      name: 'Demo',
-      description: 'Sample template pre-filled with demo data for exploration.',
-      iconKey: 'play_circle_outline',
-      defaultFields: {
-        'Priority': 'Normal',
-        'Type': 'Demo Issue',
-        'State': 'Open',
-      },
-    ),
-    const ProjectTemplateModel(
-      id: 'marketing',
-      name: 'Marketing',
-      description:
-          'Campaign tracking and content management template for marketing teams.',
-      iconKey: 'campaign',
-      defaultFields: {
-        'Priority': 'Medium',
-        'Type': 'Campaign',
-        'State': 'Draft',
-      },
-    ),
-  ];
+  final List<ProjectTemplateModel> _templates = ProjectTemplateType.values
+      .map(
+        (t) => ProjectTemplateModel(
+          id: t.name,
+          name: t.templateName,
+          description: t.description,
+          iconKey: t.iconKey,
+          defaultFields: t.defaultFields,
+        ),
+      )
+      .toList();
 
   final List<ProjectModel> _projects = [
     ProjectModel(
       id: 'proj_demo',
       name: 'Demo Project',
-      projectKey: 'DEMO',
+      projectId: 'DEMO',
       description: 'Demonstration project showcasing YouTrack capabilities.',
       isArchived: false,
-      isTemplate: false,
-      templateId: 'demo',
+
+      templateType: .kanban,
       ownerId: 'admin',
       createdAt: DateTime(2026, 7, 20),
       isFavorite: true,
@@ -138,11 +44,11 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
     ProjectModel(
       id: 'proj_fingerprint',
       name: 'fingerprint',
-      projectKey: 'FIN',
+      projectId: 'FIN',
       description: 'Biometric fingerprint authentication subsystem.',
       isArchived: false,
-      isTemplate: false,
-      templateId: 'default',
+
+      templateType: ProjectTemplateType.kanban,
       ownerId: 'admin',
       createdAt: DateTime(2026, 7, 22),
       isFavorite: false,
@@ -150,11 +56,11 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
     ProjectModel(
       id: 'proj_test',
       name: 'Test project',
-      projectKey: 'TP',
+      projectId: 'TP',
       description: 'Primary testing environment for new workflow features.',
       isArchived: false,
-      isTemplate: false,
-      templateId: 'default',
+
+      templateType: ProjectTemplateType.kanban,
       ownerId: 'admin',
       createdAt: DateTime(2026, 7, 24),
       isFavorite: false,
@@ -165,18 +71,18 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
     const ProjectMemberModel(
       id: 'm1',
       projectId: 'proj_test',
-      name: 'AD',
-      email: 'osmflutterdeveloper@gmail.com',
+      // name: 'AD',
+      // email: 'osmflutterdeveloper@gmail.com',
       roles: ['System Admin', 'Contributor', 'Project Admin'],
       isOwner: true,
+      userId: 'hello',
     ),
     const ProjectMemberModel(
       id: 'm2',
       projectId: 'proj_test',
-      name: 'Registered Users',
-      email: 'users@youtrack.local',
       roles: ['Contributor'],
       isOwner: false,
+      userId: 'sdfjk',
     ),
   ];
 
@@ -193,7 +99,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
   @override
   Future<ProjectModel> getProjectById(String id) async {
     final project = _projects.firstWhere(
-      (p) => p.id == id || p.projectKey == id,
+      (p) => p.id == id || p.projectId == id,
       orElse: () => throw Exception('Project not found with ID: $id'),
     );
     return project;
@@ -223,11 +129,10 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
       _projects[index] = ProjectModel(
         id: p.id,
         name: p.name,
-        projectKey: p.projectKey,
+        projectId: p.projectId,
         description: p.description,
         isArchived: true,
-        isTemplate: p.isTemplate,
-        templateId: p.templateId,
+        templateType: p.templateType,
         ownerId: p.ownerId,
         createdAt: p.createdAt,
         isFavorite: p.isFavorite,

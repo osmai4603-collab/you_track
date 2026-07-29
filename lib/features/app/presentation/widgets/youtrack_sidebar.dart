@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
+import 'package:issues_tracking/core/init_dependencies.dart';
 import 'package:issues_tracking/core/widgets/user_icon_widget.dart';
+import 'package:issues_tracking/features/app/presentation/cubit/app_cubit.dart';
+import 'package:issues_tracking/features/app/presentation/cubit/app_state.dart';
+import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
 
 class YouTrackSidebar extends StatefulWidget {
   const YouTrackSidebar({super.key});
@@ -18,6 +23,7 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
   final MenuController _moreOptionController = MenuController();
   final MenuController _helpController = MenuController();
   final MenuController _createController = MenuController();
+  final MenuController _adminWidgetController = MenuController();
 
   @override
   Widget build(BuildContext context) {
@@ -172,6 +178,16 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
                   selectedTextColor: selectedTextColor,
                   selectedBgColor: selectedBgColor,
                 ),
+                _buildNavItem(
+                  context: context,
+                  icon: Icons.group_outlined,
+                  label: 'Groups',
+                  route: AppRouteKeys.groups,
+                  currentRoute: currentRoute,
+                  textColor: textColor,
+                  selectedTextColor: selectedTextColor,
+                  selectedBgColor: selectedBgColor,
+                ),
 
                 _buildMoreOptionsWidget(
                   context,
@@ -187,45 +203,47 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
           // ── القائمة السفلية ─────────────────────────────────────
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.small),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // زر Create المخصص
-                _buildCreateMore(
-                  currentRoute,
-                  selectedTextColor,
-                  selectedBgColor,
-                  textColor,
-                ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // زر Create المخصص
+                  _buildCreateMore(
+                    currentRoute,
+                    selectedTextColor,
+                    selectedBgColor,
+                    textColor,
+                  ),
 
-                _buildAdministration(
-                  context,
-                  currentRoute,
-                  textColor,
-                  selectedTextColor,
-                  selectedBgColor,
-                ),
-                _buildHelpMenuWidget(
-                  context,
-                  textColor,
-                  selectedBgColor,
-                  selectedTextColor,
-                ),
-                _buildNotificationWidget(
-                  context,
-                  currentRoute,
-                  textColor,
-                  selectedTextColor,
-                  selectedBgColor,
-                ),
-                const SizedBox(height: AppSpacing.small),
+                  _buildAdministration(
+                    context,
+                    currentRoute,
+                    textColor,
+                    selectedTextColor,
+                    selectedBgColor,
+                  ),
+                  _buildHelpMenuWidget(
+                    context,
+                    textColor,
+                    selectedBgColor,
+                    selectedTextColor,
+                  ),
+                  _buildNotificationWidget(
+                    context,
+                    currentRoute,
+                    textColor,
+                    selectedTextColor,
+                    selectedBgColor,
+                  ),
+                  const SizedBox(height: AppSpacing.small),
 
-                // الملف الشخصي
-                _buildAdminWidget(textColor),
+                  // الملف الشخصي
+                  _buildAdminWidget(textColor),
 
-                // زر Collapse
-                _buildCollapsedWidget(textColor),
-              ],
+                  // زر Collapse
+                  _buildCollapsedWidget(textColor),
+                ],
+              ),
             ),
           ),
         ],
@@ -456,30 +474,181 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
     );
   }
 
-  Padding _buildAdminWidget(Color textColor) {
+  Widget _buildAdminWidget(Color textColor) {
+    final session = get_it<UserSession>();
     return Padding(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.small,
         vertical: AppSpacing.small,
       ),
-      child: Row(
-        mainAxisAlignment: _isCollapsed
-            ? MainAxisAlignment.center
-            : MainAxisAlignment.start,
-        children: [
-          UserIconWidget(),
-          if (!_isCollapsed) ...[
-            const SizedBox(width: AppSpacing.medium),
-            Expanded(
-              child: Text(
-                'admin',
-                style: TextStyle(color: textColor, fontSize: 14),
-                overflow: TextOverflow.ellipsis,
-              ),
+      child: MenuAnchor(
+        controller: _adminWidgetController,
+        alignmentOffset: Offset(_isCollapsed ? 80 : 200, -40),
+        menuChildren: _buildAdminWidgetMenu(context),
+        style: MenuStyle(
+          backgroundColor: WidgetStatePropertyAll(const Color(0xFF2E3139)),
+          shape: WidgetStatePropertyAll(
+            RoundedRectangleBorder(borderRadius: AppRadius.smallBorderRadius),
+          ),
+        ),
+        builder: (context, controller, child) {
+          return InkWell(
+            onTap: () {
+              if (controller.isOpen) {
+                controller.close();
+              } else {
+                controller.open();
+              }
+            },
+            child: Row(
+              mainAxisAlignment: _isCollapsed
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.start,
+              children: [
+                UserIconWidget(userKey: session.currentUser!.userKey),
+                if (!_isCollapsed)
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: AppSpacing.medium),
+                      child: Text(
+                        '${session.currentUser?.userName}',
+                        style: TextStyle(color: textColor, fontSize: 14),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ),
+              ],
             ),
-          ],
-        ],
+          );
+        },
       ),
+    );
+  }
+
+  List<Widget> _buildAdminWidgetMenu(BuildContext context) {
+    const textColor = Color(0xFFC0C1C7);
+    final itemStyle = ButtonStyle(
+      foregroundColor: WidgetStatePropertyAll(textColor),
+      overlayColor: WidgetStatePropertyAll(Colors.white.withValues(alpha: 0.1)),
+      padding: const WidgetStatePropertyAll(
+        EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
+      shape: WidgetStatePropertyAll(
+        RoundedRectangleBorder(borderRadius: AppRadius.smallBorderRadius),
+      ),
+    );
+    return [
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {
+          context.go('users/profile');
+          _adminWidgetController.close();
+        },
+        leadingIcon: Icon(Icons.person_outline, color: textColor, size: 18),
+        child: const Text('Profile'),
+      ),
+      _buildAppearanceSubmenu(context, itemStyle, textColor),
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {
+          _adminWidgetController.close();
+        },
+        leadingIcon: Icon(Icons.swap_horiz, color: textColor, size: 18),
+        child: const Text('Switch user'),
+      ),
+      const Divider(color: Colors.white24, height: 1),
+      MenuItemButton(
+        style: itemStyle,
+        onPressed: () {
+          get_it<UserSession>().clearUser();
+          context.go(AppRouteKeys.login);
+        },
+        leadingIcon: Icon(Icons.logout, color: textColor, size: 18),
+        child: const Text('Log out'),
+      ),
+    ];
+  }
+
+  Widget _buildAppearanceSubmenu(
+    BuildContext context,
+    ButtonStyle itemStyle,
+    Color textColor,
+  ) {
+    final appState = context.watch<AppCubit>().state;
+    final currentTheme = appState is AppSettingsLoaded
+        ? appState.themeMode
+        : ThemeMode.dark;
+
+    return SubmenuButton(
+      style: itemStyle,
+      menuStyle: MenuStyle(
+        backgroundColor: WidgetStatePropertyAll(const Color(0xFF2E3139)),
+      ),
+      leadingIcon: Icon(Icons.palette_outlined, color: textColor, size: 18),
+      menuChildren: [
+        _buildThemeRadioItem(
+          textColor: textColor,
+          value: ThemeMode.light,
+          groupValue: currentTheme,
+          label: 'Light',
+          onChanged: (mode) {
+            context.read<AppCubit>().setThemeMode(mode);
+            _adminWidgetController.close();
+          },
+        ),
+        _buildThemeRadioItem(
+          textColor: textColor,
+          value: ThemeMode.dark,
+          groupValue: currentTheme,
+          label: 'Dark',
+          onChanged: (mode) {
+            context.read<AppCubit>().setThemeMode(mode);
+            _adminWidgetController.close();
+          },
+        ),
+        _buildThemeRadioItem(
+          textColor: textColor,
+          value: ThemeMode.system,
+          groupValue: currentTheme,
+          label: 'Sync with OS',
+          onChanged: (mode) {
+            context.read<AppCubit>().setThemeMode(mode);
+            _adminWidgetController.close();
+          },
+        ),
+      ],
+      child: const Text('Appearance'),
+    );
+  }
+
+  Widget _buildThemeRadioItem({
+    required Color textColor,
+    required ThemeMode value,
+    required ThemeMode groupValue,
+    required String label,
+    required ValueChanged<ThemeMode> onChanged,
+  }) {
+    final isSelected = value == groupValue;
+    return MenuItemButton(
+      style: ButtonStyle(
+        foregroundColor: WidgetStatePropertyAll(textColor),
+        overlayColor: WidgetStatePropertyAll(
+          Colors.white.withValues(alpha: 0.1),
+        ),
+        padding: const WidgetStatePropertyAll(
+          EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        ),
+        shape: WidgetStatePropertyAll(
+          RoundedRectangleBorder(borderRadius: AppRadius.smallBorderRadius),
+        ),
+      ),
+      onPressed: () => onChanged(value),
+      leadingIcon: Icon(
+        isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
+        color: isSelected ? Colors.blue : textColor,
+        size: 18,
+      ),
+      child: Text(label),
     );
   }
 
@@ -545,7 +714,6 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
               controller.open();
             }
           },
-          
         );
       },
     );
@@ -634,7 +802,7 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
         menuChildren: [
           MenuItemButton(
             style: itemStyle,
-            onPressed: () {},
+            onPressed: () => context.go(AppRouteKeys.users),
             child: const Text('Users'),
           ),
           MenuItemButton(
@@ -649,7 +817,7 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
           ),
           MenuItemButton(
             style: itemStyle,
-            onPressed: () {},
+            onPressed: () => context.go(AppRouteKeys.roles),
             child: const Text('Roles'),
           ),
           MenuItemButton(

@@ -514,4 +514,196 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tagEventTagRemoved => 'Tag removed';
+
+  @override
+  String get templateDefault => 'Default';
+
+  @override
+  String get templateScrum => 'Scrum';
+
+  @override
+  String get templateKanban => 'Kanban';
+
+  @override
+  String get templateTaskManagement => 'Task Management';
+
+  @override
+  String get templateHelpdesk => 'Helpdesk';
+
+  @override
+  String get templateProjectManagement => 'Project Management';
+
+  @override
+  String get templateDemo => 'Demo';
+
+  @override
+  String get templateMarketing => 'Marketing';
+
+  @override
+  String get permissionProjectReadProjectBasic => 'Read Project Basic';
+
+  @override
+  String get permissionProjectCreateProject => 'Create Project';
+
+  @override
+  String get permissionProjectReadProjectFull => 'Read Project Full';
+
+  @override
+  String get permissionProjectUpdateProject => 'Update Project';
+
+  @override
+  String get permissionProjectDeleteProject => 'Delete Project';
+
+  @override
+  String get permissionOrganizationReadOrganization => 'Read Organization';
+
+  @override
+  String get permissionOrganizationUpdateOrganization => 'Update Organization';
+
+  @override
+  String get permissionOrganizationCreateOrganization => 'Create Organization';
+
+  @override
+  String get permissionOrganizationDeleteOrganization => 'Delete Organization';
+
+  @override
+  String get permissionUserProfileUpdateSelf => 'Update Self Profile';
+
+  @override
+  String get permissionUserReadUserBasic => 'Read User Basic';
+
+  @override
+  String get permissionUserReadUserDetails => 'Read User Details';
+
+  @override
+  String get permissionUserUpdateUser => 'Update User';
+
+  @override
+  String get permissionUserCreateUser => 'Create User';
+
+  @override
+  String get permissionUserDeleteUser => 'Delete User';
+
+  @override
+  String get permissionSystemLowLevelAdminRead =>
+      'Read Low-Level Admin Settings';
+
+  @override
+  String get permissionSystemLowLevelAdminWrite =>
+      'Write Low-Level Admin Settings';
+
+  @override
+  String get permissionIssueReadIssue => 'Read Issue';
+
+  @override
+  String get permissionIssueReadIssuePrivateFields =>
+      'Read Issue Private Fields';
+
+  @override
+  String get permissionIssueUpdateIssue => 'Update Issue';
+
+  @override
+  String get permissionIssueCreateIssue => 'Create Issue';
+
+  @override
+  String get permissionIssueDeleteIssue => 'Delete Issue';
+
+  @override
+  String get permissionIssueLinkIssues => 'Link Issues';
+
+  @override
+  String get permissionIssueUpdateIssuePrivateFields =>
+      'Update Issue Private Fields';
+
+  @override
+  String get permissionIssueApplyCommandsSilently => 'Apply Commands Silently';
+
+  @override
+  String get permissionIssueViewWatchers => 'View Watchers';
+
+  @override
+  String get permissionIssueUpdateWatchers => 'Update Watchers';
+
+  @override
+  String get permissionIssueViewVoters => 'View Voters';
+
+  @override
+  String get permissionAttachmentAddAttachment => 'Add Attachment';
+
+  @override
+  String get permissionAttachmentUpdateAttachment => 'Update Attachment';
+
+  @override
+  String get permissionAttachmentDeleteAttachment => 'Delete Attachment';
+
+  @override
+  String get permissionCommentCreateIssueComment => 'Create Issue Comment';
+
+  @override
+  String get permissionCommentReadIssueComment => 'Read Issue Comment';
+
+  @override
+  String get permissionCommentUpdateIssueComment => 'Update Issue Comment';
+
+  @override
+  String get permissionCommentDeleteIssueComment => 'Delete Issue Comment';
+
+  @override
+  String get permissionCommentUpdateNotOwnIssueComment =>
+      'Update Not Own Issue Comment';
+
+  @override
+  String get permissionCommentDeleteNotOwnCommentAndPermanentCommentDelete =>
+      'Delete Not Own Comment & Permanent Delete';
+
+  @override
+  String get permissionCommentReadArticleComment => 'Read Article Comment';
+
+  @override
+  String get permissionCommentCreateArticleComment => 'Create Article Comment';
+
+  @override
+  String get permissionCommentUpdateArticleComment => 'Update Article Comment';
+
+  @override
+  String get permissionCommentDeleteArticleComment => 'Delete Article Comment';
+
+  @override
+  String get permissionVisibilityOverrideVisibilityRestrictions =>
+      'Override Visibility Restrictions';
+
+  @override
+  String get permissionIssueWorkItemReadWorkItem => 'Read Work Item';
+
+  @override
+  String get permissionIssueWorkItemUpdateWorkItem => 'Update Work Item';
+
+  @override
+  String get permissionIssueWorkItemUpdateNotOwnWorkItem =>
+      'Update Not Own Work Item';
+
+  @override
+  String get permissionIssueWorkItemCreateWorkItem => 'Create Work Item';
+
+  @override
+  String get permissionIssueWorkItemCreateNotOwnWorkItem =>
+      'Create Not Own Work Item';
+
+  @override
+  String get permissionArticleReadArticle => 'Read Article';
+
+  @override
+  String get permissionArticleCreateArticle => 'Create Article';
+
+  @override
+  String get permissionArticleUpdateArticle => 'Update Article';
+
+  @override
+  String get permissionArticleDeleteArticle => 'Delete Article';
+
+  @override
+  String get permissionAppReadAppContent => 'Read App Content';
+
+  @override
+  String get permissionAppUpdateAppContent => 'Update App Content';
 }

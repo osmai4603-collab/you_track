@@ -1,5 +1,11 @@
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
+import 'package:issues_tracking/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:issues_tracking/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:issues_tracking/features/auth/domain/repositories/auth_repository.dart';
+import 'package:issues_tracking/features/auth/domain/usecases/login_use_case.dart';
+import 'package:issues_tracking/features/auth/presentation/cubits/login_cubit.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/get_project_templates_use_case.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import "package:issues_tracking/features/dashboards/data/datasources/dashboard_remote_data_source.dart";
@@ -7,7 +13,7 @@ import "package:issues_tracking/features/dashboards/data/repositories/dashboard_
 import "package:issues_tracking/features/dashboards/domain/repositories/dashboard_repository.dart";
 import "package:issues_tracking/features/dashboards/domain/usecases/get_dashboards.dart";
 import "package:issues_tracking/features/dashboards/presentation/bloc/dashboard_bloc.dart";
-import "package:issues_tracking/features/dashboards/presentation/cubits/youtrack_shell_cubit.dart";
+import "package:issues_tracking/features/app/presentation/cubit/youtrack_shell_cubit.dart";
 
 import 'package:issues_tracking/features/issues/data/datasources/issues_remote_data_source.dart';
 import 'package:issues_tracking/features/issues/data/repositories/issues_repository_impl.dart';
@@ -143,6 +149,29 @@ import 'package:issues_tracking/features/agile_boards/domain/use_cases/get_board
 import 'package:issues_tracking/features/agile_boards/domain/use_cases/move_card_use_case.dart';
 import 'package:issues_tracking/features/agile_boards/presentation/bloc/agile_boards_bloc.dart';
 
+import 'package:issues_tracking/features/groups/data/datasources/groups_remote_data_source.dart';
+import 'package:issues_tracking/features/groups/data/repositories/groups_repository_impl.dart';
+import 'package:issues_tracking/features/groups/domain/repositories/groups_repository.dart';
+import 'package:issues_tracking/features/groups/domain/usecases/get_groups.dart';
+import 'package:issues_tracking/features/groups/domain/usecases/create_group.dart';
+import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
+
+import 'package:issues_tracking/features/roles/data/datasources/roles_remote_data_source.dart';
+import 'package:issues_tracking/features/roles/data/repositories/roles_repository_impl.dart';
+import 'package:issues_tracking/features/roles/domain/repositories/roles_repository.dart';
+import 'package:issues_tracking/features/roles/domain/usecases/get_roles.dart';
+import 'package:issues_tracking/features/roles/domain/usecases/create_role.dart';
+import 'package:issues_tracking/features/roles/domain/usecases/update_role.dart';
+import 'package:issues_tracking/features/roles/domain/usecases/delete_role.dart';
+import 'package:issues_tracking/features/roles/presentation/bloc/roles_bloc.dart';
+
+import 'package:issues_tracking/features/users/data/datasources/users_remote_data_source.dart';
+import 'package:issues_tracking/features/users/data/repositories/users_repository_impl.dart';
+import 'package:issues_tracking/features/users/domain/repositories/users_repository.dart';
+import 'package:issues_tracking/features/users/domain/usecases/get_users.dart';
+import 'package:issues_tracking/features/users/domain/usecases/create_user.dart';
+import 'package:issues_tracking/features/users/presentation/bloc/users_bloc.dart';
+
 // ignore: non_constant_identifier_names
 final get_it = GetIt.instance;
 
@@ -164,6 +193,9 @@ Future<void> initDependencies() async {
   _initAuthFeature();
   _initKnowledgeBaseFeature();
   _initAgileBoardsFeature();
+  _initGroupsFeature();
+  _initRolesFeature();
+  _initUsersFeature();
 }
 
 void _initAppFeature() {
@@ -285,6 +317,7 @@ void _initProjectsFeature() {
   get_it.registerLazySingleton(() => ArchiveProjectUseCase(get_it()));
   get_it.registerLazySingleton(() => DeleteProjectUseCase(get_it()));
   get_it.registerLazySingleton(() => AddProjectMemberUseCase(get_it()));
+  get_it.registerLazySingleton(() => GetProjectTemplatesUseCase(get_it()));
 
   // Cubits
   get_it.registerFactory(
@@ -297,7 +330,6 @@ void _initProjectsFeature() {
   );
   get_it.registerFactory(
     () => ProjectCreationCubit(
-      getProjectTemplatesUseCase: get_it(),
       createProjectUseCase: get_it(),
       addProjectMemberUseCase: get_it(),
     ),
@@ -502,6 +534,18 @@ void _initKnowledgeBaseFeature() {
 }
 
 void _initAuthFeature() {
+  get_it.registerLazySingleton<AuthRemoteDataSource>(
+    () => AuthRemoteDataSourceImpl(get_it()),
+  );
+
+  get_it.registerLazySingleton<AuthRepository>(
+    () => AuthRepositoryImpl(get_it()),
+  );
+
+  get_it.registerLazySingleton(() => LoginUseCase(get_it()));
+
+  get_it.registerFactory(() => LoginCubit(loginUseCase: get_it()));
+
   get_it.registerLazySingleton<UserSession>(() => UserSession());
 }
 
@@ -522,5 +566,63 @@ void _initAgileBoardsFeature() {
       getBoardDetailsUseCase: get_it(),
       moveCardUseCase: get_it(),
     ),
+  );
+}
+
+void _initGroupsFeature() {
+  get_it.registerLazySingleton<GroupsRemoteDataSource>(
+    () => GroupsRemoteDataSourceImpl(get_it()),
+  );
+
+  get_it.registerLazySingleton<GroupsRepository>(
+    () => GroupsRepositoryImpl(get_it()),
+  );
+
+  get_it.registerLazySingleton(() => GetGroups(get_it()));
+  get_it.registerLazySingleton(() => CreateGroup(get_it()));
+
+  get_it.registerFactory(
+    () => GroupsBloc(getGroups: get_it(), createGroup: get_it()),
+  );
+}
+
+void _initRolesFeature() {
+  get_it.registerLazySingleton<RolesRemoteDataSource>(
+    () => RolesRemoteDataSourceImpl(get_it()),
+  );
+
+  get_it.registerLazySingleton<RolesRepository>(
+    () => RolesRepositoryImpl(get_it()),
+  );
+
+  get_it.registerLazySingleton(() => GetRoles(get_it()));
+  get_it.registerLazySingleton(() => CreateRole(get_it()));
+  get_it.registerLazySingleton(() => UpdateRole(get_it()));
+  get_it.registerLazySingleton(() => DeleteRole(get_it()));
+
+  get_it.registerFactory(
+    () => RolesBloc(
+      getRoles: get_it(),
+      createRole: get_it(),
+      updateRole: get_it(),
+      deleteRole: get_it(),
+    ),
+  );
+}
+
+void _initUsersFeature() {
+  get_it.registerLazySingleton<UsersRemoteDataSource>(
+    () => UsersRemoteDataSourceImpl(get_it()),
+  );
+
+  get_it.registerLazySingleton<UsersRepository>(
+    () => UsersRepositoryImpl(get_it()),
+  );
+
+  get_it.registerLazySingleton(() => GetUsers(get_it()));
+  get_it.registerLazySingleton(() => CreateUser(get_it()));
+
+  get_it.registerFactory(
+    () => UsersBloc(getUsers: get_it(), createUser: get_it()),
   );
 }

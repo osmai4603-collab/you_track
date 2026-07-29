@@ -5,7 +5,7 @@ import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/issue_state_chip.dart';
 import 'package:issues_tracking/core/widgets/issue_priority_chip.dart';
-import 'package:issues_tracking/features/dashboards/presentation/cubits/youtrack_shell_cubit.dart';
+import 'package:issues_tracking/features/app/presentation/cubit/youtrack_shell_cubit.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';

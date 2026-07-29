@@ -7,12 +7,19 @@ import 'package:issues_tracking/core/services/navigation/agile_boards_navigation
 import 'package:issues_tracking/core/services/navigation/dashboard_navigation.dart';
 import 'package:issues_tracking/core/services/navigation/issues_navigation.dart';
 import 'package:issues_tracking/core/services/navigation/project_navigation.dart';
+import 'package:issues_tracking/core/services/navigation/groups_navigation.dart';
+import 'package:issues_tracking/core/services/navigation/roles_navigation.dart';
+import 'package:issues_tracking/core/services/navigation/users_navigation.dart';
 import 'package:issues_tracking/core/services/navigation/report_navigation.dart';
+import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
 import 'package:issues_tracking/features/dashboards/presentation/bloc/dashboard_bloc.dart';
 import 'package:issues_tracking/features/dashboards/presentation/bloc/dashboard_event.dart';
-import 'package:issues_tracking/features/dashboards/presentation/cubits/youtrack_shell_cubit.dart';
+import 'package:issues_tracking/features/app/presentation/cubit/youtrack_shell_cubit.dart';
 import 'package:issues_tracking/features/dashboards/presentation/pages/dashboard_page.dart';
-import 'package:issues_tracking/features/dashboards/presentation/widgets/youtrack_shell.dart';
+import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
+import 'package:issues_tracking/features/roles/presentation/bloc/roles_bloc.dart';
+import 'package:issues_tracking/features/users/presentation/bloc/users_bloc.dart';
+import 'package:issues_tracking/features/app/presentation/widgets/youtrack_shell.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
 import 'package:issues_tracking/features/issues/presentation/cubits/issue_form_cubit.dart';
@@ -67,9 +74,18 @@ sealed class NavigationService {
 
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
-    initialLocation: AppRouteKeys.dashboard,
+    initialLocation: AppRouteKeys.login,
+    refreshListenable: get_it<UserSession>(),
+    redirect: (context, state) {
+      final isLoggedIn = get_it<UserSession>().isLoggedIn;
+      final isLoginRoute = state.matchedLocation == AppRouteKeys.login;
+
+      if (!isLoggedIn && !isLoginRoute) return AppRouteKeys.login;
+      if (isLoggedIn && isLoginRoute) return AppRouteKeys.dashboard;
+      return null;
+    },
     routes: [
-      GoRoute(path: '/', redirect: (context, state) => AppRouteKeys.dashboard),
+      GoRoute(path: '/', redirect: (context, state) => AppRouteKeys.login),
       GoRoute(
         path: AppRouteKeys.login,
         builder: (context, state) => const LoginPage(),
@@ -83,6 +99,9 @@ sealed class NavigationService {
             BlocProvider(
               create: (_) => get_it<IssuesBloc>()..add(const LoadIssues()),
             ),
+            BlocProvider(create: (_) => get_it<GroupsBloc>()),
+            BlocProvider(create: (_) => get_it<RolesBloc>()),
+            BlocProvider(create: (_) => get_it<UsersBloc>()),
             BlocProvider(create: (_) => get_it<YouTrackShellCubit>()),
           ],
           child: YouTrackShell(navigationShell: navigationShell),
@@ -102,6 +121,21 @@ sealed class NavigationService {
           // ║                       Agile Boards Branch                          ║
           // ╚════════════════════════════════════════════════════════════════════╝
           AgileBoardsNavigation(),
+
+          // ╔════════════════════════════════════════════════════════════════════╗
+          // ║                          Groups Branch                             ║
+          // ╚════════════════════════════════════════════════════════════════════╝
+          GroupsNavigation(),
+
+          // ╔════════════════════════════════════════════════════════════════════╗
+          // ║                          Roles Branch                              ║
+          // ╚════════════════════════════════════════════════════════════════════╝
+          RolesNavigation(),
+
+          // ╔════════════════════════════════════════════════════════════════════╗
+          // ║                          Users Branch                              ║
+          // ╚════════════════════════════════════════════════════════════════════╝
+          UsersNavigation(),
 
           // ╔════════════════════════════════════════════════════════════════════╗
           // ║                         Reports Branch                             ║

@@ -10,10 +10,10 @@ import 'package:issues_tracking/features/issues/domain/entities/issue_attachment
 import 'package:issues_tracking/features/issues/domain/entities/issue_link.dart';
 import 'package:issues_tracking/features/issues/domain/entities/sprint.dart';
 import 'package:issues_tracking/features/issues/domain/entities/tag.dart';
+import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/issues_repository.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:issues_tracking/features/projects/domain/usecases/get_projects_use_case.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/get_project_members_use_case.dart';
@@ -61,7 +61,7 @@ class IssueFormCubit extends Cubit<IssueFormState> {
   ) async {
     if (projectKey == null || projects.isEmpty) return;
     try {
-      final project = projects.firstWhere((p) => p.projectKey == projectKey);
+      final project = projects.firstWhere((p) => p.projectId == projectKey);
 
       final membersResult = await getProjectMembersUseCase(
         params: GetProjectMembersParams(projectId: project.id),
@@ -179,10 +179,12 @@ class IssueFormCubit extends Cubit<IssueFormState> {
   }
 
   void addBuild(Build build) {
-    emit(state.copyWith(
-      build: build,
-      availableBuilds: [...state.availableBuilds, build],
-    ));
+    emit(
+      state.copyWith(
+        build: build,
+        availableBuilds: [...state.availableBuilds, build],
+      ),
+    );
   }
 
   void updateEstimation(Duration? value) {
@@ -292,7 +294,7 @@ class IssueFormCubit extends Cubit<IssueFormState> {
 
     emit(state.copyWith(isSubmitting: true, clearErrorMessage: true));
 
-    final user = get_it<SupabaseClient>().auth.currentUser;
+    final userSession = get_it<UserSession>();
     final now = DateTime.now();
 
     final issue = Issue(
@@ -306,8 +308,8 @@ class IssueFormCubit extends Cubit<IssueFormState> {
       issueType: state.issueType,
       assigneeId: state.assigneeId,
       assigneeName: state.assigneeName,
-      reporterId: user?.id ?? 'anonymous',
-      reporterName: user?.email ?? 'Anonymous',
+      reporterId: userSession.currentUser?.id ?? 'anonymous',
+      reporterName: userSession.currentUser?.email ?? 'Anonymous',
       subsystem: state.subsystem,
       fixVersions: state.fixVersions,
       build: state.build,

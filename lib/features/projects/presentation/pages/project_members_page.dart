@@ -12,10 +12,7 @@ import '../cubits/project_members_cubit.dart';
 class ProjectMembersPage extends StatefulWidget {
   final String projectId;
 
-  const ProjectMembersPage({
-    super.key,
-    required this.projectId,
-  });
+  const ProjectMembersPage({super.key, required this.projectId});
 
   @override
   State<ProjectMembersPage> createState() => _ProjectMembersPageState();
@@ -238,6 +235,7 @@ class _ProjectMembersPageState extends State<ProjectMembersPage> {
                         ? value
                         : '$value@youtrack.local',
                     roles: const ['Contributor'],
+                    userId: '',
                   );
                 }
                 Navigator.pop(dialogContext);

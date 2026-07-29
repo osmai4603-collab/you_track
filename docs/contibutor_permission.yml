@@ -1,0 +1,208 @@
+permissions:
+  - module: attachment
+    permissions:
+      - name: Add Attachment
+        description: Attach files or screenshots to issues
+        entity: Attachment
+        operation: Create
+
+      - name: Update Attachment
+        description: Modify files attached to issue and modify attachment visibility
+        entity: Attachment
+        operation: Update
+
+      - name: Delete Attachment
+        description: Delete files attached to issues
+        entity: Attachment
+        operation: Delete
+
+  - module: comment
+    permissions:
+      - name: Create Issue Comment
+        description: Comment issues
+        entity: Comment
+        operation: Create
+
+      - name: Read Issue Comment
+        description: View issues comments
+        entity: Comment
+        operation: Read
+        dependent_permissions:
+          - Update Not Own Issue Comment
+          - Delete Not Own Comment and Permanent Comment Delete
+
+      - name: Update Issue Comment
+        description: Edit own issue comments
+        entity: Comment
+        operation: Update
+
+      - name: Delete Issue Comment
+        description: Delete comments that you have added to issues
+        entity: Comment
+        operation: Delete
+
+      - name: Read Article Comment
+        description: Read comments that are posted to articles in the knowledge base
+        entity: Comment
+        operation: Read
+        implied_permissions:
+          - Read Article
+          - Read Project Basic
+        dependent_permissions:
+          - Create Article Comment
+          - Update Article Comment
+          - Delete Article Comment
+
+      - name: Create Article Comment
+        description: Add comments to articles in the knowledge base
+        entity: Comment
+        operation: Create
+        implied_permissions:
+          - Read Article Comment
+          - Read Article
+          - Read Project Basic
+
+  - module: issue_work_item
+    permissions:
+      - name: Read Work Item
+        description: View issue work items
+        entity: Issue work item
+        operation: Read
+        dependent_permissions:
+          - Update Not Own Work Item
+
+      - name: Update Work Item
+        description: Add and edit work items
+        entity: Issue work item
+        operation: Update
+        dependent_permissions:
+          - Update Not Own Work Item
+
+      - name: Create Work Item
+        description: Create work items
+        entity: Issue work item
+        operation: Create
+        dependent_permissions:
+          - Create Not Own Work Item
+
+  - module: issue
+    permissions:
+      - name: Create Issue
+        description: Create new issue (also allows viewing and updating public fields in reported issues)
+        entity: Issue
+        operation: Create
+        implied_permissions:
+          - Read Project Basic
+
+      - name: Update Issue
+        description: Update public fields of any issue
+        entity: Issue
+        operation: Update
+        dependent_permissions:
+          - Update Issue Private Fields
+
+      - name: Delete Issue
+        description: Delete issues
+        entity: Issue
+        operation: Delete
+
+      - name: Read Issue
+        description: View issues (public fields only)
+        entity: Issue
+        operation: Read
+        implied_permissions:
+          - Read Project Basic
+
+      - name: Read Issue Private Fields
+        description: View issue private fields
+        entity: Issue
+        operation: Read
+        implied_permissions:
+          - Read Project Basic
+        dependent_permissions:
+          - Update Issue Private Fields
+          - Override Visibility Restrictions
+
+      - name: Update Issue Private Fields
+        description: Update issue private fields
+        entity: Issue
+        operation: Update
+        implied_permissions:
+          - Read Issue Private Fields
+          - Update Issue
+          - Read Project Basic
+
+      - name: Link Issues
+        description: Set relationships between issues
+        entity: Issue
+        operation: Link
+
+      - name: View Voters
+        description: View the list of users who have voted for an issue (available in full issue view)
+        entity: Issue
+        operation: Read
+        implied_permissions:
+          - Read Project Basic
+
+      - name: View Watchers
+        description: View the list of users who are watching an issue (available in full issue view)
+        entity: Issue
+        operation: Read
+        implied_permissions:
+          - Read Project Basic
+
+      - name: Update Watchers
+        description: Set another user as a watcher for an issue
+        entity: Issue
+        operation: Update
+
+  - module: project
+    permissions:
+      - name: Read Project Basic
+        description: View basic project properties and content. With Read User Basic, view the members of the project team.
+        entity: Project
+        operation: Read
+        dependent_permissions:
+          - Read Project Full
+          - Read Issue
+          - Read Issue Private Fields
+          - Create Issue
+          - View Watchers
+          - View Voters
+          - Read Article
+          - Create Article
+          - Update Article
+          - Delete Article
+          - Read Article Comment
+          - Create Article Comment
+          - Update Article Comment
+          - Delete Article Comment
+          - Update Issue Private Fields
+          - Override Visibility Restrictions
+          - Update Project
+          - Delete Project
+
+  - module: article
+    permissions:
+      - name: Read Article
+        description: Read articles that are posted to the knowledge base
+        entity: Article
+        operation: Read
+        implied_permissions:
+          - Read Project Basic
+        dependent_permissions:
+          - Create Article
+          - Update Article
+          - Delete Article
+          - Read Article Comment
+          - Create Article Comment
+          - Update Article Comment
+          - Delete Article Comment
+
+      - name: Create Article
+        description: Add articles to the knowledge base
+        entity: Article
+        operation: Create
+        implied_permissions:
+          - Read Article
+          - Read Project Basic

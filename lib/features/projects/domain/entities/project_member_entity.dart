@@ -1,45 +1,49 @@
+import 'package:issues_tracking/features/auth/domain/entities/user_entity.dart';
+
 import '../../../../core/entities/entity.dart';
 
 class ProjectMemberEntity extends Entity {
   final String id;
   final String projectId;
-  final String name;
-  final String email;
   final List<String> roles;
-  final String? avatarUrl;
   final bool isOwner;
+  final String userId;
+  final UserEntity? userData;
+
+  String get name => userData?.userName ?? '';
+  String get userKey => userData?.userKey ?? '';
+  String get email => userData?.email ?? '';
+  String? get avatarUrl => userData?.avatarUrl;
 
   const ProjectMemberEntity({
     required this.id,
     required this.projectId,
-    required this.name,
-    required this.email,
+
     required this.roles,
-    this.avatarUrl,
     this.isOwner = false,
+    required this.userId,
+    this.userData,
   });
 
   @override
   ProjectMemberEntity copyWith({
     String? id,
     String? projectId,
-    String? name,
-    String? email,
     List<String>? roles,
-    String? avatarUrl,
     bool? isOwner,
+    String? userId,
+    UserEntity? userData,
   }) {
     return ProjectMemberEntity(
       id: id ?? this.id,
       projectId: projectId ?? this.projectId,
-      name: name ?? this.name,
-      email: email ?? this.email,
       roles: roles ?? this.roles,
-      avatarUrl: avatarUrl ?? this.avatarUrl,
       isOwner: isOwner ?? this.isOwner,
+      userId: userId ?? this.userId,
+      userData: userData ?? this.userData,
     );
   }
 
   @override
-  List<Object?> get props => [id, projectId, name, email, roles, avatarUrl, isOwner];
+  List<Object?> get props => [id, projectId, roles, isOwner, userId, userData];
 }

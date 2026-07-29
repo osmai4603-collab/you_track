@@ -152,7 +152,7 @@ class _ProjectListTileState extends YouTrackState<ProjectListTile> {
               ProjectChip(
                 colors: colors,
                 textTheme: textTheme,
-                shortKey: project.projectKey,
+                shortKey: project.projectId,
                 textColor:
                     _projectColors[Random(0).nextInt(_projectColors.length)],
               ),
@@ -210,7 +210,7 @@ class _ProjectListTileState extends YouTrackState<ProjectListTile> {
 
               child: Center(
                 child: Text(
-                  member.name,
+                  member.userKey.toUpperCase(),
                   style: textTheme.labelSmall?.copyWith(
                     fontSize: 10,
                     color: Colors.white,

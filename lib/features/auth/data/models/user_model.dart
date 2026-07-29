@@ -4,7 +4,7 @@ class UserModel extends UserEntity {
   const UserModel({
     required super.id,
     required super.email,
-    super.fullName,
+    super.userName,
     super.avatarUrl,
     super.createdAt,
   });
@@ -13,19 +13,20 @@ class UserModel extends UserEntity {
     return UserModel(
       id: entity.id,
       email: entity.email,
-      fullName: entity.fullName,
+      userName: entity.userName,
       avatarUrl: entity.avatarUrl,
       createdAt: entity.createdAt,
     );
   }
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
+    print('user: $json');
     return UserModel(
-      id: (json['id'] ?? '').toString(),
-      email: (json['email'] ?? '').toString(),
-      fullName: json['full_name']?.toString(),
-      avatarUrl: json['avatar_url']?.toString(),
-      createdAt: _parseDate(json['created_at']),
+      id: json['id'] ?? '',
+      email: json['email'] ?? '',
+      userName: json['user_name'] ?? '',
+      avatarUrl: json['avatar_url'],
+      createdAt: DateTime.tryParse(json['created_at']),
     );
   }
 
@@ -33,18 +34,9 @@ class UserModel extends UserEntity {
     return {
       'id': id,
       'email': email,
-      'full_name': fullName,
+      'user_name': userName,
       'avatar_url': avatarUrl,
       'created_at': createdAt?.toIso8601String(),
     };
-  }
-
-  static DateTime? _parseDate(dynamic value) {
-    if (value == null) return null;
-    try {
-      return DateTime.parse(value.toString());
-    } catch (_) {
-      return null;
-    }
   }
 }

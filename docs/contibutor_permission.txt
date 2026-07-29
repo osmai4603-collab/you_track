@@ -1,0 +1,216 @@
+Contributor Permissions
+    1- Attacjment
+        Add Attachment
+            Attach files or screenshots to issues
+            Entity
+            Attachment
+            Operation
+            Create
+        Update Attachment
+            Modify files attached to issue and modify attachment visibility
+            Entity
+            Attachment
+            Operation
+            Update
+    
+        Delete Attachment
+            Delete files attached to issues
+            Entity
+            Attachment
+            Operation
+
+
+    2- Comment
+        Create Issue Comment
+            Comment issues
+            Entity
+            Comment
+            Operation
+            Create
+    
+        Read Issue Comment
+            View issues comments
+            Entity
+            Comment
+            Operation
+            Read
+            Dependent permission
+            Update Not Own Issue Comment, Delete Not Own Comment and Permanent Comment Delete
+    
+        Update Issue Comment
+            Edit own issue comments
+            Entity
+            Comment
+            Operation
+            Update
+    
+        Delete Issue Comment
+            Delete comments that you have added to issues
+            Entity
+            Comment
+            Operation
+            Delete
+    
+        Read Article Comment
+            Read comments that are posted to articles in the knowledge base
+            Entity
+            Comment
+            Operation
+            Read
+            Implied permission
+            Read Article, Read Project Basic
+            Dependent permission
+            Create Article Comment, Update Article Comment, Delete Article Comment
+
+        Create Article Comment
+            Add comments to articles in the knowledge base
+            Entity
+            Comment
+            Operation
+            Create
+            Implied permission
+            Read Article Comment, Read Article, Read Project Basic
+
+    3- Issue work item
+        Read Work Item
+            View issue work items
+            Entity
+            Issue work item
+            Operation
+            Read
+            Dependent permission
+            Update Not Own Work Item
+        Update Work Item
+            Add and edit work items
+            Entity
+            Issue work item
+            Operation
+            Update
+            Dependent permission
+            Update Not Own Work Item
+        Create Work Item
+            Create work items
+            Entity
+            Issue work item
+            Operation
+            Create
+            Dependent permission
+            Create Not Own Work Item
+            
+            
+    4- Issue
+        Create Issue
+            Create new issue (also allows viewing and updating public fields in reported issues)
+            Entity
+                Issue
+            Operation
+                Create
+            Implied permission
+            Read Project Basic
+        Update Issue
+            Update public fields of any issue
+            Entity
+            Issue
+            Operation
+            Update
+            Dependent permission
+            Update Issue Private Fields
+            
+        Delete Issue
+            Delete issues
+            Entity
+                Issue
+            Operation
+                Delete
+                
+        Read Issue
+            View issues (public fields only)
+            Entity
+            Issue
+            Operation
+            Read
+            Implied permission
+            Read Project Basic
+            
+        Read Issue Private Fields
+            View issue private fields
+            Entity
+            Issue
+            Operation
+            Read
+            Implied permission
+            Read Project Basic
+            Dependent permission
+            Update Issue Private Fields, Override Visibility Restrictions
+            
+        Update Issue Private Fields
+            Update issue private fields
+            Entity
+            Issue
+            Operation
+            Update
+            Implied permission
+            Read Issue Private Fields, Update Issue, Read Project Basic
+
+        Link Issues
+            Set relationships between issues
+            Entity
+            Issue
+            Operation
+            Link
+
+        View Voters
+            View the list of users who have voted for an issue (available in full issue view)
+            Entity
+            Issue
+            Operation
+            Read
+            Implied permission
+            Read Project Basic
+
+        View Watchers
+            View the list of users who are watching an issue (available in full issue view)
+            Entity
+            Issue
+            Operation
+            Read
+            Implied permission
+            Read Project Basic
+
+        Update Watchers
+            Set another user as a watcher for an issue
+            Entity
+                Issue
+            Operation
+                Update
+        
+    5- Project
+        Read Project Basic
+            View basic project properties and content. With Read User Basic, view the members of                    the project team.
+            Entity
+            Project
+            Operation
+            Read
+            Dependent permission
+            Read Project Full, Read Issue, Read Issue Private Fields, Create Issue, View Watchers, View Voters, Read Article, Create Article, Update Article, Delete Article, Read Article Comment, Create Article Comment, Update Article Comment, Delete Article Comment, Update Issue Private Fields, Override Visibility Restrictions, Update Project, Delete Project
+
+    6- Article
+        Read Article
+            Read articles that are posted to the knowledge base
+            Entity
+            Article
+            Operation
+            Read
+            Implied permission
+            Read Project Basic
+            Dependent permission
+            Create Article, Update Article, Delete Article, Read Article Comment, Create Article Comment, Update Article Comment, Delete Article Comment
+            
+        Create Article
+            Add articles to the knowledge base
+            Entity
+            Article
+            Operation
+            Create
+            Implied permission
+            Read Article, Read Project Basic
