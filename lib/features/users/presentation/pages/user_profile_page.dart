@@ -184,7 +184,9 @@ class _GeneralTab extends StatelessWidget {
               TextButton(
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Downloading personal data as CSV...')),
+                    const SnackBar(
+                      content: Text('Downloading personal data as CSV...'),
+                    ),
                   );
                 },
                 child: const Text('Download in CSV format'),
@@ -270,7 +272,11 @@ class _GeneralTab extends StatelessWidget {
     );
   }
 
-  Widget _buildTimezoneSection(BuildContext context, ColorScheme colors, TextTheme textTheme) {
+  Widget _buildTimezoneSection(
+    BuildContext context,
+    ColorScheme colors,
+    TextTheme textTheme,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -312,7 +318,11 @@ class _GeneralTab extends StatelessWidget {
             TextButton(
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Time zone guessed: UTC (based on IP address)')),
+                  const SnackBar(
+                    content: Text(
+                      'Time zone guessed: UTC (based on IP address)',
+                    ),
+                  ),
                 );
               },
               child: const Text('Guess time zone'),
@@ -369,11 +379,20 @@ class _WorkspaceTabState extends State<_WorkspaceTab> {
           const SizedBox(height: 12),
           Row(
             children: [
-              _ThemeCard(color: Colors.grey.shade200, isSelected: _theme == 'light'),
+              _ThemeCard(
+                color: Colors.grey.shade200,
+                isSelected: _theme == 'light',
+              ),
               const SizedBox(width: 8),
-              _ThemeCard(color: const Color(0xFF1E1E20), isSelected: _theme == 'dark'),
+              _ThemeCard(
+                color: const Color(0xFF1E1E20),
+                isSelected: _theme == 'dark',
+              ),
               const SizedBox(width: 8),
-              _ThemeCard(color: Colors.grey.shade400, isSelected: _theme == 'sync'),
+              _ThemeCard(
+                color: Colors.grey.shade400,
+                isSelected: _theme == 'sync',
+              ),
             ],
           ),
           const SizedBox(height: AppSpacing.large),
@@ -431,6 +450,7 @@ class _WorkspaceTabState extends State<_WorkspaceTab> {
             ),
           ),
           const SizedBox(height: 12),
+
           Container(
             height: 40,
             decoration: BoxDecoration(
@@ -573,7 +593,9 @@ class _TagsAndSearchesTab extends StatelessWidget {
                     TextButton(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('No tags selected to delete')),
+                          const SnackBar(
+                            content: Text('No tags selected to delete'),
+                          ),
                         );
                       },
                       child: const Text('Delete'),
@@ -614,7 +636,9 @@ class _TagsAndSearchesTab extends StatelessWidget {
                     TextButton(
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Showing tags created by me')),
+                          const SnackBar(
+                            content: Text('Showing tags created by me'),
+                          ),
                         );
                       },
                       child: const Text('Created by me'),
@@ -704,7 +728,9 @@ class _TagsAndSearchesTab extends StatelessWidget {
                       icon: const Icon(Icons.help_outline, size: 16),
                       onPressed: () {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Remove tag on issue resolution')),
+                          const SnackBar(
+                            content: Text('Remove tag on issue resolution'),
+                          ),
                         );
                       },
                     ),
@@ -879,7 +905,9 @@ class _NotificationCheckboxState extends State<_NotificationCheckbox> {
           onChanged: (value) => setState(() => _checked = value!),
           visualDensity: VisualDensity.compact,
         ),
-        Expanded(child: Text(widget.label, style: const TextStyle(fontSize: 12))),
+        Expanded(
+          child: Text(widget.label, style: const TextStyle(fontSize: 12)),
+        ),
       ],
     );
   }
@@ -938,7 +966,9 @@ class _NotificationsTabState extends State<_NotificationsTab> {
               TextButton(
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Telegram bot connection page opened')),
+                    const SnackBar(
+                      content: Text('Telegram bot connection page opened'),
+                    ),
                   );
                 },
                 child: const Text('Connect my account'),
@@ -1099,7 +1129,9 @@ class _GroupsTabState extends State<_GroupsTab> {
                         context: context,
                         builder: (ctx) => AlertDialog(
                           title: const Text('Add to group'),
-                          content: const Text('Select a group to add this user to.'),
+                          content: const Text(
+                            'Select a group to add this user to.',
+                          ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(ctx),
@@ -1125,7 +1157,10 @@ class _GroupsTabState extends State<_GroupsTab> {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Text('Add to group', style: TextStyle(fontSize: 13)),
+                          const Text(
+                            'Add to group',
+                            style: TextStyle(fontSize: 13),
+                          ),
                           const SizedBox(width: 4),
                           Icon(
                             Icons.arrow_drop_down,
@@ -1153,7 +1188,9 @@ class _GroupsTabState extends State<_GroupsTab> {
                         ),
                         border: InputBorder.none,
                         isDense: true,
-                        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                        ),
                         prefixIcon: Icon(
                           Icons.search,
                           size: 16,
@@ -1187,7 +1224,11 @@ class _GroupsTabState extends State<_GroupsTab> {
               ...groups.map(
                 (g) => Column(
                   children: [
-                    _GroupRow(name: g.name, badge: g.autoJoin ? 'auto-join' : g.groupType, members: ''),
+                    _GroupRow(
+                      name: g.name,
+                      badge: g.autoJoin ? 'auto-join' : g.groupType,
+                      members: '',
+                    ),
                     const Divider(height: 1),
                   ],
                 ),
@@ -1314,7 +1355,11 @@ class _GroupRowState extends State<_GroupRow> {
             icon: const Icon(Icons.more_horiz, size: 18),
             onSelected: (value) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Group ${value == 'edit' ? 'edit' : 'delete'} action')),
+                SnackBar(
+                  content: Text(
+                    'Group ${value == 'edit' ? 'edit' : 'delete'} action',
+                  ),
+                ),
               );
             },
             itemBuilder: (context) => [
@@ -1368,7 +1413,9 @@ class _RolesTabState extends State<_RolesTab> {
                         context: context,
                         builder: (ctx) => AlertDialog(
                           title: const Text('Grant role'),
-                          content: const Text('Select a role and project to grant to this user.'),
+                          content: const Text(
+                            'Select a role and project to grant to this user.',
+                          ),
                           actions: [
                             TextButton(
                               onPressed: () => Navigator.pop(ctx),
@@ -1396,7 +1443,10 @@ class _RolesTabState extends State<_RolesTab> {
                   ),
                   const Spacer(),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       border: Border.all(color: colors.outlineVariant),
                       borderRadius: BorderRadius.circular(4),
@@ -1528,7 +1578,9 @@ class _RoleRowState extends State<_RoleRow> {
             onChanged: (value) => setState(() => _checked = value!),
             visualDensity: VisualDensity.compact,
           ),
-          Expanded(child: Text(widget.role, style: const TextStyle(fontSize: 13))),
+          Expanded(
+            child: Text(widget.role, style: const TextStyle(fontSize: 13)),
+          ),
           SizedBox(
             width: 300,
             child: Text(
@@ -1540,7 +1592,11 @@ class _RoleRowState extends State<_RoleRow> {
             icon: const Icon(Icons.more_horiz, size: 18),
             onSelected: (value) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Role ${value == 'edit' ? 'edit' : 'remove'} action')),
+                SnackBar(
+                  content: Text(
+                    'Role ${value == 'edit' ? 'edit' : 'remove'} action',
+                  ),
+                ),
               );
             },
             itemBuilder: (context) => [
@@ -1580,7 +1636,9 @@ class _AccountSecurityTab extends StatelessWidget {
                   FilledButton.icon(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Pair with authenticator app started')),
+                        const SnackBar(
+                          content: Text('Pair with authenticator app started'),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.mobile_screen_share, size: 16),
@@ -1590,7 +1648,9 @@ class _AccountSecurityTab extends StatelessWidget {
                   OutlinedButton.icon(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Pair with hardware token started')),
+                        const SnackBar(
+                          content: Text('Pair with hardware token started'),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.security, size: 16),
@@ -1634,7 +1694,9 @@ class _AccountSecurityTab extends StatelessWidget {
               FilledButton.icon(
                 onPressed: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Add credentials form opened')),
+                    const SnackBar(
+                      content: Text('Add credentials form opened'),
+                    ),
                   );
                 },
                 icon: const Icon(Icons.add, size: 16),
@@ -1720,7 +1782,9 @@ class _AccountSecurityTab extends StatelessWidget {
                   FilledButton.icon(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('New token creation form opened')),
+                        const SnackBar(
+                          content: Text('New token creation form opened'),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.add, size: 16),
@@ -1730,7 +1794,9 @@ class _AccountSecurityTab extends StatelessWidget {
                   OutlinedButton.icon(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('New password creation form opened')),
+                        const SnackBar(
+                          content: Text('New password creation form opened'),
+                        ),
                       );
                     },
                     icon: const Icon(Icons.vpn_key, size: 16),
@@ -1803,9 +1869,9 @@ class _AccountSecurityTab extends StatelessWidget {
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('$title confirmed')),
-              );
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('$title confirmed')));
             },
             child: const Text('Confirm'),
           ),
