@@ -31,10 +31,10 @@ class UsersRepositoryImpl implements UsersRepository {
   }
 
   @override
-  Future<Either<Failure, UserEntity>> createUser(UserEntity user) async {
+  Future<Either<Failure, UserEntity>> createUser(UserEntity user, {String? password}) async {
     try {
       final model = UserModel.fromEntity(user);
-      final created = await dataSource.createUser(model.toJson());
+      final created = await dataSource.createUser(model.toJson(), password: password);
       return Right(created);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

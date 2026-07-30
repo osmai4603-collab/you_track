@@ -46,13 +46,14 @@ class _RolesPageState extends State<RolesPage> {
                 children: [
                   const SizedBox(height: 16),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 24.0),
                     child: Row(
                       children: [
                         Expanded(child: _buildSearchField()),
                         const SizedBox(width: 8),
                         FilledButton.icon(
-                          onPressed: () => context.push(AppRouteKeys.createRole),
+                          onPressed: () =>
+                              context.push(AppRouteKeys.createRole),
                           icon: const Icon(Icons.add, size: 18),
                           label: const Text('Add role'),
                         ),
@@ -86,13 +87,13 @@ class _RolesPageState extends State<RolesPage> {
   }
 
   Widget _buildSearchField() {
-    return Container(
+    return SizedBox(
       height: 30,
       child: TextFormField(
         controller: _searchController,
         decoration: const InputDecoration(
           hintText: 'Search roles...',
-          prefixIcon: Icon(Icons.search, size: 18),
+          prefixIcon: Icon(Icons.search),
         ),
       ),
     );

@@ -45,6 +45,7 @@ class RolesBloc extends Bloc<RolesEvent, RolesState> {
     final result = await createRole(
       params: CreateRoleParams(
         name: event.name,
+        description: event.description,
         permissions: event.permissions,
       ),
     );
@@ -60,8 +61,8 @@ class RolesBloc extends Bloc<RolesEvent, RolesState> {
   ) async {
     final result = await updateRole(
       params: UpdateRoleParams(
-        id: event.id,
         name: event.name,
+        description: event.description,
         permissions: event.permissions,
       ),
     );

@@ -21,6 +21,12 @@ class GroupsLoaded extends GroupsState {
     this.selectedGroupId,
   });
 
+  GroupEntity? get selectedGroup {
+    if (selectedGroupId == null) return null;
+    final index = groups.indexWhere((g) => g.id == selectedGroupId);
+    return index != -1 ? groups[index] : null;
+  }
+
   GroupsLoaded copyWith({
     List<GroupEntity>? groups,
     String? selectedGroupId,
@@ -28,7 +34,9 @@ class GroupsLoaded extends GroupsState {
   }) {
     return GroupsLoaded(
       groups: groups ?? this.groups,
-      selectedGroupId: clearSelected ? null : (selectedGroupId ?? this.selectedGroupId),
+      selectedGroupId: clearSelected
+          ? null
+          : (selectedGroupId ?? this.selectedGroupId),
     );
   }
 

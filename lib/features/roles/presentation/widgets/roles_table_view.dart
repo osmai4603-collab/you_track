@@ -58,9 +58,9 @@ class RolesTableView extends StatelessWidget {
                     final role = state.roles[index];
                     return RoleTableRow(
                       role: role,
-                      isSelected: state.selectedRoleId == role.id,
+                      isSelected: state.selectedRoleId == role.name,
                       onTap: () {
-                        context.read<RolesBloc>().add(SelectRole(role.id));
+                        context.read<RolesBloc>().add(SelectRole(role.name));
                       },
                     );
                   },
@@ -94,12 +94,12 @@ class _TableHeader extends StatelessWidget {
         children: [
           const SizedBox(width: 40),
           const SizedBox(width: AppSpacing.small),
-          Expanded(
-            flex: 3,
+          SizedBox(
+            width: 200,
             child: Text('Name', style: textTheme.labelMedium),
           ),
-          Expanded(
-            flex: 4,
+          SizedBox(
+            width: 200,
             child: Text('Permissions', style: textTheme.labelMedium),
           ),
         ],

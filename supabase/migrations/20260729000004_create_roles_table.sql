@@ -3,5 +3,6 @@
 
 CREATE TABLE roles (
   name TEXT PRIMARY KEY,
+  description TEXT,
   permissions TEXT[] NOT NULL DEFAULT '{}'
 );

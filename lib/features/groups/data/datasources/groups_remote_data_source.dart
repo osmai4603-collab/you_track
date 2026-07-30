@@ -1,12 +1,30 @@
+import 'package:issues_tracking/core/errors/exceptions.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import '../models/group_member_model.dart';
 import '../models/group_model.dart';
+import '../models/group_project_model.dart';
+import '../models/group_role_assignment_model.dart';
 
 abstract class GroupsRemoteDataSource {
   Future<List<GroupModel>> getGroups();
   Future<GroupModel> getGroupById(String id);
-  Future<GroupModel> createGroup(Map<String, dynamic> data);
-  Future<GroupModel> updateGroup(String id, Map<String, dynamic> data);
+  Future<GroupModel> createGroup(GroupModel data);
+  Future<GroupModel> updateGroup(String id, GroupModel data);
   Future<void> deleteGroup(String id);
+
+  Future<GroupRoleAssignmentModel> assignRole(GroupRoleAssignmentModel data);
+  Future<List<GroupRoleAssignmentModel>> getGroupRoles(String groupId);
+
+  Future<List<GroupMemberModel>> getGroupMembers(String groupId);
+  Future<List<GroupMemberModel>> addGroupMembers(
+    String groupId,
+    List<String> userIds,
+  );
+
+  Future<List<GroupProjectModel>> addGroupProjects(
+    String groupId,
+    List<String> projectIds,
+  );
 }
 
 class GroupsRemoteDataSourceImpl implements GroupsRemoteDataSource {
@@ -16,33 +34,114 @@ class GroupsRemoteDataSourceImpl implements GroupsRemoteDataSource {
 
   @override
   Future<List<GroupModel>> getGroups() async {
-    final response = await supabase.from('groups').select('*').order('created_at', ascending: false);
+    final response = await supabase
+        .from('groups')
+        .select('*, group_members(*, users(id, user_name, email, avatar_url)), group_roles(*, projects(*)), group_projects(*, projects(*))')
+        .order('created_at', ascending: false);
     return (response as List).map((e) => GroupModel.fromJson(e)).toList();
   }
 
   @override
   Future<GroupModel> getGroupById(String id) async {
-    final response = await supabase.from('groups').select('*').eq('id', id).single();
+    final response = await supabase
+        .from('groups')
+        .select('*, group_members(*, users(id, user_name, email, avatar_url)), group_roles(*, projects(*)), group_projects(*, projects(*))')
+        .eq('id', id)
+        .single();
     return GroupModel.fromJson(response);
   }
 
   @override
-  Future<GroupModel> createGroup(Map<String, dynamic> data) async {
-    data.remove('id');
-    final response = await supabase.from('groups').insert(data).select().single();
+  Future<GroupModel> createGroup(GroupModel data) async {
+    final json = data.toJson()..remove('id');
+    final response = await supabase
+        .from('groups')
+        .insert(json)
+        .select()
+        .single();
     return GroupModel.fromJson(response);
   }
 
   @override
-  Future<GroupModel> updateGroup(String id, Map<String, dynamic> data) async {
-    data.remove('id');
-    data['updated_at'] = DateTime.now().toIso8601String();
-    final response = await supabase.from('groups').update(data).eq('id', id).select().single();
+  Future<GroupModel> updateGroup(String id, GroupModel data) async {
+    final json = data.toJson()
+      ..remove('id')
+      ..['updated_at'] = DateTime.now().toIso8601String();
+    final response = await supabase
+        .from('groups')
+        .update(json)
+        .eq('id', id)
+        .select()
+        .maybeSingle();
+    if (response == null) {
+      throw DatabaseException('Group Did not updated');
+    }
     return GroupModel.fromJson(response);
   }
 
   @override
   Future<void> deleteGroup(String id) async {
     await supabase.from('groups').delete().eq('id', id);
+  }
+
+  @override
+  Future<GroupRoleAssignmentModel> assignRole(
+    GroupRoleAssignmentModel data,
+  ) async {
+    final json = data.toJson()..remove('id');
+    final response = await supabase
+        .from('group_roles')
+        .insert(json)
+        .select()
+        .maybeSingle();
+    if (response == null) {
+      throw DatabaseException('Group Role Did not inserted');
+    }
+    return GroupRoleAssignmentModel.fromJson(response);
+  }
+
+  @override
+  Future<List<GroupRoleAssignmentModel>> getGroupRoles(String groupId) async {
+    final response = await supabase
+        .from('group_roles')
+        .select('*')
+        .eq('group_id', groupId)
+        .order('role_name', ascending: false);
+    return (response as List)
+        .map((e) => GroupRoleAssignmentModel.fromJson(e))
+        .toList();
+  }
+
+  @override
+  Future<List<GroupMemberModel>> getGroupMembers(String groupId) async {
+    final response = await supabase
+        .from('group_members')
+        .select('*')
+        .eq('group_id', groupId);
+    return (response as List).map((e) => GroupMemberModel.fromJson(e)).toList();
+  }
+
+  @override
+  Future<List<GroupMemberModel>> addGroupMembers(
+    String groupId,
+    List<String> userIds,
+  ) async {
+    final data = userIds
+        .map((uid) => {'user_id': uid, 'group_id': groupId})
+        .toList();
+    final response = await supabase.from('group_members').insert(data).select();
+    return response.map((e) => GroupMemberModel.fromJson(e)).toList();
+  }
+
+  @override
+  Future<List<GroupProjectModel>> addGroupProjects(
+    String groupId,
+    List<String> projectIds,
+  ) async {
+    final data = projectIds
+        .map((pid) => {'project_id': pid, 'group_id': groupId})
+        .toList();
+    final response = await supabase.from('group_projects').insert(data).select();
+    return response.map((e) => GroupProjectModel.fromJson(e)).toList();
   }
 }

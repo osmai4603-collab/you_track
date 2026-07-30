@@ -29,10 +29,11 @@ class CreateUser extends UseCase<UserEntity, CreateUserParams> {
     return repository.createUser(
       UserEntity(
         id: '',
-        displayName: params.displayName,
+        fullName: params.displayName,
         username: params.email.split('@').first,
         email: params.email,
       ),
+      password: params.password,
     );
   }
 }

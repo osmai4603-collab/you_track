@@ -14,6 +14,11 @@ abstract class UseCase<ReturnType, ParamsType extends Params> {
   Future<Either<Failure, ReturnType>> call({required ParamsType params});
 }
 
+abstract class StreamUseCase<ReturnType, ParamsType extends Params> {
+  const StreamUseCase();
+  Stream<Either<Failure, ReturnType>> call({required ParamsType params});
+}
+
 class NoParams extends Params {
   const NoParams();
 }

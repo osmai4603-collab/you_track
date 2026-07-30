@@ -21,9 +21,9 @@ class RolesRepositoryImpl implements RolesRepository {
   }
 
   @override
-  Future<Either<Failure, RoleEntity>> getRoleById(String id) async {
+  Future<Either<Failure, RoleEntity>> getRoleByName(String name) async {
     try {
-      final role = await dataSource.getRoleById(id);
+      final role = await dataSource.getRoleByName(name);
       return Right(role);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -33,8 +33,7 @@ class RolesRepositoryImpl implements RolesRepository {
   @override
   Future<Either<Failure, RoleEntity>> createRole(RoleEntity role) async {
     try {
-      final model = RoleModel.fromEntity(role);
-      final created = await dataSource.createRole(model.toJson());
+      final created = await dataSource.createRole({'name': role.name, 'description': role.description, 'permissions': role.permissions});
       return Right(created);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -44,8 +43,7 @@ class RolesRepositoryImpl implements RolesRepository {
   @override
   Future<Either<Failure, RoleEntity>> updateRole(RoleEntity role) async {
     try {
-      final model = RoleModel.fromEntity(role);
-      final updated = await dataSource.updateRole(model.id, model.toJson());
+      final updated = await dataSource.updateRole(role.name, {'name': role.name, 'description': role.description, 'permissions': role.permissions});
       return Right(updated);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -53,9 +51,9 @@ class RolesRepositoryImpl implements RolesRepository {
   }
 
   @override
-  Future<Either<Failure, void>> deleteRole(String id) async {
+  Future<Either<Failure, void>> deleteRole(String name) async {
     try {
-      await dataSource.deleteRole(id);
+      await dataSource.deleteRole(name);
       return const Right(null);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

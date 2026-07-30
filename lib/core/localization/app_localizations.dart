@@ -254,6 +254,12 @@ abstract class AppLocalizations {
   /// **'Cancel'**
   String get cancelButton;
 
+  /// No description provided for @saveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveButton;
+
   /// No description provided for @projectNameLabel.
   ///
   /// In en, this message translates to:
@@ -1151,319 +1157,319 @@ abstract class AppLocalizations {
   /// Permission: Read Project Basic
   ///
   /// In en, this message translates to:
-  /// **'Read Project Basic'**
+  /// **'Project Basic'**
   String get permissionProjectReadProjectBasic;
 
   /// Permission: Create Project
   ///
   /// In en, this message translates to:
-  /// **'Create Project'**
+  /// **'Project'**
   String get permissionProjectCreateProject;
 
   /// Permission: Read Project Full
   ///
   /// In en, this message translates to:
-  /// **'Read Project Full'**
+  /// **'Project Full'**
   String get permissionProjectReadProjectFull;
 
   /// Permission: Update Project
   ///
   /// In en, this message translates to:
-  /// **'Update Project'**
+  /// **'Project'**
   String get permissionProjectUpdateProject;
 
   /// Permission: Delete Project
   ///
   /// In en, this message translates to:
-  /// **'Delete Project'**
+  /// **'Project'**
   String get permissionProjectDeleteProject;
 
   /// Permission: Read Organization
   ///
   /// In en, this message translates to:
-  /// **'Read Organization'**
+  /// **'Organization'**
   String get permissionOrganizationReadOrganization;
 
   /// Permission: Update Organization
   ///
   /// In en, this message translates to:
-  /// **'Update Organization'**
+  /// **'Organization'**
   String get permissionOrganizationUpdateOrganization;
 
   /// Permission: Create Organization
   ///
   /// In en, this message translates to:
-  /// **'Create Organization'**
+  /// **'Organization'**
   String get permissionOrganizationCreateOrganization;
 
   /// Permission: Delete Organization
   ///
   /// In en, this message translates to:
-  /// **'Delete Organization'**
+  /// **'Organization'**
   String get permissionOrganizationDeleteOrganization;
 
   /// Permission: Update Self Profile
   ///
   /// In en, this message translates to:
-  /// **'Update Self Profile'**
+  /// **'Self Profile'**
   String get permissionUserProfileUpdateSelf;
 
   /// Permission: Read User Basic
   ///
   /// In en, this message translates to:
-  /// **'Read User Basic'**
+  /// **'User Basic'**
   String get permissionUserReadUserBasic;
 
   /// Permission: Read User Details
   ///
   /// In en, this message translates to:
-  /// **'Read User Details'**
+  /// **'User Details'**
   String get permissionUserReadUserDetails;
 
   /// Permission: Update User
   ///
   /// In en, this message translates to:
-  /// **'Update User'**
+  /// **'User'**
   String get permissionUserUpdateUser;
 
   /// Permission: Create User
   ///
   /// In en, this message translates to:
-  /// **'Create User'**
+  /// **'User'**
   String get permissionUserCreateUser;
 
   /// Permission: Delete User
   ///
   /// In en, this message translates to:
-  /// **'Delete User'**
+  /// **'User'**
   String get permissionUserDeleteUser;
 
   /// Permission: Read Low-Level Admin Settings
   ///
   /// In en, this message translates to:
-  /// **'Read Low-Level Admin Settings'**
+  /// **'Low-Level Admin Settings'**
   String get permissionSystemLowLevelAdminRead;
 
   /// Permission: Write Low-Level Admin Settings
   ///
   /// In en, this message translates to:
-  /// **'Write Low-Level Admin Settings'**
+  /// **'Low-Level Admin Settings'**
   String get permissionSystemLowLevelAdminWrite;
 
   /// Permission: Read Issue
   ///
   /// In en, this message translates to:
-  /// **'Read Issue'**
+  /// **'Issue'**
   String get permissionIssueReadIssue;
 
   /// Permission: Read Issue Private Fields
   ///
   /// In en, this message translates to:
-  /// **'Read Issue Private Fields'**
+  /// **'Issue Private Fields'**
   String get permissionIssueReadIssuePrivateFields;
 
   /// Permission: Update Issue
   ///
   /// In en, this message translates to:
-  /// **'Update Issue'**
+  /// **'Issue'**
   String get permissionIssueUpdateIssue;
 
   /// Permission: Create Issue
   ///
   /// In en, this message translates to:
-  /// **'Create Issue'**
+  /// **'Issue'**
   String get permissionIssueCreateIssue;
 
   /// Permission: Delete Issue
   ///
   /// In en, this message translates to:
-  /// **'Delete Issue'**
+  /// **'Issue'**
   String get permissionIssueDeleteIssue;
 
   /// Permission: Link Issues
   ///
   /// In en, this message translates to:
-  /// **'Link Issues'**
+  /// **'Issues'**
   String get permissionIssueLinkIssues;
 
   /// Permission: Update Issue Private Fields
   ///
   /// In en, this message translates to:
-  /// **'Update Issue Private Fields'**
+  /// **'Issue Private Fields'**
   String get permissionIssueUpdateIssuePrivateFields;
 
   /// Permission: Apply Commands Silently
   ///
   /// In en, this message translates to:
-  /// **'Apply Commands Silently'**
+  /// **'Commands Silently'**
   String get permissionIssueApplyCommandsSilently;
 
   /// Permission: View Watchers
   ///
   /// In en, this message translates to:
-  /// **'View Watchers'**
+  /// **'Watchers'**
   String get permissionIssueViewWatchers;
 
   /// Permission: Update Watchers
   ///
   /// In en, this message translates to:
-  /// **'Update Watchers'**
+  /// **'Watchers'**
   String get permissionIssueUpdateWatchers;
 
   /// Permission: View Voters
   ///
   /// In en, this message translates to:
-  /// **'View Voters'**
+  /// **'Voters'**
   String get permissionIssueViewVoters;
 
   /// Permission: Add Attachment
   ///
   /// In en, this message translates to:
-  /// **'Add Attachment'**
+  /// **'Attachment'**
   String get permissionAttachmentAddAttachment;
 
   /// Permission: Update Attachment
   ///
   /// In en, this message translates to:
-  /// **'Update Attachment'**
+  /// **'Attachment'**
   String get permissionAttachmentUpdateAttachment;
 
   /// Permission: Delete Attachment
   ///
   /// In en, this message translates to:
-  /// **'Delete Attachment'**
+  /// **'Attachment'**
   String get permissionAttachmentDeleteAttachment;
 
   /// Permission: Create Issue Comment
   ///
   /// In en, this message translates to:
-  /// **'Create Issue Comment'**
+  /// **'Issue Comment'**
   String get permissionCommentCreateIssueComment;
 
   /// Permission: Read Issue Comment
   ///
   /// In en, this message translates to:
-  /// **'Read Issue Comment'**
+  /// **'Issue Comment'**
   String get permissionCommentReadIssueComment;
 
   /// Permission: Update Issue Comment
   ///
   /// In en, this message translates to:
-  /// **'Update Issue Comment'**
+  /// **'Issue Comment'**
   String get permissionCommentUpdateIssueComment;
 
   /// Permission: Delete Issue Comment
   ///
   /// In en, this message translates to:
-  /// **'Delete Issue Comment'**
+  /// **'Issue Comment'**
   String get permissionCommentDeleteIssueComment;
 
   /// Permission: Update Not Own Issue Comment
   ///
   /// In en, this message translates to:
-  /// **'Update Not Own Issue Comment'**
+  /// **'Not Own Issue Comment'**
   String get permissionCommentUpdateNotOwnIssueComment;
 
   /// Permission: Delete Not Own Comment & Permanent Delete
   ///
   /// In en, this message translates to:
-  /// **'Delete Not Own Comment & Permanent Delete'**
+  /// **'Not Own Comment & Permanent Delete'**
   String get permissionCommentDeleteNotOwnCommentAndPermanentCommentDelete;
 
   /// Permission: Read Article Comment
   ///
   /// In en, this message translates to:
-  /// **'Read Article Comment'**
+  /// **'Article Comment'**
   String get permissionCommentReadArticleComment;
 
   /// Permission: Create Article Comment
   ///
   /// In en, this message translates to:
-  /// **'Create Article Comment'**
+  /// **'Article Comment'**
   String get permissionCommentCreateArticleComment;
 
   /// Permission: Update Article Comment
   ///
   /// In en, this message translates to:
-  /// **'Update Article Comment'**
+  /// **'Article Comment'**
   String get permissionCommentUpdateArticleComment;
 
   /// Permission: Delete Article Comment
   ///
   /// In en, this message translates to:
-  /// **'Delete Article Comment'**
+  /// **'Article Comment'**
   String get permissionCommentDeleteArticleComment;
 
   /// Permission: Override Visibility Restrictions
   ///
   /// In en, this message translates to:
-  /// **'Override Visibility Restrictions'**
+  /// **'Visibility Restrictions'**
   String get permissionVisibilityOverrideVisibilityRestrictions;
 
   /// Permission: Read Work Item
   ///
   /// In en, this message translates to:
-  /// **'Read Work Item'**
+  /// **'Work Item'**
   String get permissionIssueWorkItemReadWorkItem;
 
   /// Permission: Update Work Item
   ///
   /// In en, this message translates to:
-  /// **'Update Work Item'**
+  /// **'Work Item'**
   String get permissionIssueWorkItemUpdateWorkItem;
 
   /// Permission: Update Not Own Work Item
   ///
   /// In en, this message translates to:
-  /// **'Update Not Own Work Item'**
+  /// **'Not Own Work Item'**
   String get permissionIssueWorkItemUpdateNotOwnWorkItem;
 
   /// Permission: Create Work Item
   ///
   /// In en, this message translates to:
-  /// **'Create Work Item'**
+  /// **'Work Item'**
   String get permissionIssueWorkItemCreateWorkItem;
 
   /// Permission: Create Not Own Work Item
   ///
   /// In en, this message translates to:
-  /// **'Create Not Own Work Item'**
+  /// **'Not Own Work Item'**
   String get permissionIssueWorkItemCreateNotOwnWorkItem;
 
   /// Permission: Read Article
   ///
   /// In en, this message translates to:
-  /// **'Read Article'**
+  /// **'Article'**
   String get permissionArticleReadArticle;
 
   /// Permission: Create Article
   ///
   /// In en, this message translates to:
-  /// **'Create Article'**
+  /// **'Article'**
   String get permissionArticleCreateArticle;
 
   /// Permission: Update Article
   ///
   /// In en, this message translates to:
-  /// **'Update Article'**
+  /// **'Article'**
   String get permissionArticleUpdateArticle;
 
   /// Permission: Delete Article
   ///
   /// In en, this message translates to:
-  /// **'Delete Article'**
+  /// **'Article'**
   String get permissionArticleDeleteArticle;
 
   /// Permission: Read App Content
   ///
   /// In en, this message translates to:
-  /// **'Read App Content'**
+  /// **'App Content'**
   String get permissionAppReadAppContent;
 
   /// Permission: Update App Content
   ///
   /// In en, this message translates to:
-  /// **'Update App Content'**
+  /// **'App Content'**
   String get permissionAppUpdateAppContent;
 }
 

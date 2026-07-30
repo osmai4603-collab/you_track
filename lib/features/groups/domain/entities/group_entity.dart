@@ -1,4 +1,7 @@
 import 'package:issues_tracking/core/entities/entity.dart';
+import 'package:issues_tracking/features/groups/domain/entities/group_member_entity.dart';
+import 'package:issues_tracking/features/groups/domain/entities/group_project_entity.dart';
+import 'package:issues_tracking/features/groups/domain/entities/group_role_assignment_entity.dart';
 
 class GroupEntity extends Entity {
   final String id;
@@ -13,6 +16,9 @@ class GroupEntity extends Entity {
   final String groupType;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final List<GroupMemberEntity> members;
+  final List<GroupRoleAssignmentEntity> roles;
+  final List<GroupProjectEntity> projects;
 
   const GroupEntity({
     required this.id,
@@ -27,6 +33,9 @@ class GroupEntity extends Entity {
     this.groupType = 'users',
     this.createdAt,
     this.updatedAt,
+    this.members = const [],
+    this.roles = const [],
+    this.projects = const [],
   });
 
   @override
@@ -43,6 +52,9 @@ class GroupEntity extends Entity {
     String? groupType,
     DateTime? createdAt,
     DateTime? updatedAt,
+    List<GroupMemberEntity>? members,
+    List<GroupRoleAssignmentEntity>? roles,
+    List<GroupProjectEntity>? projects,
   }) {
     return GroupEntity(
       id: id ?? this.id,
@@ -57,6 +69,9 @@ class GroupEntity extends Entity {
       groupType: groupType ?? this.groupType,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      members: members ?? this.members,
+      roles: roles ?? this.roles,
+      projects: projects ?? this.projects,
     );
   }
 
@@ -74,5 +89,8 @@ class GroupEntity extends Entity {
         groupType,
         createdAt,
         updatedAt,
+        members,
+        roles,
+        projects,
       ];
 }

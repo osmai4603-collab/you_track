@@ -171,10 +171,14 @@ class _UsersPageState extends State<UsersPage> {
   }
 
   void _showNewUserDialog(BuildContext context) {
+    final usersBloc = context.read<UsersBloc>();
     showDialog(
       context: context,
       barrierColor: Colors.black54,
-      builder: (context) => const NewUserDialog(),
+      builder: (context) => BlocProvider.value(
+        value: usersBloc,
+        child: const NewUserDialog(),
+      ),
     );
   }
 }

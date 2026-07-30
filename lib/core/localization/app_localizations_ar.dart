@@ -87,6 +87,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get cancelButton => 'إلغاء';
 
   @override
+  String get saveButton => 'حفظ';
+
+  @override
   String get projectNameLabel => 'الاسم';
 
   @override
@@ -540,174 +543,165 @@ class AppLocalizationsAr extends AppLocalizations {
   String get templateMarketing => 'تسويق';
 
   @override
-  String get permissionProjectReadProjectBasic =>
-      'قراءة بيانات المشروع الأساسية';
+  String get permissionProjectReadProjectBasic => 'بيانات المشروع الأساسية';
 
   @override
-  String get permissionProjectCreateProject => 'إنشاء مشروع جديد';
+  String get permissionProjectCreateProject => 'مشروع جديد';
 
   @override
-  String get permissionProjectReadProjectFull => 'قراءة تفاصيل المشروع بالكامل';
+  String get permissionProjectReadProjectFull => 'تفاصيل المشروع بالكامل';
 
   @override
-  String get permissionProjectUpdateProject => 'تعديل إعدادات المشروع';
+  String get permissionProjectUpdateProject => 'إعدادات المشروع';
 
   @override
-  String get permissionProjectDeleteProject => 'حذف المشروع';
+  String get permissionProjectDeleteProject => 'المشروع';
 
   @override
-  String get permissionOrganizationReadOrganization => 'عرض بيانات المؤسسة';
+  String get permissionOrganizationReadOrganization => 'بيانات المؤسسة';
 
   @override
-  String get permissionOrganizationUpdateOrganization => 'تعديل بيانات المؤسسة';
+  String get permissionOrganizationUpdateOrganization => 'بيانات المؤسسة';
 
   @override
-  String get permissionOrganizationCreateOrganization => 'إنشاء مؤسسة جديدة';
+  String get permissionOrganizationCreateOrganization => 'مؤسسة جديدة';
 
   @override
-  String get permissionOrganizationDeleteOrganization => 'حذف المؤسسة';
+  String get permissionOrganizationDeleteOrganization => 'المؤسسة';
 
   @override
-  String get permissionUserProfileUpdateSelf => 'تعديل الملف الشخصي';
+  String get permissionUserProfileUpdateSelf => 'الملف الشخصي';
 
   @override
-  String get permissionUserReadUserBasic => 'عرض بيانات المستخدمين الأساسية';
+  String get permissionUserReadUserBasic => 'بيانات المستخدمين الأساسية';
 
   @override
-  String get permissionUserReadUserDetails => 'عرض تفاصيل الحسابات الشاملة';
+  String get permissionUserReadUserDetails => 'تفاصيل الحسابات الشاملة';
 
   @override
-  String get permissionUserUpdateUser => 'تعديل حسابات المستخدمين';
+  String get permissionUserUpdateUser => 'حسابات المستخدمين';
 
   @override
-  String get permissionUserCreateUser => 'إنشاء حساب مستخدم جديد';
+  String get permissionUserCreateUser => 'حساب مستخدم جديد';
 
   @override
-  String get permissionUserDeleteUser => 'حذف حساب مستخدم';
+  String get permissionUserDeleteUser => 'حساب مستخدم';
 
   @override
-  String get permissionSystemLowLevelAdminRead =>
-      'قراءة إعدادات النظام المتقدمة';
+  String get permissionSystemLowLevelAdminRead => 'إعدادات النظام المتقدمة';
 
   @override
-  String get permissionSystemLowLevelAdminWrite =>
-      'تعديل إعدادات النظام المتقدمة';
+  String get permissionSystemLowLevelAdminWrite => 'إعدادات النظام المتقدمة';
 
   @override
-  String get permissionIssueReadIssue => 'قراءة بيانات المهام العامة';
+  String get permissionIssueReadIssue => 'بيانات المهام العامة';
 
   @override
-  String get permissionIssueReadIssuePrivateFields =>
-      'قراءة الحقول الخاصة بالمهام';
+  String get permissionIssueReadIssuePrivateFields => 'الحقول الخاصة بالمهام';
 
   @override
-  String get permissionIssueUpdateIssue => 'تعديل المهام';
+  String get permissionIssueUpdateIssue => 'المهام';
 
   @override
-  String get permissionIssueCreateIssue => 'إنشاء مهام جديدة';
+  String get permissionIssueCreateIssue => 'مهام جديدة';
 
   @override
-  String get permissionIssueDeleteIssue => 'حذف المهام';
+  String get permissionIssueDeleteIssue => 'المهام';
 
   @override
-  String get permissionIssueLinkIssues => 'ربط المهام ببعضها';
+  String get permissionIssueLinkIssues => 'المهام ببعضها';
 
   @override
-  String get permissionIssueUpdateIssuePrivateFields =>
-      'تعديل الحقول الخاصة بالمهام';
+  String get permissionIssueUpdateIssuePrivateFields => 'الحقول الخاصة بالمهام';
 
   @override
   String get permissionIssueApplyCommandsSilently =>
-      'تطبيق أوامر على المهام دون تنبيهات';
+      'أوامر على المهام دون تنبيهات';
 
   @override
-  String get permissionIssueViewWatchers => 'عرض متابعي المهمة';
+  String get permissionIssueViewWatchers => 'متابعي المهمة';
 
   @override
-  String get permissionIssueUpdateWatchers => 'إدارة متابعي المهمة';
+  String get permissionIssueUpdateWatchers => 'متابعي المهمة';
 
   @override
-  String get permissionIssueViewVoters => 'عرض المصوتين للمهمة';
+  String get permissionIssueViewVoters => 'المصوتين للمهمة';
 
   @override
-  String get permissionAttachmentAddAttachment => 'إضافة مرفقات للمهمة';
+  String get permissionAttachmentAddAttachment => 'مرفقات للمهمة';
 
   @override
-  String get permissionAttachmentUpdateAttachment => 'تعديل المرفقات والرؤية';
+  String get permissionAttachmentUpdateAttachment => 'المرفقات والرؤية';
 
   @override
-  String get permissionAttachmentDeleteAttachment => 'حذف المرفقات';
+  String get permissionAttachmentDeleteAttachment => 'المرفقات';
 
   @override
-  String get permissionCommentCreateIssueComment => 'إضافة تعليق على المهمة';
+  String get permissionCommentCreateIssueComment => 'تعليق على المهمة';
 
   @override
-  String get permissionCommentReadIssueComment => 'قراءة تعليقات المهمة';
+  String get permissionCommentReadIssueComment => 'تعليقات المهمة';
 
   @override
-  String get permissionCommentUpdateIssueComment => 'تعديل التعليق الشخصي';
+  String get permissionCommentUpdateIssueComment => 'التعليق الشخصي';
 
   @override
-  String get permissionCommentDeleteIssueComment => 'حذف التعليق الشخصي';
+  String get permissionCommentDeleteIssueComment => 'التعليق الشخصي';
 
   @override
-  String get permissionCommentUpdateNotOwnIssueComment =>
-      'تعديل تعليقات الآخرين';
+  String get permissionCommentUpdateNotOwnIssueComment => 'تعليقات الآخرين';
 
   @override
   String get permissionCommentDeleteNotOwnCommentAndPermanentCommentDelete =>
-      'حذف تعليقات الآخرين نهائياً';
+      'تعليقات الآخرين نهائياً';
 
   @override
-  String get permissionCommentReadArticleComment => 'قراءة تعليقات المقالات';
+  String get permissionCommentReadArticleComment => 'تعليقات المقالات';
 
   @override
-  String get permissionCommentCreateArticleComment =>
-      'كتابة تعليق على المقالات';
+  String get permissionCommentCreateArticleComment => 'تعليق على المقالات';
 
   @override
-  String get permissionCommentUpdateArticleComment => 'تعديل تعليق على مقال';
+  String get permissionCommentUpdateArticleComment => 'تعليق على مقال';
 
   @override
-  String get permissionCommentDeleteArticleComment => 'حذف تعليق على مقال';
+  String get permissionCommentDeleteArticleComment => 'تعليق على مقال';
 
   @override
   String get permissionVisibilityOverrideVisibilityRestrictions =>
-      'تجاوز قيود رؤية العناصر';
+      'قيود رؤية العناصر';
 
   @override
-  String get permissionIssueWorkItemReadWorkItem => 'عرض سجلات الوقت والعمل';
+  String get permissionIssueWorkItemReadWorkItem => 'سجلات الوقت والعمل';
 
   @override
-  String get permissionIssueWorkItemUpdateWorkItem =>
-      'تعديل سجلات العمل الخاصة';
+  String get permissionIssueWorkItemUpdateWorkItem => 'سجلات العمل الخاصة';
 
   @override
-  String get permissionIssueWorkItemUpdateNotOwnWorkItem =>
-      'تعديل سجلات عمل الآخرين';
+  String get permissionIssueWorkItemUpdateNotOwnWorkItem => 'سجلات عمل الآخرين';
 
   @override
-  String get permissionIssueWorkItemCreateWorkItem => 'إضافة سجل عمل جديد';
+  String get permissionIssueWorkItemCreateWorkItem => 'سجل عمل جديد';
 
   @override
   String get permissionIssueWorkItemCreateNotOwnWorkItem =>
-      'إضافة سجل عمل باسم شخص آخر';
+      'سجل عمل باسم شخص آخر';
 
   @override
-  String get permissionArticleReadArticle => 'قراءة مقالات قاعدة المعرفة';
+  String get permissionArticleReadArticle => 'مقالات قاعدة المعرفة';
 
   @override
-  String get permissionArticleCreateArticle => 'إنشاء مقال جديد';
+  String get permissionArticleCreateArticle => 'مقال جديد';
 
   @override
-  String get permissionArticleUpdateArticle => 'تعديل مقال';
+  String get permissionArticleUpdateArticle => 'مقال';
 
   @override
-  String get permissionArticleDeleteArticle => 'حذف مقال';
+  String get permissionArticleDeleteArticle => 'مقال';
 
   @override
-  String get permissionAppReadAppContent => 'عرض محتوى التطبيقات المضافة';
+  String get permissionAppReadAppContent => 'محتوى التطبيقات المضافة';
 
   @override
-  String get permissionAppUpdateAppContent => 'تعديل محتوى التطبيقات المضافة';
+  String get permissionAppUpdateAppContent => 'محتوى التطبيقات المضافة';
 }

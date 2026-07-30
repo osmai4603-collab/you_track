@@ -1,9 +1,19 @@
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
+import 'package:issues_tracking/core/services/supabase_storage_service.dart';
+import 'package:issues_tracking/core/widgets/avatar_url_chip.dart';
+import 'package:issues_tracking/core/widgets/project_chip.dart';
+import 'package:issues_tracking/features/groups/domain/entities/group_entity.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_event.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_state.dart';
+import 'package:issues_tracking/features/groups/presentation/widgets/add_members_dialog.dart';
+import 'package:issues_tracking/features/groups/presentation/widgets/add_project_dialog.dart';
+import 'package:issues_tracking/features/groups/presentation/widgets/assign_role_dialog.dart';
+import 'package:issues_tracking/core/localization/app_localizations.dart';
 
 class GroupFormPage extends StatefulWidget {
   const GroupFormPage({super.key});
@@ -39,7 +49,14 @@ class _GroupFormPageState extends State<GroupFormPage>
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
 
-    return BlocBuilder<GroupsBloc, GroupsState>(
+    return BlocConsumer<GroupsBloc, GroupsState>(
+      listener: (context, state) {
+        if (state is GroupsError) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(SnackBar(content: Text(state.message)));
+        }
+      },
       builder: (context, state) {
         if (state is! GroupsLoaded || state.selectedGroupId == null) {
           return const SizedBox.shrink();
@@ -65,7 +82,14 @@ class _GroupFormPageState extends State<GroupFormPage>
           ),
           child: Column(
             children: [
-              _Header(group: group, colors: colors, textTheme: textTheme),
+              _Header(
+                group: group,
+                colors: colors,
+                textTheme: textTheme,
+                nameController: _nameController,
+                descriptionController: _descriptionController,
+                domainsController: _domainsController,
+              ),
               const Divider(height: 1),
               _TabBarWidget(tabController: _tabController, colors: colors),
               const Divider(height: 1),
@@ -73,9 +97,21 @@ class _GroupFormPageState extends State<GroupFormPage>
                 child: TabBarView(
                   controller: _tabController,
                   children: [
-                    _MembersTab(colors: colors, textTheme: textTheme),
-                    _RolesTab(colors: colors, textTheme: textTheme),
-                    _ProjectTeamsTab(colors: colors, textTheme: textTheme),
+                    _MembersTab(
+                      group: group,
+                      colors: colors,
+                      textTheme: textTheme,
+                    ),
+                    _RolesTab(
+                      group: group,
+                      colors: colors,
+                      textTheme: textTheme,
+                    ),
+                    _ProjectTeamsTab(
+                      group: group,
+                      colors: colors,
+                      textTheme: textTheme,
+                    ),
                     _SettingsTab(
                       group: group,
                       nameController: _nameController,
@@ -99,15 +135,22 @@ class _Header extends StatelessWidget {
   final dynamic group;
   final ColorScheme colors;
   final TextTheme textTheme;
+  final TextEditingController nameController;
+  final TextEditingController descriptionController;
+  final TextEditingController domainsController;
 
   const _Header({
     required this.group,
     required this.colors,
     required this.textTheme,
+    required this.nameController,
+    required this.descriptionController,
+    required this.domainsController,
   });
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context)!;
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.medium,
@@ -144,27 +187,40 @@ class _Header extends StatelessWidget {
               ),
             ),
           ),
-          IconButton(
-            icon: const Icon(Icons.link, size: 18),
-            onPressed: () {},
-            tooltip: 'Copy link',
-            visualDensity: VisualDensity.compact,
-          ),
-          PopupMenuButton(
-            icon: const Icon(Icons.more_vert, size: 18),
-            itemBuilder: (context) => [
-              const PopupMenuItem(value: 'edit', child: Text('Edit')),
-              const PopupMenuItem(value: 'delete', child: Text('Delete')),
-            ],
-          ),
-          const SizedBox(width: 4),
-          IconButton(
-            icon: const Icon(Icons.close, size: 20),
+          TextButton(
             onPressed: () {
               context.read<GroupsBloc>().add(const SelectGroup(null));
             },
-            tooltip: 'Close',
-            visualDensity: VisualDensity.compact,
+            child: Text(localization.cancelButton),
+          ),
+          const SizedBox(width: AppSpacing.small),
+          FilledButton(
+            onPressed: () {
+              context.read<GroupsBloc>().add(
+                UpdateGroupSettingsEvent(
+                  groupId: group.id,
+                  name: nameController.text,
+                  description: descriptionController.text,
+                  autoJoin: group.autoJoin,
+                  autoJoinDomains: domainsController.text.isNotEmpty
+                      ? domainsController.text
+                            .split(',')
+                            .map((e) => e.trim())
+                            .where((e) => e.isNotEmpty)
+                            .toList()
+                      : const [],
+                  twoFactorAuth: group.twoFactorAuth,
+                  groupType: group.groupType,
+                  logo: group.logo,
+                ),
+              );
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Settings saved successfully')),
+              );
+              context.read<GroupsBloc>().add(const SelectGroup(null));
+            },
+            style: FilledButton.styleFrom(visualDensity: VisualDensity.compact),
+            child: Text(localization.saveButton),
           ),
         ],
       ),
@@ -200,14 +256,25 @@ class _TabBarWidget extends StatelessWidget {
   }
 }
 
-class _MembersTab extends StatelessWidget {
+class _MembersTab extends StatefulWidget {
+  final GroupEntity group;
   final ColorScheme colors;
   final TextTheme textTheme;
 
-  const _MembersTab({required this.colors, required this.textTheme});
+  const _MembersTab({
+    required this.group,
+    required this.colors,
+    required this.textTheme,
+  });
 
   @override
+  State<_MembersTab> createState() => _MembersTabState();
+}
+
+class _MembersTabState extends State<_MembersTab> {
+  @override
   Widget build(BuildContext context) {
+    final members = widget.group.members;
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.medium),
       child: Column(
@@ -216,7 +283,8 @@ class _MembersTab extends StatelessWidget {
           Row(
             children: [
               FilledButton.icon(
-                onPressed: () {},
+                onPressed: () =>
+                    AddMembersDialog.show(context, widget.group.id, members),
                 icon: const Icon(Icons.person_add, size: 16),
                 label: const Text('Add members'),
               ),
@@ -233,9 +301,44 @@ class _MembersTab extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.medium),
-          Text('No members yet', style: textTheme.bodySmall?.copyWith(
-            color: colors.onSurfaceVariant,
-          )),
+          if (members.isEmpty)
+            Text(
+              'No members yet',
+              style: widget.textTheme.bodySmall?.copyWith(
+                color: widget.colors.onSurfaceVariant,
+              ),
+            )
+          else
+            Expanded(
+              child: ListView.separated(
+                itemCount: members.length,
+                separatorBuilder: (_, _) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final member = members[index];
+                  return Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      leading: AvatarUrlChip(
+                        avatarUrl: members[index].user?.avatarUrl,
+                      ),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 8,
+                        horizontal: 4,
+                      ),
+                      title: Text(member.user?.userName ?? ''),
+                      trailing: IconButton(
+                        icon: Icon(
+                          Icons.delete_outline,
+                          size: 18,
+                          color: widget.colors.error,
+                        ),
+                        onPressed: () {},
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
         ],
       ),
     );
@@ -243,13 +346,19 @@ class _MembersTab extends StatelessWidget {
 }
 
 class _RolesTab extends StatelessWidget {
+  final GroupEntity group;
   final ColorScheme colors;
   final TextTheme textTheme;
 
-  const _RolesTab({required this.colors, required this.textTheme});
+  const _RolesTab({
+    required this.group,
+    required this.colors,
+    required this.textTheme,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final groupRoles = group.roles;
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.medium),
       child: Column(
@@ -258,7 +367,7 @@ class _RolesTab extends StatelessWidget {
           Row(
             children: [
               FilledButton.icon(
-                onPressed: () {},
+                onPressed: () => AssignRoleDialog.show(context, group.id),
                 icon: const Icon(Icons.add, size: 16),
                 label: const Text('Assign role'),
               ),
@@ -275,9 +384,43 @@ class _RolesTab extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.medium),
-          Text('No roles assigned', style: textTheme.bodySmall?.copyWith(
-            color: colors.onSurfaceVariant,
-          )),
+          if (groupRoles.isEmpty)
+            Text(
+              'No roles assigned',
+              style: textTheme.bodySmall?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            )
+          else
+            Expanded(
+              child: ListView.separated(
+                itemCount: groupRoles.length,
+                separatorBuilder: (_, _) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final role = groupRoles[index];
+                  return Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      leading: ProjectChip(
+                        colors: colors,
+                        textTheme: textTheme,
+                        shortKey: role.project?.projectId ?? '',
+                      ),
+                      title: Text(role.roleName),
+                      subtitle: Text(role.project?.projectName ?? ''),
+                      trailing: IconButton(
+                        icon: Icon(
+                          Icons.delete_outline,
+                          size: 16,
+                          color: colors.error,
+                        ),
+                        onPressed: () {},
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
         ],
       ),
     );
@@ -285,13 +428,19 @@ class _RolesTab extends StatelessWidget {
 }
 
 class _ProjectTeamsTab extends StatelessWidget {
+  final GroupEntity group;
   final ColorScheme colors;
   final TextTheme textTheme;
 
-  const _ProjectTeamsTab({required this.colors, required this.textTheme});
+  const _ProjectTeamsTab({
+    required this.group,
+    required this.colors,
+    required this.textTheme,
+  });
 
   @override
   Widget build(BuildContext context) {
+    final projects = group.projects;
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.medium),
       child: Column(
@@ -300,7 +449,8 @@ class _ProjectTeamsTab extends StatelessWidget {
           Row(
             children: [
               FilledButton.icon(
-                onPressed: () {},
+                onPressed: () =>
+                    AddProjectDialog.show(context, group.id, projects),
                 icon: const Icon(Icons.add, size: 16),
                 label: const Text('Add to project'),
               ),
@@ -317,17 +467,51 @@ class _ProjectTeamsTab extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.medium),
-          Text('Not linked to any projects', style: textTheme.bodySmall?.copyWith(
-            color: colors.onSurfaceVariant,
-          )),
+          if (projects.isEmpty)
+            Text(
+              'Not linked to any projects',
+              style: textTheme.bodySmall?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            )
+          else
+            Expanded(
+              child: ListView.separated(
+                itemCount: projects.length,
+                separatorBuilder: (_, _) => const Divider(height: 1),
+                itemBuilder: (context, index) {
+                  final project = projects[index];
+                  return Material(
+                    color: Colors.transparent,
+                    child: ListTile(
+                      leading: ProjectChip(
+                        colors: colors,
+                        textTheme: textTheme,
+                        shortKey: project.project?.projectId ?? '',
+                      ),
+                      title: Text(project.project?.projectName ?? ''),
+                      subtitle: Text(project.project?.projectId ?? ''),
+                      trailing: IconButton(
+                        icon: Icon(
+                          Icons.delete_outline,
+                          size: 18,
+                          color: colors.error,
+                        ),
+                        onPressed: () {},
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
         ],
       ),
     );
   }
 }
 
-class _SettingsTab extends StatelessWidget {
-  final dynamic group;
+class _SettingsTab extends StatefulWidget {
+  final GroupEntity group;
   final TextEditingController nameController;
   final TextEditingController descriptionController;
   final TextEditingController domainsController;
@@ -344,6 +528,93 @@ class _SettingsTab extends StatelessWidget {
   });
 
   @override
+  State<_SettingsTab> createState() => _SettingsTabState();
+}
+
+class _SettingsTabState extends State<_SettingsTab> {
+  late bool _autoJoin;
+  late String _twoFactorAuth;
+  late String _groupType;
+  String? _logoUrl;
+  bool _isUploadingLogo = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _autoJoin = widget.group.autoJoin;
+    _twoFactorAuth = widget.group.twoFactorAuth;
+    _groupType = widget.group.groupType;
+    _logoUrl = widget.group.logo;
+  }
+
+  void _save() {
+    context.read<GroupsBloc>().add(
+      UpdateGroupSettingsEvent(
+        groupId: widget.group.id,
+        name: widget.nameController.text,
+        description: widget.descriptionController.text,
+        autoJoin: _autoJoin,
+        autoJoinDomains: widget.domainsController.text.isNotEmpty
+            ? widget.domainsController.text
+                  .split(',')
+                  .map((e) => e.trim())
+                  .where((e) => e.isNotEmpty)
+                  .toList()
+            : const [],
+        twoFactorAuth: _twoFactorAuth,
+        groupType: _groupType,
+        logo: _logoUrl,
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Settings saved successfully')),
+    );
+  }
+
+  Future<void> _pickAndUploadLogo() async {
+    try {
+      final result = await FilePicker.pickFiles(type: FileType.image);
+
+      if (result != null && result.files.single.path != null) {
+        final file = File(result.files.single.path!);
+        setState(() => _isUploadingLogo = true);
+
+        final fileName =
+            '${widget.group.id}_${DateTime.now().millisecondsSinceEpoch}';
+        final storageService = SupabaseStorageService();
+
+        final stream = storageService.uploadFile(path: fileName, file: file);
+
+        await for (final state in stream) {
+          if (state.status == UploadStatus.success) {
+            setState(() {
+              _logoUrl = state.downloadUrl;
+              _isUploadingLogo = false;
+            });
+            _save();
+            break;
+          } else if (state.status == UploadStatus.failure) {
+            setState(() => _isUploadingLogo = false);
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(state.errorMessage ?? 'Upload failed')),
+              );
+            }
+            break;
+          }
+        }
+      }
+    } catch (e) {
+      setState(() => _isUploadingLogo = false);
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Failed to pick image: $e')));
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.medium),
@@ -353,7 +624,7 @@ class _SettingsTab extends StatelessWidget {
           _Field(
             label: 'Name',
             child: TextField(
-              controller: nameController,
+              controller: widget.nameController,
               decoration: const InputDecoration(isDense: true),
             ),
           ),
@@ -361,7 +632,7 @@ class _SettingsTab extends StatelessWidget {
           _Field(
             label: 'Description',
             child: TextField(
-              controller: descriptionController,
+              controller: widget.descriptionController,
               maxLines: 3,
               decoration: const InputDecoration(isDense: true),
             ),
@@ -369,28 +640,44 @@ class _SettingsTab extends StatelessWidget {
           const SizedBox(height: AppSpacing.medium),
           _Field(
             label: 'Logo',
-            child: Container(
-              height: 100,
-              decoration: BoxDecoration(
-                border: Border.all(color: colors.outlineVariant),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.cloud_upload, color: colors.onSurfaceVariant, size: 24),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Upload a JPG, GIF, PNG, or SVG file.\nThe image is resized to 192x192 pixels.',
-                      textAlign: TextAlign.center,
-                      style: textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
+            child: InkWell(
+              onTap: _isUploadingLogo ? null : _pickAndUploadLogo,
+              borderRadius: BorderRadius.circular(8),
+              child: Container(
+                height: 100,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  border: Border.all(color: widget.colors.outlineVariant),
+                  borderRadius: BorderRadius.circular(8),
                 ),
+                child: _isUploadingLogo
+                    ? const Center(child: CircularProgressIndicator())
+                    : _logoUrl != null
+                    ? ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(_logoUrl!, fit: BoxFit.cover),
+                      )
+                    : Center(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.cloud_upload,
+                              color: widget.colors.onSurfaceVariant,
+                              size: 24,
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              'Upload a JPG, GIF, PNG, or SVG file.\nThe image is resized to 192x192 pixels.',
+                              textAlign: TextAlign.center,
+                              style: widget.textTheme.bodySmall?.copyWith(
+                                color: widget.colors.onSurfaceVariant,
+                                fontSize: 11,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
               ),
             ),
           ),
@@ -402,15 +689,18 @@ class _SettingsTab extends StatelessWidget {
                 ButtonSegment(value: false, label: Text('Disabled')),
                 ButtonSegment(value: true, label: Text('Enabled')),
               ],
-              selected: {group.autoJoin},
-              onSelectionChanged: (v) {},
+              selected: {_autoJoin},
+              onSelectionChanged: (v) {
+                setState(() => _autoJoin = v.first);
+                _save();
+              },
             ),
           ),
           const SizedBox(height: AppSpacing.medium),
           _Field(
             label: 'Auto-join domains',
             child: TextField(
-              controller: domainsController,
+              controller: widget.domainsController,
               decoration: const InputDecoration(
                 isDense: true,
                 hintText: 'example.com',
@@ -425,8 +715,11 @@ class _SettingsTab extends StatelessWidget {
                 ButtonSegment(value: 'optional', label: Text('Optional')),
                 ButtonSegment(value: 'required', label: Text('Required')),
               ],
-              selected: {group.twoFactorAuth},
-              onSelectionChanged: (v) {},
+              selected: {_twoFactorAuth},
+              onSelectionChanged: (v) {
+                setState(() => _twoFactorAuth = v.first);
+                _save();
+              },
             ),
           ),
           const SizedBox(height: AppSpacing.medium),
@@ -437,8 +730,11 @@ class _SettingsTab extends StatelessWidget {
                 ButtonSegment(value: 'users', label: Text('Users')),
                 ButtonSegment(value: 'teams', label: Text('Teams')),
               ],
-              selected: {group.groupType},
-              onSelectionChanged: (v) {},
+              selected: {_groupType},
+              onSelectionChanged: (v) {
+                setState(() => _groupType = v.first);
+                _save();
+              },
             ),
           ),
         ],
@@ -458,10 +754,13 @@ class _Field extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(
-          color: Theme.of(context).colorScheme.onSurfaceVariant,
-          fontWeight: FontWeight.w500,
-        )),
+        Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: Theme.of(context).colorScheme.onSurfaceVariant,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
         const SizedBox(height: 6),
         child,
       ],

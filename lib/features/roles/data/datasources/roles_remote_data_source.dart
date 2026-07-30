@@ -3,10 +3,10 @@ import '../models/role_model.dart';
 
 abstract class RolesRemoteDataSource {
   Future<List<RoleModel>> getRoles();
-  Future<RoleModel> getRoleById(String id);
+  Future<RoleModel> getRoleByName(String name);
   Future<RoleModel> createRole(Map<String, dynamic> data);
-  Future<RoleModel> updateRole(String id, Map<String, dynamic> data);
-  Future<void> deleteRole(String id);
+  Future<RoleModel> updateRole(String name, Map<String, dynamic> data);
+  Future<void> deleteRole(String name);
 }
 
 class RolesRemoteDataSourceImpl implements RolesRemoteDataSource {
@@ -16,33 +16,30 @@ class RolesRemoteDataSourceImpl implements RolesRemoteDataSource {
 
   @override
   Future<List<RoleModel>> getRoles() async {
-    final response = await supabase.from('roles').select('*').order('created_at', ascending: false);
+    final response = await supabase.from('roles').select('*');
     return (response as List).map((e) => RoleModel.fromJson(e)).toList();
   }
 
   @override
-  Future<RoleModel> getRoleById(String id) async {
-    final response = await supabase.from('roles').select('*').eq('id', id).single();
+  Future<RoleModel> getRoleByName(String name) async {
+    final response = await supabase.from('roles').select('*').eq('name', name).single();
     return RoleModel.fromJson(response);
   }
 
   @override
   Future<RoleModel> createRole(Map<String, dynamic> data) async {
-    data.remove('id');
     final response = await supabase.from('roles').insert(data).select().single();
     return RoleModel.fromJson(response);
   }
 
   @override
-  Future<RoleModel> updateRole(String id, Map<String, dynamic> data) async {
-    data.remove('id');
-    data['updated_at'] = DateTime.now().toIso8601String();
-    final response = await supabase.from('roles').update(data).eq('id', id).select().single();
+  Future<RoleModel> updateRole(String name, Map<String, dynamic> data) async {
+    final response = await supabase.from('roles').update(data).eq('name', name).select().single();
     return RoleModel.fromJson(response);
   }
 
   @override
-  Future<void> deleteRole(String id) async {
-    await supabase.from('roles').delete().eq('id', id);
+  Future<void> deleteRole(String name) async {
+    await supabase.from('roles').delete().eq('name', name);
   }
 }

@@ -1,19 +1,24 @@
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:issues_tracking/features/auth/data/datasources/auth_remote_data_source.dart';
+import 'package:issues_tracking/features/auth/data/datasources/auth_sqlite_data_source_impl.dart';
 import 'package:issues_tracking/features/auth/data/repositories/auth_repository_impl.dart';
 import 'package:issues_tracking/features/auth/domain/repositories/auth_repository.dart';
 import 'package:issues_tracking/features/auth/domain/usecases/login_use_case.dart';
 import 'package:issues_tracking/features/auth/presentation/cubits/login_cubit.dart';
+import 'package:issues_tracking/features/issues/data/datasources/issues_sqlite_data_source_impl.dart';
+import 'package:issues_tracking/features/issues/data/datasources/tag_sqlite_datasource_impl.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/get_project_templates_use_case.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import "package:issues_tracking/features/dashboards/data/datasources/dashboard_remote_data_source.dart";
-import "package:issues_tracking/features/dashboards/data/repositories/dashboard_repository_impl.dart";
+import 'package:issues_tracking/features/dashboards/data/datasources/dashboard_remote_data_source.dart';
+import 'package:issues_tracking/features/dashboards/data/datasources/dashboard_sqlite_data_source_impl.dart';
+import 'package:issues_tracking/features/dashboards/data/repositories/dashboard_repository_impl.dart';
 import "package:issues_tracking/features/dashboards/domain/repositories/dashboard_repository.dart";
 import "package:issues_tracking/features/dashboards/domain/usecases/get_dashboards.dart";
 import "package:issues_tracking/features/dashboards/presentation/bloc/dashboard_bloc.dart";
 import "package:issues_tracking/features/app/presentation/cubit/youtrack_shell_cubit.dart";
+import 'package:issues_tracking/core/services/supabase_storage_service.dart';
 
 import 'package:issues_tracking/features/issues/data/datasources/issues_remote_data_source.dart';
 import 'package:issues_tracking/features/issues/data/repositories/issues_repository_impl.dart';
@@ -32,6 +37,7 @@ import 'package:issues_tracking/features/app/domain/usecases/save_app_settings.d
 import 'package:issues_tracking/features/app/presentation/cubit/app_cubit.dart';
 import 'package:issues_tracking/features/projects/data/datasources/projects_local_data_source.dart';
 import 'package:issues_tracking/features/projects/data/datasources/projects_remote_data_source.dart';
+import 'package:issues_tracking/features/projects/data/datasources/projects_sqlite_data_source_impl.dart';
 import 'package:issues_tracking/features/projects/data/repositories/projects_repository_impl.dart';
 import 'package:issues_tracking/features/projects/domain/repositories/projects_repository.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/get_projects_use_case.dart';
@@ -137,6 +143,9 @@ import 'package:issues_tracking/features/issues/data/datasources/tag_remote_data
 import 'package:issues_tracking/features/issues/data/repositories/tags_repository_impl.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/tags_repository.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/create_tag.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/get_issue_by_id.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/get_issues.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/stream_issues.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_project_members.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/is_tag_name_unique.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/associate_tag_with_issue.dart';
@@ -150,13 +159,22 @@ import 'package:issues_tracking/features/agile_boards/domain/use_cases/move_card
 import 'package:issues_tracking/features/agile_boards/presentation/bloc/agile_boards_bloc.dart';
 
 import 'package:issues_tracking/features/groups/data/datasources/groups_remote_data_source.dart';
+import 'package:issues_tracking/features/groups/data/datasources/groups_sqlite_data_source_impl.dart';
 import 'package:issues_tracking/features/groups/data/repositories/groups_repository_impl.dart';
 import 'package:issues_tracking/features/groups/domain/repositories/groups_repository.dart';
 import 'package:issues_tracking/features/groups/domain/usecases/get_groups.dart';
 import 'package:issues_tracking/features/groups/domain/usecases/create_group.dart';
+import 'package:issues_tracking/features/groups/domain/usecases/assign_role.dart';
+import 'package:issues_tracking/features/groups/domain/usecases/get_group_roles.dart';
+import 'package:issues_tracking/features/groups/domain/usecases/get_group_members.dart';
+import 'package:issues_tracking/features/groups/domain/usecases/add_group_members.dart';
+import 'package:issues_tracking/features/groups/domain/usecases/add_group_projects.dart';
+import 'package:issues_tracking/features/groups/domain/usecases/get_group_by_id.dart';
+import 'package:issues_tracking/features/groups/domain/usecases/update_group.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
 
 import 'package:issues_tracking/features/roles/data/datasources/roles_remote_data_source.dart';
+import 'package:issues_tracking/features/roles/data/datasources/roles_sqlite_data_source_impl.dart';
 import 'package:issues_tracking/features/roles/data/repositories/roles_repository_impl.dart';
 import 'package:issues_tracking/features/roles/domain/repositories/roles_repository.dart';
 import 'package:issues_tracking/features/roles/domain/usecases/get_roles.dart';
@@ -166,6 +184,7 @@ import 'package:issues_tracking/features/roles/domain/usecases/delete_role.dart'
 import 'package:issues_tracking/features/roles/presentation/bloc/roles_bloc.dart';
 
 import 'package:issues_tracking/features/users/data/datasources/users_remote_data_source.dart';
+import 'package:issues_tracking/features/users/data/datasources/users_sqlite_data_source_impl.dart';
 import 'package:issues_tracking/features/users/data/repositories/users_repository_impl.dart';
 import 'package:issues_tracking/features/users/domain/repositories/users_repository.dart';
 import 'package:issues_tracking/features/users/domain/usecases/get_users.dart';
@@ -175,30 +194,40 @@ import 'package:issues_tracking/features/users/presentation/bloc/users_bloc.dart
 // ignore: non_constant_identifier_names
 final get_it = GetIt.instance;
 
-Future<void> initDependencies() async {
+Future<void> initDependencies({bool isOffline = false}) async {
   // 1. Core Services
   final sharedPreferences = await SharedPreferences.getInstance();
   get_it.registerLazySingleton(() => sharedPreferences);
   get_it.registerLazySingleton(() => Supabase.instance.client);
+  get_it.registerLazySingleton<SupabaseClient>(
+    () => SupabaseClient(
+      'https://jadgeemsdhhtrgnieumt.supabase.co',
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImphZGdlZW1zZGhodHJnbmlldW10Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4NDgxMTYyNSwiZXhwIjoyMTAwMzg3NjI1fQ.SA5mntHuB2a8M93fHTiFL0ktO_Ray53jAEdRLKYoYfg',
+    ),
+    instanceName: 'adminClient',
+  );
   get_it.registerLazySingleton<Box<dynamic>>(() => Hive.box('article_drafts'));
+  get_it.registerLazySingleton(
+    () => SupabaseStorageService(supabaseClient: get_it()),
+  );
 
   // 2. App Feature Initialization
-  _initAppFeature();
-  _initDashboardsFeature();
-  _initIssuesFeature();
-  _initProjectsFeature();
-  _initCustomFieldsFeature();
-  _initVersionControlFeature();
-  _initTimeTrackingFeature();
-  _initAuthFeature();
-  _initKnowledgeBaseFeature();
-  _initAgileBoardsFeature();
-  _initGroupsFeature();
-  _initRolesFeature();
-  _initUsersFeature();
+  _initAppFeature(isOffline: isOffline);
+  _initDashboardsFeature(isOffline: isOffline);
+  _initIssuesFeature(isOffline: isOffline);
+  _initProjectsFeature(isOffline: isOffline);
+  _initCustomFieldsFeature(isOffline: isOffline);
+  _initVersionControlFeature(isOffline: isOffline);
+  _initTimeTrackingFeature(isOffline: isOffline);
+  _initAuthFeature(isOffline: isOffline);
+  _initKnowledgeBaseFeature(isOffline: isOffline);
+  _initAgileBoardsFeature(isOffline: isOffline);
+  _initGroupsFeature(isOffline: isOffline);
+  _initRolesFeature(isOffline: isOffline);
+  _initUsersFeature(isOffline: isOffline);
 }
 
-void _initAppFeature() {
+void _initAppFeature({required bool isOffline}) {
   // Data Sources
   get_it.registerLazySingleton<AppSettingsLocalDataSource>(
     () => AppSettingsLocalDataSourceImpl(get_it()),
@@ -219,10 +248,12 @@ void _initAppFeature() {
   );
 }
 
-void _initDashboardsFeature() {
-  // Data Sources
+void _initDashboardsFeature({required bool isOffline}) {
+  // Data sources
   get_it.registerLazySingleton<DashboardRemoteDataSource>(
-    () => DashboardRemoteDataSourceImpl(get_it()),
+    () => isOffline
+        ? DashboardSqliteDataSourceImpl(get_it())
+        : DashboardRemoteDataSourceImpl(get_it()),
   );
 
   // Repositories
@@ -241,13 +272,17 @@ void _initDashboardsFeature() {
   get_it.registerFactory(() => YouTrackShellCubit());
 }
 
-void _initIssuesFeature() {
+void _initIssuesFeature({required bool isOffline}) {
   // Data Sources
   get_it.registerLazySingleton<IssuesRemoteDataSource>(
-    () => IssuesRemoteDataSourceImpl(get_it()),
+    () => isOffline
+        ? IssuesSqliteDataSourceImpl(get_it())
+        : IssuesRemoteDataSourceImpl(get_it()),
   );
   get_it.registerLazySingleton<TagRemoteDatasource>(
-    () => TagRemoteDatasourceImpl(get_it()),
+    () => isOffline
+        ? TagSqliteDatasourceImpl(get_it())
+        : TagRemoteDatasourceImpl(get_it()),
   );
 
   // Repositories
@@ -260,6 +295,7 @@ void _initIssuesFeature() {
 
   // UseCases
   get_it.registerLazySingleton(() => GetIssues(get_it()));
+  get_it.registerLazySingleton(() => StreamIssues(get_it()));
   get_it.registerLazySingleton(() => GetIssueById(get_it()));
   get_it.registerLazySingleton(() => CreateTag(get_it()));
   get_it.registerLazySingleton(() => GetProjectMembers(get_it()));
@@ -268,7 +304,7 @@ void _initIssuesFeature() {
 
   // Blocs
   get_it.registerFactory(
-    () => IssuesBloc(getIssues: get_it(), repository: get_it()),
+    () => IssuesBloc(getIssues: get_it(), streamIssues: get_it(), repository: get_it()),
   );
   get_it.registerFactory(
     () => IssueFormCubit(
@@ -289,13 +325,15 @@ void _initIssuesFeature() {
   );
 }
 
-void _initProjectsFeature() {
+void _initProjectsFeature({required bool isOffline}) {
   // Data Sources
   get_it.registerLazySingleton<ProjectsLocalDataSource>(
     () => ProjectsLocalDataSourceImpl(),
   );
   get_it.registerLazySingleton<ProjectsRemoteDataSource>(
-    () => ProjectsRemoteDataSourceImpl(get_it()),
+    () => isOffline
+        ? ProjectsSqliteDataSourceImpl(get_it())
+        : ProjectsRemoteDataSourceImpl(get_it()),
   );
 
   // Repositories
@@ -345,7 +383,7 @@ void _initProjectsFeature() {
   );
 }
 
-void _initCustomFieldsFeature() {
+void _initCustomFieldsFeature({required bool isOffline}) {
   get_it.registerLazySingleton<CustomFieldsRemoteDataSource>(
     () => CustomFieldsRemoteDataSourceImpl(get_it()),
   );
@@ -398,7 +436,7 @@ void _initCustomFieldsFeature() {
   get_it.registerFactory(() => PrivacyStateCubit());
 }
 
-void _initVersionControlFeature() {
+void _initVersionControlFeature({required bool isOffline}) {
   get_it.registerLazySingleton<VersionControlRemoteDataSource>(
     () => VersionControlRemoteDataSourceImpl(get_it()),
   );
@@ -428,7 +466,7 @@ void _initVersionControlFeature() {
   );
 }
 
-void _initTimeTrackingFeature() {
+void _initTimeTrackingFeature({required bool isOffline}) {
   get_it.registerLazySingleton<TimeTrackingRemoteDataSource>(
     () => TimeTrackingRemoteDataSourceImpl(get_it()),
   );
@@ -459,7 +497,7 @@ void _initTimeTrackingFeature() {
   );
 }
 
-void _initKnowledgeBaseFeature() {
+void _initKnowledgeBaseFeature({required bool isOffline}) {
   get_it.registerLazySingleton<ArticleRemoteDataSource>(
     () => ArticleRemoteDataSourceImpl(get_it()),
   );
@@ -533,9 +571,11 @@ void _initKnowledgeBaseFeature() {
   );
 }
 
-void _initAuthFeature() {
+void _initAuthFeature({required bool isOffline}) {
   get_it.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSourceImpl(get_it()),
+    () => isOffline
+        ? AuthSqliteDataSourceImpl(get_it())
+        : AuthRemoteDataSourceImpl(get_it()),
   );
 
   get_it.registerLazySingleton<AuthRepository>(
@@ -549,7 +589,7 @@ void _initAuthFeature() {
   get_it.registerLazySingleton<UserSession>(() => UserSession());
 }
 
-void _initAgileBoardsFeature() {
+void _initAgileBoardsFeature({required bool isOffline}) {
   get_it.registerLazySingleton<AgileBoardsRemoteDataSource>(
     () => AgileBoardsSupabaseDataSource(get_it()),
   );
@@ -569,9 +609,11 @@ void _initAgileBoardsFeature() {
   );
 }
 
-void _initGroupsFeature() {
+void _initGroupsFeature({required bool isOffline}) {
   get_it.registerLazySingleton<GroupsRemoteDataSource>(
-    () => GroupsRemoteDataSourceImpl(get_it()),
+    () => isOffline
+        ? GroupsSqliteDataSourceImpl(get_it())
+        : GroupsRemoteDataSourceImpl(get_it()),
   );
 
   get_it.registerLazySingleton<GroupsRepository>(
@@ -580,15 +622,32 @@ void _initGroupsFeature() {
 
   get_it.registerLazySingleton(() => GetGroups(get_it()));
   get_it.registerLazySingleton(() => CreateGroup(get_it()));
+  get_it.registerLazySingleton(() => AssignRole(get_it()));
+  get_it.registerLazySingleton(() => GetGroupRoles(get_it()));
+  get_it.registerLazySingleton(() => GetGroupMembers(get_it()));
+  get_it.registerLazySingleton(() => AddGroupMembers(get_it()));
+  get_it.registerLazySingleton(() => AddGroupProjects(get_it()));
+  get_it.registerLazySingleton(() => GetGroupById(get_it()));
+  get_it.registerLazySingleton(() => UpdateGroup(get_it()));
 
   get_it.registerFactory(
-    () => GroupsBloc(getGroups: get_it(), createGroup: get_it()),
+    () => GroupsBloc(
+      getGroups: get_it(),
+      createGroup: get_it(),
+      assignRole: get_it(),
+      getGroupById: get_it(),
+      addGroupMembers: get_it(),
+      addGroupProjects: get_it(),
+      updateGroup: get_it(),
+    ),
   );
 }
 
-void _initRolesFeature() {
+void _initRolesFeature({required bool isOffline}) {
   get_it.registerLazySingleton<RolesRemoteDataSource>(
-    () => RolesRemoteDataSourceImpl(get_it()),
+    () => isOffline
+        ? RolesSqliteDataSourceImpl(get_it())
+        : RolesRemoteDataSourceImpl(get_it()),
   );
 
   get_it.registerLazySingleton<RolesRepository>(
@@ -610,9 +669,14 @@ void _initRolesFeature() {
   );
 }
 
-void _initUsersFeature() {
+void _initUsersFeature({required bool isOffline}) {
   get_it.registerLazySingleton<UsersRemoteDataSource>(
-    () => UsersRemoteDataSourceImpl(get_it()),
+    () => isOffline
+        ? UsersSqliteDataSourceImpl(get_it())
+        : UsersRemoteDataSourceImpl(
+            get_it(),
+            adminClient: get_it(instanceName: 'adminClient'),
+          ),
   );
 
   get_it.registerLazySingleton<UsersRepository>(

@@ -13,6 +13,8 @@ class NewUserDialog extends StatefulWidget {
 class _NewUserDialogState extends State<NewUserDialog>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final _createFormKey = GlobalKey<FormState>();
+  final _inviteFormKey = GlobalKey<FormState>();
   final _emailTextController = TextEditingController();
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -24,6 +26,9 @@ class _NewUserDialogState extends State<NewUserDialog>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      if (mounted) setState(() {});
+    });
   }
 
   @override
@@ -38,24 +43,26 @@ class _NewUserDialogState extends State<NewUserDialog>
   }
 
   void _inviteUsers() {
+    if (!_inviteFormKey.currentState!.validate()) return;
     final text = _emailTextController.text.trim();
     if (text.isEmpty) return;
-    final emails = text.split(RegExp(r'\s+')).where((e) => e.isNotEmpty).toList();
+    final emails = text
+        .split(RegExp(r'\s+'))
+        .where((e) => e.isNotEmpty)
+        .toList();
     if (emails.isEmpty) return;
     context.read<UsersBloc>().add(InviteUsersEvent(emails: emails));
     Navigator.of(context).pop();
   }
 
   void _createUser() {
+    if (!_createFormKey.currentState!.validate()) return;
     final name = _fullNameController.text.trim();
     final email = _emailController.text.trim();
     final password = _passwordController.text;
-    if (name.isEmpty || email.isEmpty || password.isEmpty) return;
-    context.read<UsersBloc>().add(CreateUserEvent(
-      displayName: name,
-      email: email,
-      password: password,
-    ));
+    context.read<UsersBloc>().add(
+      CreateUserEvent(displayName: name, email: email, password: password),
+    );
     Navigator.of(context).pop();
   }
 
@@ -65,7 +72,6 @@ class _NewUserDialogState extends State<NewUserDialog>
     final textTheme = Theme.of(context).textTheme;
 
     return Dialog(
-      backgroundColor: const Color(0xFF222326),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: SizedBox(
         width: 480,
@@ -78,7 +84,6 @@ class _NewUserDialogState extends State<NewUserDialog>
               child: Text(
                 'New User',
                 style: textTheme.titleLarge?.copyWith(
-                  color: Colors.white,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -86,65 +91,47 @@ class _NewUserDialogState extends State<NewUserDialog>
             const SizedBox(height: 16),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.transparent,
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => _tabController.animateTo(0),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            color: _tabController.index == 0
-                                ? colors.primary
-                                : const Color(0xFF2E2E32),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Invite users',
-                            style: TextStyle(
-                              color: _tabController.index == 0
-                                  ? Colors.white
-                                  : colors.onSurfaceVariant,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => _tabController.animateTo(1),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 8),
-                          decoration: BoxDecoration(
-                            color: _tabController.index == 1
-                                ? colors.primary
-                                : const Color(0xFF2E2E32),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            'Create user',
-                            style: TextStyle(
-                              color: _tabController.index == 1
-                                  ? Colors.white
-                                  : colors.onSurfaceVariant,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
+              child: SizedBox(
+                width: double.infinity,
+                child: SegmentedButton<int>(
+                  segments: const [
+                    ButtonSegment<int>(value: 0, label: Text('Invite users')),
+                    ButtonSegment<int>(value: 1, label: Text('Create user')),
                   ],
+                  selected: {_tabController.index},
+                  onSelectionChanged: (Set<int> newSelection) {
+                    _tabController.animateTo(newSelection.first);
+                  },
+                  showSelectedIcon: false,
+                  style: ButtonStyle(
+                    // backgroundColor: WidgetStateProperty.resolveWith<Color>(
+                    //   (Set<WidgetState> states) {
+                    //     if (states.contains(WidgetState.selected)) {
+                    //       return colors.primary;
+                    //     }
+                    //     return const Color(0xFF2E2E32);
+                    //   },
+                    // ),
+                    // foregroundColor: WidgetStateProperty.resolveWith<Color>(
+                    //   (Set<WidgetState> states) {
+                    //     if (states.contains(WidgetState.selected)) {
+                    //       return Colors.white;
+                    //     }
+                    //     return colors.onSurfaceVariant;
+                    //   },
+                    // ),
+                    // shape: WidgetStateProperty.all<OutlinedBorder>(
+                    //   RoundedRectangleBorder(
+                    //     borderRadius: BorderRadius.circular(8),
+                    //   ),
+                    // ),
+                    // textStyle: WidgetStateProperty.all<TextStyle>(
+                    //   const TextStyle(
+                    //     fontSize: 13,
+                    //     fontWeight: FontWeight.w500,
+                    //   ),
+                    // ),
+                  ),
                 ),
               ),
             ),
@@ -176,7 +163,9 @@ class _NewUserDialogState extends State<NewUserDialog>
                   ),
                   const SizedBox(width: 12),
                   FilledButton(
-                    onPressed: _tabController.index == 0 ? _inviteUsers : _createUser,
+                    onPressed: _tabController.index == 0
+                        ? _inviteUsers
+                        : _createUser,
                     style: FilledButton.styleFrom(
                       backgroundColor: colors.primary,
                     ),
@@ -194,78 +183,117 @@ class _NewUserDialogState extends State<NewUserDialog>
   }
 
   Widget _buildInviteTab(ColorScheme colors, TextTheme textTheme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Emails',
-          style: textTheme.bodySmall?.copyWith(
-            color: colors.onSurfaceVariant,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-        const SizedBox(height: 6),
-        TextField(
-          controller: _emailTextController,
-          maxLines: 6,
-          decoration: InputDecoration(
-            hintText:
-                'Enter a space-separated list of email addresses',
-            hintStyle: TextStyle(color: colors.onSurfaceVariant.withValues(alpha: 0.5)),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colors.primary),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colors.outlineVariant),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colors.primary, width: 2),
+    return Form(
+      key: _inviteFormKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Emails',
+            style: textTheme.bodySmall?.copyWith(
+              color: colors.onSurfaceVariant,
+              fontWeight: FontWeight.w500,
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: 6),
+          TextFormField(
+            controller: _emailTextController,
+            maxLines: 6,
+            validator: (value) {
+              if (value == null || value.trim().isEmpty) {
+                return 'Please enter at least one email';
+              }
+              return null;
+            },
+            decoration: InputDecoration(
+              hintText: 'Enter a space-separated list of email addresses',
+            ),
+          ),
+        ],
+      ),
     );
   }
 
   Widget _buildCreateTab(ColorScheme colors, TextTheme textTheme) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildField('Full name', _fullNameController, colors, textTheme),
-        const SizedBox(height: 14),
-        _buildField('Email', _emailController, colors, textTheme),
-        const SizedBox(height: 14),
-        _buildField('Password', _passwordController, colors, textTheme,
-            obscureText: true),
-        const SizedBox(height: 14),
-        _buildField('Confirm password', _confirmPasswordController, colors,
+    return Form(
+      key: _createFormKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildField(
+            'Full name',
+            _fullNameController,
+            colors,
+            hintText: 'Enter full name',
             textTheme,
-            obscureText: true),
-        const SizedBox(height: 16),
-        Row(
-          children: [
-            SizedBox(
-              height: 24,
-              width: 24,
-              child: Checkbox(
-                value: _forceChangePassword,
-                onChanged: (v) =>
-                    setState(() => _forceChangePassword = v ?? true),
-                fillColor: WidgetStateProperty.all(colors.primary),
-                checkColor: Colors.white,
+            validator: (val) => val == null || val.trim().isEmpty
+                ? 'Please enter full name'
+                : null,
+          ),
+          const SizedBox(height: 14),
+          _buildField(
+            'Email',
+            _emailController,
+            colors,
+            textTheme,
+            hintText: 'Enter email',
+            validator: (val) => val == null || val.trim().isEmpty
+                ? 'Please enter email'
+                : (!val.contains('@') ? 'Invalid email format' : null),
+          ),
+          const SizedBox(height: 14),
+          _buildField(
+            'Password',
+            _passwordController,
+            colors,
+            textTheme,
+            obscureText: true,
+            hintText: 'Enter password',
+            validator: (val) => val == null || val.isEmpty
+                ? 'Please enter password'
+                : (val.length < 6
+                      ? 'Password must be at least 6 characters'
+                      : null),
+          ),
+          const SizedBox(height: 14),
+          _buildField(
+            'Confirm password',
+            _confirmPasswordController,
+            colors,
+            textTheme,
+            obscureText: true,
+            hintText: 'Enter confirm password',
+            validator: (val) {
+              if (val == null || val.isEmpty) return 'Please confirm password';
+              if (val != _passwordController.text) {
+                return 'Passwords do not match';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 32),
+          Row(
+            children: [
+              SizedBox(
+                height: 24,
+                width: 24,
+                child: Checkbox(
+                  value: _forceChangePassword,
+                  onChanged: (v) =>
+                      setState(() => _forceChangePassword = v ?? true),
+                  fillColor: WidgetStateProperty.all(colors.primary),
+                  checkColor: Colors.white,
+                ),
               ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'Force changing password',
-              style: textTheme.bodySmall?.copyWith(color: Colors.white),
-            ),
-          ],
-        ),
-      ],
+              const SizedBox(width: 8),
+              Text(
+                'Force changing password',
+                style: textTheme.bodySmall?.copyWith(fontWeight: .bold),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -274,7 +302,9 @@ class _NewUserDialogState extends State<NewUserDialog>
     TextEditingController controller,
     ColorScheme colors,
     TextTheme textTheme, {
+    String? hintText,
     bool obscureText = false,
+    String? Function(String?)? validator,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -287,24 +317,12 @@ class _NewUserDialogState extends State<NewUserDialog>
           ),
         ),
         const SizedBox(height: 6),
-        TextField(
+        TextFormField(
+          cursorHeight: 17,
           controller: controller,
           obscureText: obscureText,
-          decoration: InputDecoration(
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colors.outlineVariant),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colors.outlineVariant),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: colors.primary, width: 2),
-            ),
-            isDense: true,
-          ),
+          validator: validator,
+          decoration: InputDecoration(hintText: hintText),
         ),
       ],
     );

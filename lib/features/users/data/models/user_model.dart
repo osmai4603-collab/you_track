@@ -1,13 +1,14 @@
+import 'package:flutter/foundation.dart';
 import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 
 class UserModel extends UserEntity {
   const UserModel({
     required super.id,
-    required super.displayName,
+    required super.fullName,
     required super.username,
     required super.email,
     super.avatarUrl,
-    super.registrationDate,
+    super.createdAt,
     super.isBanned,
     super.groups,
     super.projects,
@@ -17,11 +18,11 @@ class UserModel extends UserEntity {
   factory UserModel.fromEntity(UserEntity entity) {
     return UserModel(
       id: entity.id,
-      displayName: entity.displayName,
+      fullName: entity.fullName,
       username: entity.username,
       email: entity.email,
       avatarUrl: entity.avatarUrl,
-      registrationDate: entity.registrationDate,
+      createdAt: entity.createdAt,
       isBanned: entity.isBanned,
       groups: entity.groups,
       projects: entity.projects,
@@ -29,42 +30,40 @@ class UserModel extends UserEntity {
     );
   }
 
-  factory UserModel.fromJson(Map<String, dynamic> json) {
+  factory UserModel.fromJson(Map<String, dynamic> data) {
+    debugPrint('User: $data');
     return UserModel(
-      id: (json['id'] ?? '').toString(),
-      displayName: (json['display_name'] ?? (json['full_name'] ?? '')).toString(),
-      username: (json['username'] ?? '').toString(),
-      email: (json['email'] ?? '').toString(),
-      avatarUrl: json['avatar_url']?.toString(),
-      registrationDate: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'].toString())
-          : null,
-      isBanned: json['is_banned'] == true,
-      groups: (json['groups'] as List<dynamic>?)
+      id: data['id'],
+      fullName: data['full_name'],
+      username: (data['user_name'] ?? '').toString(),
+      email: data['email'],
+      avatarUrl: data['avatar_url'],
+      createdAt: DateTime.tryParse(data['created_at'] ?? ''),
+      isBanned: data['is_banned'] == true,
+      groups:
+          (data['groups'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
-      projects: (json['projects'] as List<dynamic>?)
+      projects:
+          (data['projects'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           [],
-      initials: _computeInitials(
-        (json['display_name'] ?? (json['full_name'] ?? '')).toString(),
-      ),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'id': id,
-      'display_name': displayName,
-      'username': username,
+      'full_name': fullName,
+      'user_name': username,
       'email': email,
       'avatar_url': avatarUrl,
-      'created_at': registrationDate?.toIso8601String(),
+      'created_at': createdAt?.toIso8601String(),
       'is_banned': isBanned,
-      'groups': groups,
-      'projects': projects,
+      // 'groups': groups,
+      // 'projects': projects,
     };
   }
 

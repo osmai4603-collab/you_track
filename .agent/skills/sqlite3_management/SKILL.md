@@ -41,13 +41,17 @@ description: كيفية التعامل مع SQLite3، تعاريف الجداو�
 ## 🛠️ المتطلبات التقنية
 تعتمد هذه المهارة بشكل أساسي على:
 1.  **المكتبات المذكورة أعلاه**: يجب التأكد من وجودها في `pubspec.yaml`.
-2.  **كلاس `SqliteService`**: الموجود في `lib/core/services/sqlite_service.dart`.
+2.  **كلاس `SqliteService`**: الموجود في `lib/core/services/sqlite/sqlite_service.dart`.
     *   [دليل بناء خدمة SQLite3](resources/sqlite3_service_implementation.md).
-3.  **الثوابت (Tables)**: الموجودة في `lib/core/constants/tables/`.
-4.  **مسار قاعدة البيانات**: يجب استدعاء المسار الخاص بالتطبيق الحالي (Application Documents Directory) لتخزين ملف قاعدة البيانات لضمان الوصول الصحيح والأمان.
+3.  **كلاس `TableInfo`**: الفئة الأساسية لتعريف الجداول في `lib/core/services/sqlite/table_info.dart`.
+4.  **كلاس `SqliteTable`**: الفئة الأساسية لإنشاء الجداول في `lib/core/services/sqlite/sqlite_tables/sqlite_table.dart`.
+5.  **الثوابت والجداول (Tables)**: الموجودة في `lib/core/tables/`. يجب أن ترث من `TableInfo` وتطبق نمط الـ Singleton.
+6.  **جداول SQLite**: الموجودة في `lib/core/services/sqlite/sqlite_tables/`. وتكون كلاسات ترث من كلاس الجدول الأصلي وتنفذ `SqliteTable` (أيضاً بنمط الـ Singleton).
+7.  **مسار قاعدة البيانات**: يجب استدعاء المسار الخاص بالتطبيق الحالي (Application Documents Directory) لتخزين ملف قاعدة البيانات لضمان الوصول الصحيح والأمان.
 
 > [!IMPORTANT]
 > *   يجب أن يحتوي كل كلاس جدول على `List<String> get columns` يُرجع قائمة بجميع الحقول.
+> *   **يمنع** استخدام الحقول الثابتة `static final/const` على مستوى الجدول؛ يجب أن تكون حقول نهائية `final` ويتم إنشاؤها عبر كائن مفرد (Singleton).
 > *   **يمنع** استخدام prefix مثل `col` في تسمية الحقول (استخدم `id` بدلاً من `colId`).
 > *   **يجب** توثيق كل حقل بتعليق يوضح دوره والقيود المفروضة عليه.
 
@@ -56,37 +60,58 @@ description: كيفية التعامل مع SQLite3، تعاريف الجداو�
     *   في حال عدم وجود المكتبات، قم بتشغيل: `flutter pub add sqlite3 sqlite3_flutter_libs path_provider path`
     *   تأكد دائماً من تشغيل `flutter pub get` بعد الإضافة.
     *   التحقق من وجود وجاهزية كلاس `SqliteService`.
-2.  **تحديث الخدمة**:
-    *   زيادة رقم الإصدار `user_version` في `SqliteService`.
-    *   إضافة جملة `CREATE TABLE` أو `ALTER TABLE` أو `CREATE TRIGGER` في دالة `_onCreate()` أو الدوال المخصصة للـ Migration (`_onUpgrade`).
-    *   **يمنع منعاً باتاً** كتابة أسماء الجداول أو الأعمدة كنصوص مباشرة (Hardcoded Strings) داخل `SqliteService`.
-    *   يجب إنشاء instance من كلاس الجدول واستدعاء الحقول منه.
-3.  **التكامل (Clean Architecture)**:
+2.  **تحديث الخدمة وإجراء Migrations**:
+    *   زيادة رقم الإصدار `currentVersion` في `SqliteSchemaManager`.
+    *   إنشاء كلاس مستقل للـ Migration يرث من `SqliteMigration` داخل مجلد `lib/core/services/sqlite/sqlite_migrations/` (مثال: `V10Migration`).
+    *   تسجيل الـ instance الخاص بالـ Migration الجديد في قائمة `sqliteMigrations` داخل ملف `lib/core/services/sqlite/sqlite_migrations/sqlite_migrations.dart`.
+    *   **يمنع منعاً باتاً** كتابة أسماء الجداول أو الأعمدة كنصوص مباشرة (Hardcoded Strings) داخل كلاس الـ Migration؛ يجب استدعاؤها من كائن الجدول المفرد (مثل `MyTable().tableName`).
+3.  **إنشاء جدول جديد**:
+    *   أنشئ كلاس الجدول في `lib/core/tables/` يرث من `TableInfo` وبنمط الـ Singleton.
+    *   أنشئ كلاس الـ Sqlite المقابل في `lib/core/services/sqlite/sqlite_tables/` ينتهي بـ `Sqlite` ويرث من جدول البيانات وينفذ `SqliteTable`.
+    *   سجل الجدول الجديد في قائمة الجداول في `SqliteSchemaManager._createAllTables`.
+4.  **التكامل (Clean Architecture)**:
     *   يتم استدعاء `SqliteService` من خلال `DataSources`.
-    *   يمنع استدعاء الأسماء النصية للجداول مباشرة؛ استخدم كلاس الثوابت (مثل `MyTable().tableName`).
+    *   استخدم كائن الجدول المفرد (مثل `MyTable().tableName`) بدلاً من النصوص المباشرة.
 
-## 📌 مثال استدعاء الجداول داخل `_onCreate`
+## 📌 مثال استدعاء الجداول وتصميمها
 
+### تصميم كلاس جدول البيانات (مثال: `MyTable` في `lib/core/tables/my_table.dart`):
 ```dart
-void _onCreate(Database db) {
-  final myTable = MyTable();
+import 'package:you_track/core/services/sqlite/table_info.dart';
 
-  db.execute('''
-    CREATE TABLE IF NOT EXISTS ${myTable.tableName} (
-      ${myTable.id} INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-      ${myTable.myColumn} TEXT NOT NULL
-    )
-  ''');
+class MyTable extends TableInfo {
+  static final MyTable _instance = MyTable._internal();
+  factory MyTable() => _instance;
+  MyTable._internal();
+
+  @override
+  final String tableName = 'my_table';
+
+  final String id = 'id';
+  final String myColumn = 'my_column';
+
+  @override
+  List<String> get columns => [id, myColumn];
 }
 ```
 
-### ❌ الطريقة الخاطئة (Incorrect)
+### تصميم كلاس إنشاء الجدول (مثال: `MyTableSqlite` في `lib/core/services/sqlite/sqlite_tables/my_table_sqlite.dart`):
 ```dart
-db.execute('CREATE TABLE IF NOT EXISTS my_table (id INTEGER ..., my_column TEXT ...)');
+import 'package:you_track/core/services/sqlite/sqlite_tables/sqlite_table.dart';
+import 'package:you_track/core/tables/my_table.dart';
+
+class MyTableSqlite extends MyTable implements SqliteTable {
+  static final MyTableSqlite _instance = MyTableSqlite._internal();
+  factory MyTableSqlite() => _instance;
+  MyTableSqlite._internal();
+
+  @override
+  String get queryCreateTable => '''
+    CREATE TABLE IF NOT EXISTS $tableName (
+      $id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+      $myColumn TEXT NOT NULL
+    )
+  ''';
+}
 ```
 
-### ✅ الطريقة الصحيحة (Correct)
-```dart
-final myTable = MyTable();
-db.execute('CREATE TABLE IF NOT EXISTS ${myTable.tableName} (${myTable.id} INTEGER ..., ${myTable.myColumn} TEXT ...)');
-```

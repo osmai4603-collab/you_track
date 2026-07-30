@@ -29,6 +29,7 @@
   "defaultTemplateTitle": "Default Project Template",
   "useThisTemplateButton": "Use this template",
   "cancelButton": "Cancel",
+  "saveButton": "Save",
   "projectNameLabel": "Name",
   "projectNameHint": "Enter a name for your project",
   "projectIdLabel": "Project ID",
@@ -244,215 +245,215 @@
   "@templateMarketing": {
     "description": "Marketing project template"
   },
-  "permissionProjectReadProjectBasic": "Read Project Basic",
+  "permissionProjectReadProjectBasic": "Project Basic",
   "@permissionProjectReadProjectBasic": {
     "description": "Permission: Read Project Basic"
   },
-  "permissionProjectCreateProject": "Create Project",
+  "permissionProjectCreateProject": "Project",
   "@permissionProjectCreateProject": {
     "description": "Permission: Create Project"
   },
-  "permissionProjectReadProjectFull": "Read Project Full",
+  "permissionProjectReadProjectFull": "Project Full",
   "@permissionProjectReadProjectFull": {
     "description": "Permission: Read Project Full"
   },
-  "permissionProjectUpdateProject": "Update Project",
+  "permissionProjectUpdateProject": "Project",
   "@permissionProjectUpdateProject": {
     "description": "Permission: Update Project"
   },
-  "permissionProjectDeleteProject": "Delete Project",
+  "permissionProjectDeleteProject": "Project",
   "@permissionProjectDeleteProject": {
     "description": "Permission: Delete Project"
   },
-  "permissionOrganizationReadOrganization": "Read Organization",
+  "permissionOrganizationReadOrganization": "Organization",
   "@permissionOrganizationReadOrganization": {
     "description": "Permission: Read Organization"
   },
-  "permissionOrganizationUpdateOrganization": "Update Organization",
+  "permissionOrganizationUpdateOrganization": "Organization",
   "@permissionOrganizationUpdateOrganization": {
     "description": "Permission: Update Organization"
   },
-  "permissionOrganizationCreateOrganization": "Create Organization",
+  "permissionOrganizationCreateOrganization": "Organization",
   "@permissionOrganizationCreateOrganization": {
     "description": "Permission: Create Organization"
   },
-  "permissionOrganizationDeleteOrganization": "Delete Organization",
+  "permissionOrganizationDeleteOrganization": "Organization",
   "@permissionOrganizationDeleteOrganization": {
     "description": "Permission: Delete Organization"
   },
-  "permissionUserProfileUpdateSelf": "Update Self Profile",
+  "permissionUserProfileUpdateSelf": "Self Profile",
   "@permissionUserProfileUpdateSelf": {
     "description": "Permission: Update Self Profile"
   },
-  "permissionUserReadUserBasic": "Read User Basic",
+  "permissionUserReadUserBasic": "User Basic",
   "@permissionUserReadUserBasic": {
     "description": "Permission: Read User Basic"
   },
-  "permissionUserReadUserDetails": "Read User Details",
+  "permissionUserReadUserDetails": "User Details",
   "@permissionUserReadUserDetails": {
     "description": "Permission: Read User Details"
   },
-  "permissionUserUpdateUser": "Update User",
+  "permissionUserUpdateUser": "User",
   "@permissionUserUpdateUser": {
     "description": "Permission: Update User"
   },
-  "permissionUserCreateUser": "Create User",
+  "permissionUserCreateUser": "User",
   "@permissionUserCreateUser": {
     "description": "Permission: Create User"
   },
-  "permissionUserDeleteUser": "Delete User",
+  "permissionUserDeleteUser": "User",
   "@permissionUserDeleteUser": {
     "description": "Permission: Delete User"
   },
-  "permissionSystemLowLevelAdminRead": "Read Low-Level Admin Settings",
+  "permissionSystemLowLevelAdminRead": "Low-Level Admin Settings",
   "@permissionSystemLowLevelAdminRead": {
     "description": "Permission: Read Low-Level Admin Settings"
   },
-  "permissionSystemLowLevelAdminWrite": "Write Low-Level Admin Settings",
+  "permissionSystemLowLevelAdminWrite": "Low-Level Admin Settings",
   "@permissionSystemLowLevelAdminWrite": {
     "description": "Permission: Write Low-Level Admin Settings"
   },
-  "permissionIssueReadIssue": "Read Issue",
+  "permissionIssueReadIssue": "Issue",
   "@permissionIssueReadIssue": {
     "description": "Permission: Read Issue"
   },
-  "permissionIssueReadIssuePrivateFields": "Read Issue Private Fields",
+  "permissionIssueReadIssuePrivateFields": "Issue Private Fields",
   "@permissionIssueReadIssuePrivateFields": {
     "description": "Permission: Read Issue Private Fields"
   },
-  "permissionIssueUpdateIssue": "Update Issue",
+  "permissionIssueUpdateIssue": "Issue",
   "@permissionIssueUpdateIssue": {
     "description": "Permission: Update Issue"
   },
-  "permissionIssueCreateIssue": "Create Issue",
+  "permissionIssueCreateIssue": "Issue",
   "@permissionIssueCreateIssue": {
     "description": "Permission: Create Issue"
   },
-  "permissionIssueDeleteIssue": "Delete Issue",
+  "permissionIssueDeleteIssue": "Issue",
   "@permissionIssueDeleteIssue": {
     "description": "Permission: Delete Issue"
   },
-  "permissionIssueLinkIssues": "Link Issues",
+  "permissionIssueLinkIssues": "Issues",
   "@permissionIssueLinkIssues": {
     "description": "Permission: Link Issues"
   },
-  "permissionIssueUpdateIssuePrivateFields": "Update Issue Private Fields",
+  "permissionIssueUpdateIssuePrivateFields": "Issue Private Fields",
   "@permissionIssueUpdateIssuePrivateFields": {
     "description": "Permission: Update Issue Private Fields"
   },
-  "permissionIssueApplyCommandsSilently": "Apply Commands Silently",
+  "permissionIssueApplyCommandsSilently": "Commands Silently",
   "@permissionIssueApplyCommandsSilently": {
     "description": "Permission: Apply Commands Silently"
   },
-  "permissionIssueViewWatchers": "View Watchers",
+  "permissionIssueViewWatchers": "Watchers",
   "@permissionIssueViewWatchers": {
     "description": "Permission: View Watchers"
   },
-  "permissionIssueUpdateWatchers": "Update Watchers",
+  "permissionIssueUpdateWatchers": "Watchers",
   "@permissionIssueUpdateWatchers": {
     "description": "Permission: Update Watchers"
   },
-  "permissionIssueViewVoters": "View Voters",
+  "permissionIssueViewVoters": "Voters",
   "@permissionIssueViewVoters": {
     "description": "Permission: View Voters"
   },
-  "permissionAttachmentAddAttachment": "Add Attachment",
+  "permissionAttachmentAddAttachment": "Attachment",
   "@permissionAttachmentAddAttachment": {
     "description": "Permission: Add Attachment"
   },
-  "permissionAttachmentUpdateAttachment": "Update Attachment",
+  "permissionAttachmentUpdateAttachment": "Attachment",
   "@permissionAttachmentUpdateAttachment": {
     "description": "Permission: Update Attachment"
   },
-  "permissionAttachmentDeleteAttachment": "Delete Attachment",
+  "permissionAttachmentDeleteAttachment": "Attachment",
   "@permissionAttachmentDeleteAttachment": {
     "description": "Permission: Delete Attachment"
   },
-  "permissionCommentCreateIssueComment": "Create Issue Comment",
+  "permissionCommentCreateIssueComment": "Issue Comment",
   "@permissionCommentCreateIssueComment": {
     "description": "Permission: Create Issue Comment"
   },
-  "permissionCommentReadIssueComment": "Read Issue Comment",
+  "permissionCommentReadIssueComment": "Issue Comment",
   "@permissionCommentReadIssueComment": {
     "description": "Permission: Read Issue Comment"
   },
-  "permissionCommentUpdateIssueComment": "Update Issue Comment",
+  "permissionCommentUpdateIssueComment": "Issue Comment",
   "@permissionCommentUpdateIssueComment": {
     "description": "Permission: Update Issue Comment"
   },
-  "permissionCommentDeleteIssueComment": "Delete Issue Comment",
+  "permissionCommentDeleteIssueComment": "Issue Comment",
   "@permissionCommentDeleteIssueComment": {
     "description": "Permission: Delete Issue Comment"
   },
-  "permissionCommentUpdateNotOwnIssueComment": "Update Not Own Issue Comment",
+  "permissionCommentUpdateNotOwnIssueComment": "Not Own Issue Comment",
   "@permissionCommentUpdateNotOwnIssueComment": {
     "description": "Permission: Update Not Own Issue Comment"
   },
-  "permissionCommentDeleteNotOwnCommentAndPermanentCommentDelete": "Delete Not Own Comment & Permanent Delete",
+  "permissionCommentDeleteNotOwnCommentAndPermanentCommentDelete": "Not Own Comment & Permanent Delete",
   "@permissionCommentDeleteNotOwnCommentAndPermanentCommentDelete": {
     "description": "Permission: Delete Not Own Comment & Permanent Delete"
   },
-  "permissionCommentReadArticleComment": "Read Article Comment",
+  "permissionCommentReadArticleComment": "Article Comment",
   "@permissionCommentReadArticleComment": {
     "description": "Permission: Read Article Comment"
   },
-  "permissionCommentCreateArticleComment": "Create Article Comment",
+  "permissionCommentCreateArticleComment": "Article Comment",
   "@permissionCommentCreateArticleComment": {
     "description": "Permission: Create Article Comment"
   },
-  "permissionCommentUpdateArticleComment": "Update Article Comment",
+  "permissionCommentUpdateArticleComment": "Article Comment",
   "@permissionCommentUpdateArticleComment": {
     "description": "Permission: Update Article Comment"
   },
-  "permissionCommentDeleteArticleComment": "Delete Article Comment",
+  "permissionCommentDeleteArticleComment": "Article Comment",
   "@permissionCommentDeleteArticleComment": {
     "description": "Permission: Delete Article Comment"
   },
-  "permissionVisibilityOverrideVisibilityRestrictions": "Override Visibility Restrictions",
+  "permissionVisibilityOverrideVisibilityRestrictions": "Visibility Restrictions",
   "@permissionVisibilityOverrideVisibilityRestrictions": {
     "description": "Permission: Override Visibility Restrictions"
   },
-  "permissionIssueWorkItemReadWorkItem": "Read Work Item",
+  "permissionIssueWorkItemReadWorkItem": "Work Item",
   "@permissionIssueWorkItemReadWorkItem": {
     "description": "Permission: Read Work Item"
   },
-  "permissionIssueWorkItemUpdateWorkItem": "Update Work Item",
+  "permissionIssueWorkItemUpdateWorkItem": "Work Item",
   "@permissionIssueWorkItemUpdateWorkItem": {
     "description": "Permission: Update Work Item"
   },
-  "permissionIssueWorkItemUpdateNotOwnWorkItem": "Update Not Own Work Item",
+  "permissionIssueWorkItemUpdateNotOwnWorkItem": "Not Own Work Item",
   "@permissionIssueWorkItemUpdateNotOwnWorkItem": {
     "description": "Permission: Update Not Own Work Item"
   },
-  "permissionIssueWorkItemCreateWorkItem": "Create Work Item",
+  "permissionIssueWorkItemCreateWorkItem": "Work Item",
   "@permissionIssueWorkItemCreateWorkItem": {
     "description": "Permission: Create Work Item"
   },
-  "permissionIssueWorkItemCreateNotOwnWorkItem": "Create Not Own Work Item",
+  "permissionIssueWorkItemCreateNotOwnWorkItem": "Not Own Work Item",
   "@permissionIssueWorkItemCreateNotOwnWorkItem": {
     "description": "Permission: Create Not Own Work Item"
   },
-  "permissionArticleReadArticle": "Read Article",
+  "permissionArticleReadArticle": "Article",
   "@permissionArticleReadArticle": {
     "description": "Permission: Read Article"
   },
-  "permissionArticleCreateArticle": "Create Article",
+  "permissionArticleCreateArticle": "Article",
   "@permissionArticleCreateArticle": {
     "description": "Permission: Create Article"
   },
-  "permissionArticleUpdateArticle": "Update Article",
+  "permissionArticleUpdateArticle": "Article",
   "@permissionArticleUpdateArticle": {
     "description": "Permission: Update Article"
   },
-  "permissionArticleDeleteArticle": "Delete Article",
+  "permissionArticleDeleteArticle": "Article",
   "@permissionArticleDeleteArticle": {
     "description": "Permission: Delete Article"
   },
-  "permissionAppReadAppContent": "Read App Content",
+  "permissionAppReadAppContent": "App Content",
   "@permissionAppReadAppContent": {
     "description": "Permission: Read App Content"
   },
-  "permissionAppUpdateAppContent": "Update App Content",
+  "permissionAppUpdateAppContent": "App Content",
   "@permissionAppUpdateAppContent": {
     "description": "Permission: Update App Content"
   }

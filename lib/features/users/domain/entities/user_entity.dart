@@ -2,11 +2,11 @@ import 'package:issues_tracking/core/entities/entity.dart';
 
 class UserEntity extends Entity {
   final String id;
-  final String displayName;
+  final String fullName;
   final String username;
   final String email;
   final String? avatarUrl;
-  final DateTime? registrationDate;
+  final DateTime? createdAt;
   final bool isBanned;
   final List<String> groups;
   final List<String> projects;
@@ -14,11 +14,11 @@ class UserEntity extends Entity {
 
   const UserEntity({
     required this.id,
-    required this.displayName,
+    required this.fullName,
     required this.username,
     required this.email,
     this.avatarUrl,
-    this.registrationDate,
+    this.createdAt,
     this.isBanned = false,
     this.groups = const [],
     this.projects = const [],
@@ -40,11 +40,11 @@ class UserEntity extends Entity {
   }) {
     return UserEntity(
       id: id ?? this.id,
-      displayName: displayName ?? this.displayName,
+      fullName: displayName ?? this.fullName,
       username: username ?? this.username,
       email: email ?? this.email,
       avatarUrl: avatarUrl ?? this.avatarUrl,
-      registrationDate: registrationDate ?? this.registrationDate,
+      createdAt: registrationDate ?? this.createdAt,
       isBanned: isBanned ?? this.isBanned,
       groups: groups ?? this.groups,
       projects: projects ?? this.projects,
@@ -54,15 +54,15 @@ class UserEntity extends Entity {
 
   @override
   List<Object?> get props => [
-        id,
-        displayName,
-        username,
-        email,
-        avatarUrl,
-        registrationDate,
-        isBanned,
-        groups,
-        projects,
-        initials,
-      ];
+    id,
+    fullName,
+    username,
+    email,
+    avatarUrl,
+    createdAt,
+    isBanned,
+    groups,
+    projects,
+    initials,
+  ];
 }

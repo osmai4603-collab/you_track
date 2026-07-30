@@ -1,7 +1,4 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:issues_tracking/core/enums/issue_priority_type_enum.dart';
-import 'package:issues_tracking/core/enums/issue_state_enum.dart';
-import 'package:issues_tracking/core/enums/issue_type_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/features/issues/domain/entities/build.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
@@ -9,10 +6,10 @@ import 'package:issues_tracking/features/issues/domain/entities/issue_attachment
 import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dart';
 import 'package:issues_tracking/features/issues/domain/entities/sprint.dart';
 import 'package:issues_tracking/features/issues/domain/entities/tag.dart';
-import 'package:issues_tracking/features/issues/domain/entities/issue_link.dart';
 
 abstract class IssuesRepository {
   Future<Either<Failure, List<Issue>>> getIssues(IssueFilter filter);
+  Stream<Issue> streamIssues(IssueFilter filter);
   Future<Either<Failure, Issue>> getIssueById(String id);
   Future<Either<Failure, List<Tag>>> getAllTags();
   Future<Either<Failure, List<Sprint>>> getSprints(String projectId);

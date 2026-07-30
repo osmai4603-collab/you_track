@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:issues_tracking/features/issues/data/models/build_model.dart';
 import 'package:issues_tracking/features/issues/data/models/sprint_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -11,6 +12,7 @@ import '../models/issue_link_model.dart';
 
 abstract class IssuesRemoteDataSource {
   Future<List<IssueModel>> getIssues(IssueFilter filter);
+  Stream<IssueModel> streamIssues(IssueFilter filter);
   Future<IssueModel> getIssueById(String id);
   Future<List<TagModel>> getAllTags();
   Future<List<SprintModel>> getSprints(String projectId);
@@ -33,13 +35,28 @@ abstract class IssuesRemoteDataSource {
 
 class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
   final SupabaseClient supabase;
+  final _controller = StreamController<IssueModel>();
+  RealtimeChannel? _channel;
 
-  IssuesRemoteDataSourceImpl(this.supabase);
+  IssuesRemoteDataSourceImpl(this.supabase) {
+    _channel = supabase
+        .channel('public:issues')
+        .onPostgresChanges(
+          event: PostgresChangeEvent.all,
+          schema: 'public',
+          table: 'issues',
+          callback: _fetchAndEmit,
+        )
+        .subscribe();
+  }
 
   @override
   Future<List<BuildModel>> getBuilds(String projectId) async {
     try {
-      final response = await supabase.from('builds').select('*').eq('project_id', projectId);
+      final response = await supabase
+          .from('builds')
+          .select('*')
+          .eq('project_id', projectId);
       return (response as List).map((e) => BuildModel.fromJson(e)).toList();
     } catch (_) {
       return [];
@@ -48,13 +65,21 @@ class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
 
   @override
   Future<BuildModel> createBuild(Map<String, dynamic> buildData) async {
-    final response = await supabase.from('builds').insert(buildData).select().single();
+    final response = await supabase
+        .from('builds')
+        .insert(buildData)
+        .select()
+        .single();
     return BuildModel.fromJson(response);
   }
 
   @override
   Future<List<IssueModel>> getIssues(IssueFilter filter) async {
-    var query = supabase.from('issues').select('*, build:builds(*), sprints(*), tags(*), issue_links:issue_links!issue_links_source_issue_id_fkey(*)');
+    var query = supabase
+        .from('issues')
+        .select(
+          '*, build:builds(*), sprints(*), tags(*), issue_links:issue_links!issue_links_source_issue_id_fkey(*)',
+        );
 
     if (filter.projectFilter != null) {
       query = query.eq('project_id', filter.projectFilter!);
@@ -86,11 +111,29 @@ class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
     return (response as List).map((e) => IssueModel.fromJson(e)).toList();
   }
 
+  void _fetchAndEmit(PostgresChangePayload payload) async {
+    switch (payload.eventType) {
+      case PostgresChangeEvent.all:
+      case PostgresChangeEvent.delete:
+        return;
+      case PostgresChangeEvent.insert:
+      case PostgresChangeEvent.update:
+        _controller.sink.add(IssueModel.fromJson(payload.newRecord));
+    }
+  }
+
+  @override
+  Stream<IssueModel> streamIssues(IssueFilter filter) {
+    return _controller.stream;
+  }
+
   @override
   Future<IssueModel> getIssueById(String id) async {
     final response = await supabase
         .from('issues')
-        .select('*, build:builds(*), sprints(*), tags(*), issue_links:issue_links!issue_links_source_issue_id_fkey(*)')
+        .select(
+          '*, build:builds(*), sprints(*), tags(*), issue_links:issue_links!issue_links_source_issue_id_fkey(*)',
+        )
         .eq('id', id)
         .single();
     return IssueModel.fromJson(response);
@@ -109,7 +152,10 @@ class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
   @override
   Future<List<SprintModel>> getSprints(String projectId) async {
     try {
-      final response = await supabase.from('sprints').select('*').eq('project_id', projectId);
+      final response = await supabase
+          .from('sprints')
+          .select('*')
+          .eq('project_id', projectId);
       return (response as List).map((e) => SprintModel.fromJson(e)).toList();
     } catch (_) {
       return [];
@@ -152,14 +198,15 @@ class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
     final createdIssue = IssueModel.fromJson(response);
 
     if (sprints.isNotEmpty) {
-      final sprintData = sprints.map((s) => (s as SprintModel).toJson()).toList();
+      final sprintData = sprints
+          .map((s) => (s as SprintModel).toJson())
+          .toList();
       await supabase.from('sprints').upsert(sprintData);
 
-      final junctionData = sprints.map((s) => {
-        'issue_id': createdIssue.id,
-        'sprint_id': s.id,
-      }).toList();
-      
+      final junctionData = sprints
+          .map((s) => {'issue_id': createdIssue.id, 'sprint_id': s.id})
+          .toList();
+
       await supabase.from('issue_sprints').insert(junctionData);
     }
 
@@ -167,16 +214,17 @@ class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
       final tagData = tags.map((t) => (t as TagModel).toJson()).toList();
       await supabase.from('tags').upsert(tagData);
 
-      final junctionData = tags.map((t) => {
-        'issue_id': createdIssue.id,
-        'tag_id': t.id,
-      }).toList();
-      
+      final junctionData = tags
+          .map((t) => {'issue_id': createdIssue.id, 'tag_id': t.id})
+          .toList();
+
       await supabase.from('issue_tags').insert(junctionData);
     }
 
     if (links.isNotEmpty) {
-      final linkData = links.map((l) => (l as IssueLinkModel).toJson()).toList();
+      final linkData = links
+          .map((l) => (l as IssueLinkModel).toJson())
+          .toList();
       await supabase.from('issue_links').insert(linkData);
     }
 
@@ -206,14 +254,15 @@ class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
 
     await supabase.from('issue_sprints').delete().eq('issue_id', issueId);
     if (sprints.isNotEmpty) {
-      final sprintData = sprints.map((s) => (s as SprintModel).toJson()).toList();
+      final sprintData = sprints
+          .map((s) => (s as SprintModel).toJson())
+          .toList();
       await supabase.from('sprints').upsert(sprintData);
 
-      final junctionData = sprints.map((s) => {
-        'issue_id': issueId,
-        'sprint_id': s.id,
-      }).toList();
-      
+      final junctionData = sprints
+          .map((s) => {'issue_id': issueId, 'sprint_id': s.id})
+          .toList();
+
       await supabase.from('issue_sprints').insert(junctionData);
     }
 
@@ -222,17 +271,18 @@ class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
       final tagData = tags.map((t) => (t as TagModel).toJson()).toList();
       await supabase.from('tags').upsert(tagData);
 
-      final junctionData = tags.map((t) => {
-        'issue_id': issueId,
-        'tag_id': t.id,
-      }).toList();
-      
+      final junctionData = tags
+          .map((t) => {'issue_id': issueId, 'tag_id': t.id})
+          .toList();
+
       await supabase.from('issue_tags').insert(junctionData);
     }
 
     await supabase.from('issue_links').delete().eq('source_issue_id', issueId);
     if (links.isNotEmpty) {
-      final linkData = links.map((l) => (l as IssueLinkModel).toJson()).toList();
+      final linkData = links
+          .map((l) => (l as IssueLinkModel).toJson())
+          .toList();
       await supabase.from('issue_links').insert(linkData);
     }
 

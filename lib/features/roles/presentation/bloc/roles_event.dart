@@ -13,27 +13,28 @@ class LoadRoles extends RolesEvent {
 
 class CreateRoleEvent extends RolesEvent {
   final String name;
+  final String? description;
   final List<String> permissions;
 
-  const CreateRoleEvent({required this.name, required this.permissions});
+  const CreateRoleEvent({required this.name, this.description, required this.permissions});
 
   @override
-  List<Object?> get props => [name, permissions];
+  List<Object?> get props => [name, description, permissions];
 }
 
 class UpdateRoleEvent extends RolesEvent {
-  final String id;
   final String name;
+  final String? description;
   final List<String> permissions;
 
   const UpdateRoleEvent({
-    required this.id,
     required this.name,
+    this.description,
     required this.permissions,
   });
 
   @override
-  List<Object?> get props => [id, name, permissions];
+  List<Object?> get props => [name, description, permissions];
 }
 
 class DeleteRoleEvent extends RolesEvent {

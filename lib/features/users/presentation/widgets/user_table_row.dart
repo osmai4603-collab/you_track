@@ -54,8 +54,8 @@ class _UserTableRowState extends State<UserTableRow> {
             color: widget.isSelected
                 ? colors.primaryContainer.withValues(alpha: 0.2)
                 : _isHovered
-                    ? colors.onSurface.withValues(alpha: 0.04)
-                    : Colors.transparent,
+                ? colors.onSurface.withValues(alpha: 0.04)
+                : Colors.transparent,
             border: Border(
               bottom: BorderSide(
                 color: colors.outlineVariant.withValues(alpha: 0.3),
@@ -91,7 +91,7 @@ class _UserTableRowState extends State<UserTableRow> {
                     Row(
                       children: [
                         Text(
-                          user.displayName,
+                          user.fullName,
                           style: textTheme.bodyMedium?.copyWith(
                             color: colors.primary,
                             fontWeight: FontWeight.w500,
@@ -141,9 +141,7 @@ class _UserTableRowState extends State<UserTableRow> {
               SizedBox(
                 width: 120,
                 child: Text(
-                  user.registrationDate != null
-                      ? _formatDate(user.registrationDate!)
-                      : '-',
+                  user.createdAt != null ? _formatDate(user.createdAt!) : '-',
                   style: textTheme.bodySmall?.copyWith(
                     color: colors.onSurfaceVariant,
                   ),
@@ -192,8 +190,18 @@ class _UserTableRowState extends State<UserTableRow> {
 
   String _formatDate(DateTime date) {
     final months = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
     ];
     return '${date.day} ${months[date.month - 1]} ${date.year}';
   }

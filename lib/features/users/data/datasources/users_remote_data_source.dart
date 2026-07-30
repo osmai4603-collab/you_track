@@ -4,15 +4,16 @@ import '../models/user_model.dart';
 abstract class UsersRemoteDataSource {
   Future<List<UserModel>> getUsers();
   Future<UserModel> getUserById(String id);
-  Future<UserModel> createUser(Map<String, dynamic> data);
+  Future<UserModel> createUser(Map<String, dynamic> data, {String? password});
   Future<UserModel> updateUser(String id, Map<String, dynamic> data);
   Future<void> deleteUser(String id);
 }
 
 class UsersRemoteDataSourceImpl implements UsersRemoteDataSource {
   final SupabaseClient supabase;
+  final SupabaseClient? adminClient;
 
-  UsersRemoteDataSourceImpl(this.supabase);
+  UsersRemoteDataSourceImpl(this.supabase, {this.adminClient});
 
   @override
   Future<List<UserModel>> getUsers() async {
@@ -31,8 +32,40 @@ class UsersRemoteDataSourceImpl implements UsersRemoteDataSource {
   }
 
   @override
-  Future<UserModel> createUser(Map<String, dynamic> data) async {
+  Future<UserModel> createUser(Map<String, dynamic> data, {String? password}) async {
     data.remove('id');
+    
+    if (adminClient != null && password != null && data.containsKey('email')) {
+      final res = await adminClient!.auth.admin.createUser(
+        AdminUserAttributes(
+          email: data['email'],
+          password: password,
+          emailConfirm: true,
+          userMetadata: {
+            'display_name': data['display_name'],
+            'username': data['username'],
+          },
+        ),
+      );
+
+      if (res.user != null) {
+        try {
+          final userRecord = await supabase
+              .from('users')
+              .select('*')
+              .eq('id', res.user!.id)
+              .single();
+          return UserModel.fromJson(userRecord);
+        } catch (e) {
+          // Fallback if trigger is delayed or error happens fetching
+          data['id'] = res.user!.id;
+          data['created_at'] = res.user!.createdAt;
+          return UserModel.fromJson(data);
+        }
+      }
+    }
+
+    // Fallback to original behavior if no adminClient or password is provided
     final response =
         await supabase.from('users').insert(data).select().single();
     return UserModel.fromJson(response);

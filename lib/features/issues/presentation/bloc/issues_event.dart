@@ -80,3 +80,11 @@ class SelectAllIssues extends IssuesEvent {
 class DeselectAllIssues extends IssuesEvent {
   const DeselectAllIssues();
 }
+
+class IssuesStreamUpdated extends IssuesEvent {
+  final dynamic result; // Either<Failure, List<Issue>>
+  const IssuesStreamUpdated(this.result);
+
+  @override
+  List<Object?> get props => [result];
+}

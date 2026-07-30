@@ -168,7 +168,7 @@ sealed class Permission extends AppEnum {
 final class ProjectReadProjectBasic extends Permission {
   const ProjectReadProjectBasic._();
   @override
-  String get name => 'project-read-project-basic';
+  String get name => 'Read Project Basic';
   @override
   int get index => 0;
   @override
@@ -185,7 +185,7 @@ final class ProjectReadProjectBasic extends Permission {
 final class ProjectCreateProject extends Permission {
   const ProjectCreateProject._();
   @override
-  String get name => 'project-create-project';
+  String get name => 'Create Project';
   @override
   int get index => 1;
   @override
@@ -202,7 +202,7 @@ final class ProjectCreateProject extends Permission {
 final class ProjectReadProjectFull extends Permission {
   const ProjectReadProjectFull._();
   @override
-  String get name => 'project-read-project-full';
+  String get name => 'Read Project Full';
   @override
   int get index => 2;
   @override
@@ -219,7 +219,7 @@ final class ProjectReadProjectFull extends Permission {
 final class ProjectUpdateProject extends Permission {
   const ProjectUpdateProject._();
   @override
-  String get name => 'project-update-project';
+  String get name => 'Update Project';
   @override
   int get index => 3;
   @override
@@ -236,7 +236,7 @@ final class ProjectUpdateProject extends Permission {
 final class ProjectDeleteProject extends Permission {
   const ProjectDeleteProject._();
   @override
-  String get name => 'project-delete-project';
+  String get name => 'Delete Project';
   @override
   int get index => 4;
   @override
@@ -257,7 +257,7 @@ final class ProjectDeleteProject extends Permission {
 final class OrganizationReadOrganization extends Permission {
   const OrganizationReadOrganization._();
   @override
-  String get name => 'organization-read-organization';
+  String get name => 'Read Organization';
   @override
   int get index => 5;
   @override
@@ -274,7 +274,7 @@ final class OrganizationReadOrganization extends Permission {
 final class OrganizationUpdateOrganization extends Permission {
   const OrganizationUpdateOrganization._();
   @override
-  String get name => 'organization-update-organization';
+  String get name => 'Update Organization';
   @override
   int get index => 6;
   @override
@@ -291,7 +291,7 @@ final class OrganizationUpdateOrganization extends Permission {
 final class OrganizationCreateOrganization extends Permission {
   const OrganizationCreateOrganization._();
   @override
-  String get name => 'organization-create-organization';
+  String get name => 'Create Organization';
   @override
   int get index => 7;
   @override
@@ -308,7 +308,7 @@ final class OrganizationCreateOrganization extends Permission {
 final class OrganizationDeleteOrganization extends Permission {
   const OrganizationDeleteOrganization._();
   @override
-  String get name => 'organization-delete-organization';
+  String get name => 'Delete Organization';
   @override
   int get index => 8;
   @override
@@ -329,7 +329,7 @@ final class OrganizationDeleteOrganization extends Permission {
 final class UserProfileUpdateSelf extends Permission {
   const UserProfileUpdateSelf._();
   @override
-  String get name => 'user-profile-update-self';
+  String get name => 'Profile Update Self';
   @override
   int get index => 9;
   @override
@@ -350,7 +350,7 @@ final class UserProfileUpdateSelf extends Permission {
 final class UserReadUserBasic extends Permission {
   const UserReadUserBasic._();
   @override
-  String get name => 'user-read-user-basic';
+  String get name => 'Read User Basic';
   @override
   int get index => 10;
   @override
@@ -367,7 +367,7 @@ final class UserReadUserBasic extends Permission {
 final class UserReadUserDetails extends Permission {
   const UserReadUserDetails._();
   @override
-  String get name => 'user-read-user-details';
+  String get name => 'Read User Details';
   @override
   int get index => 11;
   @override
@@ -384,7 +384,7 @@ final class UserReadUserDetails extends Permission {
 final class UserUpdateUser extends Permission {
   const UserUpdateUser._();
   @override
-  String get name => 'user-update-user';
+  String get name => 'Update User';
   @override
   int get index => 12;
   @override
@@ -401,7 +401,7 @@ final class UserUpdateUser extends Permission {
 final class UserCreateUser extends Permission {
   const UserCreateUser._();
   @override
-  String get name => 'user-create-user';
+  String get name => 'Create User';
   @override
   int get index => 13;
   @override
@@ -418,7 +418,7 @@ final class UserCreateUser extends Permission {
 final class UserDeleteUser extends Permission {
   const UserDeleteUser._();
   @override
-  String get name => 'user-delete-user';
+  String get name => 'Delete User';
   @override
   int get index => 14;
   @override
@@ -439,7 +439,7 @@ final class UserDeleteUser extends Permission {
 final class SystemLowLevelAdminRead extends Permission {
   const SystemLowLevelAdminRead._();
   @override
-  String get name => 'system-low-level-admin-read';
+  String get name => 'Low Level Admin Read';
   @override
   int get index => 15;
   @override
@@ -456,7 +456,7 @@ final class SystemLowLevelAdminRead extends Permission {
 final class SystemLowLevelAdminWrite extends Permission {
   const SystemLowLevelAdminWrite._();
   @override
-  String get name => 'system-low-level-admin-write';
+  String get name => 'Low Level Admin Write';
   @override
   int get index => 16;
   @override
@@ -477,7 +477,7 @@ final class SystemLowLevelAdminWrite extends Permission {
 final class IssueReadIssue extends Permission {
   const IssueReadIssue._();
   @override
-  String get name => 'issue-read-issue';
+  String get name => 'Read Issue';
   @override
   int get index => 17;
   @override
@@ -494,7 +494,7 @@ final class IssueReadIssue extends Permission {
 final class IssueReadIssuePrivateFields extends Permission {
   const IssueReadIssuePrivateFields._();
   @override
-  String get name => 'issue-read-issue-private-fields';
+  String get name => 'Read Issue Private Fields';
   @override
   int get index => 18;
   @override
@@ -511,7 +511,7 @@ final class IssueReadIssuePrivateFields extends Permission {
 final class IssueUpdateIssue extends Permission {
   const IssueUpdateIssue._();
   @override
-  String get name => 'issue-update-issue';
+  String get name => 'Update Issue';
   @override
   int get index => 19;
   @override
@@ -528,7 +528,7 @@ final class IssueUpdateIssue extends Permission {
 final class IssueCreateIssue extends Permission {
   const IssueCreateIssue._();
   @override
-  String get name => 'issue-create-issue';
+  String get name => 'Create Issue';
   @override
   int get index => 20;
   @override
@@ -545,7 +545,7 @@ final class IssueCreateIssue extends Permission {
 final class IssueDeleteIssue extends Permission {
   const IssueDeleteIssue._();
   @override
-  String get name => 'issue-delete-issue';
+  String get name => 'Delete Issue';
   @override
   int get index => 21;
   @override
@@ -562,7 +562,7 @@ final class IssueDeleteIssue extends Permission {
 final class IssueLinkIssues extends Permission {
   const IssueLinkIssues._();
   @override
-  String get name => 'issue-link-issues';
+  String get name => 'Link Issues';
   @override
   int get index => 22;
   @override
@@ -579,7 +579,7 @@ final class IssueLinkIssues extends Permission {
 final class IssueUpdateIssuePrivateFields extends Permission {
   const IssueUpdateIssuePrivateFields._();
   @override
-  String get name => 'issue-update-issue-private-fields';
+  String get name => 'Update Issue Private Fields';
   @override
   int get index => 23;
   @override
@@ -596,7 +596,7 @@ final class IssueUpdateIssuePrivateFields extends Permission {
 final class IssueApplyCommandsSilently extends Permission {
   const IssueApplyCommandsSilently._();
   @override
-  String get name => 'issue-apply-commands-silently';
+  String get name => 'Apply Commands Silently';
   @override
   int get index => 24;
   @override
@@ -613,7 +613,7 @@ final class IssueApplyCommandsSilently extends Permission {
 final class IssueViewWatchers extends Permission {
   const IssueViewWatchers._();
   @override
-  String get name => 'issue-view-watchers';
+  String get name => 'View Watchers';
   @override
   int get index => 25;
   @override
@@ -630,7 +630,7 @@ final class IssueViewWatchers extends Permission {
 final class IssueUpdateWatchers extends Permission {
   const IssueUpdateWatchers._();
   @override
-  String get name => 'issue-update-watchers';
+  String get name => 'Update Watchers';
   @override
   int get index => 26;
   @override
@@ -647,7 +647,7 @@ final class IssueUpdateWatchers extends Permission {
 final class IssueViewVoters extends Permission {
   const IssueViewVoters._();
   @override
-  String get name => 'issue-view-voters';
+  String get name => 'View Voters';
   @override
   int get index => 27;
   @override
@@ -668,7 +668,7 @@ final class IssueViewVoters extends Permission {
 final class AttachmentAddAttachment extends Permission {
   const AttachmentAddAttachment._();
   @override
-  String get name => 'attachment-add-attachment';
+  String get name => 'Add Attachment';
   @override
   int get index => 28;
   @override
@@ -685,7 +685,7 @@ final class AttachmentAddAttachment extends Permission {
 final class AttachmentUpdateAttachment extends Permission {
   const AttachmentUpdateAttachment._();
   @override
-  String get name => 'attachment-update-attachment';
+  String get name => 'Update Attachment';
   @override
   int get index => 29;
   @override
@@ -702,7 +702,7 @@ final class AttachmentUpdateAttachment extends Permission {
 final class AttachmentDeleteAttachment extends Permission {
   const AttachmentDeleteAttachment._();
   @override
-  String get name => 'attachment-delete-attachment';
+  String get name => 'Delete Attachment';
   @override
   int get index => 30;
   @override
@@ -723,7 +723,7 @@ final class AttachmentDeleteAttachment extends Permission {
 final class CommentCreateIssueComment extends Permission {
   const CommentCreateIssueComment._();
   @override
-  String get name => 'comment-create-issue-comment';
+  String get name => 'Create Issue Comment';
   @override
   int get index => 31;
   @override
@@ -740,7 +740,7 @@ final class CommentCreateIssueComment extends Permission {
 final class CommentReadIssueComment extends Permission {
   const CommentReadIssueComment._();
   @override
-  String get name => 'comment-read-issue-comment';
+  String get name => 'Read Issue Comment';
   @override
   int get index => 32;
   @override
@@ -757,7 +757,7 @@ final class CommentReadIssueComment extends Permission {
 final class CommentUpdateIssueComment extends Permission {
   const CommentUpdateIssueComment._();
   @override
-  String get name => 'comment-update-issue-comment';
+  String get name => 'Update Issue Comment';
   @override
   int get index => 33;
   @override
@@ -774,7 +774,7 @@ final class CommentUpdateIssueComment extends Permission {
 final class CommentDeleteIssueComment extends Permission {
   const CommentDeleteIssueComment._();
   @override
-  String get name => 'comment-delete-issue-comment';
+  String get name => 'Delete Issue Comment';
   @override
   int get index => 34;
   @override
@@ -791,7 +791,7 @@ final class CommentDeleteIssueComment extends Permission {
 final class CommentUpdateNotOwnIssueComment extends Permission {
   const CommentUpdateNotOwnIssueComment._();
   @override
-  String get name => 'comment-update-not-own-issue-comment';
+  String get name => 'Update Not Own Issue Comment';
   @override
   int get index => 35;
   @override
@@ -809,8 +809,7 @@ final class CommentDeleteNotOwnCommentAndPermanentCommentDelete
     extends Permission {
   const CommentDeleteNotOwnCommentAndPermanentCommentDelete._();
   @override
-  String get name =>
-      'comment-delete-not-own-comment-and-permanent-comment-delete';
+  String get name => 'Delete Not Own Comment And Permanent Comment Delete';
   @override
   int get index => 36;
   @override
@@ -827,7 +826,7 @@ final class CommentDeleteNotOwnCommentAndPermanentCommentDelete
 final class CommentReadArticleComment extends Permission {
   const CommentReadArticleComment._();
   @override
-  String get name => 'comment-read-article-comment';
+  String get name => 'Read Article Comment';
   @override
   int get index => 37;
   @override
@@ -844,7 +843,7 @@ final class CommentReadArticleComment extends Permission {
 final class CommentCreateArticleComment extends Permission {
   const CommentCreateArticleComment._();
   @override
-  String get name => 'comment-create-article-comment';
+  String get name => 'Create Article Comment';
   @override
   int get index => 38;
   @override
@@ -861,7 +860,7 @@ final class CommentCreateArticleComment extends Permission {
 final class CommentUpdateArticleComment extends Permission {
   const CommentUpdateArticleComment._();
   @override
-  String get name => 'comment-update-article-comment';
+  String get name => 'Update Article Comment';
   @override
   int get index => 39;
   @override
@@ -878,7 +877,7 @@ final class CommentUpdateArticleComment extends Permission {
 final class CommentDeleteArticleComment extends Permission {
   const CommentDeleteArticleComment._();
   @override
-  String get name => 'comment-delete-article-comment';
+  String get name => 'Delete Article Comment';
   @override
   int get index => 40;
   @override
@@ -899,7 +898,7 @@ final class CommentDeleteArticleComment extends Permission {
 final class VisibilityOverrideVisibilityRestrictions extends Permission {
   const VisibilityOverrideVisibilityRestrictions._();
   @override
-  String get name => 'visibility-override-visibility-restrictions';
+  String get name => 'Override Visibility Restrictions';
   @override
   int get index => 41;
   @override
@@ -920,7 +919,7 @@ final class VisibilityOverrideVisibilityRestrictions extends Permission {
 final class IssueWorkItemReadWorkItem extends Permission {
   const IssueWorkItemReadWorkItem._();
   @override
-  String get name => 'issue-work-item-read-work-item';
+  String get name => 'Work Item Read Work Item';
   @override
   int get index => 42;
   @override
@@ -937,7 +936,7 @@ final class IssueWorkItemReadWorkItem extends Permission {
 final class IssueWorkItemUpdateWorkItem extends Permission {
   const IssueWorkItemUpdateWorkItem._();
   @override
-  String get name => 'issue-work-item-update-work-item';
+  String get name => 'Work Item Update Work Item';
   @override
   int get index => 43;
   @override
@@ -954,7 +953,7 @@ final class IssueWorkItemUpdateWorkItem extends Permission {
 final class IssueWorkItemUpdateNotOwnWorkItem extends Permission {
   const IssueWorkItemUpdateNotOwnWorkItem._();
   @override
-  String get name => 'issue-work-item-update-not-own-work-item';
+  String get name => 'Work Item Update Not Own Work Item';
   @override
   int get index => 44;
   @override
@@ -971,7 +970,7 @@ final class IssueWorkItemUpdateNotOwnWorkItem extends Permission {
 final class IssueWorkItemCreateWorkItem extends Permission {
   const IssueWorkItemCreateWorkItem._();
   @override
-  String get name => 'issue-work-item-create-work-item';
+  String get name => 'Work Item Create Work Item';
   @override
   int get index => 45;
   @override
@@ -988,7 +987,7 @@ final class IssueWorkItemCreateWorkItem extends Permission {
 final class IssueWorkItemCreateNotOwnWorkItem extends Permission {
   const IssueWorkItemCreateNotOwnWorkItem._();
   @override
-  String get name => 'issue-work-item-create-not-own-work-item';
+  String get name => 'Work Item Create Not Own Work Item';
   @override
   int get index => 46;
   @override
@@ -1009,7 +1008,7 @@ final class IssueWorkItemCreateNotOwnWorkItem extends Permission {
 final class ArticleReadArticle extends Permission {
   const ArticleReadArticle._();
   @override
-  String get name => 'article-read-article';
+  String get name => 'Read Article';
   @override
   int get index => 47;
   @override
@@ -1026,7 +1025,7 @@ final class ArticleReadArticle extends Permission {
 final class ArticleCreateArticle extends Permission {
   const ArticleCreateArticle._();
   @override
-  String get name => 'article-create-article';
+  String get name => 'Create Article';
   @override
   int get index => 48;
   @override
@@ -1043,7 +1042,7 @@ final class ArticleCreateArticle extends Permission {
 final class ArticleUpdateArticle extends Permission {
   const ArticleUpdateArticle._();
   @override
-  String get name => 'article-update-article';
+  String get name => 'Update Article';
   @override
   int get index => 49;
   @override
@@ -1060,7 +1059,7 @@ final class ArticleUpdateArticle extends Permission {
 final class ArticleDeleteArticle extends Permission {
   const ArticleDeleteArticle._();
   @override
-  String get name => 'article-delete-article';
+  String get name => 'Delete Article';
   @override
   int get index => 50;
   @override
@@ -1081,7 +1080,7 @@ final class ArticleDeleteArticle extends Permission {
 final class AppReadAppContent extends Permission {
   const AppReadAppContent._();
   @override
-  String get name => 'app-read-app-content';
+  String get name => 'Read App Content';
   @override
   int get index => 51;
   @override
@@ -1098,7 +1097,7 @@ final class AppReadAppContent extends Permission {
 final class AppUpdateAppContent extends Permission {
   const AppUpdateAppContent._();
   @override
-  String get name => 'app-update-app-content';
+  String get name => 'Update App Content';
   @override
   int get index => 52;
   @override

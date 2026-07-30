@@ -41,8 +41,8 @@ class _RoleTableRowState extends State<RoleTableRow> {
             color: widget.isSelected
                 ? colors.primaryContainer.withValues(alpha: 0.2)
                 : _isHovered
-                    ? colors.onSurface.withValues(alpha: 0.04)
-                    : Colors.transparent,
+                ? colors.onSurface.withValues(alpha: 0.04)
+                : Colors.transparent,
             border: Border(
               bottom: BorderSide(
                 color: colors.outlineVariant.withValues(alpha: 0.3),
@@ -64,8 +64,8 @@ class _RoleTableRowState extends State<RoleTableRow> {
                 ),
               ),
               const SizedBox(width: AppSpacing.small),
-              Expanded(
-                flex: 3,
+              SizedBox(
+                width: 200,
                 child: Text(
                   role.name,
                   style: textTheme.bodyMedium?.copyWith(
@@ -77,7 +77,7 @@ class _RoleTableRowState extends State<RoleTableRow> {
               SizedBox(
                 width: 200,
                 child: Text(
-                  role.permissions.join(', '),
+                  role.permissions.length.toString(),
                   style: textTheme.bodySmall?.copyWith(
                     color: colors.onSurfaceVariant,
                   ),

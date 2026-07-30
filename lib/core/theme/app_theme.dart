@@ -27,6 +27,7 @@ sealed class AppTheme {
       useMaterial3: true,
       brightness: colorScheme.brightness,
       colorScheme: colorScheme,
+      textTheme: textTheme,
       scaffoldBackgroundColor: colorScheme.surface,
       hoverColor: colorScheme.secondary.withValues(alpha: 0.05),
       splashColor: colorScheme.primary.withValues(alpha: 0.15),
@@ -79,6 +80,16 @@ sealed class AppTheme {
           textStyle: textTheme.labelSmall?.copyWith(fontWeight: .bold),
         ),
       ),
+      segmentedButtonTheme: SegmentedButtonThemeData(
+        style: SegmentedButton.styleFrom(
+          shape: _defaultShape,
+          foregroundColor: colorScheme.onSurfaceVariant,
+          backgroundColor: colorScheme.surface,
+          selectedBackgroundColor: colorScheme.primary.withValues(alpha: 0.10),
+          selectedForegroundColor: colorScheme.onSurface,
+          textStyle: textTheme.labelSmall?.copyWith(fontWeight: .bold),
+        ),
+      ),
 
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
@@ -95,6 +106,10 @@ sealed class AppTheme {
           foregroundColor: colorScheme.onPrimary,
           backgroundColor: colorScheme.primary,
           textStyle: textTheme.labelSmall?.copyWith(fontWeight: .bold),
+          fixedSize: Size.fromHeight(28),
+          //minimumSize: Size.fromHeight(28),
+          // maximumSize: Size.fromHeight(28),
+          padding: .symmetric(horizontal: 12, vertical: 4),
         ),
       ),
 
@@ -128,7 +143,7 @@ sealed class AppTheme {
   }) {
     return InputDecorationThemeData(
       labelStyle: null,
-      hintStyle: textTheme.bodySmall?.copyWith(
+      hintStyle: textTheme.bodyMedium?.copyWith(
         color: colorScheme.onSurfaceVariant.withValues(alpha: 0.35),
       ),
       isDense: true,
@@ -139,6 +154,8 @@ sealed class AppTheme {
         borderRadius: .circular(AppRadius.extraSmall),
         borderSide: BorderSide(color: colorScheme.outline),
       ),
+
+      contentPadding: .all(8),
     );
   }
 }

@@ -87,6 +87,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cancelButton => 'Cancel';
 
   @override
+  String get saveButton => 'Save';
+
+  @override
   String get projectNameLabel => 'Name';
 
   @override
@@ -540,170 +543,164 @@ class AppLocalizationsEn extends AppLocalizations {
   String get templateMarketing => 'Marketing';
 
   @override
-  String get permissionProjectReadProjectBasic => 'Read Project Basic';
+  String get permissionProjectReadProjectBasic => 'Project Basic';
 
   @override
-  String get permissionProjectCreateProject => 'Create Project';
+  String get permissionProjectCreateProject => 'Project';
 
   @override
-  String get permissionProjectReadProjectFull => 'Read Project Full';
+  String get permissionProjectReadProjectFull => 'Project Full';
 
   @override
-  String get permissionProjectUpdateProject => 'Update Project';
+  String get permissionProjectUpdateProject => 'Project';
 
   @override
-  String get permissionProjectDeleteProject => 'Delete Project';
+  String get permissionProjectDeleteProject => 'Project';
 
   @override
-  String get permissionOrganizationReadOrganization => 'Read Organization';
+  String get permissionOrganizationReadOrganization => 'Organization';
 
   @override
-  String get permissionOrganizationUpdateOrganization => 'Update Organization';
+  String get permissionOrganizationUpdateOrganization => 'Organization';
 
   @override
-  String get permissionOrganizationCreateOrganization => 'Create Organization';
+  String get permissionOrganizationCreateOrganization => 'Organization';
 
   @override
-  String get permissionOrganizationDeleteOrganization => 'Delete Organization';
+  String get permissionOrganizationDeleteOrganization => 'Organization';
 
   @override
-  String get permissionUserProfileUpdateSelf => 'Update Self Profile';
+  String get permissionUserProfileUpdateSelf => 'Self Profile';
 
   @override
-  String get permissionUserReadUserBasic => 'Read User Basic';
+  String get permissionUserReadUserBasic => 'User Basic';
 
   @override
-  String get permissionUserReadUserDetails => 'Read User Details';
+  String get permissionUserReadUserDetails => 'User Details';
 
   @override
-  String get permissionUserUpdateUser => 'Update User';
+  String get permissionUserUpdateUser => 'User';
 
   @override
-  String get permissionUserCreateUser => 'Create User';
+  String get permissionUserCreateUser => 'User';
 
   @override
-  String get permissionUserDeleteUser => 'Delete User';
+  String get permissionUserDeleteUser => 'User';
 
   @override
-  String get permissionSystemLowLevelAdminRead =>
-      'Read Low-Level Admin Settings';
+  String get permissionSystemLowLevelAdminRead => 'Low-Level Admin Settings';
 
   @override
-  String get permissionSystemLowLevelAdminWrite =>
-      'Write Low-Level Admin Settings';
+  String get permissionSystemLowLevelAdminWrite => 'Low-Level Admin Settings';
 
   @override
-  String get permissionIssueReadIssue => 'Read Issue';
+  String get permissionIssueReadIssue => 'Issue';
 
   @override
-  String get permissionIssueReadIssuePrivateFields =>
-      'Read Issue Private Fields';
+  String get permissionIssueReadIssuePrivateFields => 'Issue Private Fields';
 
   @override
-  String get permissionIssueUpdateIssue => 'Update Issue';
+  String get permissionIssueUpdateIssue => 'Issue';
 
   @override
-  String get permissionIssueCreateIssue => 'Create Issue';
+  String get permissionIssueCreateIssue => 'Issue';
 
   @override
-  String get permissionIssueDeleteIssue => 'Delete Issue';
+  String get permissionIssueDeleteIssue => 'Issue';
 
   @override
-  String get permissionIssueLinkIssues => 'Link Issues';
+  String get permissionIssueLinkIssues => 'Issues';
 
   @override
-  String get permissionIssueUpdateIssuePrivateFields =>
-      'Update Issue Private Fields';
+  String get permissionIssueUpdateIssuePrivateFields => 'Issue Private Fields';
 
   @override
-  String get permissionIssueApplyCommandsSilently => 'Apply Commands Silently';
+  String get permissionIssueApplyCommandsSilently => 'Commands Silently';
 
   @override
-  String get permissionIssueViewWatchers => 'View Watchers';
+  String get permissionIssueViewWatchers => 'Watchers';
 
   @override
-  String get permissionIssueUpdateWatchers => 'Update Watchers';
+  String get permissionIssueUpdateWatchers => 'Watchers';
 
   @override
-  String get permissionIssueViewVoters => 'View Voters';
+  String get permissionIssueViewVoters => 'Voters';
 
   @override
-  String get permissionAttachmentAddAttachment => 'Add Attachment';
+  String get permissionAttachmentAddAttachment => 'Attachment';
 
   @override
-  String get permissionAttachmentUpdateAttachment => 'Update Attachment';
+  String get permissionAttachmentUpdateAttachment => 'Attachment';
 
   @override
-  String get permissionAttachmentDeleteAttachment => 'Delete Attachment';
+  String get permissionAttachmentDeleteAttachment => 'Attachment';
 
   @override
-  String get permissionCommentCreateIssueComment => 'Create Issue Comment';
+  String get permissionCommentCreateIssueComment => 'Issue Comment';
 
   @override
-  String get permissionCommentReadIssueComment => 'Read Issue Comment';
+  String get permissionCommentReadIssueComment => 'Issue Comment';
 
   @override
-  String get permissionCommentUpdateIssueComment => 'Update Issue Comment';
+  String get permissionCommentUpdateIssueComment => 'Issue Comment';
 
   @override
-  String get permissionCommentDeleteIssueComment => 'Delete Issue Comment';
+  String get permissionCommentDeleteIssueComment => 'Issue Comment';
 
   @override
   String get permissionCommentUpdateNotOwnIssueComment =>
-      'Update Not Own Issue Comment';
+      'Not Own Issue Comment';
 
   @override
   String get permissionCommentDeleteNotOwnCommentAndPermanentCommentDelete =>
-      'Delete Not Own Comment & Permanent Delete';
+      'Not Own Comment & Permanent Delete';
 
   @override
-  String get permissionCommentReadArticleComment => 'Read Article Comment';
+  String get permissionCommentReadArticleComment => 'Article Comment';
 
   @override
-  String get permissionCommentCreateArticleComment => 'Create Article Comment';
+  String get permissionCommentCreateArticleComment => 'Article Comment';
 
   @override
-  String get permissionCommentUpdateArticleComment => 'Update Article Comment';
+  String get permissionCommentUpdateArticleComment => 'Article Comment';
 
   @override
-  String get permissionCommentDeleteArticleComment => 'Delete Article Comment';
+  String get permissionCommentDeleteArticleComment => 'Article Comment';
 
   @override
   String get permissionVisibilityOverrideVisibilityRestrictions =>
-      'Override Visibility Restrictions';
+      'Visibility Restrictions';
 
   @override
-  String get permissionIssueWorkItemReadWorkItem => 'Read Work Item';
+  String get permissionIssueWorkItemReadWorkItem => 'Work Item';
 
   @override
-  String get permissionIssueWorkItemUpdateWorkItem => 'Update Work Item';
+  String get permissionIssueWorkItemUpdateWorkItem => 'Work Item';
 
   @override
-  String get permissionIssueWorkItemUpdateNotOwnWorkItem =>
-      'Update Not Own Work Item';
+  String get permissionIssueWorkItemUpdateNotOwnWorkItem => 'Not Own Work Item';
 
   @override
-  String get permissionIssueWorkItemCreateWorkItem => 'Create Work Item';
+  String get permissionIssueWorkItemCreateWorkItem => 'Work Item';
 
   @override
-  String get permissionIssueWorkItemCreateNotOwnWorkItem =>
-      'Create Not Own Work Item';
+  String get permissionIssueWorkItemCreateNotOwnWorkItem => 'Not Own Work Item';
 
   @override
-  String get permissionArticleReadArticle => 'Read Article';
+  String get permissionArticleReadArticle => 'Article';
 
   @override
-  String get permissionArticleCreateArticle => 'Create Article';
+  String get permissionArticleCreateArticle => 'Article';
 
   @override
-  String get permissionArticleUpdateArticle => 'Update Article';
+  String get permissionArticleUpdateArticle => 'Article';
 
   @override
-  String get permissionArticleDeleteArticle => 'Delete Article';
+  String get permissionArticleDeleteArticle => 'Article';
 
   @override
-  String get permissionAppReadAppContent => 'Read App Content';
+  String get permissionAppReadAppContent => 'App Content';
 
   @override
-  String get permissionAppUpdateAppContent => 'Update App Content';
+  String get permissionAppUpdateAppContent => 'App Content';
 }

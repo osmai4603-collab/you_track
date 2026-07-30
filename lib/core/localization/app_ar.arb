@@ -29,6 +29,7 @@
   "defaultTemplateTitle": "قالب المشروع الافتراضي",
   "useThisTemplateButton": "استخدام هذا القالب",
   "cancelButton": "إلغاء",
+  "saveButton": "حفظ",
   "projectNameLabel": "الاسم",
   "projectNameHint": "أدخل اسماً لمشروعك",
   "projectIdLabel": "معرف المشروع",
@@ -221,215 +222,215 @@
   "@templateMarketing": {
     "description": "قالب تسويق"
   },
-  "permissionProjectReadProjectBasic": "قراءة بيانات المشروع الأساسية",
+  "permissionProjectReadProjectBasic": "بيانات المشروع الأساسية",
   "@permissionProjectReadProjectBasic": {
     "description": "صلاحية: قراءة بيانات المشروع الأساسية"
   },
-  "permissionProjectCreateProject": "إنشاء مشروع جديد",
+  "permissionProjectCreateProject": "مشروع جديد",
   "@permissionProjectCreateProject": {
     "description": "صلاحية: إنشاء مشروع جديد"
   },
-  "permissionProjectReadProjectFull": "قراءة تفاصيل المشروع بالكامل",
+  "permissionProjectReadProjectFull": "تفاصيل المشروع بالكامل",
   "@permissionProjectReadProjectFull": {
     "description": "صلاحية: قراءة تفاصيل المشروع بالكامل"
   },
-  "permissionProjectUpdateProject": "تعديل إعدادات المشروع",
+  "permissionProjectUpdateProject": "إعدادات المشروع",
   "@permissionProjectUpdateProject": {
     "description": "صلاحية: تعديل إعدادات المشروع"
   },
-  "permissionProjectDeleteProject": "حذف المشروع",
+  "permissionProjectDeleteProject": "المشروع",
   "@permissionProjectDeleteProject": {
     "description": "صلاحية: حذف المشروع"
   },
-  "permissionOrganizationReadOrganization": "عرض بيانات المؤسسة",
+  "permissionOrganizationReadOrganization": "بيانات المؤسسة",
   "@permissionOrganizationReadOrganization": {
     "description": "صلاحية: عرض بيانات المؤسسة"
   },
-  "permissionOrganizationUpdateOrganization": "تعديل بيانات المؤسسة",
+  "permissionOrganizationUpdateOrganization": "بيانات المؤسسة",
   "@permissionOrganizationUpdateOrganization": {
     "description": "صلاحية: تعديل بيانات المؤسسة"
   },
-  "permissionOrganizationCreateOrganization": "إنشاء مؤسسة جديدة",
+  "permissionOrganizationCreateOrganization": "مؤسسة جديدة",
   "@permissionOrganizationCreateOrganization": {
     "description": "صلاحية: إنشاء مؤسسة جديدة"
   },
-  "permissionOrganizationDeleteOrganization": "حذف المؤسسة",
+  "permissionOrganizationDeleteOrganization": "المؤسسة",
   "@permissionOrganizationDeleteOrganization": {
     "description": "صلاحية: حذف المؤسسة"
   },
-  "permissionUserProfileUpdateSelf": "تعديل الملف الشخصي",
+  "permissionUserProfileUpdateSelf": "الملف الشخصي",
   "@permissionUserProfileUpdateSelf": {
     "description": "صلاحية: تعديل الملف الشخصي للمستخدم نفسه"
   },
-  "permissionUserReadUserBasic": "عرض بيانات المستخدمين الأساسية",
+  "permissionUserReadUserBasic": "بيانات المستخدمين الأساسية",
   "@permissionUserReadUserBasic": {
     "description": "صلاحية: عرض بيانات المستخدمين الأساسية"
   },
-  "permissionUserReadUserDetails": "عرض تفاصيل الحسابات الشاملة",
+  "permissionUserReadUserDetails": "تفاصيل الحسابات الشاملة",
   "@permissionUserReadUserDetails": {
     "description": "صلاحية: عرض تفاصيل الحسابات الشاملة"
   },
-  "permissionUserUpdateUser": "تعديل حسابات المستخدمين",
+  "permissionUserUpdateUser": "حسابات المستخدمين",
   "@permissionUserUpdateUser": {
     "description": "صلاحية: تعديل حسابات المستخدمين"
   },
-  "permissionUserCreateUser": "إنشاء حساب مستخدم جديد",
+  "permissionUserCreateUser": "حساب مستخدم جديد",
   "@permissionUserCreateUser": {
     "description": "صلاحية: إنشاء حساب مستخدم جديد"
   },
-  "permissionUserDeleteUser": "حذف حساب مستخدم",
+  "permissionUserDeleteUser": "حساب مستخدم",
   "@permissionUserDeleteUser": {
     "description": "صلاحية: حذف حساب مستخدم"
   },
-  "permissionSystemLowLevelAdminRead": "قراءة إعدادات النظام المتقدمة",
+  "permissionSystemLowLevelAdminRead": "إعدادات النظام المتقدمة",
   "@permissionSystemLowLevelAdminRead": {
     "description": "صلاحية: قراءة إعدادات النظام المتقدمة"
   },
-  "permissionSystemLowLevelAdminWrite": "تعديل إعدادات النظام المتقدمة",
+  "permissionSystemLowLevelAdminWrite": "إعدادات النظام المتقدمة",
   "@permissionSystemLowLevelAdminWrite": {
     "description": "صلاحية: تعديل إعدادات النظام المتقدمة"
   },
-  "permissionIssueReadIssue": "قراءة بيانات المهام العامة",
+  "permissionIssueReadIssue": "بيانات المهام العامة",
   "@permissionIssueReadIssue": {
     "description": "صلاحية: قراءة بيانات المهام العامة"
   },
-  "permissionIssueReadIssuePrivateFields": "قراءة الحقول الخاصة بالمهام",
+  "permissionIssueReadIssuePrivateFields": "الحقول الخاصة بالمهام",
   "@permissionIssueReadIssuePrivateFields": {
     "description": "صلاحية: قراءة الحقول الخاصة بالمهام"
   },
-  "permissionIssueUpdateIssue": "تعديل المهام",
+  "permissionIssueUpdateIssue": "المهام",
   "@permissionIssueUpdateIssue": {
     "description": "صلاحية: تعديل المهام"
   },
-  "permissionIssueCreateIssue": "إنشاء مهام جديدة",
+  "permissionIssueCreateIssue": "مهام جديدة",
   "@permissionIssueCreateIssue": {
     "description": "صلاحية: إنشاء مهام جديدة"
   },
-  "permissionIssueDeleteIssue": "حذف المهام",
+  "permissionIssueDeleteIssue": "المهام",
   "@permissionIssueDeleteIssue": {
     "description": "صلاحية: حذف المهام"
   },
-  "permissionIssueLinkIssues": "ربط المهام ببعضها",
+  "permissionIssueLinkIssues": "المهام ببعضها",
   "@permissionIssueLinkIssues": {
     "description": "صلاحية: ربط المهام ببعضها"
   },
-  "permissionIssueUpdateIssuePrivateFields": "تعديل الحقول الخاصة بالمهام",
+  "permissionIssueUpdateIssuePrivateFields": "الحقول الخاصة بالمهام",
   "@permissionIssueUpdateIssuePrivateFields": {
     "description": "صلاحية: تعديل الحقول الخاصة بالمهام"
   },
-  "permissionIssueApplyCommandsSilently": "تطبيق أوامر على المهام دون تنبيهات",
+  "permissionIssueApplyCommandsSilently": "أوامر على المهام دون تنبيهات",
   "@permissionIssueApplyCommandsSilently": {
     "description": "صلاحية: تطبيق أوامر على المهام دون تنبيهات"
   },
-  "permissionIssueViewWatchers": "عرض متابعي المهمة",
+  "permissionIssueViewWatchers": "متابعي المهمة",
   "@permissionIssueViewWatchers": {
     "description": "صلاحية: عرض متابعي المهمة"
   },
-  "permissionIssueUpdateWatchers": "إدارة متابعي المهمة",
+  "permissionIssueUpdateWatchers": "متابعي المهمة",
   "@permissionIssueUpdateWatchers": {
     "description": "صلاحية: إضافة/تعديل متابعي المهمة"
   },
-  "permissionIssueViewVoters": "عرض المصوتين للمهمة",
+  "permissionIssueViewVoters": "المصوتين للمهمة",
   "@permissionIssueViewVoters": {
     "description": "صلاحية: عرض المصوتين للمهمة"
   },
-  "permissionAttachmentAddAttachment": "إضافة مرفقات للمهمة",
+  "permissionAttachmentAddAttachment": "مرفقات للمهمة",
   "@permissionAttachmentAddAttachment": {
     "description": "صلاحية: إضافة مرفقات للمهمة"
   },
-  "permissionAttachmentUpdateAttachment": "تعديل المرفقات والرؤية",
+  "permissionAttachmentUpdateAttachment": "المرفقات والرؤية",
   "@permissionAttachmentUpdateAttachment": {
     "description": "صلاحية: تعديل المرفقات والرؤية"
   },
-  "permissionAttachmentDeleteAttachment": "حذف المرفقات",
+  "permissionAttachmentDeleteAttachment": "المرفقات",
   "@permissionAttachmentDeleteAttachment": {
     "description": "صلاحية: حذف المرفقات"
   },
-  "permissionCommentCreateIssueComment": "إضافة تعليق على المهمة",
+  "permissionCommentCreateIssueComment": "تعليق على المهمة",
   "@permissionCommentCreateIssueComment": {
     "description": "صلاحية: إضافة تعليق على المهمة"
   },
-  "permissionCommentReadIssueComment": "قراءة تعليقات المهمة",
+  "permissionCommentReadIssueComment": "تعليقات المهمة",
   "@permissionCommentReadIssueComment": {
     "description": "صلاحية: قراءة تعليقات المهمة"
   },
-  "permissionCommentUpdateIssueComment": "تعديل التعليق الشخصي",
+  "permissionCommentUpdateIssueComment": "التعليق الشخصي",
   "@permissionCommentUpdateIssueComment": {
     "description": "صلاحية: تعديل التعليق الشخصي"
   },
-  "permissionCommentDeleteIssueComment": "حذف التعليق الشخصي",
+  "permissionCommentDeleteIssueComment": "التعليق الشخصي",
   "@permissionCommentDeleteIssueComment": {
     "description": "صلاحية: حذف التعليق الشخصي"
   },
-  "permissionCommentUpdateNotOwnIssueComment": "تعديل تعليقات الآخرين",
+  "permissionCommentUpdateNotOwnIssueComment": "تعليقات الآخرين",
   "@permissionCommentUpdateNotOwnIssueComment": {
     "description": "صلاحية: تعديل تعليقات الآخرين"
   },
-  "permissionCommentDeleteNotOwnCommentAndPermanentCommentDelete": "حذف تعليقات الآخرين نهائياً",
+  "permissionCommentDeleteNotOwnCommentAndPermanentCommentDelete": "تعليقات الآخرين نهائياً",
   "@permissionCommentDeleteNotOwnCommentAndPermanentCommentDelete": {
     "description": "صلاحية: حذف تعليقات الآخرين نهائياً"
   },
-  "permissionCommentReadArticleComment": "قراءة تعليقات المقالات",
+  "permissionCommentReadArticleComment": "تعليقات المقالات",
   "@permissionCommentReadArticleComment": {
     "description": "صلاحية: قراءة تعليقات المقالات"
   },
-  "permissionCommentCreateArticleComment": "كتابة تعليق على المقالات",
+  "permissionCommentCreateArticleComment": "تعليق على المقالات",
   "@permissionCommentCreateArticleComment": {
     "description": "صلاحية: كتابة تعليق على المقالات"
   },
-  "permissionCommentUpdateArticleComment": "تعديل تعليق على مقال",
+  "permissionCommentUpdateArticleComment": "تعليق على مقال",
   "@permissionCommentUpdateArticleComment": {
     "description": "صلاحية: تعديل تعليق على مقال"
   },
-  "permissionCommentDeleteArticleComment": "حذف تعليق على مقال",
+  "permissionCommentDeleteArticleComment": "تعليق على مقال",
   "@permissionCommentDeleteArticleComment": {
     "description": "صلاحية: حذف تعليق على مقال"
   },
-  "permissionVisibilityOverrideVisibilityRestrictions": "تجاوز قيود رؤية العناصر",
+  "permissionVisibilityOverrideVisibilityRestrictions": "قيود رؤية العناصر",
   "@permissionVisibilityOverrideVisibilityRestrictions": {
     "description": "صلاحية: تجاوز قيود رؤية العناصر"
   },
-  "permissionIssueWorkItemReadWorkItem": "عرض سجلات الوقت والعمل",
+  "permissionIssueWorkItemReadWorkItem": "سجلات الوقت والعمل",
   "@permissionIssueWorkItemReadWorkItem": {
     "description": "صلاحية: عرض سجلات الوقت والعمل"
   },
-  "permissionIssueWorkItemUpdateWorkItem": "تعديل سجلات العمل الخاصة",
+  "permissionIssueWorkItemUpdateWorkItem": "سجلات العمل الخاصة",
   "@permissionIssueWorkItemUpdateWorkItem": {
     "description": "صلاحية: تعديل سجلات العمل الخاصة"
   },
-  "permissionIssueWorkItemUpdateNotOwnWorkItem": "تعديل سجلات عمل الآخرين",
+  "permissionIssueWorkItemUpdateNotOwnWorkItem": "سجلات عمل الآخرين",
   "@permissionIssueWorkItemUpdateNotOwnWorkItem": {
     "description": "صلاحية: تعديل سجلات عمل الآخرين"
   },
-  "permissionIssueWorkItemCreateWorkItem": "إضافة سجل عمل جديد",
+  "permissionIssueWorkItemCreateWorkItem": "سجل عمل جديد",
   "@permissionIssueWorkItemCreateWorkItem": {
     "description": "صلاحية: إضافة سجل عمل جديد"
   },
-  "permissionIssueWorkItemCreateNotOwnWorkItem": "إضافة سجل عمل باسم شخص آخر",
+  "permissionIssueWorkItemCreateNotOwnWorkItem": "سجل عمل باسم شخص آخر",
   "@permissionIssueWorkItemCreateNotOwnWorkItem": {
     "description": "صلاحية: إضافة سجل عمل باسم شخص آخر"
   },
-  "permissionArticleReadArticle": "قراءة مقالات قاعدة المعرفة",
+  "permissionArticleReadArticle": "مقالات قاعدة المعرفة",
   "@permissionArticleReadArticle": {
     "description": "صلاحية: قراءة مقالات قاعدة المعرفة"
   },
-  "permissionArticleCreateArticle": "إنشاء مقال جديد",
+  "permissionArticleCreateArticle": "مقال جديد",
   "@permissionArticleCreateArticle": {
     "description": "صلاحية: إنشاء مقال جديد"
   },
-  "permissionArticleUpdateArticle": "تعديل مقال",
+  "permissionArticleUpdateArticle": "مقال",
   "@permissionArticleUpdateArticle": {
     "description": "صلاحية: تعديل مقال"
   },
-  "permissionArticleDeleteArticle": "حذف مقال",
+  "permissionArticleDeleteArticle": "مقال",
   "@permissionArticleDeleteArticle": {
     "description": "صلاحية: حذف مقال"
   },
-  "permissionAppReadAppContent": "عرض محتوى التطبيقات المضافة",
+  "permissionAppReadAppContent": "محتوى التطبيقات المضافة",
   "@permissionAppReadAppContent": {
     "description": "صلاحية: عرض محتوى التطبيقات المضافة"
   },
-  "permissionAppUpdateAppContent": "تعديل محتوى التطبيقات المضافة",
+  "permissionAppUpdateAppContent": "محتوى التطبيقات المضافة",
   "@permissionAppUpdateAppContent": {
     "description": "صلاحية: تعديل محتوى التطبيقات المضافة"
   }

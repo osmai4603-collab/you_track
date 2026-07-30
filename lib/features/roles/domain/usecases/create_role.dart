@@ -6,12 +6,13 @@ import 'package:issues_tracking/features/roles/domain/repositories/roles_reposit
 
 class CreateRoleParams extends Params {
   final String name;
+  final String? description;
   final List<String> permissions;
 
-  const CreateRoleParams({required this.name, required this.permissions});
+  const CreateRoleParams({required this.name, this.description, required this.permissions});
 
   @override
-  List<Object?> get props => [name, permissions];
+  List<Object?> get props => [name, description, permissions];
 }
 
 class CreateRole extends UseCase<RoleEntity, CreateRoleParams> {
@@ -23,8 +24,8 @@ class CreateRole extends UseCase<RoleEntity, CreateRoleParams> {
   Future<Either<Failure, RoleEntity>> call({required CreateRoleParams params}) {
     return repository.createRole(
       RoleEntity(
-        id: '',
         name: params.name,
+        description: params.description,
         permissions: params.permissions,
       ),
     );

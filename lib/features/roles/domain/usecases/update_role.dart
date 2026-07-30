@@ -5,18 +5,18 @@ import 'package:issues_tracking/features/roles/domain/entities/role_entity.dart'
 import 'package:issues_tracking/features/roles/domain/repositories/roles_repository.dart';
 
 class UpdateRoleParams extends Params {
-  final String id;
   final String name;
+  final String? description;
   final List<String> permissions;
 
   const UpdateRoleParams({
-    required this.id,
     required this.name,
+    this.description,
     required this.permissions,
   });
 
   @override
-  List<Object?> get props => [id, name, permissions];
+  List<Object?> get props => [name, description, permissions];
 }
 
 class UpdateRole extends UseCase<RoleEntity, UpdateRoleParams> {
@@ -28,8 +28,8 @@ class UpdateRole extends UseCase<RoleEntity, UpdateRoleParams> {
   Future<Either<Failure, RoleEntity>> call({required UpdateRoleParams params}) {
     return repository.updateRole(
       RoleEntity(
-        id: params.id,
         name: params.name,
+        description: params.description,
         permissions: params.permissions,
       ),
     );

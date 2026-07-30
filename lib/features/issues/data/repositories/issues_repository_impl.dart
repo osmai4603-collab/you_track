@@ -31,6 +31,11 @@ class IssuesRepositoryImpl implements IssuesRepository {
   }
 
   @override
+  Stream<Issue> streamIssues(IssueFilter filter) {
+    return dataSource.streamIssues(filter);
+  }
+
+  @override
   Future<Either<Failure, Issue>> getIssueById(String id) async {
     try {
       final issue = await dataSource.getIssueById(id);
@@ -89,7 +94,9 @@ class IssuesRepositoryImpl implements IssuesRepository {
   @override
   Future<Either<Failure, Issue>> createIssue(Issue issue) async {
     try {
-      final createdIssue = await dataSource.createIssue(IssueModel.fromEntity(issue));
+      final createdIssue = await dataSource.createIssue(
+        IssueModel.fromEntity(issue),
+      );
       return Right(createdIssue);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -99,7 +106,9 @@ class IssuesRepositoryImpl implements IssuesRepository {
   @override
   Future<Either<Failure, Issue>> updateIssue(Issue issue) async {
     try {
-      final updatedIssue = await dataSource.updateIssue(IssueModel.fromEntity(issue));
+      final updatedIssue = await dataSource.updateIssue(
+        IssueModel.fromEntity(issue),
+      );
       return Right(updatedIssue);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
@@ -156,14 +165,16 @@ class IssuesRepositoryImpl implements IssuesRepository {
     try {
       final files = await dataSource.getAttachments(issueId);
       final attachments = files
-          .map((f) => IssueAttachment(
-                id: f['path'] ?? '',
-                fileName: f['name'] ?? '',
-                fileSize: (f['size'] ?? 0) as int,
-                mimeType: f['mimeType'] ?? 'application/octet-stream',
-                storagePath: f['path'],
-                status: AttachmentStatus.uploaded,
-              ))
+          .map(
+            (f) => IssueAttachment(
+              id: f['path'] ?? '',
+              fileName: f['name'] ?? '',
+              fileSize: (f['size'] ?? 0) as int,
+              mimeType: f['mimeType'] ?? 'application/octet-stream',
+              storagePath: f['path'],
+              status: AttachmentStatus.uploaded,
+            ),
+          )
           .toList();
       return Right(attachments);
     } catch (e) {
