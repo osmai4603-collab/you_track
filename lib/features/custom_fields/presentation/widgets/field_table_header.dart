@@ -67,6 +67,20 @@ class FieldTableHeader extends StatelessWidget {
               ),
             ),
             Expanded(
+              flex: 1,
+              child: Text(
+                'Can Be Empty',
+                style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
+              flex: 2,
+              child: Text(
+                'Value Mode',
+                style: textTheme.labelLarge?.copyWith(fontWeight: FontWeight.bold),
+              ),
+            ),
+            Expanded(
               flex: 2,
               child: Text(
                 'Default Visibility in Issues List',

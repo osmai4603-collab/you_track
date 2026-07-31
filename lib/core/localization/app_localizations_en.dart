@@ -703,4 +703,72 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get permissionAppUpdateAppContent => 'App Content';
+
+  @override
+  String get customFieldsAddFieldToProject => 'Add field to project ...';
+
+  @override
+  String get customFieldsEditField => 'Edit Custom Field';
+
+  @override
+  String get customFieldsDeleteFields => 'Delete Custom Fields';
+
+  @override
+  String get customFieldsEmptyValue => 'Empty value (optional)';
+
+  @override
+  String get customFieldsCanBeEmpty => 'Can be empty';
+
+  @override
+  String get customFieldsValueMode => 'Value mode';
+
+  @override
+  String get customFieldsValueModeSingle => 'Single';
+
+  @override
+  String get customFieldsValueModeMulti => 'Multi';
+
+  @override
+  String get customFieldsAliases => 'Aliases (optional, comma-separated)';
+
+  @override
+  String get customFieldsFieldMode => 'Field mode';
+
+  @override
+  String get customFieldsVisibleTo => 'Visible to';
+
+  @override
+  String get customFieldsUpdatableBy => 'Updatable by';
+
+  @override
+  String get customFieldsShowOnlyWhen => 'Show only when';
+
+  @override
+  String get customFieldsFilterValuesBasedOn => 'Filter values based on';
+
+  @override
+  String get customFieldsAdvancedSettings => 'Advanced settings';
+
+  @override
+  String get customFieldsNoCustomFieldsYet => 'No custom fields yet';
+
+  @override
+  String get customFieldsFieldDetails => 'Field Details';
+
+  @override
+  String get customFieldsMakePublicSuccess =>
+      'Field is now visible to everyone';
+
+  @override
+  String get customFieldsAccessControlUpdated => 'Access control updated';
+
+  @override
+  String customFieldsSelected(Object count) {
+    return '$count selected';
+  }
+
+  @override
+  String customFieldsDeleteConfirmation(Object count) {
+    return 'Are you sure you want to delete $count custom field(s)?';
+  }
 }

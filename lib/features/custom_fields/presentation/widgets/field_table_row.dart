@@ -86,6 +86,21 @@ class FieldTableRow extends StatelessWidget {
                 ),
               ),
               Expanded(
+                flex: 1,
+                child: Icon(
+                  field.canBeEmpty ? Icons.check_circle : Icons.cancel,
+                  size: 16,
+                  color: field.canBeEmpty ? colors.primary : colors.error,
+                ),
+              ),
+              Expanded(
+                flex: 2,
+                child: Text(
+                  field.valueMode == 'single' ? 'Single' : 'Multi',
+                  style: textTheme.bodySmall,
+                ),
+              ),
+              Expanded(
                 flex: 2,
                 child: GestureDetector(
                   onTap: onVisibilityTap != null

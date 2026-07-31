@@ -198,6 +198,21 @@ class GroupsSqliteDataSourceImpl implements GroupsRemoteDataSource {
   }
 
   @override
+  Future<void> removeGroupMembers(
+    String groupId,
+    List<String> userIds,
+  ) async {
+    _sqlite.transaction(() {
+      for (final uid in userIds) {
+        _sqlite.execute(
+          'DELETE FROM ${_membersTable.tableName} WHERE ${_membersTable.groupId} = ? AND ${_membersTable.userId} = ?',
+          [groupId, uid],
+        );
+      }
+    });
+  }
+
+  @override
   Future<List<GroupMemberModel>> getGroupMembers(String groupId) async {
     final rows = _sqlite.query(
       table: _membersTable.tableName,

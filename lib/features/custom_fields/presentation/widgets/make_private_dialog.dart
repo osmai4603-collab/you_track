@@ -3,20 +3,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import '../../domain/entities/custom_field_entity.dart';
 import '../cubits/custom_fields_cubit.dart';
+import '../../../groups/presentation/bloc/groups_bloc.dart';
+import '../../../groups/presentation/bloc/groups_event.dart';
+import '../../../groups/presentation/bloc/groups_state.dart';
+import '../../../users/presentation/bloc/users_bloc.dart';
+import '../../../users/presentation/bloc/users_event.dart';
+import '../../../users/presentation/bloc/users_state.dart';
 
-enum AccessLevel {
-  everyone,
-  adminsOnly,
-  custom,
-}
+enum AccessLevel { everyone, adminsOnly, custom }
 
 class MakePrivateDialog extends StatefulWidget {
   final CustomFieldEntity field;
 
-  const MakePrivateDialog({
-    super.key,
-    required this.field,
-  });
+  const MakePrivateDialog({super.key, required this.field});
 
   @override
   State<MakePrivateDialog> createState() => _MakePrivateDialogState();
@@ -33,6 +32,8 @@ class _MakePrivateDialogState extends State<MakePrivateDialog> {
   void initState() {
     super.initState();
     _initializeFromField();
+    context.read<GroupsBloc>().add(const LoadGroups());
+    context.read<UsersBloc>().add(const LoadUsers());
   }
 
   void _initializeFromField() {
@@ -227,90 +228,134 @@ class _MakePrivateDialogState extends State<MakePrivateDialog> {
   }
 
   Widget _buildGroupsSection(ColorScheme colors, TextTheme textTheme) {
-    final groups = ['Developers', 'Designers', 'QA Team', 'DevOps'];
-    final filteredGroups = _searchQuery.isEmpty
-        ? groups
-        : groups
-            .where((g) => g.toLowerCase().contains(_searchQuery.toLowerCase()))
-            .toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Groups',
-          style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(height: AppSpacing.small),
-        if (filteredGroups.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.small),
-            child: Text(
-              'No groups found',
-              style: textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+    return BlocBuilder<GroupsBloc, GroupsState>(
+      builder: (context, state) {
+        if (state is GroupsLoading) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: AppSpacing.small),
+            child: SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
             ),
-          )
-        else
-          ...filteredGroups.map((group) => CheckboxListTile(
-                value: _selectedGroupIds.contains(group),
-                onChanged: (checked) {
-                  setState(() {
-                    if (checked == true) {
-                      _selectedGroupIds.add(group);
-                    } else {
-                      _selectedGroupIds.remove(group);
-                    }
-                  });
-                },
-                title: Text(group, style: textTheme.bodyMedium),
-                dense: true,
-                contentPadding: EdgeInsets.zero,
-              )),
-      ],
+          );
+        }
+
+        final groups = state is GroupsLoaded ? state.groups : [];
+        final filteredGroups = groups.where((g) {
+          if (_searchQuery.isEmpty) return true;
+          return g.name.toLowerCase().contains(_searchQuery.toLowerCase());
+        }).toList();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Groups',
+              style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: AppSpacing.small),
+            if (filteredGroups.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.small),
+                child: Text(
+                  'No groups found',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
+              )
+            else
+              ...filteredGroups.map(
+                (group) => CheckboxListTile(
+                  value: _selectedGroupIds.contains(group.id) ||
+                      _selectedGroupIds.contains(group.name),
+                  onChanged: (checked) {
+                    setState(() {
+                      if (checked == true) {
+                        _selectedGroupIds.add(group.id);
+                      } else {
+                        _selectedGroupIds.remove(group.id);
+                        _selectedGroupIds.remove(group.name);
+                      }
+                    });
+                  },
+                  title: Text(group.name, style: textTheme.bodyMedium),
+                  dense: true,
+                  contentPadding: EdgeInsets.zero,
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 
   Widget _buildUsersSection(ColorScheme colors, TextTheme textTheme) {
-    final users = ['John Doe', 'Jane Smith', 'Bob Johnson', 'Alice Brown'];
-    final filteredUsers = _searchQuery.isEmpty
-        ? users
-        : users
-            .where((u) => u.toLowerCase().contains(_searchQuery.toLowerCase()))
-            .toList();
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Users',
-          style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w500),
-        ),
-        const SizedBox(height: AppSpacing.small),
-        if (filteredUsers.isEmpty)
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: AppSpacing.small),
-            child: Text(
-              'No users found',
-              style: textTheme.bodySmall?.copyWith(color: colors.onSurfaceVariant),
+    return BlocBuilder<UsersBloc, UsersState>(
+      builder: (context, state) {
+        if (state is UsersLoading) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: AppSpacing.small),
+            child: SizedBox(
+              height: 20,
+              width: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
             ),
-          )
-        else
-          ...filteredUsers.map((user) => CheckboxListTile(
-                value: _selectedUserIds.contains(user),
-                onChanged: (checked) {
-                  setState(() {
-                    if (checked == true) {
-                      _selectedUserIds.add(user);
-                    } else {
-                      _selectedUserIds.remove(user);
-                    }
-                  });
+          );
+        }
+
+        final users = state is UsersLoaded ? state.users : [];
+        final filteredUsers = users.where((u) {
+          if (_searchQuery.isEmpty) return true;
+          final name = u.displayName ?? u.email ?? '';
+          return name.toLowerCase().contains(_searchQuery.toLowerCase());
+        }).toList();
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Users',
+              style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: AppSpacing.small),
+            if (filteredUsers.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: AppSpacing.small),
+                child: Text(
+                  'No users found',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
+              )
+            else
+              ...filteredUsers.map(
+                (user) {
+                  final displayName = user.displayName ?? user.email ?? user.id;
+                  return CheckboxListTile(
+                    value: _selectedUserIds.contains(user.id) ||
+                        _selectedUserIds.contains(displayName),
+                    onChanged: (checked) {
+                      setState(() {
+                        if (checked == true) {
+                          _selectedUserIds.add(user.id);
+                        } else {
+                          _selectedUserIds.remove(user.id);
+                          _selectedUserIds.remove(displayName);
+                        }
+                      });
+                    },
+                    title: Text(displayName, style: textTheme.bodyMedium),
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                  );
                 },
-                title: Text(user, style: textTheme.bodyMedium),
-                dense: true,
-                contentPadding: EdgeInsets.zero,
-              )),
-      ],
+              ),
+          ],
+        );
+      },
     );
   }
 
@@ -328,17 +373,16 @@ class _MakePrivateDialogState extends State<MakePrivateDialog> {
         accessControl = {
           if (_selectedGroupIds.isNotEmpty)
             'groups': _selectedGroupIds.toList(),
-          if (_selectedUserIds.isNotEmpty)
-            'users': _selectedUserIds.toList(),
+          if (_selectedUserIds.isNotEmpty) 'users': _selectedUserIds.toList(),
         };
         break;
     }
 
     if (accessControl != null) {
       context.read<CustomFieldsCubit>().updateAccessControl(
-            fieldId: widget.field.id,
-            accessControl: accessControl,
-          );
+        fieldId: widget.field.id,
+        accessControl: accessControl,
+      );
     }
 
     Navigator.of(context).pop();

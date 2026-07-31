@@ -10,16 +10,25 @@ class AddCustomFieldParams extends Params {
   final String name;
   final CustomFieldEnumType fieldType;
   final String? defaultValue;
+  final String? emptyValue;
+  final bool canBeEmpty;
+  final String valueMode;
+  final List<String>? aliases;
 
   const AddCustomFieldParams({
     required this.projectId,
     required this.name,
     required this.fieldType,
     this.defaultValue,
+    this.emptyValue,
+    this.canBeEmpty = true,
+    this.valueMode = 'single',
+    this.aliases,
   });
 
   @override
-  List<Object?> get props => [projectId, name, fieldType, defaultValue];
+  List<Object?> get props =>
+      [projectId, name, fieldType, defaultValue, emptyValue, canBeEmpty, valueMode, aliases];
 }
 
 class AddCustomFieldUseCase
@@ -37,6 +46,10 @@ class AddCustomFieldUseCase
       name: params.name,
       fieldType: params.fieldType,
       defaultValue: params.defaultValue,
+      emptyValue: params.emptyValue,
+      canBeEmpty: params.canBeEmpty,
+      valueMode: params.valueMode,
+      aliases: params.aliases,
     );
   }
 }

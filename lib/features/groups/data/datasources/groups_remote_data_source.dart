@@ -20,6 +20,7 @@ abstract class GroupsRemoteDataSource {
     String groupId,
     List<String> userIds,
   );
+  Future<void> removeGroupMembers(String groupId, List<String> userIds);
 
   Future<List<GroupProjectModel>> addGroupProjects(
     String groupId,
@@ -131,6 +132,20 @@ class GroupsRemoteDataSourceImpl implements GroupsRemoteDataSource {
         .toList();
     final response = await supabase.from('group_members').insert(data).select();
     return response.map((e) => GroupMemberModel.fromJson(e)).toList();
+  }
+
+  @override
+  Future<void> removeGroupMembers(
+    String groupId,
+    List<String> userIds,
+  ) async {
+    for (final uid in userIds) {
+      await supabase
+          .from('group_members')
+          .delete()
+          .eq('group_id', groupId)
+          .eq('user_id', uid);
+    }
   }
 
   @override

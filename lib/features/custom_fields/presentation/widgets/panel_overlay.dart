@@ -14,15 +14,18 @@ class PanelOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedOpacity(
-      opacity: isVisible ? 1.0 : 0.0,
-      duration: animationDuration,
-      child: GestureDetector(
-        onTap: onTap,
-        child: Container(
-          color: Colors.black54,
-          width: double.infinity,
-          height: double.infinity,
+    return IgnorePointer(
+      ignoring: !isVisible,
+      child: AnimatedOpacity(
+        opacity: isVisible ? 1.0 : 0.0,
+        duration: animationDuration,
+        child: GestureDetector(
+          onTap: onTap,
+          child: Container(
+            color: Colors.black54,
+            width: double.infinity,
+            height: double.infinity,
+          ),
         ),
       ),
     );

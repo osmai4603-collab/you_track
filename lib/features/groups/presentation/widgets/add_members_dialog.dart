@@ -4,7 +4,6 @@ import 'package:get_it/get_it.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_member_entity.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
-import 'package:issues_tracking/features/groups/presentation/bloc/groups_event.dart';
 import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 import 'package:issues_tracking/features/users/domain/usecases/get_users.dart';
 
@@ -18,12 +17,12 @@ class AddMembersDialog extends StatefulWidget {
     required this.existingMembers,
   });
 
-  static Future<void> show(
+  static Future<List<String>?> show(
     BuildContext context,
     String groupId,
     List<GroupMemberEntity> existingMembers,
   ) {
-    return showDialog(
+    return showDialog<List<String>>(
       context: context,
       barrierDismissible: true,
       builder: (_) => BlocProvider.value(
@@ -45,7 +44,6 @@ class _AddMembersDialogState extends State<AddMembersDialog> {
 
   List<UserEntity>? _users;
   bool _isLoading = true;
-  bool _isSubmitting = false;
 
   final _selectedUserIds = <String>{};
   Set<String> _existingUserIds = {};
@@ -76,16 +74,6 @@ class _AddMembersDialogState extends State<AddMembersDialog> {
 
   void _onAddMembers() {
     if (_selectedUserIds.isEmpty) return;
-
-    setState(() => _isSubmitting = true);
-
-    if (!mounted) return;
-    context.read<GroupsBloc>().add(
-      AddGroupMembersEvent(
-        groupId: widget.groupId,
-        userIds: _selectedUserIds.toList(),
-      ),
-    );
 
     Navigator.pop(context, _selectedUserIds.toList());
   }
@@ -118,9 +106,7 @@ class _AddMembersDialogState extends State<AddMembersDialog> {
                     const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.close, size: 20),
-                      onPressed: _isSubmitting
-                          ? null
-                          : () => Navigator.pop(context),
+                      onPressed: () => Navigator.pop(context),
                       visualDensity: VisualDensity.compact,
                     ),
                   ],
@@ -261,26 +247,15 @@ class _AddMembersDialogState extends State<AddMembersDialog> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: _isSubmitting
-                            ? null
-                            : () => Navigator.pop(context),
+                        onPressed: () => Navigator.pop(context),
                         child: const Text('Cancel'),
                       ),
                       const SizedBox(width: 8),
                       FilledButton(
-                        onPressed: _selectedUserIds.isNotEmpty && !_isSubmitting
+                        onPressed: _selectedUserIds.isNotEmpty
                             ? _onAddMembers
                             : null,
-                        child: _isSubmitting
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Text('Add members'),
+                        child: const Text('Add members'),
                       ),
                     ],
                   ),

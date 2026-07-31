@@ -11,6 +11,10 @@ abstract class CustomFieldsRepository {
     required String name,
     required CustomFieldEnumType fieldType,
     String? defaultValue,
+    String? emptyValue,
+    bool canBeEmpty = true,
+    String valueMode = 'single',
+    List<String>? aliases,
   });
 
   Future<Either<Failure, CustomFieldEntity>> updateField({
@@ -18,6 +22,10 @@ abstract class CustomFieldsRepository {
     String? name,
     CustomFieldEnumType? fieldType,
     String? defaultValue,
+    String? emptyValue,
+    bool? canBeEmpty,
+    String? valueMode,
+    List<String>? aliases,
   });
 
   Future<Either<Failure, void>> deleteFields(List<String> fieldIds);
@@ -42,5 +50,13 @@ abstract class CustomFieldsRepository {
     required String fieldId,
     required String oldValue,
     required String newValue,
+  });
+
+  Future<Either<Failure, CustomFieldEntity>> updateAdvancedSettings({
+    required String fieldId,
+    List<String>? visibleTo,
+    List<String>? updatableBy,
+    String? showOnlyWhen,
+    String? filterValuesBasedOn,
   });
 }

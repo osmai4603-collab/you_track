@@ -17,6 +17,7 @@ abstract class GroupsRepository {
 
   Future<Either<Failure, List<GroupMemberEntity>>> getGroupMembers(String groupId);
   Future<Either<Failure, List<GroupMemberEntity>>> addGroupMembers(String groupId, List<String> userIds);
+  Future<Either<Failure, void>> removeGroupMembers(String groupId, List<String> userIds);
 
   Future<Either<Failure, List<GroupProjectEntity>>> addGroupProjects(String groupId, List<String> projectIds);
 }

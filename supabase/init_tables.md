@@ -466,6 +466,16 @@
 | `user_id` | `uuid` |  |
 | `group_id` | `uuid` |  |
 
+## Table `group_projects`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `group_id` | `uuid` |  |
+| `project_id` | `uuid` |  |
+
 ## Custom Types / Enums
 
 ### `vcs_provider_type`

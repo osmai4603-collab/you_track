@@ -28,6 +28,10 @@ class CustomFieldsRepositoryImpl implements CustomFieldsRepository {
     required String name,
     required CustomFieldEnumType fieldType,
     String? defaultValue,
+    String? emptyValue,
+    bool canBeEmpty = true,
+    String valueMode = 'single',
+    List<String>? aliases,
   }) async {
     try {
       final fields = await remoteDataSource.getFields(projectId);
@@ -47,6 +51,10 @@ class CustomFieldsRepositoryImpl implements CustomFieldsRepository {
         name: name,
         fieldType: fieldType,
         defaultValue: fieldType.firstAvailableOrDefault(defaultValue),
+        emptyValue: emptyValue,
+        canBeEmpty: canBeEmpty,
+        valueMode: valueMode,
+        aliases: aliases,
         orderIndex: maxOrder + 1,
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
@@ -65,6 +73,10 @@ class CustomFieldsRepositoryImpl implements CustomFieldsRepository {
     String? name,
     CustomFieldEnumType? fieldType,
     String? defaultValue,
+    String? emptyValue,
+    bool? canBeEmpty,
+    String? valueMode,
+    List<String>? aliases,
   }) async {
     try {
       final current = await remoteDataSource.getFields('');
@@ -91,6 +103,10 @@ class CustomFieldsRepositoryImpl implements CustomFieldsRepository {
         name: name,
         fieldType: resolvedType,
         defaultValue: resolvedDefault,
+        emptyValue: emptyValue,
+        canBeEmpty: canBeEmpty,
+        valueMode: valueMode,
+        aliases: aliases,
         updatedAt: DateTime.now(),
       );
 
@@ -187,6 +203,28 @@ class CustomFieldsRepositoryImpl implements CustomFieldsRepository {
         newValue: newValue,
       );
       return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, CustomFieldEntity>> updateAdvancedSettings({
+    required String fieldId,
+    List<String>? visibleTo,
+    List<String>? updatableBy,
+    String? showOnlyWhen,
+    String? filterValuesBasedOn,
+  }) async {
+    try {
+      final result = await remoteDataSource.updateAdvancedSettings(
+        fieldId: fieldId,
+        visibleTo: visibleTo,
+        updatableBy: updatableBy,
+        showOnlyWhen: showOnlyWhen,
+        filterValuesBasedOn: filterValuesBasedOn,
+      );
+      return Right(result);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

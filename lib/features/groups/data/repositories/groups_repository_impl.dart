@@ -104,6 +104,19 @@ class GroupsRepositoryImpl implements GroupsRepository {
   }
 
   @override
+  Future<Either<Failure, void>> removeGroupMembers(
+    String groupId,
+    List<String> userIds,
+  ) async {
+    try {
+      await dataSource.removeGroupMembers(groupId, userIds);
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, List<GroupMemberEntity>>> addGroupMembers(
     String groupId,
     List<String> userIds,

@@ -28,6 +28,14 @@ abstract class CustomFieldsRemoteDataSource {
     required String oldValue,
     required String newValue,
   });
+
+  Future<CustomFieldModel> updateAdvancedSettings({
+    required String fieldId,
+    List<String>? visibleTo,
+    List<String>? updatableBy,
+    String? showOnlyWhen,
+    String? filterValuesBasedOn,
+  });
 }
 
 class CustomFieldsRemoteDataSourceImpl implements CustomFieldsRemoteDataSource {
@@ -131,5 +139,28 @@ class CustomFieldsRemoteDataSourceImpl implements CustomFieldsRemoteDataSource {
         .from('custom_fields')
         .update({'available_values': updatedValues})
         .eq('id', fieldId);
+  }
+
+  @override
+  Future<CustomFieldModel> updateAdvancedSettings({
+    required String fieldId,
+    List<String>? visibleTo,
+    List<String>? updatableBy,
+    String? showOnlyWhen,
+    String? filterValuesBasedOn,
+  }) async {
+    final payload = <String, dynamic>{
+      if (visibleTo != null) 'visible_to': visibleTo,
+      if (updatableBy != null) 'updatable_by': updatableBy,
+      if (showOnlyWhen != null) 'show_only_when': showOnlyWhen,
+      if (filterValuesBasedOn != null) 'filter_values_based_on': filterValuesBasedOn,
+    };
+    final response = await supabase
+        .from('custom_fields')
+        .update(payload)
+        .eq('id', fieldId)
+        .select()
+        .single();
+    return CustomFieldModel.fromJson(response);
   }
 }

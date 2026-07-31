@@ -10,16 +10,25 @@ class UpdateCustomFieldParams extends Params {
   final String? name;
   final CustomFieldEnumType? fieldType;
   final String? defaultValue;
+  final String? emptyValue;
+  final bool? canBeEmpty;
+  final String? valueMode;
+  final List<String>? aliases;
 
   const UpdateCustomFieldParams({
     required this.fieldId,
     this.name,
     this.fieldType,
     this.defaultValue,
+    this.emptyValue,
+    this.canBeEmpty,
+    this.valueMode,
+    this.aliases,
   });
 
   @override
-  List<Object?> get props => [fieldId, name, fieldType, defaultValue];
+  List<Object?> get props =>
+      [fieldId, name, fieldType, defaultValue, emptyValue, canBeEmpty, valueMode, aliases];
 }
 
 class UpdateCustomFieldUseCase
@@ -37,6 +46,10 @@ class UpdateCustomFieldUseCase
       name: params.name,
       fieldType: params.fieldType,
       defaultValue: params.defaultValue,
+      emptyValue: params.emptyValue,
+      canBeEmpty: params.canBeEmpty,
+      valueMode: params.valueMode,
+      aliases: params.aliases,
     );
   }
 }

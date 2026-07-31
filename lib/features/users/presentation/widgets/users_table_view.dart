@@ -48,7 +48,11 @@ class UsersTableView extends StatelessWidget {
 
           return Column(
             children: [
-              _TableHeader(colors: colors, textTheme: textTheme),
+              _TableHeader(
+                colors: colors,
+                textTheme: textTheme,
+                isAllSelected: state.isAllSelected,
+              ),
               const Divider(height: 1),
               Expanded(
                 child: ListView.separated(
@@ -59,6 +63,7 @@ class UsersTableView extends StatelessWidget {
                     return UserTableRow(
                       user: user,
                       isSelected: state.selectedUserId == user.id,
+                      isChecked: state.selectedUserIds.contains(user.id),
                       onTap: () {
                         context
                             .read<UsersBloc>()
@@ -81,8 +86,13 @@ class UsersTableView extends StatelessWidget {
 class _TableHeader extends StatelessWidget {
   final ColorScheme colors;
   final TextTheme textTheme;
+  final bool isAllSelected;
 
-  const _TableHeader({required this.colors, required this.textTheme});
+  const _TableHeader({
+    required this.colors,
+    required this.textTheme,
+    this.isAllSelected = false,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -95,8 +105,9 @@ class _TableHeader extends StatelessWidget {
       child: Row(
         children: [
           Checkbox(
-            value: false,
-            onChanged: null,
+            value: isAllSelected,
+            onChanged: (_) =>
+                context.read<UsersBloc>().add(const ToggleSelectAll()),
             visualDensity: VisualDensity.compact,
           ),
           const SizedBox(width: 36),

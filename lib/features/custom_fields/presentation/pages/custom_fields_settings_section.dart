@@ -11,26 +11,31 @@ import 'package:reorderables/reorderables.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
 import 'package:issues_tracking/features/custom_fields/presentation/widgets/custom_field_details_panel.dart';
+import 'package:issues_tracking/features/custom_fields/presentation/widgets/advanced_field_settings_dialog.dart';
 import '../../domain/entities/custom_field_entity.dart';
 import '../cubits/custom_fields_cubit.dart';
 
-class CustomFieldsSettingsSection extends StatefulWidget {
-  const CustomFieldsSettingsSection({super.key});
+class ProjectSettingCustomFieldsSection extends StatefulWidget {
+  const ProjectSettingCustomFieldsSection({super.key});
 
   @override
-  State<CustomFieldsSettingsSection> createState() =>
-      _CustomFieldsSettingsSectionState();
+  State<ProjectSettingCustomFieldsSection> createState() =>
+      _ProjectSettingCustomFieldsSectionState();
 }
 
-class _CustomFieldsSettingsSectionState
-    extends State<CustomFieldsSettingsSection> {
+class _ProjectSettingCustomFieldsSectionState
+    extends State<ProjectSettingCustomFieldsSection> {
   final Set<String> _selectedFieldIds = {};
   bool _isPanelOpen = false;
   bool _isDetailsPanelOpen = false;
   bool _showDetails = true;
   final _fieldNameController = TextEditingController();
   final _defaultValueController = TextEditingController();
+  final _emptyValueController = TextEditingController();
+  final _aliasesController = TextEditingController();
   CustomFieldEnumType _selectedType = CustomFieldEnumType.string;
+  bool _canBeEmpty = true;
+  String _valueMode = 'single';
   bool _isSubmitting = false;
 
   @override
@@ -66,51 +71,74 @@ class _CustomFieldsSettingsSectionState
         }
       },
       builder: (context, state) {
-        return Stack(
-          children: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.large),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildToolbar(colors, textTheme, state),
-                  const SizedBox(height: AppSpacing.medium),
-                  if (_selectedFieldIds.isNotEmpty)
-                    _buildSelectionBar(colors, textTheme),
-                  const SizedBox(height: AppSpacing.medium),
-                  Expanded(child: _buildContent(state, colors, textTheme)),
-                ],
-              ),
-            ),
-            // Overlay
-            PanelOverlay(isVisible: _isPanelOpen, onTap: _closePanel),
-            // Sliding panel
-            SlidingPanel(
-              isOpen: _isPanelOpen,
-              child: _buildAddFieldPanel(colors, textTheme),
-            ),
-            // Details Sliding panel
-            if (state is CustomFieldsLoaded)
-              SlidingPanel(
-                isOpen: _isDetailsPanelOpen && _selectedFieldIds.length == 1,
-                child: CustomFieldDetailsPanel(
-                  field: _selectedFieldIds.isNotEmpty
-                      ? state.fields.firstWhere((f) => f.id == _selectedFieldIds.first)
-                      : state.fields.first,
-                  onClose: _closeDetailsPanel,
-                  onEdit: _editSelectedField,
+        return Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.large),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildToolbar(colors, textTheme, state),
+              const SizedBox(height: AppSpacing.medium),
+              Expanded(
+                child: Stack(
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (_selectedFieldIds.isNotEmpty)
+                          _buildSelectionBar(colors, textTheme),
+                        if (_selectedFieldIds.isNotEmpty)
+                          const SizedBox(height: AppSpacing.medium),
+                        Expanded(
+                          child: _buildContent(state, colors, textTheme),
+                        ),
+                      ],
+                    ),
+                    // Overlay
+                    PanelOverlay(
+                      isVisible:
+                          _isPanelOpen ||
+                          (_isDetailsPanelOpen &&
+                              _selectedFieldIds.length == 1),
+                      onTap: () {
+                        _closePanel();
+                        _closeDetailsPanel();
+                      },
+                    ),
+                    // Sliding panel
+                    SlidingPanel(
+                      isOpen: _isPanelOpen,
+                      child: _buildAddFieldPanel(colors, textTheme),
+                    ),
+                    // Details Sliding panel
+                    if (state is CustomFieldsLoaded)
+                      SlidingPanel(
+                        isOpen:
+                            _isDetailsPanelOpen &&
+                            _selectedFieldIds.length == 1,
+                        child: CustomFieldDetailsPanel(
+                          field: _selectedFieldIds.isNotEmpty
+                              ? state.fields.firstWhere(
+                                  (f) => f.id == _selectedFieldIds.first,
+                                )
+                              : state.fields.first,
+                          onClose: _closeDetailsPanel,
+                          onEdit: _editSelectedField,
+                        ),
+                      ),
+                    if (state is CustomFieldsLoaded && state.isSaving)
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        child: LinearProgressIndicator(
+                          backgroundColor: colors.surfaceContainerLow,
+                        ),
+                      ),
+                  ],
                 ),
               ),
-            if (state is CustomFieldsLoaded && state.isSaving)
-              Positioned(
-                top: 0,
-                left: 0,
-                right: 0,
-                child: LinearProgressIndicator(
-                  backgroundColor: colors.surfaceContainerLow,
-                ),
-              ),
-          ],
+            ],
+          ),
         );
       },
     );
@@ -169,6 +197,14 @@ class _CustomFieldsSettingsSectionState
               : null,
           child: const Text('Make public'),
         ),
+        const SizedBox(width: AppSpacing.small),
+        OutlinedButton.icon(
+          onPressed: hasSelection && _selectedFieldIds.length == 1
+              ? _showAdvancedSettings
+              : null,
+          icon: const Icon(Icons.settings_outlined, size: 18),
+          label: const Text('Advanced'),
+        ),
         const Spacer(),
         TextButton.icon(
           onPressed: canEdit
@@ -184,7 +220,9 @@ class _CustomFieldsSettingsSectionState
                 },
           icon: Icon(
             canEdit
-                ? (_isDetailsPanelOpen ? Icons.visibility_off : Icons.visibility)
+                ? (_isDetailsPanelOpen
+                      ? Icons.visibility_off
+                      : Icons.visibility)
                 : (_showDetails ? Icons.visibility_off : Icons.visibility),
             size: 18,
           ),
@@ -384,18 +422,20 @@ class _CustomFieldsSettingsSectionState
 
   Widget _buildAddFieldPanel(ColorScheme colors, TextTheme textTheme) {
     return Container(
-      color: Colors.white,
+      color: colors.surface,
       child: Column(
         children: [
           // Header
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: AppSpacing.paddingAllMedium,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Add Custom Field',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                  style: textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close),
@@ -408,7 +448,7 @@ class _CustomFieldsSettingsSectionState
           // Form content
           Expanded(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(16.0),
+              padding: AppSpacing.paddingAllMedium,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -452,6 +492,52 @@ class _CustomFieldsSettingsSectionState
                       border: OutlineInputBorder(),
                     ),
                   ),
+                  const SizedBox(height: AppSpacing.medium),
+                  TextField(
+                    controller: _emptyValueController,
+                    decoration: const InputDecoration(
+                      labelText: 'Empty value (optional)',
+                      isDense: true,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.medium),
+                  SwitchListTile(
+                    value: _canBeEmpty,
+                    onChanged: (value) {
+                      setState(() => _canBeEmpty = value);
+                    },
+                    title: const Text('Can be empty'),
+                    dense: true,
+                    contentPadding: EdgeInsets.zero,
+                  ),
+                  const SizedBox(height: AppSpacing.medium),
+                  DropdownButtonFormField<String>(
+                    initialValue: _valueMode,
+                    decoration: const InputDecoration(
+                      labelText: 'Value mode',
+                      isDense: true,
+                      border: OutlineInputBorder(),
+                    ),
+                    items: const [
+                      DropdownMenuItem(value: 'single', child: Text('Single')),
+                      DropdownMenuItem(value: 'multi', child: Text('Multi')),
+                    ],
+                    onChanged: (value) {
+                      if (value != null) {
+                        setState(() => _valueMode = value);
+                      }
+                    },
+                  ),
+                  const SizedBox(height: AppSpacing.medium),
+                  TextField(
+                    controller: _aliasesController,
+                    decoration: const InputDecoration(
+                      labelText: 'Aliases (optional, comma-separated)',
+                      isDense: true,
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
                   if (_isSubmitting) ...[
                     const SizedBox(height: AppSpacing.medium),
                     const LinearProgressIndicator(),
@@ -462,7 +548,7 @@ class _CustomFieldsSettingsSectionState
           ),
           // Action buttons
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: AppSpacing.paddingAllMedium,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
@@ -544,8 +630,16 @@ class _CustomFieldsSettingsSectionState
 
   void _showEditFieldDialog(BuildContext context, CustomFieldEntity field) {
     final nameController = TextEditingController(text: field.name);
+    final emptyValueController = TextEditingController(
+      text: field.emptyValue ?? '',
+    );
+    final aliasesController = TextEditingController(
+      text: field.aliases?.join(', ') ?? '',
+    );
     CustomFieldEnumType selectedType = field.fieldType;
     String? selectedDefault = field.defaultValue;
+    bool canBeEmpty = field.canBeEmpty;
+    String valueMode = field.valueMode;
 
     showDialog(
       context: context,
@@ -556,62 +650,116 @@ class _CustomFieldsSettingsSectionState
               title: const Text('Edit Custom Field'),
               content: SizedBox(
                 width: 400,
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    TextField(
-                      controller: nameController,
-                      decoration: const InputDecoration(
-                        labelText: 'Field name',
-                        isDense: true,
-                        border: OutlineInputBorder(),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.medium),
-                    DropdownButtonFormField<CustomFieldEnumType>(
-                      initialValue: selectedType,
-                      decoration: const InputDecoration(
-                        labelText: 'Type',
-                        isDense: true,
-                        border: OutlineInputBorder(),
-                      ),
-                      items: CustomFieldEnumType.values.map((type) {
-                        return DropdownMenuItem(
-                          value: type,
-                          child: Text(_typeDisplayName(type)),
-                        );
-                      }).toList(),
-                      onChanged: (type) {
-                        if (type != null && type != selectedType) {
-                          setDialogState(() {
-                            selectedType = type;
-                          });
-                        }
-                      },
-                    ),
-                    const SizedBox(height: AppSpacing.medium),
-                    DropdownButtonFormField<String>(
-                      initialValue: selectedDefault,
-                      decoration: const InputDecoration(
-                        labelText: 'Default value (optional)',
-                        isDense: true,
-                        border: OutlineInputBorder(),
-                      ),
-                      items: [
-                        const DropdownMenuItem(
-                          value: null,
-                          child: Text('None'),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      TextField(
+                        controller: nameController,
+                        decoration: const InputDecoration(
+                          labelText: 'Field name',
+                          isDense: true,
+                          border: OutlineInputBorder(),
                         ),
-                        ...selectedType.availableValues.map((v) {
-                          return DropdownMenuItem(value: v, child: Text(v));
-                        }),
-                      ],
-                      onChanged: (value) {
-                        setDialogState(() => selectedDefault = value);
-                      },
-                    ),
-                  ],
+                      ),
+                      const SizedBox(height: AppSpacing.medium),
+                      DropdownButtonFormField<CustomFieldEnumType>(
+                        initialValue: selectedType,
+                        decoration: const InputDecoration(
+                          labelText: 'Type',
+                          isDense: true,
+                          border: OutlineInputBorder(),
+                        ),
+                        items: CustomFieldEnumType.values.map((type) {
+                          return DropdownMenuItem(
+                            value: type,
+                            child: Text(_typeDisplayName(type)),
+                          );
+                        }).toList(),
+                        onChanged: (type) {
+                          if (type != null && type != selectedType) {
+                            setDialogState(() {
+                              selectedType = type;
+                            });
+                          }
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.medium),
+                      DropdownButtonFormField<String>(
+                        initialValue: selectedDefault,
+                        decoration: const InputDecoration(
+                          labelText: 'Default value (optional)',
+                          isDense: true,
+                          border: OutlineInputBorder(),
+                        ),
+                        items: [
+                          const DropdownMenuItem(
+                            value: null,
+                            child: Text('None'),
+                          ),
+                          ...selectedType.availableValues.map((v) {
+                            return DropdownMenuItem(value: v, child: Text(v));
+                          }),
+                        ],
+                        onChanged: (value) {
+                          setDialogState(() => selectedDefault = value);
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.medium),
+                      TextField(
+                        controller: emptyValueController,
+                        decoration: const InputDecoration(
+                          labelText: 'Empty value (optional)',
+                          isDense: true,
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.medium),
+                      SwitchListTile(
+                        value: canBeEmpty,
+                        onChanged: (value) {
+                          setDialogState(() => canBeEmpty = value);
+                        },
+                        title: const Text('Can be empty'),
+                        dense: true,
+                        contentPadding: EdgeInsets.zero,
+                      ),
+                      const SizedBox(height: AppSpacing.medium),
+                      DropdownButtonFormField<String>(
+                        initialValue: valueMode,
+                        decoration: const InputDecoration(
+                          labelText: 'Value mode',
+                          isDense: true,
+                          border: OutlineInputBorder(),
+                        ),
+                        items: const [
+                          DropdownMenuItem(
+                            value: 'single',
+                            child: Text('Single'),
+                          ),
+                          DropdownMenuItem(
+                            value: 'multi',
+                            child: Text('Multi'),
+                          ),
+                        ],
+                        onChanged: (value) {
+                          if (value != null) {
+                            setDialogState(() => valueMode = value);
+                          }
+                        },
+                      ),
+                      const SizedBox(height: AppSpacing.medium),
+                      TextField(
+                        controller: aliasesController,
+                        decoration: const InputDecoration(
+                          labelText: 'Aliases (optional, comma-separated)',
+                          isDense: true,
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
               actions: [
@@ -633,6 +781,18 @@ class _CustomFieldsSettingsSectionState
                       name: name,
                       fieldType: selectedType,
                       defaultValue: selectedDefault,
+                      emptyValue: emptyValueController.text.trim().isEmpty
+                          ? null
+                          : emptyValueController.text.trim(),
+                      canBeEmpty: canBeEmpty,
+                      valueMode: valueMode,
+                      aliases: aliasesController.text.trim().isEmpty
+                          ? null
+                          : aliasesController.text
+                                .split(',')
+                                .map((e) => e.trim())
+                                .where((e) => e.isNotEmpty)
+                                .toList(),
                     );
                     Navigator.of(dialogContext).pop();
                   },
@@ -728,6 +888,20 @@ class _CustomFieldsSettingsSectionState
     }
   }
 
+  void _showAdvancedSettings() {
+    if (_selectedFieldIds.length != 1) return;
+    final state = context.read<CustomFieldsCubit>().state;
+    if (state is CustomFieldsLoaded) {
+      final field = state.fields.firstWhere(
+        (f) => f.id == _selectedFieldIds.first,
+      );
+      showDialog(
+        context: context,
+        builder: (context) => AdvancedFieldSettingsDialog(field: field),
+      );
+    }
+  }
+
   void _closePanel() {
     setState(() {
       _isPanelOpen = false;
@@ -772,11 +946,27 @@ class _CustomFieldsSettingsSectionState
         defaultValue: _defaultValueController.text.trim().isEmpty
             ? null
             : _defaultValueController.text.trim(),
+        emptyValue: _emptyValueController.text.trim().isEmpty
+            ? null
+            : _emptyValueController.text.trim(),
+        canBeEmpty: _canBeEmpty,
+        valueMode: _valueMode,
+        aliases: _aliasesController.text.trim().isEmpty
+            ? null
+            : _aliasesController.text
+                  .split(',')
+                  .map((e) => e.trim())
+                  .where((e) => e.isNotEmpty)
+                  .toList(),
       );
       _fieldNameController.clear();
       _defaultValueController.clear();
+      _emptyValueController.clear();
+      _aliasesController.clear();
       setState(() {
         _selectedType = CustomFieldEnumType.string;
+        _canBeEmpty = true;
+        _valueMode = 'single';
         _isSubmitting = false;
         _isPanelOpen = false;
       });
@@ -787,6 +977,8 @@ class _CustomFieldsSettingsSectionState
   void dispose() {
     _fieldNameController.dispose();
     _defaultValueController.dispose();
+    _emptyValueController.dispose();
+    _aliasesController.dispose();
     super.dispose();
   }
 }

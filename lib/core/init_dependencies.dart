@@ -65,6 +65,7 @@ import 'package:issues_tracking/features/custom_fields/domain/usecases/reorder_c
 import 'package:issues_tracking/features/custom_fields/domain/usecases/update_field_visibility_use_case.dart';
 import 'package:issues_tracking/features/custom_fields/domain/usecases/update_field_access_control_use_case.dart';
 import 'package:issues_tracking/features/custom_fields/domain/usecases/replace_field_value_use_case.dart';
+import 'package:issues_tracking/features/custom_fields/domain/usecases/update_advanced_field_settings_use_case.dart';
 import 'package:issues_tracking/features/custom_fields/presentation/cubits/custom_fields_cubit.dart';
 
 import 'package:issues_tracking/features/custom_fields/data/datasources/custom_field_remote_data_source.dart';
@@ -143,8 +144,6 @@ import 'package:issues_tracking/features/issues/data/datasources/tag_remote_data
 import 'package:issues_tracking/features/issues/data/repositories/tags_repository_impl.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/tags_repository.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/create_tag.dart';
-import 'package:issues_tracking/features/issues/domain/usecases/get_issue_by_id.dart';
-import 'package:issues_tracking/features/issues/domain/usecases/get_issues.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/stream_issues.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_project_members.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/is_tag_name_unique.dart';
@@ -170,6 +169,7 @@ import 'package:issues_tracking/features/groups/domain/usecases/get_group_member
 import 'package:issues_tracking/features/groups/domain/usecases/add_group_members.dart';
 import 'package:issues_tracking/features/groups/domain/usecases/add_group_projects.dart';
 import 'package:issues_tracking/features/groups/domain/usecases/get_group_by_id.dart';
+import 'package:issues_tracking/features/groups/domain/usecases/remove_group_members.dart';
 import 'package:issues_tracking/features/groups/domain/usecases/update_group.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
 
@@ -189,6 +189,10 @@ import 'package:issues_tracking/features/users/data/repositories/users_repositor
 import 'package:issues_tracking/features/users/domain/repositories/users_repository.dart';
 import 'package:issues_tracking/features/users/domain/usecases/get_users.dart';
 import 'package:issues_tracking/features/users/domain/usecases/create_user.dart';
+import 'package:issues_tracking/features/users/domain/usecases/delete_user.dart';
+import 'package:issues_tracking/features/users/domain/usecases/ban_user.dart';
+import 'package:issues_tracking/features/users/domain/usecases/update_user.dart';
+import 'package:issues_tracking/features/users/domain/usecases/merge_users.dart';
 import 'package:issues_tracking/features/users/presentation/bloc/users_bloc.dart';
 
 // ignore: non_constant_identifier_names
@@ -304,7 +308,11 @@ void _initIssuesFeature({required bool isOffline}) {
 
   // Blocs
   get_it.registerFactory(
-    () => IssuesBloc(getIssues: get_it(), streamIssues: get_it(), repository: get_it()),
+    () => IssuesBloc(
+      getIssues: get_it(),
+      streamIssues: get_it(),
+      repository: get_it(),
+    ),
   );
   get_it.registerFactory(
     () => IssueFormCubit(
@@ -400,6 +408,9 @@ void _initCustomFieldsFeature({required bool isOffline}) {
   get_it.registerLazySingleton(() => UpdateFieldVisibilityUseCase(get_it()));
   get_it.registerLazySingleton(() => UpdateFieldAccessControlUseCase(get_it()));
   get_it.registerLazySingleton(() => ReplaceFieldValueUseCase(get_it()));
+  get_it.registerLazySingleton(
+    () => UpdateAdvancedFieldSettingsUseCase(get_it()),
+  );
 
   get_it.registerFactory(
     () => CustomFieldsCubit(
@@ -411,6 +422,7 @@ void _initCustomFieldsFeature({required bool isOffline}) {
       updateVisibilityUseCase: get_it(),
       updateAccessControlUseCase: get_it(),
       replaceFieldValueUseCase: get_it(),
+      updateAdvancedSettingsUseCase: get_it(),
     ),
   );
 
@@ -626,6 +638,7 @@ void _initGroupsFeature({required bool isOffline}) {
   get_it.registerLazySingleton(() => GetGroupRoles(get_it()));
   get_it.registerLazySingleton(() => GetGroupMembers(get_it()));
   get_it.registerLazySingleton(() => AddGroupMembers(get_it()));
+  get_it.registerLazySingleton(() => RemoveGroupMembers(get_it()));
   get_it.registerLazySingleton(() => AddGroupProjects(get_it()));
   get_it.registerLazySingleton(() => GetGroupById(get_it()));
   get_it.registerLazySingleton(() => UpdateGroup(get_it()));
@@ -685,8 +698,23 @@ void _initUsersFeature({required bool isOffline}) {
 
   get_it.registerLazySingleton(() => GetUsers(get_it()));
   get_it.registerLazySingleton(() => CreateUser(get_it()));
+  get_it.registerLazySingleton(() => DeleteUser(get_it()));
+  get_it.registerLazySingleton(() => BanUser(get_it()));
+  get_it.registerLazySingleton(() => UpdateUser(get_it()));
+  get_it.registerLazySingleton(() => MergeUsers(get_it()));
 
   get_it.registerFactory(
-    () => UsersBloc(getUsers: get_it(), createUser: get_it()),
+    () => UsersBloc(
+      getUsers: get_it(),
+      createUser: get_it(),
+      deleteUser: get_it(),
+      banUser: get_it(),
+      updateUser: get_it(),
+      mergeUsers: get_it(),
+      addGroupMembers: get_it(),
+      removeGroupMembers: get_it(),
+      getGroups: get_it(),
+      getGroupMembers: get_it(),
+    ),
   );
 }

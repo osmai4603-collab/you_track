@@ -456,5 +456,95 @@
   "permissionAppUpdateAppContent": "App Content",
   "@permissionAppUpdateAppContent": {
     "description": "Permission: Update App Content"
+  },
+  "customFieldsAddFieldToProject": "Add field to project ...",
+  "@customFieldsAddFieldToProject": {
+    "description": "Button to add a new custom field to the project"
+  },
+  "customFieldsEditField": "Edit Custom Field",
+  "@customFieldsEditField": {
+    "description": "Title for editing a custom field"
+  },
+  "customFieldsDeleteFields": "Delete Custom Fields",
+  "@customFieldsDeleteFields": {
+    "description": "Title for deleting custom fields"
+  },
+  "customFieldsEmptyValue": "Empty value (optional)",
+  "@customFieldsEmptyValue": {
+    "description": "Label for empty value field"
+  },
+  "customFieldsCanBeEmpty": "Can be empty",
+  "@customFieldsCanBeEmpty": {
+    "description": "Label for can be empty toggle"
+  },
+  "customFieldsValueMode": "Value mode",
+  "@customFieldsValueMode": {
+    "description": "Label for value mode field"
+  },
+  "customFieldsValueModeSingle": "Single",
+  "@customFieldsValueModeSingle": {
+    "description": "Single value mode option"
+  },
+  "customFieldsValueModeMulti": "Multi",
+  "@customFieldsValueModeMulti": {
+    "description": "Multi value mode option"
+  },
+  "customFieldsAliases": "Aliases (optional, comma-separated)",
+  "@customFieldsAliases": {
+    "description": "Label for aliases field"
+  },
+  "customFieldsFieldMode": "Field mode",
+  "@customFieldsFieldMode": {
+    "description": "Label for field mode"
+  },
+  "customFieldsVisibleTo": "Visible to",
+  "@customFieldsVisibleTo": {
+    "description": "Label for visible to field"
+  },
+  "customFieldsUpdatableBy": "Updatable by",
+  "@customFieldsUpdatableBy": {
+    "description": "Label for updatable by field"
+  },
+  "customFieldsShowOnlyWhen": "Show only when",
+  "@customFieldsShowOnlyWhen": {
+    "description": "Label for show only when field"
+  },
+  "customFieldsFilterValuesBasedOn": "Filter values based on",
+  "@customFieldsFilterValuesBasedOn": {
+    "description": "Label for filter values based on field"
+  },
+  "customFieldsAdvancedSettings": "Advanced settings",
+  "@customFieldsAdvancedSettings": {
+    "description": "Button for advanced settings"
+  },
+  "customFieldsNoCustomFieldsYet": "No custom fields yet",
+  "@customFieldsNoCustomFieldsYet": {
+    "description": "Empty state message when no custom fields exist"
+  },
+  "customFieldsFieldDetails": "Field Details",
+  "@customFieldsFieldDetails": {
+    "description": "Title for field details panel"
+  },
+  "customFieldsMakePublicSuccess": "Field is now visible to everyone",
+  "@customFieldsMakePublicSuccess": {
+    "description": "Snackbar message when field is made public"
+  },
+  "customFieldsAccessControlUpdated": "Access control updated",
+  "@customFieldsAccessControlUpdated": {
+    "description": "Snackbar message when access control is updated"
+  },
+  "customFieldsSelected": "{count} selected",
+  "@customFieldsSelected": {
+    "description": "Shows count of selected fields",
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "customFieldsDeleteConfirmation": "Are you sure you want to delete {count} custom field(s)?",
+  "@customFieldsDeleteConfirmation": {
+    "description": "Confirmation message for deleting custom fields",
+    "placeholders": {
+      "count": {}
+    }
   }
 }

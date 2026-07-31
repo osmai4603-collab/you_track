@@ -283,8 +283,21 @@ class _MembersTabState extends State<_MembersTab> {
           Row(
             children: [
               FilledButton.icon(
-                onPressed: () =>
-                    AddMembersDialog.show(context, widget.group.id, members),
+                onPressed: () async {
+                  final result = await AddMembersDialog.show(
+                    context,
+                    widget.group.id,
+                    members,
+                  );
+                  if (result != null && result.isNotEmpty && context.mounted) {
+                    context.read<GroupsBloc>().add(
+                          AddGroupMembersEvent(
+                            groupId: widget.group.id,
+                            userIds: result,
+                          ),
+                        );
+                  }
+                },
                 icon: const Icon(Icons.person_add, size: 16),
                 label: const Text('Add members'),
               ),
@@ -367,7 +380,19 @@ class _RolesTab extends StatelessWidget {
           Row(
             children: [
               FilledButton.icon(
-                onPressed: () => AssignRoleDialog.show(context, group.id),
+                onPressed: () async {
+                  final result = await AssignRoleDialog.show(context, group.id);
+                  if (result != null && context.mounted) {
+                    context.read<GroupsBloc>().add(
+                          AssignRoleEvent(
+                            groupId: group.id,
+                            roleName: result.roleName,
+                            projectId: result.projectId,
+                            isGlobal: result.projectId == null,
+                          ),
+                        );
+                  }
+                },
                 icon: const Icon(Icons.add, size: 16),
                 label: const Text('Assign role'),
               ),
@@ -449,8 +474,21 @@ class _ProjectTeamsTab extends StatelessWidget {
           Row(
             children: [
               FilledButton.icon(
-                onPressed: () =>
-                    AddProjectDialog.show(context, group.id, projects),
+                onPressed: () async {
+                  final result = await AddProjectDialog.show(
+                    context,
+                    group.id,
+                    projects,
+                  );
+                  if (result != null && result.isNotEmpty && context.mounted) {
+                    context.read<GroupsBloc>().add(
+                          AddGroupProjectsEvent(
+                            groupId: group.id,
+                            projectIds: result,
+                          ),
+                        );
+                  }
+                },
                 icon: const Icon(Icons.add, size: 16),
                 label: const Text('Add to project'),
               ),

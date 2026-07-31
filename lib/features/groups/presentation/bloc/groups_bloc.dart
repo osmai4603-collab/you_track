@@ -84,6 +84,24 @@ class GroupsBloc extends Bloc<GroupsEvent, GroupsState> {
     AssignRoleEvent event,
     Emitter<GroupsState> emit,
   ) async {
+    if (state is GroupsLoaded) {
+      final current = state as GroupsLoaded;
+      final groupIndex =
+          current.groups.indexWhere((g) => g.id == event.groupId);
+      if (groupIndex != -1) {
+        final group = current.groups[groupIndex];
+        final alreadyAssigned = group.roles.any(
+          (r) =>
+              r.roleName == event.roleName &&
+              r.projectId == event.projectId,
+        );
+        if (alreadyAssigned) {
+          _refreshGroup(event.groupId, emit);
+          return;
+        }
+      }
+    }
+
     final result = await assignRole(
       params: AssignRoleParams(
         groupId: event.groupId,

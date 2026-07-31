@@ -1,16 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
+import 'package:issues_tracking/features/users/presentation/bloc/users_bloc.dart';
+import 'package:issues_tracking/features/users/presentation/bloc/users_event.dart';
+import 'package:issues_tracking/features/users/presentation/pages/edit_user_dialog.dart';
+import 'package:issues_tracking/features/users/presentation/widgets/confirm_action_dialog.dart';
 
 class UserTableRow extends StatefulWidget {
   final UserEntity user;
   final bool isSelected;
+  final bool isChecked;
   final VoidCallback onTap;
 
   const UserTableRow({
     super.key,
     required this.user,
     required this.isSelected,
+    this.isChecked = false,
     required this.onTap,
   });
 
@@ -65,8 +72,10 @@ class _UserTableRowState extends State<UserTableRow> {
           child: Row(
             children: [
               Checkbox(
-                value: false,
-                onChanged: null,
+                value: widget.isChecked,
+                onChanged: (_) => context
+                    .read<UsersBloc>()
+                    .add(ToggleUserSelection(widget.user.id)),
                 visualDensity: VisualDensity.compact,
               ),
               const SizedBox(width: AppSpacing.small),
@@ -173,12 +182,16 @@ class _UserTableRowState extends State<UserTableRow> {
                       )
                     : null,
               ),
-              PopupMenuButton(
+              PopupMenuButton<String>(
                 icon: const Icon(Icons.more_horiz, size: 18),
+                onSelected: (value) => _onPopupAction(context, value, user),
                 itemBuilder: (context) => [
                   const PopupMenuItem(value: 'edit', child: Text('Edit')),
                   const PopupMenuItem(value: 'delete', child: Text('Delete')),
-                  const PopupMenuItem(value: 'ban', child: Text('Ban')),
+                  PopupMenuItem(
+                    value: 'ban',
+                    child: Text(user.isBanned ? 'Unban' : 'Ban'),
+                  ),
                 ],
               ),
             ],
@@ -186,6 +199,42 @@ class _UserTableRowState extends State<UserTableRow> {
         ),
       ),
     );
+  }
+
+  void _onPopupAction(BuildContext context, String value, UserEntity user) {
+    switch (value) {
+      case 'edit':
+        showDialog(
+          context: context,
+          barrierColor: Colors.black54,
+          builder: (ctx) => BlocProvider.value(
+            value: context.read<UsersBloc>(),
+            child: EditUserDialog(user: user),
+          ),
+        );
+      case 'delete':
+        showDialog(
+          context: context,
+          builder: (ctx) => ConfirmActionDialog(
+            title: 'Delete User',
+            message: 'Are you sure you want to delete ${user.fullName}?',
+            confirmLabel: 'Delete',
+            confirmColor: Theme.of(context).colorScheme.error,
+            onConfirm: () {
+              context
+                  .read<UsersBloc>()
+                  .add(DeleteUsersEvent([user.id]));
+            },
+          ),
+        );
+      case 'ban':
+        context.read<UsersBloc>().add(
+              BanUsersEvent(
+                userIds: [user.id],
+                ban: !user.isBanned,
+              ),
+            );
+    }
   }
 
   String _formatDate(DateTime date) {

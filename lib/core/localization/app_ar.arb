@@ -433,5 +433,95 @@
   "permissionAppUpdateAppContent": "محتوى التطبيقات المضافة",
   "@permissionAppUpdateAppContent": {
     "description": "صلاحية: تعديل محتوى التطبيقات المضافة"
+  },
+  "customFieldsAddFieldToProject": "إضافة حقل للمشروع ...",
+  "@customFieldsAddFieldToProject": {
+    "description": "زر إضافة حقل مخصص جديد للمشروع"
+  },
+  "customFieldsEditField": "تعديل حقل مخصص",
+  "@customFieldsEditField": {
+    "description": "عنوان تعديل حقل مخصص"
+  },
+  "customFieldsDeleteFields": "حذف حقول مخصصة",
+  "@customFieldsDeleteFields": {
+    "description": "عنوان حذف الحقول المخصصة"
+  },
+  "customFieldsEmptyValue": "القيمة عند الفراغ (اختياري)",
+  "@customFieldsEmptyValue": {
+    "description": "تسمية حقل القيمة عند الفراغ"
+  },
+  "customFieldsCanBeEmpty": "يمكن أن يكون فارغاً",
+  "@customFieldsCanBeEmpty": {
+    "description": "تسمية خيار يمكن أن يكون فارغاً"
+  },
+  "customFieldsValueMode": "وضع القيمة",
+  "@customFieldsValueMode": {
+    "description": "تسمية حقل وضع القيمة"
+  },
+  "customFieldsValueModeSingle": "مفرد",
+  "@customFieldsValueModeSingle": {
+    "description": "خيار وضع القيمة المفردة"
+  },
+  "customFieldsValueModeMulti": "متعدد",
+  "@customFieldsValueModeMulti": {
+    "description": "خيار وضع القيمة المتعددة"
+  },
+  "customFieldsAliases": "الأسماء البديلة (اختياري، مفصولة بفاصلة)",
+  "@customFieldsAliases": {
+    "description": "تسمية حقل الأسماء البديلة"
+  },
+  "customFieldsFieldMode": "وضع الحقل",
+  "@customFieldsFieldMode": {
+    "description": "تسمية وضع الحقل"
+  },
+  "customFieldsVisibleTo": "مرئي لـ",
+  "@customFieldsVisibleTo": {
+    "description": "تسمية حقل مرئي لـ"
+  },
+  "customFieldsUpdatableBy": "قابل للتعديل بواسطة",
+  "@customFieldsUpdatableBy": {
+    "description": "تسمية حقل قابل للتعديل بواسطة"
+  },
+  "customFieldsShowOnlyWhen": "يظهر فقط عندما",
+  "@customFieldsShowOnlyWhen": {
+    "description": "تسمية حقل يظهر فقط عندما"
+  },
+  "customFieldsFilterValuesBasedOn": "فلترة القيم بناء على",
+  "@customFieldsFilterValuesBasedOn": {
+    "description": "تسمية حقل فلترة القيم بناء على"
+  },
+  "customFieldsAdvancedSettings": "إعدادات متقدمة",
+  "@customFieldsAdvancedSettings": {
+    "description": "زر الإعدادات المتقدمة"
+  },
+  "customFieldsNoCustomFieldsYet": "لا توجد حقول مخصصة بعد",
+  "@customFieldsNoCustomFieldsYet": {
+    "description": "رسالة الحالة الفارغة عند عدم وجود حقول مخصصة"
+  },
+  "customFieldsFieldDetails": "تفاصيل الحقل",
+  "@customFieldsFieldDetails": {
+    "description": "عنوان لوحة تفاصيل الحقل"
+  },
+  "customFieldsMakePublicSuccess": "الحقل مرئي للجميع الآن",
+  "@customFieldsMakePublicSuccess": {
+    "description": "رسالة عند جعل الحقل عاماً"
+  },
+  "customFieldsAccessControlUpdated": "تم تحديث التحكم بالوصول",
+  "@customFieldsAccessControlUpdated": {
+    "description": "رسالة عند تحديث التحكم بالوصول"
+  },
+  "customFieldsSelected": "{count} محدد",
+  "@customFieldsSelected": {
+    "description": "إظهار عدد الحقول المحددة",
+    "placeholders": {
+      "count": {}
+    }
+  },
+  "customFieldsDeleteConfirmation": "هل أنت متأكد من حذف {count} حقل مخصص؟",
+  "@customFieldsDeleteConfirmation": {
+    "description": "رسالة تأكيد حذف الحقول المخصصة",
+    "placeholders": {
+      "count": {}
+    }
   }
 }

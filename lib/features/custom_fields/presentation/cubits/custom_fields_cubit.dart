@@ -10,6 +10,7 @@ import '../../domain/usecases/update_custom_field_use_case.dart';
 import '../../domain/usecases/update_field_visibility_use_case.dart';
 import '../../domain/usecases/update_field_access_control_use_case.dart';
 import '../../domain/usecases/replace_field_value_use_case.dart';
+import '../../domain/usecases/update_advanced_field_settings_use_case.dart';
 
 sealed class CustomFieldsState extends Equatable {
   const CustomFieldsState();
@@ -53,6 +54,7 @@ class CustomFieldsCubit extends Cubit<CustomFieldsState> {
   final UpdateFieldVisibilityUseCase _updateVisibilityUseCase;
   final UpdateFieldAccessControlUseCase _updateAccessControlUseCase;
   final ReplaceFieldValueUseCase _replaceFieldValueUseCase;
+  final UpdateAdvancedFieldSettingsUseCase _updateAdvancedSettingsUseCase;
 
   CustomFieldsCubit({
     required GetCustomFieldsUseCase getFieldsUseCase,
@@ -63,6 +65,7 @@ class CustomFieldsCubit extends Cubit<CustomFieldsState> {
     required UpdateFieldVisibilityUseCase updateVisibilityUseCase,
     required UpdateFieldAccessControlUseCase updateAccessControlUseCase,
     required ReplaceFieldValueUseCase replaceFieldValueUseCase,
+    required UpdateAdvancedFieldSettingsUseCase updateAdvancedSettingsUseCase,
   }) : _getFieldsUseCase = getFieldsUseCase,
        _addFieldUseCase = addFieldUseCase,
        _updateFieldUseCase = updateFieldUseCase,
@@ -71,6 +74,7 @@ class CustomFieldsCubit extends Cubit<CustomFieldsState> {
        _updateVisibilityUseCase = updateVisibilityUseCase,
        _updateAccessControlUseCase = updateAccessControlUseCase,
        _replaceFieldValueUseCase = replaceFieldValueUseCase,
+       _updateAdvancedSettingsUseCase = updateAdvancedSettingsUseCase,
        super(const CustomFieldsInitial());
 
   Future<void> loadFields(String projectId) async {
@@ -89,6 +93,10 @@ class CustomFieldsCubit extends Cubit<CustomFieldsState> {
     required String name,
     required CustomFieldEnumType fieldType,
     String? defaultValue,
+    String? emptyValue,
+    bool canBeEmpty = true,
+    String valueMode = 'single',
+    List<String>? aliases,
   }) async {
     final current = state;
     if (current is CustomFieldsLoaded) {
@@ -100,6 +108,10 @@ class CustomFieldsCubit extends Cubit<CustomFieldsState> {
         name: name,
         fieldType: fieldType,
         defaultValue: defaultValue,
+        emptyValue: emptyValue,
+        canBeEmpty: canBeEmpty,
+        valueMode: valueMode,
+        aliases: aliases,
       ),
     );
     result.fold(
@@ -127,6 +139,10 @@ class CustomFieldsCubit extends Cubit<CustomFieldsState> {
     String? name,
     CustomFieldEnumType? fieldType,
     String? defaultValue,
+    String? emptyValue,
+    bool? canBeEmpty,
+    String? valueMode,
+    List<String>? aliases,
   }) async {
     final current = state;
     if (current is CustomFieldsLoaded) {
@@ -138,6 +154,10 @@ class CustomFieldsCubit extends Cubit<CustomFieldsState> {
         name: name,
         fieldType: fieldType,
         defaultValue: defaultValue,
+        emptyValue: emptyValue,
+        canBeEmpty: canBeEmpty,
+        valueMode: valueMode,
+        aliases: aliases,
       ),
     );
     result.fold(
@@ -283,6 +303,46 @@ class CustomFieldsCubit extends Cubit<CustomFieldsState> {
           emit(CustomFieldsLoaded(
             fields:
                 s.fields.map((f) => f.id == field.id ? field : f).toList(),
+            isSaving: false,
+          ));
+        }
+      },
+    );
+  }
+
+  Future<void> updateAdvancedSettings({
+    required String fieldId,
+    List<String>? visibleTo,
+    List<String>? updatableBy,
+    String? showOnlyWhen,
+    String? filterValuesBasedOn,
+  }) async {
+    final current = state;
+    if (current is CustomFieldsLoaded) {
+      emit(CustomFieldsLoaded(fields: current.fields, isSaving: true));
+    }
+    final result = await _updateAdvancedSettingsUseCase(
+      params: UpdateAdvancedFieldSettingsParams(
+        fieldId: fieldId,
+        visibleTo: visibleTo,
+        updatableBy: updatableBy,
+        showOnlyWhen: showOnlyWhen,
+        filterValuesBasedOn: filterValuesBasedOn,
+      ),
+    );
+    result.fold(
+      (failure) {
+        final s = state;
+        if (s is CustomFieldsLoaded) {
+          emit(CustomFieldsLoaded(fields: s.fields, isSaving: false));
+        }
+        emit(CustomFieldsError(failure.message));
+      },
+      (field) {
+        final s = state;
+        if (s is CustomFieldsLoaded) {
+          emit(CustomFieldsLoaded(
+            fields: s.fields.map((f) => f.id == field.id ? field : f).toList(),
             isSaving: false,
           ));
         }

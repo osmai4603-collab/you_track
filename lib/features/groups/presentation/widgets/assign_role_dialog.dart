@@ -3,19 +3,24 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
-import 'package:issues_tracking/features/groups/presentation/bloc/groups_event.dart';
+import 'package:issues_tracking/features/groups/presentation/bloc/groups_state.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/get_projects_use_case.dart';
 import 'package:issues_tracking/features/roles/domain/entities/role_entity.dart';
 import 'package:issues_tracking/features/roles/domain/usecases/get_roles.dart';
+
+import 'package:issues_tracking/features/groups/domain/entities/group_role_assignment_entity.dart';
 
 class AssignRoleDialog extends StatefulWidget {
   final String groupId;
 
   const AssignRoleDialog({super.key, required this.groupId});
 
-  static Future<void> show(BuildContext context, String groupId) {
-    return showDialog(
+  static Future<GroupRoleAssignmentEntity?> show(
+    BuildContext context,
+    String groupId,
+  ) {
+    return showDialog<GroupRoleAssignmentEntity>(
       context: context,
       barrierDismissible: true,
       builder: (_) => BlocProvider.value(
@@ -36,10 +41,26 @@ class _AssignRoleDialogState extends State<AssignRoleDialog> {
   List<RoleEntity>? _roles;
   List<ProjectEntity>? _projects;
   bool _isLoading = true;
-  bool _isSubmitting = false;
 
   String? _selectedRoleName;
   String? _selectedProjectId;
+  String? _errorMessage;
+
+  bool _isDuplicateAssignment() {
+    final state = context.read<GroupsBloc>().state;
+    if (state is! GroupsLoaded) return false;
+
+    final groupIndex = state.groups.indexWhere((g) => g.id == widget.groupId);
+    if (groupIndex == -1) return false;
+    final group = state.groups[groupIndex];
+
+    final isGlobal = _selectedProjectId == '__global__';
+    final projectId = isGlobal ? null : _selectedProjectId;
+
+    return group.roles.any(
+      (r) => r.roleName == _selectedRoleName && r.projectId == projectId,
+    );
+  }
 
   @override
   void initState() {
@@ -72,24 +93,28 @@ class _AssignRoleDialogState extends State<AssignRoleDialog> {
     );
   }
 
-  Future<void> _onConfirm() async {
+  void _onConfirm() {
     if (_selectedRoleName == null || _selectedProjectId == null) return;
 
-    setState(() => _isSubmitting = true);
+    if (_isDuplicateAssignment()) {
+      setState(() {
+        _errorMessage =
+            'This role is already assigned to this project for this group';
+      });
+      return;
+    }
 
     final isGlobal = _selectedProjectId == '__global__';
+    final projectId = isGlobal ? null : _selectedProjectId;
 
-    if (!mounted) return;
-    context.read<GroupsBloc>().add(
-          AssignRoleEvent(
-            groupId: widget.groupId,
-            roleName: _selectedRoleName!,
-            projectId: isGlobal ? null : _selectedProjectId,
-            isGlobal: isGlobal,
-          ),
-        );
+    final assignment = GroupRoleAssignmentEntity(
+      id: '',
+      groupId: widget.groupId,
+      roleName: _selectedRoleName!,
+      projectId: projectId,
+    );
 
-    Navigator.pop(context);
+    Navigator.pop(context, assignment);
   }
 
   @override
@@ -119,9 +144,7 @@ class _AssignRoleDialogState extends State<AssignRoleDialog> {
                     const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.close, size: 20),
-                      onPressed: _isSubmitting
-                          ? null
-                          : () => Navigator.pop(context),
+                      onPressed: () => Navigator.pop(context),
                       visualDensity: VisualDensity.compact,
                     ),
                   ],
@@ -146,11 +169,12 @@ class _AssignRoleDialogState extends State<AssignRoleDialog> {
                         child: Text(role.name),
                       );
                     }).toList(),
-                    onChanged: _isSubmitting
-                        ? null
-                        : (value) {
-                            setState(() => _selectedRoleName = value);
-                          },
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedRoleName = value;
+                        _errorMessage = null;
+                      });
+                    },
                   ),
                   const SizedBox(height: 16),
                   DropdownButtonFormField<String>(
@@ -172,39 +196,35 @@ class _AssignRoleDialogState extends State<AssignRoleDialog> {
                         child: Text('Global'),
                       ),
                     ],
-                    onChanged: _isSubmitting
-                        ? null
-                        : (value) {
-                            setState(() => _selectedProjectId = value);
-                          },
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedProjectId = value;
+                        _errorMessage = null;
+                      });
+                    },
                   ),
+                  if (_errorMessage != null) ...[
+                    const SizedBox(height: 12),
+                    Text(
+                      _errorMessage!,
+                      style: TextStyle(color: Theme.of(context).colorScheme.error),
+                    ),
+                  ],
                   const SizedBox(height: 24),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: _isSubmitting
-                            ? null
-                            : () => Navigator.pop(context),
+                        onPressed: () => Navigator.pop(context),
                         child: const Text('Cancel'),
                       ),
                       const SizedBox(width: 8),
                       FilledButton(
                         onPressed: _selectedRoleName != null &&
-                                _selectedProjectId != null &&
-                                !_isSubmitting
+                                _selectedProjectId != null
                             ? _onConfirm
                             : null,
-                        child: _isSubmitting
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Text('Confirm'),
+                        child: const Text('Confirm'),
                       ),
                     ],
                   ),

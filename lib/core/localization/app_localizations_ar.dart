@@ -704,4 +704,71 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get permissionAppUpdateAppContent => 'محتوى التطبيقات المضافة';
+
+  @override
+  String get customFieldsAddFieldToProject => 'إضافة حقل للمشروع ...';
+
+  @override
+  String get customFieldsEditField => 'تعديل حقل مخصص';
+
+  @override
+  String get customFieldsDeleteFields => 'حذف حقول مخصصة';
+
+  @override
+  String get customFieldsEmptyValue => 'القيمة عند الفراغ (اختياري)';
+
+  @override
+  String get customFieldsCanBeEmpty => 'يمكن أن يكون فارغاً';
+
+  @override
+  String get customFieldsValueMode => 'وضع القيمة';
+
+  @override
+  String get customFieldsValueModeSingle => 'مفرد';
+
+  @override
+  String get customFieldsValueModeMulti => 'متعدد';
+
+  @override
+  String get customFieldsAliases => 'الأسماء البديلة (اختياري، مفصولة بفاصلة)';
+
+  @override
+  String get customFieldsFieldMode => 'وضع الحقل';
+
+  @override
+  String get customFieldsVisibleTo => 'مرئي لـ';
+
+  @override
+  String get customFieldsUpdatableBy => 'قابل للتعديل بواسطة';
+
+  @override
+  String get customFieldsShowOnlyWhen => 'يظهر فقط عندما';
+
+  @override
+  String get customFieldsFilterValuesBasedOn => 'فلترة القيم بناء على';
+
+  @override
+  String get customFieldsAdvancedSettings => 'إعدادات متقدمة';
+
+  @override
+  String get customFieldsNoCustomFieldsYet => 'لا توجد حقول مخصصة بعد';
+
+  @override
+  String get customFieldsFieldDetails => 'تفاصيل الحقل';
+
+  @override
+  String get customFieldsMakePublicSuccess => 'الحقل مرئي للجميع الآن';
+
+  @override
+  String get customFieldsAccessControlUpdated => 'تم تحديث التحكم بالوصول';
+
+  @override
+  String customFieldsSelected(Object count) {
+    return '$count محدد';
+  }
+
+  @override
+  String customFieldsDeleteConfirmation(Object count) {
+    return 'هل أنت متأكد من حذف $count حقل مخصص؟';
+  }
 }

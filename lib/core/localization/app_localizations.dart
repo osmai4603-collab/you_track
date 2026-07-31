@@ -1471,6 +1471,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'App Content'**
   String get permissionAppUpdateAppContent;
+
+  /// Button to add a new custom field to the project
+  ///
+  /// In en, this message translates to:
+  /// **'Add field to project ...'**
+  String get customFieldsAddFieldToProject;
+
+  /// Title for editing a custom field
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Custom Field'**
+  String get customFieldsEditField;
+
+  /// Title for deleting custom fields
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Custom Fields'**
+  String get customFieldsDeleteFields;
+
+  /// Label for empty value field
+  ///
+  /// In en, this message translates to:
+  /// **'Empty value (optional)'**
+  String get customFieldsEmptyValue;
+
+  /// Label for can be empty toggle
+  ///
+  /// In en, this message translates to:
+  /// **'Can be empty'**
+  String get customFieldsCanBeEmpty;
+
+  /// Label for value mode field
+  ///
+  /// In en, this message translates to:
+  /// **'Value mode'**
+  String get customFieldsValueMode;
+
+  /// Single value mode option
+  ///
+  /// In en, this message translates to:
+  /// **'Single'**
+  String get customFieldsValueModeSingle;
+
+  /// Multi value mode option
+  ///
+  /// In en, this message translates to:
+  /// **'Multi'**
+  String get customFieldsValueModeMulti;
+
+  /// Label for aliases field
+  ///
+  /// In en, this message translates to:
+  /// **'Aliases (optional, comma-separated)'**
+  String get customFieldsAliases;
+
+  /// Label for field mode
+  ///
+  /// In en, this message translates to:
+  /// **'Field mode'**
+  String get customFieldsFieldMode;
+
+  /// Label for visible to field
+  ///
+  /// In en, this message translates to:
+  /// **'Visible to'**
+  String get customFieldsVisibleTo;
+
+  /// Label for updatable by field
+  ///
+  /// In en, this message translates to:
+  /// **'Updatable by'**
+  String get customFieldsUpdatableBy;
+
+  /// Label for show only when field
+  ///
+  /// In en, this message translates to:
+  /// **'Show only when'**
+  String get customFieldsShowOnlyWhen;
+
+  /// Label for filter values based on field
+  ///
+  /// In en, this message translates to:
+  /// **'Filter values based on'**
+  String get customFieldsFilterValuesBasedOn;
+
+  /// Button for advanced settings
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced settings'**
+  String get customFieldsAdvancedSettings;
+
+  /// Empty state message when no custom fields exist
+  ///
+  /// In en, this message translates to:
+  /// **'No custom fields yet'**
+  String get customFieldsNoCustomFieldsYet;
+
+  /// Title for field details panel
+  ///
+  /// In en, this message translates to:
+  /// **'Field Details'**
+  String get customFieldsFieldDetails;
+
+  /// Snackbar message when field is made public
+  ///
+  /// In en, this message translates to:
+  /// **'Field is now visible to everyone'**
+  String get customFieldsMakePublicSuccess;
+
+  /// Snackbar message when access control is updated
+  ///
+  /// In en, this message translates to:
+  /// **'Access control updated'**
+  String get customFieldsAccessControlUpdated;
+
+  /// Shows count of selected fields
+  ///
+  /// In en, this message translates to:
+  /// **'{count} selected'**
+  String customFieldsSelected(Object count);
+
+  /// Confirmation message for deleting custom fields
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete {count} custom field(s)?'**
+  String customFieldsDeleteConfirmation(Object count);
 }
 
 class _AppLocalizationsDelegate

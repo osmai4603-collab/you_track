@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 
 class UserModel extends UserEntity {
@@ -31,10 +32,10 @@ class UserModel extends UserEntity {
   }
 
   factory UserModel.fromJson(Map<String, dynamic> data) {
-    debugPrint('User: $data');
+    printMap(title: 'User', data: data);
     return UserModel(
       id: data['id'],
-      fullName: data['full_name'],
+      fullName: data['full_name'] ?? '',
       username: (data['user_name'] ?? '').toString(),
       email: data['email'],
       avatarUrl: data['avatar_url'],

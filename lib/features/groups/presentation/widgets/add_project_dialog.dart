@@ -4,7 +4,6 @@ import 'package:get_it/get_it.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_project_entity.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
-import 'package:issues_tracking/features/groups/presentation/bloc/groups_event.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/get_projects_use_case.dart';
 
@@ -18,12 +17,12 @@ class AddProjectDialog extends StatefulWidget {
     required this.existingProjects,
   });
 
-  static Future<void> show(
+  static Future<List<String>?> show(
     BuildContext context,
     String groupId,
     List<GroupProjectEntity> existingProjects,
   ) {
-    return showDialog(
+    return showDialog<List<String>>(
       context: context,
       barrierDismissible: true,
       builder: (_) => BlocProvider.value(
@@ -45,7 +44,6 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
 
   List<ProjectEntity>? _projects;
   bool _isLoading = true;
-  bool _isSubmitting = false;
 
   final _selectedProjectIds = <String>{};
   Set<String> _existingProjectIds = {};
@@ -78,16 +76,6 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
   void _onAddProjects() {
     if (_selectedProjectIds.isEmpty) return;
 
-    setState(() => _isSubmitting = true);
-
-    if (!mounted) return;
-    context.read<GroupsBloc>().add(
-          AddGroupProjectsEvent(
-            groupId: widget.groupId,
-            projectIds: _selectedProjectIds.toList(),
-          ),
-        );
-
     Navigator.pop(context, _selectedProjectIds.toList());
   }
 
@@ -119,9 +107,7 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
                     const Spacer(),
                     IconButton(
                       icon: const Icon(Icons.close, size: 20),
-                      onPressed: _isSubmitting
-                          ? null
-                          : () => Navigator.pop(context),
+                      onPressed: () => Navigator.pop(context),
                       visualDensity: VisualDensity.compact,
                     ),
                   ],
@@ -235,27 +221,15 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       TextButton(
-                        onPressed: _isSubmitting
-                            ? null
-                            : () => Navigator.pop(context),
+                        onPressed: () => Navigator.pop(context),
                         child: const Text('Cancel'),
                       ),
                       const SizedBox(width: 8),
                       FilledButton(
-                        onPressed:
-                            _selectedProjectIds.isNotEmpty && !_isSubmitting
-                                ? _onAddProjects
-                                : null,
-                        child: _isSubmitting
-                            ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : const Text('Add projects'),
+                        onPressed: _selectedProjectIds.isNotEmpty
+                            ? _onAddProjects
+                            : null,
+                        child: const Text('Add projects'),
                       ),
                     ],
                   ),
