@@ -115,15 +115,7 @@ class _ProjectSettingCustomFieldsSectionState
                         isOpen:
                             _isDetailsPanelOpen &&
                             _selectedFieldIds.length == 1,
-                        child: CustomFieldDetailsPanel(
-                          field: _selectedFieldIds.isNotEmpty
-                              ? state.fields.firstWhere(
-                                  (f) => f.id == _selectedFieldIds.first,
-                                )
-                              : state.fields.first,
-                          onClose: _closeDetailsPanel,
-                          onEdit: _editSelectedField,
-                        ),
+                        child: _buildDetailsPanel(state),
                       ),
                     if (state is CustomFieldsLoaded && state.isSaving)
                       Positioned(
@@ -141,6 +133,33 @@ class _ProjectSettingCustomFieldsSectionState
           ),
         );
       },
+    );
+  }
+
+  Widget _buildDetailsPanel(CustomFieldsLoaded state) {
+    final fields = state.fields;
+    if (fields.isEmpty) return const SizedBox.shrink();
+
+    CustomFieldEntity? field;
+    final selectedId = _selectedFieldIds.isNotEmpty
+        ? _selectedFieldIds.first
+        : null;
+    if (selectedId == null) {
+      field = fields.first;
+    } else {
+      for (final f in fields) {
+        if (f.id == selectedId) {
+          field = f;
+          break;
+        }
+      }
+    }
+    if (field == null) return const SizedBox.shrink();
+
+    return CustomFieldDetailsPanel(
+      field: field,
+      onClose: _closeDetailsPanel,
+      onEdit: _editSelectedField,
     );
   }
 
@@ -617,13 +636,21 @@ class _ProjectSettingCustomFieldsSectionState
     }
   }
 
+  CustomFieldEntity? _findSelectedField(CustomFieldsLoaded state) {
+    if (_selectedFieldIds.isEmpty) return null;
+    final selectedId = _selectedFieldIds.first;
+    for (final f in state.fields) {
+      if (f.id == selectedId) return f;
+    }
+    return null;
+  }
+
   void _editSelectedField() {
     if (_selectedFieldIds.length != 1) return;
     final state = context.read<CustomFieldsCubit>().state;
     if (state is CustomFieldsLoaded) {
-      final field = state.fields.firstWhere(
-        (f) => f.id == _selectedFieldIds.first,
-      );
+      final field = _findSelectedField(state);
+      if (field == null) return;
       _showEditFieldDialog(context, field);
     }
   }
@@ -847,9 +874,8 @@ class _ProjectSettingCustomFieldsSectionState
     if (_selectedFieldIds.length != 1) return;
     final state = context.read<CustomFieldsCubit>().state;
     if (state is CustomFieldsLoaded) {
-      final field = state.fields.firstWhere(
-        (f) => f.id == _selectedFieldIds.first,
-      );
+      final field = _findSelectedField(state);
+      if (field == null) return;
       showDialog(
         context: context,
         builder: (context) => ReplaceValuePopup(field: field),
@@ -861,9 +887,8 @@ class _ProjectSettingCustomFieldsSectionState
     if (_selectedFieldIds.length != 1) return;
     final state = context.read<CustomFieldsCubit>().state;
     if (state is CustomFieldsLoaded) {
-      final field = state.fields.firstWhere(
-        (f) => f.id == _selectedFieldIds.first,
-      );
+      final field = _findSelectedField(state);
+      if (field == null) return;
       showDialog(
         context: context,
         builder: (context) => MakePrivateDialog(field: field),
@@ -875,9 +900,8 @@ class _ProjectSettingCustomFieldsSectionState
     if (_selectedFieldIds.length != 1) return;
     final state = context.read<CustomFieldsCubit>().state;
     if (state is CustomFieldsLoaded) {
-      final field = state.fields.firstWhere(
-        (f) => f.id == _selectedFieldIds.first,
-      );
+      final field = _findSelectedField(state);
+      if (field == null) return;
       context.read<CustomFieldsCubit>().updateAccessControl(
         fieldId: field.id,
         accessControl: const {'type': 'everyone'},
@@ -892,9 +916,8 @@ class _ProjectSettingCustomFieldsSectionState
     if (_selectedFieldIds.length != 1) return;
     final state = context.read<CustomFieldsCubit>().state;
     if (state is CustomFieldsLoaded) {
-      final field = state.fields.firstWhere(
-        (f) => f.id == _selectedFieldIds.first,
-      );
+      final field = _findSelectedField(state);
+      if (field == null) return;
       showDialog(
         context: context,
         builder: (context) => AdvancedFieldSettingsDialog(field: field),

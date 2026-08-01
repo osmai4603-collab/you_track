@@ -1,4 +1,5 @@
 import 'package:issues_tracking/core/entities/project_data.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 final class ProjectDataModel extends ProjectData {
   const ProjectDataModel({
@@ -8,6 +9,7 @@ final class ProjectDataModel extends ProjectData {
   });
 
   factory ProjectDataModel.fromjson(Map<String, dynamic> data) {
+    printMap(title: 'Project: ', data: data);
     return ProjectDataModel(
       id: data['id'],
       projectName: data['name'],

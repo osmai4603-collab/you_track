@@ -3,6 +3,7 @@ import 'package:issues_tracking/core/enums/issue_state_enum.dart';
 import 'package:issues_tracking/core/enums/issue_subsystem_enum.dart';
 import 'package:issues_tracking/core/enums/issue_type_enum.dart';
 import 'package:issues_tracking/features/agile_boards/domain/entities/board_card.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class BoardCardModel extends BoardCard {
   const BoardCardModel({
@@ -21,6 +22,7 @@ class BoardCardModel extends BoardCard {
   });
 
   factory BoardCardModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'BoardCard', data: json);
     return BoardCardModel(
       id: (json['id'] ?? '').toString(),
       issueKey: (json['issue_key'] ?? '').toString(),

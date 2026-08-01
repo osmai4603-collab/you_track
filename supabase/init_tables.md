@@ -27,6 +27,8 @@
 | `template_type` | `text` |  Nullable |
 | `is_favorite` | `bool` |  |
 | `starting_number` | `int4` |  Nullable |
+| `visibility` | `uuid` |  Nullable |
+| `recommended_visibility` | `_uuid` |  Nullable |
 
 ## Table `project_members`
 
@@ -193,6 +195,8 @@
 | `order_index` | `int4` |  |
 | `created_at` | `timestamptz` |  |
 | `updated_at` | `timestamptz` |  |
+| `visibility` | `text` |  |
+| `access_control` | `jsonb` |  |
 
 ## Table `articles`
 

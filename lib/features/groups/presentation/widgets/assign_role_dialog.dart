@@ -8,7 +8,6 @@ import 'package:issues_tracking/features/projects/domain/entities/project_entity
 import 'package:issues_tracking/features/projects/domain/usecases/get_projects_use_case.dart';
 import 'package:issues_tracking/features/roles/domain/entities/role_entity.dart';
 import 'package:issues_tracking/features/roles/domain/usecases/get_roles.dart';
-
 import 'package:issues_tracking/features/groups/domain/entities/group_role_assignment_entity.dart';
 
 class AssignRoleDialog extends StatefulWidget {
@@ -54,8 +53,7 @@ class _AssignRoleDialogState extends State<AssignRoleDialog> {
     if (groupIndex == -1) return false;
     final group = state.groups[groupIndex];
 
-    final isGlobal = _selectedProjectId == '__global__';
-    final projectId = isGlobal ? null : _selectedProjectId;
+    final projectId = _selectedProjectId;
 
     return group.roles.any(
       (r) => r.roleName == _selectedRoleName && r.projectId == projectId,
@@ -75,22 +73,16 @@ class _AssignRoleDialogState extends State<AssignRoleDialog> {
     final rolesResult = await rolesTask;
     final projectsResult = await projectsTask;
 
-    rolesResult.fold(
-      (_) => null,
-      (roles) {
-        projectsResult.fold(
-          (_) => null,
-          (projects) {
-            if (!mounted) return;
-            setState(() {
-              _roles = roles;
-              _projects = projects;
-              _isLoading = false;
-            });
-          },
-        );
-      },
-    );
+    rolesResult.fold((_) => null, (roles) {
+      projectsResult.fold((_) => null, (projects) {
+        if (!mounted) return;
+        setState(() {
+          _roles = roles;
+          _projects = projects;
+          _isLoading = false;
+        });
+      });
+    });
   }
 
   void _onConfirm() {
@@ -104,8 +96,7 @@ class _AssignRoleDialogState extends State<AssignRoleDialog> {
       return;
     }
 
-    final isGlobal = _selectedProjectId == '__global__';
-    final projectId = isGlobal ? null : _selectedProjectId;
+    final projectId = _selectedProjectId;
 
     final assignment = GroupRoleAssignmentEntity(
       id: '',
@@ -191,10 +182,6 @@ class _AssignRoleDialogState extends State<AssignRoleDialog> {
                           child: Text(project.name),
                         );
                       }),
-                      const DropdownMenuItem(
-                        value: '__global__',
-                        child: Text('Global'),
-                      ),
                     ],
                     onChanged: (value) {
                       setState(() {
@@ -207,7 +194,9 @@ class _AssignRoleDialogState extends State<AssignRoleDialog> {
                     const SizedBox(height: 12),
                     Text(
                       _errorMessage!,
-                      style: TextStyle(color: Theme.of(context).colorScheme.error),
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.error,
+                      ),
                     ),
                   ],
                   const SizedBox(height: 24),
@@ -220,7 +209,8 @@ class _AssignRoleDialogState extends State<AssignRoleDialog> {
                       ),
                       const SizedBox(width: 8),
                       FilledButton(
-                        onPressed: _selectedRoleName != null &&
+                        onPressed:
+                            _selectedRoleName != null &&
                                 _selectedProjectId != null
                             ? _onConfirm
                             : null,

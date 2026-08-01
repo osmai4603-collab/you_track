@@ -1,5 +1,6 @@
 import 'package:issues_tracking/core/models/project_data_model.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_role_assignment_entity.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class GroupRoleAssignmentModel extends GroupRoleAssignmentEntity {
   const GroupRoleAssignmentModel({
@@ -23,6 +24,7 @@ class GroupRoleAssignmentModel extends GroupRoleAssignmentEntity {
   }
 
   factory GroupRoleAssignmentModel.fromJson(Map<String, dynamic> data) {
+    printMap(title: 'GroupRoleAssignment', data: data);
     return GroupRoleAssignmentModel(
       id: (data['id'] ?? '').toString(),
       groupId: (data['group_id'] ?? '').toString(),

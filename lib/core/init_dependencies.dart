@@ -2,8 +2,13 @@ import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:issues_tracking/features/auth/data/datasources/auth_remote_data_source.dart';
 import 'package:issues_tracking/features/auth/data/datasources/auth_sqlite_data_source_impl.dart';
+import 'package:issues_tracking/features/auth/data/datasources/user_permissions_data_source.dart';
+import 'package:issues_tracking/features/auth/data/datasources/user_permissions_sqlite_data_source_impl.dart';
 import 'package:issues_tracking/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:issues_tracking/features/auth/data/repositories/user_permissions_repository_impl.dart';
 import 'package:issues_tracking/features/auth/domain/repositories/auth_repository.dart';
+import 'package:issues_tracking/features/auth/domain/repositories/user_permissions_repository.dart';
+import 'package:issues_tracking/features/auth/domain/usecases/get_user_permissions_use_case.dart';
 import 'package:issues_tracking/features/auth/domain/usecases/login_use_case.dart';
 import 'package:issues_tracking/features/auth/presentation/cubits/login_cubit.dart';
 import 'package:issues_tracking/features/issues/data/datasources/issues_sqlite_data_source_impl.dart';
@@ -19,6 +24,8 @@ import "package:issues_tracking/features/dashboards/domain/usecases/get_dashboar
 import "package:issues_tracking/features/dashboards/presentation/bloc/dashboard_bloc.dart";
 import "package:issues_tracking/features/app/presentation/cubit/youtrack_shell_cubit.dart";
 import 'package:issues_tracking/core/services/supabase_storage_service.dart';
+import 'package:issues_tracking/core/services/sqlite/sqlite_database_manager.dart';
+import 'package:issues_tracking/core/services/sqlite/sqlite_database_sync.dart';
 
 import 'package:issues_tracking/features/issues/data/datasources/issues_remote_data_source.dart';
 import 'package:issues_tracking/features/issues/data/repositories/issues_repository_impl.dart';
@@ -170,6 +177,7 @@ import 'package:issues_tracking/features/groups/domain/usecases/add_group_member
 import 'package:issues_tracking/features/groups/domain/usecases/add_group_projects.dart';
 import 'package:issues_tracking/features/groups/domain/usecases/get_group_by_id.dart';
 import 'package:issues_tracking/features/groups/domain/usecases/remove_group_members.dart';
+import 'package:issues_tracking/features/groups/domain/usecases/remove_group_role.dart';
 import 'package:issues_tracking/features/groups/domain/usecases/update_group.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
 
@@ -214,6 +222,10 @@ Future<void> initDependencies({bool isOffline = false}) async {
   get_it.registerLazySingleton(
     () => SupabaseStorageService(supabaseClient: get_it()),
   );
+
+  // SQLite database shared by offline/local data sources
+  final sqliteDatabase = await SqliteDatabaseManager.instance.database;
+  get_it.registerLazySingleton(() => SqliteDatabaseSync(sqliteDatabase));
 
   // 2. App Feature Initialization
   _initAppFeature(isOffline: isOffline);
@@ -594,7 +606,19 @@ void _initAuthFeature({required bool isOffline}) {
     () => AuthRepositoryImpl(get_it()),
   );
 
-  get_it.registerLazySingleton(() => LoginUseCase(get_it()));
+  get_it.registerLazySingleton<LoginUseCase>(() => LoginUseCase(get_it()));
+
+  get_it.registerLazySingleton<UserPermissionsDataSource>(
+    () => UserPermissionsSqliteDataSourceImpl(get_it()),
+  );
+
+  get_it.registerLazySingleton<UserPermissionsRepository>(
+    () => UserPermissionsRepositoryImpl(dataSource: get_it()),
+  );
+
+  get_it.registerLazySingleton<GetUserPermissionsUseCase>(
+    () => GetUserPermissionsUseCase(get_it()),
+  );
 
   get_it.registerFactory(() => LoginCubit(loginUseCase: get_it()));
 
@@ -639,12 +663,14 @@ void _initGroupsFeature({required bool isOffline}) {
   get_it.registerLazySingleton(() => GetGroupMembers(get_it()));
   get_it.registerLazySingleton(() => AddGroupMembers(get_it()));
   get_it.registerLazySingleton(() => RemoveGroupMembers(get_it()));
+  get_it.registerLazySingleton(() => RemoveGroupRole(get_it()));
   get_it.registerLazySingleton(() => AddGroupProjects(get_it()));
   get_it.registerLazySingleton(() => GetGroupById(get_it()));
   get_it.registerLazySingleton(() => UpdateGroup(get_it()));
 
   get_it.registerFactory(
     () => GroupsBloc(
+      removeGroupRole: get_it(),
       getGroups: get_it(),
       createGroup: get_it(),
       assignRole: get_it(),

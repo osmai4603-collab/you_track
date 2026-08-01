@@ -1,4 +1,5 @@
 import '../../domain/entities/time_tracking_config_entity.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class TimeTrackingConfigModel extends TimeTrackingConfigEntity {
   const TimeTrackingConfigModel({
@@ -24,6 +25,7 @@ class TimeTrackingConfigModel extends TimeTrackingConfigEntity {
   }
 
   factory TimeTrackingConfigModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'TimeTrackingConfig', data: json);
     return TimeTrackingConfigModel(
       projectId: (json['project_id'] ?? '').toString(),
       enabled: json['enabled'] as bool? ?? false,

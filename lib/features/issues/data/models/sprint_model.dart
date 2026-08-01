@@ -1,4 +1,5 @@
 import '../../domain/entities/sprint.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class SprintModel extends Sprint {
   const SprintModel({
@@ -13,6 +14,7 @@ class SprintModel extends Sprint {
   });
 
   factory SprintModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'Sprint', data: json);
     return SprintModel(
       id: (json['id'] ?? '').toString(),
       name: (json['name'] ?? '').toString(),

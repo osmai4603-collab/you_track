@@ -6,11 +6,13 @@ import 'package:issues_tracking/features/groups/domain/usecases/assign_role.dart
 import 'package:issues_tracking/features/groups/domain/usecases/create_group.dart';
 import 'package:issues_tracking/features/groups/domain/usecases/get_group_by_id.dart';
 import 'package:issues_tracking/features/groups/domain/usecases/get_groups.dart';
+import 'package:issues_tracking/features/groups/domain/usecases/remove_group_role.dart';
 import 'package:issues_tracking/features/groups/domain/usecases/update_group.dart';
+import 'package:issues_tracking/core/utils/permission_refresh_mixin.dart';
 import 'groups_event.dart';
 import 'groups_state.dart';
 
-class GroupsBloc extends Bloc<GroupsEvent, GroupsState> {
+class GroupsBloc extends Bloc<GroupsEvent, GroupsState> with PermissionRefreshMixin {
   final GetGroups getGroups;
   final CreateGroup createGroup;
   final AssignRole assignRole;
@@ -18,6 +20,7 @@ class GroupsBloc extends Bloc<GroupsEvent, GroupsState> {
   final AddGroupMembers addGroupMembers;
   final AddGroupProjects addGroupProjects;
   final UpdateGroup updateGroup;
+  final RemoveGroupRole removeGroupRole;
 
   GroupsBloc({
     required this.getGroups,
@@ -27,6 +30,7 @@ class GroupsBloc extends Bloc<GroupsEvent, GroupsState> {
     required this.addGroupMembers,
     required this.addGroupProjects,
     required this.updateGroup,
+    required this.removeGroupRole,
   }) : super(GroupsInitial()) {
     on<LoadGroups>(_onLoadGroups);
     on<SelectGroup>(_onSelectGroup);
@@ -35,6 +39,7 @@ class GroupsBloc extends Bloc<GroupsEvent, GroupsState> {
     on<AddGroupMembersEvent>(_onAddGroupMembers);
     on<AddGroupProjectsEvent>(_onAddGroupProjects);
     on<UpdateGroupSettingsEvent>(_onUpdateGroupSettings);
+    on<RemoveGroupRoleEvent>(_onRemoveGroupRole);
   }
 
   Future<void> _onLoadGroups(
@@ -86,14 +91,13 @@ class GroupsBloc extends Bloc<GroupsEvent, GroupsState> {
   ) async {
     if (state is GroupsLoaded) {
       final current = state as GroupsLoaded;
-      final groupIndex =
-          current.groups.indexWhere((g) => g.id == event.groupId);
+      final groupIndex = current.groups.indexWhere(
+        (g) => g.id == event.groupId,
+      );
       if (groupIndex != -1) {
         final group = current.groups[groupIndex];
         final alreadyAssigned = group.roles.any(
-          (r) =>
-              r.roleName == event.roleName &&
-              r.projectId == event.projectId,
+          (r) => r.roleName == event.roleName && r.projectId == event.projectId,
         );
         if (alreadyAssigned) {
           _refreshGroup(event.groupId, emit);
@@ -109,10 +113,12 @@ class GroupsBloc extends Bloc<GroupsEvent, GroupsState> {
         projectId: event.projectId,
       ),
     );
-    result.fold(
-      (failure) => emit(GroupsError(failure.message)),
-      (_) => _refreshGroup(event.groupId, emit),
-    );
+    await result.fold((failure) async {
+      emit(GroupsError(failure.message));
+    }, (_) async {
+      await refreshUserPermissions();
+      await _refreshGroup(event.groupId, emit);
+    });
   }
 
   Future<void> _onAddGroupMembers(
@@ -125,10 +131,12 @@ class GroupsBloc extends Bloc<GroupsEvent, GroupsState> {
         userIds: event.userIds,
       ),
     );
-    result.fold(
-      (failure) => emit(GroupsError(failure.message)),
-      (_) => _refreshGroup(event.groupId, emit),
-    );
+    await result.fold((failure) async {
+      emit(GroupsError(failure.message));
+    }, (_) async {
+      await refreshUserPermissions();
+      await _refreshGroup(event.groupId, emit);
+    });
   }
 
   Future<void> _onAddGroupProjects(
@@ -141,10 +149,9 @@ class GroupsBloc extends Bloc<GroupsEvent, GroupsState> {
         projectIds: event.projectIds,
       ),
     );
-    result.fold(
-      (failure) => emit(GroupsError(failure.message)),
-      (_) => _refreshGroup(event.groupId, emit),
-    );
+    await result.fold((failure) async {
+      emit(GroupsError(failure.message));
+    }, (_) => _refreshGroup(event.groupId, emit));
   }
 
   Future<void> _onUpdateGroupSettings(
@@ -154,7 +161,7 @@ class GroupsBloc extends Bloc<GroupsEvent, GroupsState> {
     final result = await updateGroup(
       params: UpdateGroupParams(
         id: event.groupId,
-        name: event.name,
+        name: event.name ?? '',
         description: event.description,
         autoJoin: event.autoJoin,
         autoJoinDomains: event.autoJoinDomains,
@@ -163,20 +170,32 @@ class GroupsBloc extends Bloc<GroupsEvent, GroupsState> {
         logo: event.logo,
       ),
     );
-    result.fold(
-      (failure) => emit(GroupsError(failure.message)),
-      (_) => _refreshGroup(event.groupId, emit),
-    );
+    await result.fold((failure) async {
+      emit(GroupsError(failure.message));
+    }, (_) => _refreshGroup(event.groupId, emit));
   }
 
-  Future<void> _refreshGroup(
-    String groupId,
+  Future<void> _onRemoveGroupRole(
+    RemoveGroupRoleEvent event,
     Emitter<GroupsState> emit,
   ) async {
-    if (state is! GroupsLoaded) return;
-    final result = await getGroupById(
-      params: GetGroupByIdParams(id: groupId),
+    final result = await removeGroupRole(
+      params: RemoveGroupRoleParams(
+        groupId: event.groupId,
+        projectId: event.projectId,
+      ),
     );
+    await result.fold((failure) async {
+      emit(GroupsError(failure.message));
+    }, (_) async {
+      await refreshUserPermissions();
+      await _refreshGroup(event.groupId, emit);
+    });
+  }
+
+  Future<void> _refreshGroup(String groupId, Emitter<GroupsState> emit) async {
+    if (state is! GroupsLoaded) return;
+    final result = await getGroupById(params: GetGroupByIdParams(id: groupId));
     result.fold((failure) => null, (updated) {
       if (state is! GroupsLoaded) return;
       final current = state as GroupsLoaded;

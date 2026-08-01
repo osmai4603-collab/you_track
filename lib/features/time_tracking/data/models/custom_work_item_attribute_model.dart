@@ -1,5 +1,6 @@
 import '../../../../core/enums/time_tracking_field_type_enum.dart';
 import '../../domain/entities/custom_work_item_attribute_entity.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class CustomWorkItemAttributeModel extends CustomWorkItemAttributeEntity {
   const CustomWorkItemAttributeModel({
@@ -29,6 +30,7 @@ class CustomWorkItemAttributeModel extends CustomWorkItemAttributeEntity {
   }
 
   factory CustomWorkItemAttributeModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'CustomWorkItemAttribute', data: json);
     return CustomWorkItemAttributeModel(
       id: (json['id'] ?? '').toString(),
       projectId: (json['project_id'] ?? '').toString(),

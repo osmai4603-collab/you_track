@@ -85,9 +85,13 @@ class _CreateRolePageState extends YouTrackState<CreateRolePage> {
                 label: 'Description',
                 child: TextField(
                   controller: _descriptionController,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colors.onSurface,
+                  ),
                   decoration: const InputDecoration(
                     hintText: 'Optional description',
                     isDense: true,
+                    contentPadding: .symmetric(vertical: 24, horizontal: 8),
                   ),
                   maxLines: 3,
                 ),
@@ -209,7 +213,31 @@ class _CreateRolePageState extends YouTrackState<CreateRolePage> {
                 ),
               ),
               const Spacer(),
+              TextButton(
+                style: TextButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                ),
+                onPressed: () {
+                  setState(() {
+                    if (_selectedPermissions.length ==
+                        Permission.values.length) {
+                      _selectedPermissions.clear();
+                    } else {
+                      _selectedPermissions.addAll(
+                        Permission.values.map((e) => e.name),
+                      );
+                    }
+                  });
+                },
+                child: Text(
+                  _selectedPermissions.length == Permission.values.length
+                      ? 'Deselect All'
+                      : 'Select All',
+                ),
+              ),
+              const SizedBox(width: AppSpacing.small),
               SegmentedButton<_GroupBy>(
+                showSelectedIcon: false,
                 segments: const [
                   ButtonSegment(value: _GroupBy.entity, label: Text('Entity')),
                   ButtonSegment(

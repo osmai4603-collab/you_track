@@ -3,9 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_icons.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/enums/project_widget_enum.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
+import 'package:issues_tracking/core/widgets/permission_guard.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/youtrack_shell_cubit.dart';
 import 'package:issues_tracking/features/dashboards/presentation/widgets/breadcrumbs.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
@@ -162,10 +164,13 @@ class _SectionTwo extends StatelessWidget {
           if (currentPath == AppRouteKeys.projects) ...[
             _SearchField(hint: 'Filter projects by name or ID'),
             const SizedBox(width: 16),
-            _ActionButton(
-              onPressed: () => context.go(AppRouteKeys.projectTemplates),
-              icon: Icons.add,
-              label: 'Create Project',
+            PermissionGuard(
+              permission: Permission.projectCreateProject,
+              child: _ActionButton(
+                onPressed: () => context.go(AppRouteKeys.projectTemplates),
+                icon: Icons.add,
+                label: 'Create Project',
+              ),
             ),
           ],
           if (isPeople) ...[
@@ -181,38 +186,53 @@ class _SectionTwo extends StatelessWidget {
             ),
           ],
           if (AppRouteKeys.issues == currentPath) ...[
-            _ActionButton(
-              onPressed: () => context.go(AppRouteKeys.createIssue),
-              icon: Icons.add,
-              label: 'New Issue',
+            PermissionGuard(
+              permission: Permission.issueCreateIssue,
+              child: _ActionButton(
+                onPressed: () => context.go(AppRouteKeys.createIssue),
+                icon: Icons.add,
+                label: 'New Issue',
+              ),
             ),
           ],
           if (AppRouteKeys.groups == currentPath) ...[
-            _ActionButton(
-              onPressed: () {},
-              icon: Icons.add,
-              label: 'New Group',
+            PermissionGuard(
+              permission: Permission.organizationCreateOrganization,
+              child: _ActionButton(
+                onPressed: () {},
+                icon: Icons.add,
+                label: 'New Group',
+              ),
             ),
           ],
           if (AppRouteKeys.roles == currentPath) ...[
-            _ActionButton(
-              onPressed: () {
-                context.read<RolesBloc>().add(const SelectRole('new'));
-              },
-              icon: Icons.add,
-              label: 'New Role',
+            PermissionGuard(
+              permission: Permission.systemLowLevelAdminWrite,
+              child: _ActionButton(
+                onPressed: () {
+                  context.read<RolesBloc>().add(const SelectRole('new'));
+                },
+                icon: Icons.add,
+                label: 'New Role',
+              ),
             ),
           ],
           if (AppRouteKeys.users == currentPath) ...[
-            _ActionButton(onPressed: () {}, icon: Icons.add, label: 'New User'),
+            PermissionGuard(
+              permission: Permission.userCreateUser,
+              child: _ActionButton(onPressed: () {}, icon: Icons.add, label: 'New User'),
+            ),
           ],
           if (currentPath.contains('agile-boards')) ...[
             _SearchField(hint: 'Filter cards on the boards'),
             const SizedBox(width: 16),
-            _ActionButton(
-              onPressed: () => context.go(AppRouteKeys.createIssue),
-              icon: Icons.add,
-              label: 'New card',
+            PermissionGuard(
+              permission: Permission.issueCreateIssue,
+              child: _ActionButton(
+                onPressed: () => context.go(AppRouteKeys.createIssue),
+                icon: Icons.add,
+                label: 'New card',
+              ),
             ),
           ],
           if (projectId != null &&

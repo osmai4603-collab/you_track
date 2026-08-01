@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
+import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
 
 class ArticleEmptyState extends StatelessWidget {
-  final String role;
+  final String role; // TODO: Can be removed later as role is no longer used for permissions
 
   const ArticleEmptyState({super.key, required this.role});
 
   @override
   Widget build(BuildContext context) {
-    final canCreate = role == 'admin' || role == 'developer';
+    final userSession = context.watch<UserSession>();
+    final canCreate = userSession.hasPermission(Permission.articleCreateArticle);
 
     return Center(
       child: Column(

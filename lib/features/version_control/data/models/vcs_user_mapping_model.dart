@@ -1,4 +1,5 @@
 import 'package:issues_tracking/features/version_control/domain/entities/vcs_user_mapping_entity.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class VcsUserMappingModel extends VcsUserMappingEntity {
   const VcsUserMappingModel({
@@ -20,6 +21,7 @@ class VcsUserMappingModel extends VcsUserMappingEntity {
   }
 
   factory VcsUserMappingModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'VcsUserMapping', data: json);
     return VcsUserMappingModel(
       id: (json['id'] ?? '').toString(),
       integrationId: (json['integration_id'] ?? '').toString(),

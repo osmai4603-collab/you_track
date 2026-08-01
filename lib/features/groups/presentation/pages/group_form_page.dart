@@ -272,6 +272,20 @@ class _MembersTab extends StatefulWidget {
 }
 
 class _MembersTabState extends State<_MembersTab> {
+  bool _isLoading = false;
+
+  @override
+  void didUpdateWidget(covariant _MembersTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.group != oldWidget.group) {
+      if (_isLoading) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final members = widget.group.members;
@@ -283,22 +297,35 @@ class _MembersTabState extends State<_MembersTab> {
           Row(
             children: [
               FilledButton.icon(
-                onPressed: () async {
-                  final result = await AddMembersDialog.show(
-                    context,
-                    widget.group.id,
-                    members,
-                  );
-                  if (result != null && result.isNotEmpty && context.mounted) {
-                    context.read<GroupsBloc>().add(
-                          AddGroupMembersEvent(
-                            groupId: widget.group.id,
-                            userIds: result,
-                          ),
+                onPressed: _isLoading
+                    ? null
+                    : () async {
+                        final result = await AddMembersDialog.show(
+                          context,
+                          widget.group.id,
+                          members,
                         );
-                  }
-                },
-                icon: const Icon(Icons.person_add, size: 16),
+                        if (result != null &&
+                            result.isNotEmpty &&
+                            context.mounted) {
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          context.read<GroupsBloc>().add(
+                            AddGroupMembersEvent(
+                              groupId: widget.group.id,
+                              userIds: result,
+                            ),
+                          );
+                        }
+                      },
+                icon: _isLoading
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.person_add, size: 16),
                 label: const Text('Add members'),
               ),
               const SizedBox(width: AppSpacing.small),
@@ -358,7 +385,7 @@ class _MembersTabState extends State<_MembersTab> {
   }
 }
 
-class _RolesTab extends StatelessWidget {
+class _RolesTab extends StatefulWidget {
   final GroupEntity group;
   final ColorScheme colors;
   final TextTheme textTheme;
@@ -370,8 +397,27 @@ class _RolesTab extends StatelessWidget {
   });
 
   @override
+  State<_RolesTab> createState() => _RolesTabState();
+}
+
+class _RolesTabState extends State<_RolesTab> {
+  bool _isLoading = false;
+
+  @override
+  void didUpdateWidget(covariant _RolesTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.group != oldWidget.group) {
+      if (_isLoading) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final groupRoles = group.roles;
+    final groupRoles = widget.group.roles;
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.medium),
       child: Column(
@@ -380,20 +426,34 @@ class _RolesTab extends StatelessWidget {
           Row(
             children: [
               FilledButton.icon(
-                onPressed: () async {
-                  final result = await AssignRoleDialog.show(context, group.id);
-                  if (result != null && context.mounted) {
-                    context.read<GroupsBloc>().add(
-                          AssignRoleEvent(
-                            groupId: group.id,
-                            roleName: result.roleName,
-                            projectId: result.projectId,
-                            isGlobal: result.projectId == null,
-                          ),
+                onPressed: _isLoading
+                    ? null
+                    : () async {
+                        final result = await AssignRoleDialog.show(
+                          context,
+                          widget.group.id,
                         );
-                  }
-                },
-                icon: const Icon(Icons.add, size: 16),
+                        if (result != null && context.mounted) {
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          context.read<GroupsBloc>().add(
+                            AssignRoleEvent(
+                              groupId: widget.group.id,
+                              roleName: result.roleName,
+                              projectId: result.projectId,
+                              isGlobal: result.projectId == null,
+                            ),
+                          );
+                        }
+                      },
+                icon: _isLoading
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.add, size: 16),
                 label: const Text('Assign role'),
               ),
               const SizedBox(width: AppSpacing.small),
@@ -412,8 +472,8 @@ class _RolesTab extends StatelessWidget {
           if (groupRoles.isEmpty)
             Text(
               'No roles assigned',
-              style: textTheme.bodySmall?.copyWith(
-                color: colors.onSurfaceVariant,
+              style: widget.textTheme.bodySmall?.copyWith(
+                color: widget.colors.onSurfaceVariant,
               ),
             )
           else
@@ -427,8 +487,8 @@ class _RolesTab extends StatelessWidget {
                     color: Colors.transparent,
                     child: ListTile(
                       leading: ProjectChip(
-                        colors: colors,
-                        textTheme: textTheme,
+                        colors: widget.colors,
+                        textTheme: widget.textTheme,
                         shortKey: role.project?.projectId ?? '',
                       ),
                       title: Text(role.roleName),
@@ -437,7 +497,7 @@ class _RolesTab extends StatelessWidget {
                         icon: Icon(
                           Icons.delete_outline,
                           size: 16,
-                          color: colors.error,
+                          color: widget.colors.error,
                         ),
                         onPressed: () {},
                       ),
@@ -452,7 +512,7 @@ class _RolesTab extends StatelessWidget {
   }
 }
 
-class _ProjectTeamsTab extends StatelessWidget {
+class _ProjectTeamsTab extends StatefulWidget {
   final GroupEntity group;
   final ColorScheme colors;
   final TextTheme textTheme;
@@ -464,8 +524,27 @@ class _ProjectTeamsTab extends StatelessWidget {
   });
 
   @override
+  State<_ProjectTeamsTab> createState() => _ProjectTeamsTabState();
+}
+
+class _ProjectTeamsTabState extends State<_ProjectTeamsTab> {
+  bool _isLoading = false;
+
+  @override
+  void didUpdateWidget(covariant _ProjectTeamsTab oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.group != oldWidget.group) {
+      if (_isLoading) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final projects = group.projects;
+    final projects = widget.group.projects;
     return Padding(
       padding: const EdgeInsets.all(AppSpacing.medium),
       child: Column(
@@ -474,22 +553,35 @@ class _ProjectTeamsTab extends StatelessWidget {
           Row(
             children: [
               FilledButton.icon(
-                onPressed: () async {
-                  final result = await AddProjectDialog.show(
-                    context,
-                    group.id,
-                    projects,
-                  );
-                  if (result != null && result.isNotEmpty && context.mounted) {
-                    context.read<GroupsBloc>().add(
-                          AddGroupProjectsEvent(
-                            groupId: group.id,
-                            projectIds: result,
-                          ),
+                onPressed: _isLoading
+                    ? null
+                    : () async {
+                        final result = await AddProjectDialog.show(
+                          context,
+                          widget.group.id,
+                          projects,
                         );
-                  }
-                },
-                icon: const Icon(Icons.add, size: 16),
+                        if (result != null &&
+                            result.isNotEmpty &&
+                            context.mounted) {
+                          setState(() {
+                            _isLoading = true;
+                          });
+                          context.read<GroupsBloc>().add(
+                            AddGroupProjectsEvent(
+                              groupId: widget.group.id,
+                              projectIds: result,
+                            ),
+                          );
+                        }
+                      },
+                icon: _isLoading
+                    ? const SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      )
+                    : const Icon(Icons.add, size: 16),
                 label: const Text('Add to project'),
               ),
               const SizedBox(width: AppSpacing.small),
@@ -508,8 +600,8 @@ class _ProjectTeamsTab extends StatelessWidget {
           if (projects.isEmpty)
             Text(
               'Not linked to any projects',
-              style: textTheme.bodySmall?.copyWith(
-                color: colors.onSurfaceVariant,
+              style: widget.textTheme.bodySmall?.copyWith(
+                color: widget.colors.onSurfaceVariant,
               ),
             )
           else
@@ -523,8 +615,8 @@ class _ProjectTeamsTab extends StatelessWidget {
                     color: Colors.transparent,
                     child: ListTile(
                       leading: ProjectChip(
-                        colors: colors,
-                        textTheme: textTheme,
+                        colors: widget.colors,
+                        textTheme: widget.textTheme,
                         shortKey: project.project?.projectId ?? '',
                       ),
                       title: Text(project.project?.projectName ?? ''),
@@ -533,7 +625,7 @@ class _ProjectTeamsTab extends StatelessWidget {
                         icon: Icon(
                           Icons.delete_outline,
                           size: 18,
-                          color: colors.error,
+                          color: widget.colors.error,
                         ),
                         onPressed: () {},
                       ),

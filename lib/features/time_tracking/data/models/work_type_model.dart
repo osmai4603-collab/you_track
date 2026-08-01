@@ -1,4 +1,5 @@
 import '../../domain/entities/work_type_entity.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class WorkTypeModel extends WorkTypeEntity {
   const WorkTypeModel({
@@ -26,6 +27,7 @@ class WorkTypeModel extends WorkTypeEntity {
   }
 
   factory WorkTypeModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'WorkType', data: json);
     return WorkTypeModel(
       id: (json['id'] ?? '').toString(),
       projectId: (json['project_id'] ?? '').toString(),

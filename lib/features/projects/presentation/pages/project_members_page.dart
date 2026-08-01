@@ -6,6 +6,10 @@ import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
 import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
+import 'package:issues_tracking/features/projects/presentation/pages/add_project_members_page.dart';
+import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
+import 'package:issues_tracking/features/groups/presentation/bloc/groups_state.dart';
+import 'package:issues_tracking/features/groups/domain/entities/group_entity.dart';
 import '../cubits/project_members_cubit.dart';
 
 /// صفحة 7: إدارة أعضاء الفريق والأدوار للمشروع
@@ -40,7 +44,7 @@ class _ProjectMembersPageState extends State<ProjectMembersPage> {
             BreadcrumbItem(title: 'People'),
           ],
           trailing: FilledButton.icon(
-            onPressed: () => _showAddMemberDialog(context),
+            onPressed: () => AddProjectMembersPage.show(context, projectId: widget.projectId),
             icon: const Icon(AppIcons.personAdd, size: 16),
             label: Text(localization.addPeopleButton),
           ),
@@ -51,6 +55,13 @@ class _ProjectMembersPageState extends State<ProjectMembersPage> {
             builder: (context, state) {
               if (state.status == ProjectMembersStatus.loading) {
                 return const Center(child: CircularProgressIndicator());
+              }
+
+              // قراءة المجموعات المرتبطة بالمشروع
+              final groupsState = context.read<GroupsBloc>().state;
+              List<GroupEntity> projectGroups = [];
+              if (groupsState is GroupsLoaded) {
+                projectGroups = groupsState.groups.where((g) => g.projects.any((p) => p.projectId == widget.projectId)).toList();
               }
 
               final teamMembers = state.members
@@ -66,7 +77,7 @@ class _ProjectMembersPageState extends State<ProjectMembersPage> {
                 padding: AppSpacing.paddingAllMedium,
                 children: [
                   // فريق المشروع
-                  if (teamMembers.isNotEmpty) ...[
+                  if (teamMembers.isNotEmpty || projectGroups.isNotEmpty) ...[
                     Text(
                       localization.projectTeamTitle,
                       style: textTheme.titleSmall?.copyWith(
@@ -74,6 +85,10 @@ class _ProjectMembersPageState extends State<ProjectMembersPage> {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.small),
+                    // عرض المجموعات ككيانات
+                    ...projectGroups.map(
+                      (group) => _buildGroupTile(group, widget.projectId, colors, textTheme),
+                    ),
                     ...teamMembers.map(
                       (member) => _buildMemberTile(
                         member.name,
@@ -206,45 +221,62 @@ class _ProjectMembersPageState extends State<ProjectMembersPage> {
     );
   }
 
-  void _showAddMemberDialog(BuildContext context) {
-    final controller = TextEditingController();
-    final localization = AppLocalizations.of(context)!;
+  Widget _buildGroupTile(
+    GroupEntity group,
+    String projectId,
+    ColorScheme colors,
+    TextTheme textTheme,
+  ) {
+    final groupRoleInfo = group.roles.where((r) => r.projectId == projectId).firstOrNull;
+    final role = groupRoleInfo?.roleName ?? 'Contributor';
 
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: Text(localization.addPeopleTitle),
-          content: TextField(
-            controller: controller,
-            decoration: InputDecoration(hintText: localization.selectUsersHint),
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.small),
+      padding: AppSpacing.paddingAllSmall,
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerLow,
+        borderRadius: AppRadius.smallBorderRadius,
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 18,
+            backgroundColor: colors.primaryContainer,
+            child: Icon(Icons.group, size: 20, color: colors.onPrimaryContainer),
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
-              child: Text(localization.cancelButton),
+          const SizedBox(width: AppSpacing.medium),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  group.name,
+                  style: textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  'Group',
+                  style: textTheme.bodySmall?.copyWith(
+                    color: colors.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ),
-            FilledButton(
-              onPressed: () {
-                final value = controller.text.trim();
-                if (value.isNotEmpty) {
-                  context.read<ProjectMembersCubit>().addMember(
-                    projectId: widget.projectId,
-                    name: value.contains('@') ? value.split('@').first : value,
-                    email: value.contains('@')
-                        ? value
-                        : '$value@youtrack.local',
-                    roles: const ['Contributor'],
-                    userId: '',
-                  );
-                }
-                Navigator.pop(dialogContext);
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
+          ),
+          Wrap(
+            spacing: AppSpacing.extraSmall,
+            children: [
+              Chip(
+                label: Text(role),
+                labelStyle: textTheme.labelSmall?.copyWith(fontSize: 10),
+                materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                visualDensity: VisualDensity.compact,
+              )
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

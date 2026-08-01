@@ -33,6 +33,42 @@ class UserModel extends UserEntity {
 
   factory UserModel.fromJson(Map<String, dynamic> data) {
     printMap(title: 'User', data: data);
+
+    List<String> parsedGroups = [];
+    List<String> parsedProjects = [];
+
+    if (data['group_members'] != null && data['group_members'] is List) {
+      for (final gm in data['group_members']) {
+        final group = gm['groups'];
+        if (group != null) {
+          if (group['name'] != null) {
+            parsedGroups.add(group['name'].toString());
+          }
+          if (group['group_projects'] != null &&
+              group['group_projects'] is List) {
+            for (final gp in group['group_projects']) {
+              final proj = gp['projects'];
+              if (proj != null && proj['name'] != null) {
+                if (!parsedProjects.contains(proj['name'].toString())) {
+                  parsedProjects.add(proj['name'].toString());
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+    // Support direct array format (e.g. from sqlite JSON parse)
+    if (data['groups'] != null && data['groups'] is List) {
+      parsedGroups = (data['groups'] as List).map((e) => e.toString()).toList();
+    }
+    if (data['projects'] != null && data['projects'] is List) {
+      parsedProjects = (data['projects'] as List)
+          .map((e) => e.toString())
+          .toList();
+    }
+
     return UserModel(
       id: data['id'],
       fullName: data['full_name'] ?? '',
@@ -41,16 +77,8 @@ class UserModel extends UserEntity {
       avatarUrl: data['avatar_url'],
       createdAt: DateTime.tryParse(data['created_at'] ?? ''),
       isBanned: data['is_banned'] == true,
-      groups:
-          (data['groups'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [],
-      projects:
-          (data['projects'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          [],
+      groups: parsedGroups,
+      projects: parsedProjects,
     );
   }
 

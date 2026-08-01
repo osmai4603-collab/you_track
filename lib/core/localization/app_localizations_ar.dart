@@ -771,4 +771,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String customFieldsDeleteConfirmation(Object count) {
     return 'هل أنت متأكد من حذف $count حقل مخصص؟';
   }
+
+  @override
+  String get permissionDeniedTooltip => 'ليس لديك الصلاحية لتنفيذ هذا الإجراء';
 }

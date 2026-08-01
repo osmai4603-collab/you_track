@@ -6,6 +6,7 @@ import 'package:issues_tracking/features/groups/domain/entities/group_entity.dar
 import 'package:issues_tracking/features/groups/domain/entities/group_member_entity.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_project_entity.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_role_assignment_entity.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class GroupModel extends GroupEntity {
   const GroupModel({
@@ -24,6 +25,7 @@ class GroupModel extends GroupEntity {
     super.members,
     super.roles,
     super.projects,
+    super.avatarUrl,
   });
 
   factory GroupModel.fromEntity(GroupEntity entity) {
@@ -43,10 +45,12 @@ class GroupModel extends GroupEntity {
       members: entity.members,
       roles: entity.roles,
       projects: entity.projects,
+      avatarUrl: entity.avatarUrl,
     );
   }
 
   factory GroupModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'Group', data: json);
     List<GroupMemberEntity> members = const [];
     if (json['group_members'] != null) {
       members = (json['group_members'] as List<dynamic>).map((e) {
@@ -124,7 +128,7 @@ class GroupModel extends GroupEntity {
                       .map((e) => e.toString())
                       .toList()
                 : (jsonDecode(json['auto_join_domains'].toString())
-                        as List<dynamic>)
+                          as List<dynamic>)
                       .map((e) => e.toString())
                       .toList())
           : [],
@@ -148,6 +152,7 @@ class GroupModel extends GroupEntity {
           : null,
       members: members,
       roles: roles,
+      avatarUrl: json['avatar_url'],
       projects: projects,
     );
   }
@@ -164,7 +169,9 @@ class GroupModel extends GroupEntity {
       'visible_to': visibleTo,
       'updatable_by': updatableBy,
       'group_type': groupType,
+      'avatar_url': avatarUrl,
     };
+
     if (createdAt != null) {
       data['created_at'] = createdAt?.toIso8601String();
     }

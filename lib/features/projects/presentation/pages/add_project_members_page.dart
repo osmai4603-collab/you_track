@@ -2,6 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
+import 'package:issues_tracking/features/groups/domain/entities/group_entity.dart';
+import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
+import 'package:issues_tracking/features/groups/presentation/bloc/groups_event.dart';
+import 'package:issues_tracking/features/groups/presentation/bloc/groups_state.dart';
+import 'package:issues_tracking/features/roles/presentation/bloc/roles_bloc.dart';
+import 'package:issues_tracking/features/roles/presentation/bloc/roles_event.dart';
+import 'package:issues_tracking/features/roles/presentation/bloc/roles_state.dart';
 import '../cubits/project_members_cubit.dart';
 
 class AddProjectMembersPage extends StatefulWidget {
@@ -12,8 +19,12 @@ class AddProjectMembersPage extends StatefulWidget {
   static void show(BuildContext context, {required String projectId}) {
     showDialog(
       context: context,
-      builder: (_) => BlocProvider(
-        create: (_) => get_it<ProjectMembersCubit>(),
+      builder: (_) => MultiBlocProvider(
+        providers: [
+          BlocProvider.value(value: get_it<ProjectMembersCubit>()),
+          BlocProvider.value(value: get_it<GroupsBloc>()..add(const LoadGroups())),
+          BlocProvider.value(value: get_it<RolesBloc>()..add(const LoadRoles())),
+        ],
         child: AddProjectMembersPage(projectId: projectId),
       ),
     );
@@ -49,15 +60,6 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
   final Map<String, _SelectedMember> _selectedMembers = {};
   final Set<String> _removedRows = {};
 
-  static const _availableRoles = [
-    'None',
-    'Contributor',
-    'Project Admin',
-    'System Admin',
-  ];
-
-  static const _groups = ['Registered Users', 'All Users'];
-
   @override
   void initState() {
     super.initState();
@@ -80,13 +82,22 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
         isGroup: false,
       );
     }
-    for (final group in _groups) {
-      _selectedMembers[group] = _SelectedMember(
-        isSelected: false,
-        role: 'None',
-        isGroup: true,
-      );
+  }
+
+  List<String> get _currentAvailableRoles {
+    final state = context.read<RolesBloc>().state;
+    if (state is RolesLoaded) {
+      return state.roles.map((r) => r.name).toList();
     }
+    return ['Contributor'];
+  }
+
+  List<GroupEntity> get _currentAvailableGroups {
+    final state = context.read<GroupsBloc>().state;
+    if (state is GroupsLoaded) {
+      return state.groups;
+    }
+    return [];
   }
 
   List<dynamic> get _filteredUsers {
@@ -100,12 +111,12 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
     }).toList();
   }
 
-  List<String> get _filteredGroups {
+  List<GroupEntity> get _filteredGroups {
     final query = _controller.text.toLowerCase();
-    return _groups.where((g) {
-      if (_removedRows.contains(g)) return false;
+    return _currentAvailableGroups.where((g) {
+      if (_removedRows.contains(g.id)) return false;
       if (query.isEmpty) return true;
-      return g.toLowerCase().contains(query);
+      return g.name.toLowerCase().contains(query);
     }).toList();
   }
 
@@ -114,22 +125,34 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
 
   bool get _isTyping => _controller.text.isNotEmpty;
 
-  void _toggleMember(String id) {
+  void _toggleMember(String id, bool isGroup) {
     setState(() {
       final current = _selectedMembers[id];
       if (current != null) {
         _selectedMembers[id] = current.copyWith(
           isSelected: !current.isSelected,
         );
+      } else {
+        _selectedMembers[id] = _SelectedMember(
+          isSelected: true,
+          role: 'Contributor',
+          isGroup: isGroup,
+        );
       }
     });
   }
 
-  void _updateRole(String id, String newRole) {
+  void _updateRole(String id, String newRole, bool isGroup) {
     setState(() {
       final current = _selectedMembers[id];
       if (current != null) {
         _selectedMembers[id] = current.copyWith(role: newRole);
+      } else {
+        _selectedMembers[id] = _SelectedMember(
+          isSelected: false,
+          role: newRole,
+          isGroup: isGroup,
+        );
       }
     });
   }
@@ -153,23 +176,38 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
           projectId: widget.projectId,
           name: value.split('@').first,
           email: value,
-          roles: const ['contributor'],
+          roles: const ['Contributor'],
           userId: '',
         );
       }
     } else {
       for (final id in selectedIds) {
-        final member = _selectedMembers[id];
-        if (member != null && !member.isGroup) {
+        final memberState = _selectedMembers[id];
+        if (memberState == null) continue;
+
+        if (memberState.isGroup) {
+          context.read<GroupsBloc>().add(AddGroupProjectsEvent(
+                groupId: id,
+                projectIds: [widget.projectId],
+              ));
+          context.read<GroupsBloc>().add(AssignRoleEvent(
+                groupId: id,
+                roleName: memberState.role,
+                projectId: widget.projectId,
+              ));
+        } else {
           final members = context.read<ProjectMembersCubit>().state.members;
-          final memberData = members.firstWhere((m) => m.id == id);
-          context.read<ProjectMembersCubit>().addMember(
-            projectId: widget.projectId,
-            name: memberData.name,
-            email: memberData.email,
-            roles: [member.role],
-            userId: memberData.userId,
-          );
+          try {
+            final memberData = members.firstWhere((m) => m.id == id);
+            context.read<ProjectMembersCubit>().addMember(
+              projectId: widget.projectId,
+              name: memberData.name,
+              email: memberData.email,
+              roles: [memberState.role],
+              userId: memberData.userId,
+            );
+          } catch (e) {
+          }
         }
       }
     }
@@ -178,6 +216,9 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
 
   @override
   Widget build(BuildContext context) {
+    context.watch<RolesBloc>();
+    context.watch<GroupsBloc>();
+
     final textTheme = Theme.of(context).textTheme;
 
     return Dialog(
@@ -401,7 +442,7 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
             flex: 2,
             child: Switch(
               value: selected?.isSelected ?? false,
-              onChanged: (_) => _toggleMember(memberData.id),
+              onChanged: (_) => _toggleMember(memberData.id, false),
               activeThumbColor: Colors.blue,
             ),
           ),
@@ -410,6 +451,7 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
             child: _buildRoleDropdown(
               memberData.id,
               selected?.role ?? 'Contributor',
+              false,
             ),
           ),
           SizedBox(
@@ -426,8 +468,8 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
     );
   }
 
-  Widget _buildGroupRow(String groupName) {
-    final selected = _selectedMembers[groupName];
+  Widget _buildGroupRow(GroupEntity group) {
+    final selected = _selectedMembers[group.id];
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
@@ -441,7 +483,7 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                    groupName,
+                    group.name,
                     style: const TextStyle(fontSize: 14),
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -453,19 +495,19 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
             flex: 2,
             child: Switch(
               value: selected?.isSelected ?? false,
-              onChanged: (_) => _toggleMember(groupName),
+              onChanged: (_) => _toggleMember(group.id, true),
               activeThumbColor: Colors.blue,
             ),
           ),
           Expanded(
             flex: 2,
-            child: _buildRoleDropdown(groupName, selected?.role ?? 'None'),
+            child: _buildRoleDropdown(group.id, selected?.role ?? 'Contributor', true),
           ),
           SizedBox(
             width: 32,
             child: IconButton(
               icon: Icon(Icons.close, size: 18, color: Colors.grey.shade500),
-              onPressed: () => _removeMember(groupName),
+              onPressed: () => _removeMember(group.id),
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),
             ),
@@ -475,18 +517,23 @@ class _AddProjectMembersPageState extends State<AddProjectMembersPage> {
     );
   }
 
-  Widget _buildRoleDropdown(String memberId, String currentRole) {
+  Widget _buildRoleDropdown(String memberId, String currentRole, bool isGroup) {
+    final available = _currentAvailableRoles;
+    if (available.isEmpty) return const SizedBox.shrink();
+    
+    final validRole = available.contains(currentRole) ? currentRole : available.first;
+
     return DropdownButton<String>(
-      value: currentRole,
+      value: validRole,
       isDense: true,
       underline: const SizedBox(),
       style: TextStyle(fontSize: 12, color: Colors.grey.shade600),
-      items: _availableRoles.map((role) {
+      items: available.map((role) {
         return DropdownMenuItem(value: role, child: Text(role));
       }).toList(),
       onChanged: (newRole) {
         if (newRole != null) {
-          _updateRole(memberId, newRole);
+          _updateRole(memberId, newRole, isGroup);
         }
       },
     );

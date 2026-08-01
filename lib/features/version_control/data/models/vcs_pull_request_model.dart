@@ -1,5 +1,6 @@
 import 'package:issues_tracking/core/enums/vcs_pr_state_enum.dart';
 import 'package:issues_tracking/features/version_control/domain/entities/vcs_pull_request_entity.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class VcsPullRequestModel extends VcsPullRequestEntity {
   const VcsPullRequestModel({
@@ -37,6 +38,7 @@ class VcsPullRequestModel extends VcsPullRequestEntity {
   }
 
   factory VcsPullRequestModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'VcsPullRequest', data: json);
     return VcsPullRequestModel(
       id: (json['id'] ?? '').toString(),
       integrationId: (json['integration_id'] ?? '').toString(),

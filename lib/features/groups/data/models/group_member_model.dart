@@ -1,5 +1,6 @@
 import 'package:issues_tracking/core/entities/user_data.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_member_entity.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class GroupMemberModel extends GroupMemberEntity {
   const GroupMemberModel({
@@ -19,6 +20,7 @@ class GroupMemberModel extends GroupMemberEntity {
   }
 
   factory GroupMemberModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'GroupMember', data: json);
     UserData? user;
     if (json['users'] != null) {
       final u = json['users'];

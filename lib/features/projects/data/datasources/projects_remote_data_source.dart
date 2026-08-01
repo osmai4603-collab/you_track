@@ -100,13 +100,70 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
 
   @override
   Future<List<ProjectMemberModel>> getProjectMembers(String projectId) async {
-    final response = await supabase
+    final directResponse = await supabase
         .from('project_members')
         .select('*, users(*)')
         .eq('project_id', projectId);
-    return (response as List)
+        
+    final directMembers = (directResponse as List)
         .map((e) => ProjectMemberModel.fromJson(e))
         .toList();
+        
+    // جلب المجموعات المرتبطة بالمشروع
+    final groupProjectsResponse = await supabase
+        .from('group_projects')
+        .select('group_id')
+        .eq('project_id', projectId);
+        
+    final groupIds = (groupProjectsResponse as List)
+        .map((e) => e['group_id'] as String)
+        .toList();
+        
+    if (groupIds.isEmpty) {
+      return directMembers;
+    }
+    
+    // جلب أعضاء المجموعات المرتبطة بالمشروع مع بيانات المستخدم
+    final groupMembersResponse = await supabase
+        .from('group_members')
+        .select('user_id, group_id, users(*)')
+        .inFilter('group_id', groupIds);
+        
+    // جلب أدوار المجموعات ضمن هذا المشروع
+    final groupRolesResponse = await supabase
+        .from('group_roles')
+        .select('group_id, role_name')
+        .eq('project_id', projectId)
+        .inFilter('group_id', groupIds);
+        
+    final groupRoles = <String, String>{};
+    for (final gr in (groupRolesResponse as List)) {
+      groupRoles[gr['group_id'] as String] = gr['role_name'] as String;
+    }
+    
+    final inheritedMembersMap = <String, ProjectMemberModel>{};
+    for (final gm in (groupMembersResponse as List)) {
+      final userId = gm['user_id'] as String;
+      final groupId = gm['group_id'] as String;
+      final role = groupRoles[groupId] ?? 'Contributor'; 
+      
+      // تجنب التكرار إذا كان المستخدم موجوداً بالفعل كعضو مباشر
+      if (!directMembers.any((m) => m.userId == userId) && !inheritedMembersMap.containsKey(userId)) {
+        final userData = gm['users'];
+        if (userData != null) {
+          inheritedMembersMap[userId] = ProjectMemberModel.fromJson({
+            'id': 'inherited_${userId}_$groupId',
+            'project_id': projectId,
+            'user_id': userId,
+            'roles': [role],
+            'is_owner': false,
+            'users': userData,
+          });
+        }
+      }
+    }
+    
+    return [...directMembers, ...inheritedMembersMap.values];
   }
 
   @override

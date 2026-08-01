@@ -12,10 +12,15 @@ import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
 import 'package:issues_tracking/core/widgets/project_chip.dart';
 import 'package:issues_tracking/core/widgets/text_hover_widget.dart';
 import 'package:issues_tracking/core/widgets/youtrack_state.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
+import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_member_entity.dart';
+import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
 import '../cubits/projects_list_cubit.dart';
 import '../cubits/project_details_cubit.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
+import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
+import 'package:issues_tracking/core/widgets/permission_guard.dart';
 
 final List<Color> _projectColors = const [
   Color(0xFF4285F4), // Blue
@@ -50,51 +55,72 @@ class _ProjectsListPageState extends YouTrackState<ProjectsListPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<ProjectsListCubit, ProjectsListState>(
-      builder: (context, state) {
-        if (state.status == ProjectsListStatus.loading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (state.status == ProjectsListStatus.failure) {
-          return Center(
-            child: SelectableText(
-              state.errorMessage ?? '',
-              style: textTheme.bodyMedium?.copyWith(color: colors.error),
-            ),
-          );
-        }
+    // final userSession = context.watch<UserSession>();
+    // final canCreateProject = userSession.hasPermission(
+    //   Permission.projectCreateProject,
+    // );
 
-        final projects = state.filteredProjects;
-        if (projects.isEmpty) {
-          return Center(
-            child: Text(
-              localization.noProjectsFound,
-              style: textTheme.bodyMedium?.copyWith(
-                color: colors.onSurfaceVariant,
-              ),
-            ),
-          );
-        }
+    return Column(
+      children: [
+        // ProjectsHeader(
+        //   breadcrumbs: [BreadcrumbItem(title: localization.projectsTitle)],
+        //   trailing: PermissionGuard(
+        //     permission: Permission.projectCreateProject,
+        //     child: FilledButton.icon(
+        //       onPressed: canCreateProject
+        //           ? () => context.go(AppRouteKeys.createProject)
+        //           : null,
+        //       icon: const Icon(Icons.add),
+        //       label: Text(localization.newProjectButton),
+        //     ),
+        //   ),
+        // ),
+        Expanded(
+          child: BlocBuilder<ProjectsListCubit, ProjectsListState>(
+            builder: (context, state) {
+              if (state.status == ProjectsListStatus.loading) {
+                return const Center(child: CircularProgressIndicator());
+              }
+              if (state.status == ProjectsListStatus.failure) {
+                return Center(
+                  child: SelectableText(
+                    state.errorMessage ?? '',
+                    style: textTheme.bodyMedium?.copyWith(color: colors.error),
+                  ),
+                );
+              }
 
-        return Align(
-          child: SizedBox(
-            width: 800,
-            child: ListView.separated(
-              padding: const EdgeInsets.symmetric(
-                vertical: AppSpacing.extraSmall,
-              ),
-              itemCount: projects.length,
-              separatorBuilder: (_, _) => Divider(
-                height: 1,
-                color: colors.outlineVariant.withValues(alpha: 0.3),
-              ),
-              itemBuilder: (context, index) {
-                return ProjectListTile(projectEntity: projects[index]);
-              },
-            ),
+              final projects = state.filteredProjects;
+              if (projects.isEmpty) {
+                return Center(
+                  child: Text(
+                    localization.noProjectsFound,
+                    style: textTheme.bodyMedium?.copyWith(
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                );
+              }
+
+              return Align(
+                child: SizedBox(
+                  width: 800,
+                  child: ListView.separated(
+                    itemCount: projects.length,
+                    separatorBuilder: (_, _) => Divider(
+                      height: 1,
+                      color: colors.outlineVariant.withValues(alpha: 0.3),
+                    ),
+                    itemBuilder: (context, index) {
+                      return ProjectListTile(projectEntity: projects[index]);
+                    },
+                  ),
+                ),
+              );
+            },
           ),
-        );
-      },
+        ),
+      ],
     );
   }
 }
@@ -251,6 +277,19 @@ class _ProjectListTileState extends YouTrackState<ProjectListTile> {
     ColorScheme colors,
   ) {
     final style = Theme.of(context).textTheme.labelSmall;
+    final userSession = context.watch<UserSession>();
+    final canEdit = userSession.hasPermission(
+      Permission.projectUpdateProject,
+      projectId: project.id,
+    );
+    final canDelete = userSession.hasPermission(
+      Permission.projectDeleteProject,
+      projectId: project.id,
+    );
+    final canReadSettings = userSession.hasPermission(
+      Permission.projectReadProjectFull,
+      projectId: project.id,
+    );
 
     return PopupMenuButton<String>(
       color: colors.surfaceContainerLow,
@@ -282,10 +321,11 @@ class _ProjectListTileState extends YouTrackState<ProjectListTile> {
           value: 'knowledge-base',
           child: Text(localization.knowledgeBase, style: style),
         ),
-        AppPopupMenuItem(
-          value: 'settings',
-          child: Text(localization.settings, style: style),
-        ),
+        if (canReadSettings)
+          AppPopupMenuItem(
+            value: 'settings',
+            child: Text(localization.settings, style: style),
+          ),
         const PopupMenuDivider(),
         AppPopupMenuItem(
           enabled: false,
@@ -299,11 +339,17 @@ class _ProjectListTileState extends YouTrackState<ProjectListTile> {
         ),
         AppPopupMenuItem(
           value: 'edit',
+          enabled: canEdit,
           child: Row(
             children: [
               const Icon(AppIcons.edit),
               const SizedBox(width: AppSpacing.small),
-              Text(localization.editProjectButton, style: style),
+              Text(
+                localization.editProjectButton,
+                style: style?.copyWith(
+                  color: canEdit ? null : colors.onSurfaceVariant,
+                ),
+              ),
             ],
           ),
         ),
@@ -319,11 +365,17 @@ class _ProjectListTileState extends YouTrackState<ProjectListTile> {
         ),
         AppPopupMenuItem(
           value: 'archive',
+          enabled: canEdit,
           child: Row(
             children: [
               const Icon(AppIcons.archive, size: 16),
               const SizedBox(width: AppSpacing.small),
-              Text(localization.archiveProjectButton, style: style),
+              Text(
+                localization.archiveProjectButton,
+                style: style?.copyWith(
+                  color: canEdit ? null : colors.onSurfaceVariant,
+                ),
+              ),
             ],
           ),
         ),
@@ -340,13 +392,20 @@ class _ProjectListTileState extends YouTrackState<ProjectListTile> {
         const PopupMenuDivider(),
         AppPopupMenuItem(
           value: 'delete',
+          enabled: canDelete,
           child: Row(
             children: [
-              Icon(AppIcons.delete, size: 16, color: colors.error),
+              Icon(
+                AppIcons.delete,
+                size: 16,
+                color: canDelete ? colors.error : colors.onSurfaceVariant,
+              ),
               const SizedBox(width: AppSpacing.small),
               Text(
                 localization.deleteProjectButton,
-                style: style?.copyWith(color: colors.error),
+                style: style?.copyWith(
+                  color: canDelete ? colors.error : colors.onSurfaceVariant,
+                ),
               ),
             ],
           ),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import '../../domain/entities/project_template_entity.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class ProjectTemplateModel extends ProjectTemplateEntity {
   const ProjectTemplateModel({
@@ -21,6 +22,7 @@ class ProjectTemplateModel extends ProjectTemplateEntity {
   }
 
   factory ProjectTemplateModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'ProjectTemplate', data: json);
     final fieldsRaw = json['default_fields'] ?? json['defaultFields'];
     Map<String, String> parsedFields = {};
     if (fieldsRaw is String) {

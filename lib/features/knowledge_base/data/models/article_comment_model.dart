@@ -1,4 +1,5 @@
 import '../../domain/entities/article_comment.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class ArticleCommentModel extends ArticleComment {
   const ArticleCommentModel({
@@ -16,6 +17,7 @@ class ArticleCommentModel extends ArticleComment {
   });
 
   factory ArticleCommentModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'ArticleComment', data: json);
     return ArticleCommentModel(
       id: (json['id'] ?? '').toString(),
       articleId: (json['article_id'] ?? '').toString(),

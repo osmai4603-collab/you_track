@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
+import 'package:issues_tracking/core/widgets/permission_guard.dart';
+import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article_comment.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/bloc/article_comment_bloc.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/widgets/article_comment_thread.dart';
@@ -203,6 +206,9 @@ class _ArticleContentViewerState extends State<ArticleContentViewer> {
 
   @override
   Widget build(BuildContext context) {
+    final userSession = context.watch<UserSession>();
+    final canComment = userSession.hasPermission(Permission.commentCreateArticleComment);
+
     if (widget.content.isEmpty) {
       return Center(
         child: Text(
@@ -214,7 +220,7 @@ class _ArticleContentViewerState extends State<ArticleContentViewer> {
       );
     }
 
-    final hasInlineComments = widget.comments.isNotEmpty &&
+    final hasInlineComments = canComment && widget.comments.isNotEmpty &&
         widget.articleId != null &&
         widget.currentUserId != null;
 

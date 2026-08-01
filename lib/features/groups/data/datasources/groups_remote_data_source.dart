@@ -13,6 +13,7 @@ abstract class GroupsRemoteDataSource {
   Future<void> deleteGroup(String id);
 
   Future<GroupRoleAssignmentModel> assignRole(GroupRoleAssignmentModel data);
+  Future<void> removeGroupRole(String groupId, String projectId);
   Future<List<GroupRoleAssignmentModel>> getGroupRoles(String groupId);
 
   Future<List<GroupMemberModel>> getGroupMembers(String groupId);
@@ -99,6 +100,15 @@ class GroupsRemoteDataSourceImpl implements GroupsRemoteDataSource {
       throw DatabaseException('Group Role Did not inserted');
     }
     return GroupRoleAssignmentModel.fromJson(response);
+  }
+
+  @override
+  Future<void> removeGroupRole(String groupId, String projectId) async {
+    await supabase
+        .from('group_roles')
+        .delete()
+        .eq('group_id', groupId)
+        .eq('project_id', projectId);
   }
 
   @override

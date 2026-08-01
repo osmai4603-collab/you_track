@@ -2,6 +2,7 @@ import 'package:issues_tracking/core/enums/project_template_enum.dart';
 
 import '../../domain/entities/project_entity.dart';
 import '../../data/models/project_member_model.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class ProjectModel extends ProjectEntity {
   const ProjectModel({
@@ -15,6 +16,8 @@ class ProjectModel extends ProjectEntity {
     required super.createdAt,
     super.isFavorite,
     super.members,
+    super.visibility,
+    super.recommendedVisibility,
   });
 
   factory ProjectModel.fromEntity(ProjectEntity entity) {
@@ -31,10 +34,13 @@ class ProjectModel extends ProjectEntity {
       members: entity.members
           .map((m) => ProjectMemberModel.fromEntity(m))
           .toList(),
+      visibility: entity.visibility,
+      recommendedVisibility: entity.recommendedVisibility,
     );
   }
 
   factory ProjectModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'Project', data: json);
     // print('project: $json');
     return ProjectModel(
       id: json['id'],
@@ -46,11 +52,11 @@ class ProjectModel extends ProjectEntity {
       ownerId: json['owner_id'] ?? '',
       createdAt: DateTime.tryParse(json['created_at']) ?? DateTime.now(),
       isFavorite: json['is_favorite'] == true,
-      members: (json['project_members'] ?? json['members'] as List? ?? [])
-          .map<ProjectMemberModel>(
-            (m) => ProjectMemberModel.fromJson(m as Map<String, dynamic>),
-          )
-          .toList(),
+      members: ProjectMemberModel.fromListJson(json['group_members']),
+      visibility: json['visibility'],
+      recommendedVisibility: _tryParseRecommendedVisibility(
+        json['recommended_visibility'],
+      ),
     );
   }
 
@@ -65,9 +71,16 @@ class ProjectModel extends ProjectEntity {
       'owner_id': ownerId,
       'created_at': createdAt.toIso8601String(),
       'is_favorite': isFavorite,
-      'members': members
+      'group_members': members
           .map((m) => (m as ProjectMemberModel).toJson())
           .toList(),
+      'visibility': visibility,
+      'recommended_visibility': recommendedVisibility,
     };
+  }
+
+  static List<String> _tryParseRecommendedVisibility(List<dynamic>? allData) {
+    if (allData == null) return [];
+    return allData.map((data) => data as String).toList();
   }
 }

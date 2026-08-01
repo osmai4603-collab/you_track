@@ -4,7 +4,9 @@ import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
+import 'package:issues_tracking/core/widgets/permission_guard.dart';
 import 'package:issues_tracking/core/widgets/user_icon_widget.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/app_cubit.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/app_state.dart';
@@ -376,26 +378,32 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
       controller: _createController,
       alignmentOffset: Offset(_isCollapsed ? 80 : 200, -40),
       menuChildren: [
-        _menuItem(
-          currentRoute: currentRoute,
-          selectedTextColor: selectedTextColor,
-          textColor: textColor,
-          selectedBgColor: selectedBgColor,
-          route: AppRouteKeys.createIssue,
-          label: 'New Issue',
-          icon: Icons.task_rounded,
-          onTap: () {},
+        PermissionGuard(
+          permission: Permission.issueCreateIssue,
+          child: _menuItem(
+            currentRoute: currentRoute,
+            selectedTextColor: selectedTextColor,
+            textColor: textColor,
+            selectedBgColor: selectedBgColor,
+            route: AppRouteKeys.createIssue,
+            label: 'New Issue',
+            icon: Icons.task_rounded,
+            onTap: () {},
+          ),
         ),
-
-        _menuItem(
-          currentRoute: currentRoute,
-          selectedTextColor: selectedTextColor,
-          textColor: textColor,
-          selectedBgColor: selectedBgColor,
-          route: AppRouteKeys.createIssue,
-          label: 'New Article',
-          icon: Icons.article_rounded,
-          onTap: () {},
+        PermissionGuard(
+          permission: Permission.articleCreateArticle,
+          child: _menuItem(
+            currentRoute: currentRoute,
+            selectedTextColor: selectedTextColor,
+            textColor: textColor,
+            selectedBgColor: selectedBgColor,
+            route:
+                AppRouteKeys.createIssue, // TODO: Update to createArticle route
+            label: 'New Article',
+            icon: Icons.article_rounded,
+            onTap: () {},
+          ),
         ),
       ],
       style: MenuStyle(

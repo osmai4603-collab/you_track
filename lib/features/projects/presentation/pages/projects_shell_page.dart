@@ -11,10 +11,15 @@ class ProjectsShellScope extends InheritedWidget {
   });
 
   static ProjectsShellState of(BuildContext context) {
-    final scope =
-        context.dependOnInheritedWidgetOfExactType<ProjectsShellScope>();
-    assert(scope != null, 'ProjectsShellScope not found');
-    return scope!.shellState;
+    final state = maybeOf(context);
+    assert(state != null, 'ProjectsShellScope not found');
+    return state!;
+  }
+
+  static ProjectsShellState? maybeOf(BuildContext context) {
+    return context
+        .getInheritedWidgetOfExactType<ProjectsShellScope>()
+        ?.shellState;
   }
 
   @override
@@ -104,7 +109,8 @@ class _ProjectsHeaderState extends State<ProjectsHeader> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      final shell = ProjectsShellScope.of(context);
+      final shell = ProjectsShellScope.maybeOf(context);
+      if (shell == null) return;
       shell.updateHeader(
         breadcrumbs: widget.breadcrumbs,
         trailing: widget.trailing,

@@ -19,6 +19,7 @@ class GroupEntity extends Entity {
   final List<GroupMemberEntity> members;
   final List<GroupRoleAssignmentEntity> roles;
   final List<GroupProjectEntity> projects;
+  final String? avatarUrl;
 
   const GroupEntity({
     required this.id,
@@ -36,6 +37,7 @@ class GroupEntity extends Entity {
     this.members = const [],
     this.roles = const [],
     this.projects = const [],
+    this.avatarUrl,
   });
 
   @override
@@ -55,6 +57,7 @@ class GroupEntity extends Entity {
     List<GroupMemberEntity>? members,
     List<GroupRoleAssignmentEntity>? roles,
     List<GroupProjectEntity>? projects,
+    String? avatarUrl,
   }) {
     return GroupEntity(
       id: id ?? this.id,
@@ -72,25 +75,27 @@ class GroupEntity extends Entity {
       members: members ?? this.members,
       roles: roles ?? this.roles,
       projects: projects ?? this.projects,
+      avatarUrl: avatarUrl ?? this.avatarUrl,
     );
   }
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        description,
-        logo,
-        autoJoin,
-        autoJoinDomains,
-        twoFactorAuth,
-        visibleTo,
-        updatableBy,
-        groupType,
-        createdAt,
-        updatedAt,
-        members,
-        roles,
-        projects,
-      ];
+    id,
+    name,
+    description,
+    logo,
+    autoJoin,
+    autoJoinDomains,
+    twoFactorAuth,
+    visibleTo,
+    updatableBy,
+    groupType,
+    createdAt,
+    updatedAt,
+    avatarUrl,
+    members,
+    roles,
+    projects,
+  ];
 }

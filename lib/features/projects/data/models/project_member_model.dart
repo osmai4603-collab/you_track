@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:issues_tracking/features/auth/data/models/user_model.dart';
 
 import '../../domain/entities/project_member_entity.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class ProjectMemberModel extends ProjectMemberEntity {
   const ProjectMemberModel({
@@ -24,8 +25,15 @@ class ProjectMemberModel extends ProjectMemberEntity {
     );
   }
 
+  static List<ProjectMemberModel> fromListJson(List<dynamic>? allData) {
+    if (allData == null) return [];
+    return allData
+        .map((data) => ProjectMemberModel.fromJson(data['groups']))
+        .toList();
+  }
+
   factory ProjectMemberModel.fromJson(Map<String, dynamic> json) {
-    print('member: $json');
+    printMap(title: 'ProjectMember', data: json);
 
     return ProjectMemberModel(
       id: (json['id'] ?? json['user_id'] ?? '').toString(),

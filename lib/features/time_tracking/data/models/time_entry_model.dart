@@ -1,4 +1,5 @@
 import '../../domain/entities/time_entry_entity.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class TimeEntryModel extends TimeEntryEntity {
   const TimeEntryModel({
@@ -30,6 +31,7 @@ class TimeEntryModel extends TimeEntryEntity {
   }
 
   factory TimeEntryModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'TimeEntry', data: json);
     return TimeEntryModel(
       id: (json['id'] ?? '').toString(),
       taskId: (json['task_id'] ?? '').toString(),

@@ -1,5 +1,6 @@
 import 'package:issues_tracking/core/enums/issue_link_type.dart';
 import '../../domain/entities/issue_link.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class IssueLinkModel extends IssueLink {
   const IssueLinkModel({
@@ -10,6 +11,7 @@ class IssueLinkModel extends IssueLink {
   });
 
   factory IssueLinkModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'IssueLink', data: json);
     return IssueLinkModel(
       id: (json['id'] ?? '').toString(),
       issueId: (json['source_issue_id'] ?? json['issue_id'] ?? '').toString(),

@@ -78,8 +78,8 @@ class _RoleTableRowState extends State<RoleTableRow> {
                 width: 200,
                 child: Text(
                   role.permissions.length.toString(),
-                  style: textTheme.bodySmall?.copyWith(
-                    color: colors.onSurfaceVariant,
+                  style: textTheme.bodyMedium?.copyWith(
+                    color: colors.onSurface,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),

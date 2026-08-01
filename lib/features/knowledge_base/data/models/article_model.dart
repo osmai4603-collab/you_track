@@ -1,4 +1,5 @@
 import '../../domain/entities/article.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class ArticleModel extends Article {
   const ArticleModel({
@@ -16,6 +17,7 @@ class ArticleModel extends Article {
   });
 
   factory ArticleModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'Article', data: json);
     return ArticleModel(
       id: (json['id'] ?? '').toString(),
       projectId: (json['project_id'] ?? '').toString(),

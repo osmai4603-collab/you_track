@@ -336,14 +336,11 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.small),
       children: [
         ...sidebarItems.map((item) {
-          return Material(
-            color: Colors.transparent,
-            child: ListTile(
-              dense: true,
-              leading: Icon(item.$2, size: 16),
-              title: Text(item.$1, style: textTheme.bodySmall),
-              onTap: () {},
-            ),
+          return ListTile(
+            dense: true,
+            leading: Icon(item.$2, size: 16),
+            title: Text(item.$1, style: textTheme.bodySmall),
+            onTap: () {},
           );
         }),
         Padding(
@@ -360,18 +357,15 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
           ),
         ),
         ...savedSearches.map((search) {
-          return Material(
-            color: Colors.transparent,
-            child: ListTile(
-              dense: true,
-              leading: Icon(
-                AppIcons.savedSearch,
-                size: 14,
-                color: colors.onSurfaceVariant,
-              ),
-              title: Text(search, style: textTheme.bodySmall),
-              onTap: () {},
+          return ListTile(
+            dense: true,
+            leading: Icon(
+              AppIcons.savedSearch,
+              size: 14,
+              color: colors.onSurfaceVariant,
             ),
+            title: Text(search, style: textTheme.bodySmall),
+            onTap: () {},
           );
         }),
       ],

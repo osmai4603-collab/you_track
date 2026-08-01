@@ -546,5 +546,9 @@
     "placeholders": {
       "count": {}
     }
+  },
+  "permissionDeniedTooltip": "You don't have permission to perform this action",
+  "@permissionDeniedTooltip": {
+    "description": "Tooltip shown when an action is disabled due to missing permission"
   }
 }

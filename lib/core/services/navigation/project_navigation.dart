@@ -20,7 +20,9 @@ import 'package:issues_tracking/features/projects/presentation/pages/project_tem
 import 'package:issues_tracking/features/projects/presentation/pages/project_template_selection_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/project_view_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/projects_list_page.dart';
+import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
 import 'package:issues_tracking/features/projects/presentation/widgets/settings_sections/project_general_settings_section.dart';
+import 'package:issues_tracking/features/projects/presentation/widgets/settings_sections/project_notifications_settings_section.dart';
 import 'package:issues_tracking/features/projects/presentation/widgets/settings_sections/project_people_settings_section.dart';
 import 'package:issues_tracking/features/projects/presentation/widgets/settings_sections/project_time_tracking_settings_section.dart';
 import 'package:issues_tracking/features/time_tracking/presentation/cubits/time_tracking_config_cubit.dart';
@@ -41,7 +43,7 @@ final class ProjectNavigation extends StatefulShellBranch {
           BlocProvider(create: (_) => get_it<ProjectDetailsCubit>()),
           BlocProvider(create: (_) => get_it<ProjectMembersCubit>()),
         ],
-        child: child,
+        child: ProjectsShellPage(child: child),
       ),
       routes: [
         // ── Projects List ────────────────────────────────────────
@@ -316,7 +318,7 @@ final class ProjectNavigation extends StatefulShellBranch {
             path: 'settings/notifications',
             pageBuilder: (context, state) => CustomTransitionPage(
               key: state.pageKey,
-              child: const Center(child: Text('Notifications Settings')),
+              child: const ProjectNotificationsSettingsSection(),
               transitionsBuilder: _fadeTransition,
             ),
           ),

@@ -74,7 +74,7 @@ class AddGroupProjectsEvent extends GroupsEvent {
 
 class UpdateGroupSettingsEvent extends GroupsEvent {
   final String groupId;
-  final String name;
+  final String? name;
   final String? description;
   final bool? autoJoin;
   final List<String>? autoJoinDomains;
@@ -84,7 +84,7 @@ class UpdateGroupSettingsEvent extends GroupsEvent {
 
   const UpdateGroupSettingsEvent({
     required this.groupId,
-    required this.name,
+    this.name,
     this.description,
     this.autoJoin,
     this.autoJoinDomains,
@@ -104,4 +104,17 @@ class UpdateGroupSettingsEvent extends GroupsEvent {
         groupType,
         logo,
       ];
+}
+
+class RemoveGroupRoleEvent extends GroupsEvent {
+  final String groupId;
+  final String projectId;
+
+  const RemoveGroupRoleEvent({
+    required this.groupId,
+    required this.projectId,
+  });
+
+  @override
+  List<Object> get props => [groupId, projectId];
 }

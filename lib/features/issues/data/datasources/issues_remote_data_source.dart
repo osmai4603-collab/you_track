@@ -35,7 +35,7 @@ abstract class IssuesRemoteDataSource {
 
 class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
   final SupabaseClient supabase;
-  final _controller = StreamController<IssueModel>();
+  final _controller = StreamController<IssueModel>.broadcast();
   RealtimeChannel? _channel;
 
   IssuesRemoteDataSourceImpl(this.supabase) {

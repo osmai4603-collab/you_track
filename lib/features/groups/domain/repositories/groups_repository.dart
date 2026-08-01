@@ -13,6 +13,7 @@ abstract class GroupsRepository {
   Future<Either<Failure, void>> deleteGroup(String id);
 
   Future<Either<Failure, GroupRoleAssignmentEntity>> assignRole(GroupRoleAssignmentEntity assignment);
+  Future<Either<Failure, void>> removeGroupRole(String groupId, String projectId);
   Future<Either<Failure, List<GroupRoleAssignmentEntity>>> getGroupRoles(String groupId);
 
   Future<Either<Failure, List<GroupMemberEntity>>> getGroupMembers(String groupId);

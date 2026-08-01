@@ -4,6 +4,7 @@ import 'package:issues_tracking/core/enums/tag_subscription_event_enum.dart';
 import '../../domain/entities/tag.dart';
 import '../../domain/entities/tag_permission.dart';
 import '../../domain/entities/tag_subscription.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class TagModel extends Tag {
   const TagModel({
@@ -21,6 +22,7 @@ class TagModel extends Tag {
   });
 
   factory TagModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'Tag', data: json);
     return TagModel(
       id: json['id'].toString(),
       name: json['name'].toString(),
@@ -65,6 +67,7 @@ class TagPermissionModel extends TagPermission {
   });
 
   factory TagPermissionModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'TagPermission', data: json);
     return TagPermissionModel(
       id: json['id'].toString(),
       tagId: json['tag_id'].toString(),
@@ -94,6 +97,7 @@ class TagSubscriptionModel extends TagSubscription {
   });
 
   factory TagSubscriptionModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'TagSubscription', data: json);
     return TagSubscriptionModel(
       id: json['id'].toString(),
       tagId: json['tag_id'].toString(),

@@ -8,6 +8,7 @@ import 'package:issues_tracking/features/issues/data/models/tag_model.dart';
 import 'package:issues_tracking/features/issues/data/models/issue_link_model.dart';
 
 import '../../domain/entities/issue.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class IssueModel extends Issue {
   const IssueModel({
@@ -45,6 +46,7 @@ class IssueModel extends Issue {
   });
 
   factory IssueModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'Issue', data: json);
     return IssueModel(
       id: (json['id'] ?? '').toString(),
       issueKey: (json['issue_key'] ?? '').toString(),

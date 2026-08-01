@@ -6,6 +6,8 @@ import 'package:issues_tracking/features/knowledge_base/domain/entities/article.
 import 'package:issues_tracking/features/knowledge_base/presentation/bloc/article_tree_bloc.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/bloc/article_tree_event.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/bloc/article_tree_state.dart';
+import 'package:issues_tracking/core/widgets/permission_guard.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 
 class ArticleTreeSidebar extends StatelessWidget {
   const ArticleTreeSidebar({super.key});
@@ -134,17 +136,20 @@ class ArticleTreeSidebar extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  Tooltip(
-                    message: 'New sub-article',
-                    child: InkWell(
-                      onTap: () => _createSubArticle(context, article, state),
-                      borderRadius: BorderRadius.circular(4),
-                      child: Padding(
-                        padding: const EdgeInsets.all(2),
-                        child: Icon(
-                          Icons.add,
-                          size: 16,
-                          color: Theme.of(context).colorScheme.onSurfaceVariant,
+                  PermissionGuard(
+                    permission: Permission.articleCreateArticle,
+                    child: Tooltip(
+                      message: 'New sub-article',
+                      child: InkWell(
+                        onTap: () => _createSubArticle(context, article, state),
+                        borderRadius: BorderRadius.circular(4),
+                        child: Padding(
+                          padding: const EdgeInsets.all(2),
+                          child: Icon(
+                            Icons.add,
+                            size: 16,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
                         ),
                       ),
                     ),
@@ -168,24 +173,30 @@ class ArticleTreeSidebar extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              ListTile(
-                leading: const Icon(Icons.add),
-                title: const Text('New sub-article'),
-                onTap: () {
-                  Navigator.pop(sheetContext);
-                  final state = context.read<ArticleTreeBloc>().state;
-                  if (state is ArticleTreeLoaded) {
-                    _createSubArticle(context, article, state);
-                  }
-                },
+              PermissionGuard(
+                permission: Permission.articleCreateArticle,
+                child: ListTile(
+                  leading: const Icon(Icons.add),
+                  title: const Text('New sub-article'),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    final state = context.read<ArticleTreeBloc>().state;
+                    if (state is ArticleTreeLoaded) {
+                      _createSubArticle(context, article, state);
+                    }
+                  },
+                ),
               ),
-              ListTile(
-                leading: const Icon(Icons.delete_outline, color: Colors.red),
-                title: const Text('Delete', style: TextStyle(color: Colors.red)),
-                onTap: () {
-                  Navigator.pop(sheetContext);
-                  _confirmDelete(context, article);
-                },
+              PermissionGuard(
+                permission: Permission.articleDeleteArticle,
+                child: ListTile(
+                  leading: const Icon(Icons.delete_outline, color: Colors.red),
+                  title: const Text('Delete', style: TextStyle(color: Colors.red)),
+                  onTap: () {
+                    Navigator.pop(sheetContext);
+                    _confirmDelete(context, article);
+                  },
+                ),
               ),
             ],
           ),

@@ -1,5 +1,6 @@
 import '../../domain/entities/custom_field_entity.dart';
 import '../../../../core/enums/custom_field_type_enum.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class CustomFieldModel extends CustomFieldEntity {
   const CustomFieldModel({
@@ -49,6 +50,7 @@ class CustomFieldModel extends CustomFieldEntity {
   }
 
   factory CustomFieldModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'CustomField', data: json);
     return CustomFieldModel(
       id: (json['id'] ?? '').toString(),
       projectId: (json['project_id'] ?? '').toString(),

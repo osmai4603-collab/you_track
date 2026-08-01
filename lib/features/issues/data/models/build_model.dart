@@ -1,4 +1,5 @@
 import '../../domain/entities/build.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class BuildModel extends Build {
   const BuildModel({
@@ -9,6 +10,7 @@ class BuildModel extends Build {
   });
 
   factory BuildModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'Build', data: json);
     return BuildModel(
       id: (json['id'] ?? '').toString(),
       name: (json['name'] ?? '').toString(),

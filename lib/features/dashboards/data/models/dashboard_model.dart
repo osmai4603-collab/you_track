@@ -1,4 +1,5 @@
 import 'package:issues_tracking/features/dashboards/domain/entities/dashboard.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class DashboardModel extends Dashboard {
   const DashboardModel({
@@ -14,6 +15,7 @@ class DashboardModel extends Dashboard {
   });
 
   factory DashboardModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'Dashboard', data: json);
     return DashboardModel(
       id: json['id'] as String,
       name: json['name'] as String,

@@ -1,4 +1,5 @@
 import '../../domain/entities/custom_field_value_entity.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class CustomFieldValueModel extends CustomFieldValueEntity {
   const CustomFieldValueModel({
@@ -18,6 +19,7 @@ class CustomFieldValueModel extends CustomFieldValueEntity {
   }
 
   factory CustomFieldValueModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'CustomFieldValue', data: json);
     return CustomFieldValueModel(
       id: (json['id'] ?? '').toString(),
       issueId: (json['issue_id'] ?? '').toString(),

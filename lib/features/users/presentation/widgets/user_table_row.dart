@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
+import 'package:issues_tracking/core/widgets/avatar_url_chip.dart';
 import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 import 'package:issues_tracking/features/users/presentation/bloc/users_bloc.dart';
 import 'package:issues_tracking/features/users/presentation/bloc/users_event.dart';
@@ -73,24 +74,13 @@ class _UserTableRowState extends State<UserTableRow> {
             children: [
               Checkbox(
                 value: widget.isChecked,
-                onChanged: (_) => context
-                    .read<UsersBloc>()
-                    .add(ToggleUserSelection(widget.user.id)),
+                onChanged: (_) => context.read<UsersBloc>().add(
+                  ToggleUserSelection(widget.user.id),
+                ),
                 visualDensity: VisualDensity.compact,
               ),
               const SizedBox(width: AppSpacing.small),
-              CircleAvatar(
-                radius: 16,
-                backgroundColor: _getAvatarColor(user.initials),
-                child: Text(
-                  user.initials,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
+              AvatarUrlChip(avatarUrl: user.avatarUrl),
               const SizedBox(width: AppSpacing.small),
               Expanded(
                 flex: 2,
@@ -221,19 +211,14 @@ class _UserTableRowState extends State<UserTableRow> {
             confirmLabel: 'Delete',
             confirmColor: Theme.of(context).colorScheme.error,
             onConfirm: () {
-              context
-                  .read<UsersBloc>()
-                  .add(DeleteUsersEvent([user.id]));
+              context.read<UsersBloc>().add(DeleteUsersEvent([user.id]));
             },
           ),
         );
       case 'ban':
         context.read<UsersBloc>().add(
-              BanUsersEvent(
-                userIds: [user.id],
-                ban: !user.isBanned,
-              ),
-            );
+          BanUsersEvent(userIds: [user.id], ban: !user.isBanned),
+        );
     }
   }
 

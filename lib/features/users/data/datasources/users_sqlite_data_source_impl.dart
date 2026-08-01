@@ -2,12 +2,20 @@ import 'dart:convert';
 import 'package:issues_tracking/core/errors/exceptions.dart';
 import 'package:issues_tracking/core/services/sqlite/sqlite_database_sync.dart';
 import 'package:issues_tracking/core/services/sqlite/tables/users_table.dart';
+import 'package:issues_tracking/core/services/sqlite/tables/group_members_table.dart';
+import 'package:issues_tracking/core/services/sqlite/tables/groups_table.dart';
+import 'package:issues_tracking/core/services/sqlite/tables/group_projects_table.dart';
+import 'package:issues_tracking/core/services/sqlite/tables/projects_table.dart';
 import 'package:issues_tracking/features/users/data/datasources/users_remote_data_source.dart';
 import 'package:issues_tracking/features/users/data/models/user_model.dart';
 
 class UsersSqliteDataSourceImpl implements UsersRemoteDataSource {
   final SqliteDatabaseSync _sqlite;
   final UsersTable _table = const UsersTable();
+  final GroupMembersTable _groupMembersTable = const GroupMembersTable();
+  final GroupsTable _groupsTable = const GroupsTable();
+  final GroupProjectsTable _groupProjectsTable = const GroupProjectsTable();
+  final ProjectsTable _projectsTable = const ProjectsTable();
 
   UsersSqliteDataSourceImpl(this._sqlite);
 
@@ -27,6 +35,54 @@ class UsersSqliteDataSourceImpl implements UsersRemoteDataSource {
 
   Map<String, dynamic> _parseDataFromSqlite(Map<String, dynamic> data) {
     final Map<String, dynamic> parsed = Map.of(data);
+    
+    // Attempt to enrich with groups and projects if not already populated
+    if (!parsed.containsKey('groups') || !parsed.containsKey('projects')) {
+      final userId = parsed['id']?.toString();
+      if (userId != null) {
+        final groupNames = <String>[];
+        final projectNames = <String>{};
+        
+        final memberRows = _sqlite.query(
+          table: _groupMembersTable.tableName,
+          where: '${_groupMembersTable.userId} = ?',
+          whereArgs: [userId],
+        );
+        
+        for (final mr in memberRows) {
+           final groupId = mr['group_id'];
+           final gRow = _sqlite.fetchFirst(
+             tableName: _groupsTable.tableName,
+             where: '${_groupsTable.id} = ?',
+             whereArgs: [groupId],
+           );
+           if (gRow != null) {
+             groupNames.add(gRow['name'] as String);
+             
+             final gpRows = _sqlite.query(
+               table: _groupProjectsTable.tableName,
+               where: '${_groupProjectsTable.groupId} = ?',
+               whereArgs: [groupId],
+             );
+             for (final gp in gpRows) {
+                final projectId = gp['project_id'];
+                final pRow = _sqlite.fetchFirst(
+                  tableName: _projectsTable.tableName,
+                  where: '${_projectsTable.id} = ?',
+                  whereArgs: [projectId],
+                );
+                if (pRow != null) {
+                  projectNames.add(pRow['name'] as String);
+                }
+             }
+           }
+        }
+        
+        parsed['groups'] = groupNames;
+        parsed['projects'] = projectNames.toList();
+      }
+    }
+
     if (parsed.containsKey('groups') && parsed['groups'] is String) {
       try {
         parsed['groups'] = jsonDecode(parsed['groups'] as String);

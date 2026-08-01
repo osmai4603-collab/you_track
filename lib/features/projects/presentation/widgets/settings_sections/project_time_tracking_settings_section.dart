@@ -12,6 +12,8 @@ import 'package:issues_tracking/features/time_tracking/presentation/widgets/aggr
 import 'package:issues_tracking/features/time_tracking/presentation/widgets/work_types_section.dart';
 import 'package:issues_tracking/features/time_tracking/presentation/widgets/custom_attributes_section.dart';
 import 'package:issues_tracking/features/time_tracking/presentation/widgets/time_tracking_save_bar.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
+import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
 
 class ProjectTimeTrackingSettingsSection extends StatefulWidget {
   final String projectId;
@@ -36,10 +38,12 @@ class _ProjectTimeTrackingSettingsSectionState
 
   @override
   Widget build(BuildContext context) {
+    final userSession = context.watch<UserSession>();
+    final isAdmin = userSession.hasPermission(Permission.projectUpdateProject);
+
     return BlocBuilder<ProjectDetailsCubit, ProjectDetailsState>(
       builder: (context, projectState) {
         final project = projectState.project;
-        final isAdmin = true;
 
         if (!isAdmin) {
           return Center(

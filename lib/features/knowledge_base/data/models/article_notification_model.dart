@@ -1,4 +1,5 @@
 import '../../domain/entities/article_notification.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class ArticleNotificationModel extends ArticleNotification {
   const ArticleNotificationModel({
@@ -13,6 +14,7 @@ class ArticleNotificationModel extends ArticleNotification {
   });
 
   factory ArticleNotificationModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'ArticleNotification', data: json);
     return ArticleNotificationModel(
       id: (json['id'] ?? '').toString(),
       recipientId: (json['recipient_id'] ?? '').toString(),

@@ -1,5 +1,6 @@
 import 'package:issues_tracking/core/models/project_data_model.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_project_entity.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 // osmskillsantigravity@gmail.com
 final class GroupProjectModel extends GroupProjectEntity {
@@ -11,6 +12,7 @@ final class GroupProjectModel extends GroupProjectEntity {
   });
 
   factory GroupProjectModel.fromJson(Map<String, dynamic> data) {
+    printMap(title: 'GroupProject', data: data);
     return GroupProjectModel(
       id: data['id'],
       groupId: data['group_id'],

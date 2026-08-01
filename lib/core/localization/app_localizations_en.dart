@@ -771,4 +771,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String customFieldsDeleteConfirmation(Object count) {
     return 'Are you sure you want to delete $count custom field(s)?';
   }
+
+  @override
+  String get permissionDeniedTooltip =>
+      'You don\'t have permission to perform this action';
 }

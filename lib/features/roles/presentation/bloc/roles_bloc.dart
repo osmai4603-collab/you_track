@@ -4,10 +4,11 @@ import 'package:issues_tracking/features/roles/domain/usecases/create_role.dart'
 import 'package:issues_tracking/features/roles/domain/usecases/delete_role.dart';
 import 'package:issues_tracking/features/roles/domain/usecases/get_roles.dart';
 import 'package:issues_tracking/features/roles/domain/usecases/update_role.dart';
+import 'package:issues_tracking/core/utils/permission_refresh_mixin.dart';
 import 'roles_event.dart';
 import 'roles_state.dart';
 
-class RolesBloc extends Bloc<RolesEvent, RolesState> {
+class RolesBloc extends Bloc<RolesEvent, RolesState> with PermissionRefreshMixin {
   final GetRoles getRoles;
   final CreateRole createRole;
   final UpdateRole updateRole;
@@ -51,7 +52,10 @@ class RolesBloc extends Bloc<RolesEvent, RolesState> {
     );
     result.fold(
       (failure) => emit(RolesError(failure.message)),
-      (_) => add(const LoadRoles()),
+      (_) async {
+        await refreshUserPermissions();
+        add(const LoadRoles());
+      },
     );
   }
 
@@ -68,7 +72,10 @@ class RolesBloc extends Bloc<RolesEvent, RolesState> {
     );
     result.fold(
       (failure) => emit(RolesError(failure.message)),
-      (_) => add(const LoadRoles()),
+      (_) async {
+        await refreshUserPermissions();
+        add(const LoadRoles());
+      },
     );
   }
 
@@ -81,7 +88,10 @@ class RolesBloc extends Bloc<RolesEvent, RolesState> {
     );
     result.fold(
       (failure) => emit(RolesError(failure.message)),
-      (_) => add(const LoadRoles()),
+      (_) async {
+        await refreshUserPermissions();
+        add(const LoadRoles());
+      },
     );
   }
 

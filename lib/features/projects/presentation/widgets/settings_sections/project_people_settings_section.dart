@@ -1,11 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
+import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
+import 'package:issues_tracking/core/widgets/avatar_url_chip.dart';
+import 'package:issues_tracking/core/widgets/hover_widget.dart';
+import 'package:issues_tracking/features/groups/presentation/bloc/groups_event.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_member_entity.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_members_cubit.dart';
+import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
+import 'package:issues_tracking/features/groups/presentation/bloc/groups_state.dart';
+import 'package:issues_tracking/features/groups/domain/entities/group_entity.dart';
 
 const _roleColors = <String, Color>{
   'System Admin': Color(0xFFE65100),
@@ -25,6 +33,7 @@ class _ProjectPeopleSettingsSectionState
     extends State<ProjectPeopleSettingsSection> {
   final _localMembers = <String, List<String>>{};
   String? _selectedRoleFilter;
+  final Set<String> _selectedItemIds = {};
 
   @override
   void initState() {
@@ -58,15 +67,28 @@ class _ProjectPeopleSettingsSectionState
         final project = projectState.project;
         final isAdmin = true;
 
+        // ignore: dead_code
         if (!isAdmin) {
           return _buildAccessDeniedView(l10n, textTheme);
         }
 
+        context.watch<GroupsBloc>();
+
         return BlocBuilder<ProjectMembersCubit, ProjectMembersState>(
           builder: (context, state) {
+            final projectId = project?.id ?? '';
+
+            final groupsState = context.read<GroupsBloc>().state;
+            List<GroupEntity> projectGroups = [];
+            if (groupsState is GroupsLoaded) {
+              projectGroups = groupsState.groups
+                  .where((g) => g.projects.any((p) => p.projectId == projectId))
+                  .toList();
+            }
+
             final members = _getLocalMembers(state.members);
             final query = state.searchQuery.toLowerCase();
-            final filtered = members.where((m) {
+            final filteredUsers = members.where((m) {
               final matchesSearch =
                   m.name.toLowerCase().contains(query) ||
                   m.email.toLowerCase().contains(query);
@@ -75,20 +97,41 @@ class _ProjectPeopleSettingsSectionState
                   m.roles.contains(_selectedRoleFilter);
               return matchesSearch && matchesRole;
             }).toList();
-            final teamMembers = filtered
+
+            final filteredGroups = projectGroups.where((g) {
+              final matchesSearch = g.name.toLowerCase().contains(query);
+              final matchesRole =
+                  _selectedRoleFilter == null ||
+                  g.roles.any(
+                    (r) =>
+                        r.projectId == projectId &&
+                        r.roleName == _selectedRoleFilter,
+                  );
+              return matchesSearch && matchesRole;
+            }).toList();
+
+            final teamMembers = filteredUsers
                 .where((m) => m.roles.isNotEmpty)
                 .toList();
-            final otherPeople = filtered.where((m) => m.roles.isEmpty).toList();
+            final otherPeople = filteredUsers
+                .where((m) => m.roles.isEmpty)
+                .toList();
 
             return SingleChildScrollView(
               padding: const EdgeInsets.symmetric(horizontal: AppSpacing.large),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSearchFilterBar(l10n, textTheme, colors),
+                  _buildSearchFilterBar(
+                    l10n,
+                    textTheme,
+                    colors,
+                    filteredGroups,
+                    projectId,
+                  ),
                   const SizedBox(height: AppSpacing.large),
                   _buildProjectTeamHeader(
-                    teamMembers.length,
+                    teamMembers.length + filteredGroups.length,
                     project?.ownerId ?? '',
                     l10n,
                     textTheme,
@@ -112,10 +155,42 @@ class _ProjectPeopleSettingsSectionState
                         ),
                       ),
                     )
-                  else if (teamMembers.isEmpty && otherPeople.isEmpty)
+                  else if (teamMembers.isEmpty &&
+                      otherPeople.isEmpty &&
+                      filteredGroups.isEmpty)
                     _buildEmptyState(l10n, textTheme, colors)
                   else ...[
-                    _buildMembersTableHeader(textTheme, colors),
+                    Builder(
+                      builder: (context) {
+                        final mainTableIds = [
+                          ...filteredGroups.map((g) => g.id),
+                          ...teamMembers.map((m) => m.id),
+                        ];
+                        final allSelected =
+                            mainTableIds.isNotEmpty &&
+                            mainTableIds.every(
+                              (id) => _selectedItemIds.contains(id),
+                            );
+                        return _buildMembersTableHeader(
+                          textTheme,
+                          colors,
+                          allSelected: allSelected,
+                          onSelectAll: (value) {
+                            setState(() {
+                              if (value == true) {
+                                _selectedItemIds.addAll(mainTableIds);
+                              } else {
+                                _selectedItemIds.removeAll(mainTableIds);
+                              }
+                            });
+                          },
+                        );
+                      },
+                    ),
+                    ...filteredGroups.map(
+                      (g) =>
+                          _buildGroupRow(g, projectId, l10n, textTheme, colors),
+                    ),
                     ...teamMembers.map(
                       (m) => _buildMemberRow(m, l10n, textTheme, colors),
                     ),
@@ -170,31 +245,59 @@ class _ProjectPeopleSettingsSectionState
     AppLocalizations l10n,
     ThemeData textTheme,
     ColorScheme colors,
+    List<GroupEntity> filteredGroups,
+    String projectId,
   ) {
-    return TextField(
-      onChanged: (value) {
-        context.read<ProjectMembersCubit>().updateSearchQuery(value);
-      },
-      decoration: InputDecoration(
-        hintText: l10n.searchMembersHint,
-        prefixIcon: IconButton(
-          icon: const Icon(Icons.add, size: 20),
-          onPressed: () {},
+    return Row(
+      children: [
+        Expanded(
+          child: TextField(
+            onChanged: (value) {
+              context.read<ProjectMembersCubit>().updateSearchQuery(value);
+            },
+            decoration: InputDecoration(
+              hintText: l10n.searchMembersHint,
+              prefixIcon: IconButton(
+                icon: const Icon(Icons.add, size: 20),
+                onPressed: () {},
+              ),
+              suffixIcon: const Icon(Icons.search, size: 20),
+              border: OutlineInputBorder(
+                borderRadius: AppRadius.smallBorderRadius,
+                borderSide: BorderSide(color: colors.outline),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: AppRadius.smallBorderRadius,
+                borderSide: BorderSide(color: colors.outline),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.medium,
+                vertical: AppSpacing.small,
+              ),
+            ),
+          ),
         ),
-        suffixIcon: const Icon(Icons.search, size: 20),
-        border: OutlineInputBorder(
-          borderRadius: AppRadius.smallBorderRadius,
-          borderSide: BorderSide(color: colors.outline),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: AppRadius.smallBorderRadius,
-          borderSide: BorderSide(color: colors.outline),
-        ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.medium,
-          vertical: AppSpacing.small,
-        ),
-      ),
+        if (_selectedItemIds.isNotEmpty) ...[
+          const SizedBox(width: AppSpacing.medium),
+          ElevatedButton.icon(
+            onPressed: () {
+              _showBulkRemoveConfirmation(
+                l10n,
+                textTheme,
+                colors,
+                filteredGroups,
+                projectId,
+              );
+            },
+            icon: const Icon(Icons.person_remove),
+            label: Text(l10n.removeMemberAction),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: colors.errorContainer,
+              foregroundColor: colors.onErrorContainer,
+            ),
+          ),
+        ],
+      ],
     );
   }
 
@@ -290,39 +393,44 @@ class _ProjectPeopleSettingsSectionState
     );
   }
 
-  Widget _buildMembersTableHeader(ThemeData textTheme, ColorScheme colors) {
+  Widget _buildMembersTableHeader(
+    ThemeData textTheme,
+    ColorScheme colors, {
+    required bool allSelected,
+    required ValueChanged<bool?> onSelectAll,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.small),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 24,
-            child: Checkbox(
-              value: false,
-              onChanged: (_) {},
-              visualDensity: VisualDensity.compact,
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Text(
-              'Name',
-              style: textTheme.textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+      child: CheckboxListTile(
+        value: allSelected,
+        onChanged: onSelectAll,
+        contentPadding: EdgeInsets.zero,
+        controlAffinity: ListTileControlAffinity.leading,
+        visualDensity: VisualDensity.compact,
+        dense: true,
+        title: Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Text(
+                'Name',
+                style: textTheme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Text(
-              'Roles',
-              style: textTheme.textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.bold,
+            Expanded(
+              flex: 3,
+              child: Text(
+                'Roles',
+                style: textTheme.textTheme.labelLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: 32),
-        ],
+            const SizedBox(width: 32),
+          ],
+        ),
       ),
     );
   }
@@ -342,163 +450,145 @@ class _ProjectPeopleSettingsSectionState
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.extraSmall),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 24,
-            child: Checkbox(
-              value: false,
-              onChanged: (_) {},
-              visualDensity: VisualDensity.compact,
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 16,
-                  backgroundColor: avatarColor,
-                  child: Text(
-                    initials,
-                    style: textTheme.textTheme.labelSmall?.copyWith(
-                      color: Colors.white,
-                      fontWeight: FontWeight.w600,
+      child: CheckboxListTile(
+        value: _selectedItemIds.contains(member.id),
+        onChanged: (value) {
+          setState(() {
+            if (value == true) {
+              _selectedItemIds.add(member.id);
+            } else {
+              _selectedItemIds.remove(member.id);
+            }
+          });
+        },
+        contentPadding: EdgeInsets.zero,
+        controlAffinity: ListTileControlAffinity.leading,
+        visualDensity: VisualDensity.compact,
+        dense: true,
+        title: Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Row(
+                children: [
+                  CircleAvatar(
+                    radius: 16,
+                    backgroundColor: avatarColor,
+                    child: Text(
+                      initials,
+                      style: textTheme.textTheme.labelSmall?.copyWith(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: AppSpacing.small),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Flexible(
-                            child: Text(
-                              member.name,
-                              style: textTheme.textTheme.bodySmall?.copyWith(
-                                fontWeight: FontWeight.w500,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ),
-                          if (member.isOwner) ...[
-                            const SizedBox(width: AppSpacing.extraSmall),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 4,
-                                vertical: 1,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.green.withValues(alpha: 0.1),
-                                borderRadius: AppRadius.extraSmallBorderRadius,
-                              ),
+                  const SizedBox(width: AppSpacing.small),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Flexible(
                               child: Text(
-                                l10n.projectOwnerBadge,
-                                style: textTheme.textTheme.labelSmall?.copyWith(
-                                  color: Colors.green.shade700,
-                                  fontSize: 9,
+                                member.name,
+                                style: textTheme.textTheme.bodySmall?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            if (member.isOwner) ...[
+                              const SizedBox(width: AppSpacing.extraSmall),
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 4,
+                                  vertical: 1,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.green.withValues(alpha: 0.1),
+                                  borderRadius:
+                                      AppRadius.extraSmallBorderRadius,
+                                ),
+                                child: Text(
+                                  l10n.projectOwnerBadge,
+                                  style: textTheme.textTheme.labelSmall
+                                      ?.copyWith(
+                                        color: Colors.green.shade700,
+                                        fontSize: 9,
+                                      ),
                                 ),
                               ),
-                            ),
+                            ],
                           ],
-                        ],
-                      ),
-                      Text(
-                        member.email,
-                        style: textTheme.textTheme.labelSmall?.copyWith(
-                          color: Colors.grey.shade600,
                         ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
+                        Text(
+                          member.email,
+                          style: textTheme.textTheme.labelSmall?.copyWith(
+                            color: Colors.grey.shade600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            flex: 3,
-            child: Wrap(
-              spacing: AppSpacing.extraSmall,
-              runSpacing: AppSpacing.extraSmall,
-              children: member.roles.map((role) {
-                return _buildRoleChip(role, member, l10n, textTheme, colors);
-              }).toList(),
+            Expanded(
+              flex: 3,
+              child: Wrap(
+                spacing: AppSpacing.extraSmall,
+                runSpacing: AppSpacing.extraSmall,
+                children: member.roles.map((role) {
+                  return _buildRoleChip(role, textTheme, colors);
+                }).toList(),
+              ),
             ),
-          ),
-          if (!member.isOwner)
-            _buildMemberContextMenu(member, l10n, textTheme, colors)
-          else
-            const SizedBox(width: 32),
-        ],
+            if (!member.isOwner)
+              _buildMemberContextMenu(member, l10n, textTheme, colors)
+            else
+              const SizedBox(width: 32),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildRoleChip(
-    String role,
-    ProjectMemberEntity member,
-    AppLocalizations l10n,
-    ThemeData textTheme,
-    ColorScheme colors,
-  ) {
+  Widget _buildRoleChip(String role, ThemeData textTheme, ColorScheme colors) {
     final chipColor = _roleColors[role] ?? Colors.grey.shade600;
 
-    return PopupMenuButton<String>(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-        decoration: BoxDecoration(
-          color: chipColor.withValues(alpha: 0.1),
+    return HoverWidget(
+      builder: (context, isHovered) {
+        return InkWell(
+          onTap: () => context.go(AppRouteKeys.roles),
           borderRadius: AppRadius.extraSmallBorderRadius,
-          border: Border.all(color: chipColor.withValues(alpha: 0.3)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              role,
-              style: textTheme.textTheme.labelSmall?.copyWith(
-                color: chipColor,
-                fontSize: 11,
-              ),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: isHovered
+                  ? chipColor.withValues(alpha: 0.2)
+                  : chipColor.withValues(alpha: 0.1),
+              borderRadius: AppRadius.extraSmallBorderRadius,
+              border: Border.all(color: chipColor.withValues(alpha: 0.3)),
             ),
-            const Icon(Icons.arrow_drop_down, size: 14, color: Colors.grey),
-          ],
-        ),
-      ),
-      onSelected: (selectedRole) {
-        setState(() {
-          final currentRoles =
-              _localMembers[member.id] ?? List.from(member.roles);
-          if (currentRoles.contains(selectedRole)) {
-            currentRoles.remove(selectedRole);
-          } else {
-            currentRoles.add(selectedRole);
-          }
-          _localMembers[member.id] = currentRoles;
-        });
-      },
-      itemBuilder: (context) =>
-          ['System Admin', 'Contributor', 'Project Admin'].map((r) {
-            final isSelected = member.roles.contains(r);
-            return PopupMenuItem<String>(
-              value: r,
-              child: Row(
-                children: [
-                  Icon(
-                    isSelected
-                        ? Icons.check_box
-                        : Icons.check_box_outline_blank,
-                    size: 18,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  role,
+                  style: textTheme.textTheme.labelSmall?.copyWith(
+                    color: chipColor,
+                    fontSize: 11,
                   ),
-                  const SizedBox(width: AppSpacing.small),
-                  Text(r),
-                ],
-              ),
-            );
-          }).toList(),
+                ),
+                if (isHovered)
+                  Icon(Icons.open_in_new, size: 12, color: chipColor),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -535,6 +625,11 @@ class _ProjectPeopleSettingsSectionState
   ) {
     if (people.isEmpty) return const SizedBox.shrink();
 
+    final otherTableIds = people.map((m) => m.id).toList();
+    final allSelected =
+        otherTableIds.isNotEmpty &&
+        otherTableIds.every((id) => _selectedItemIds.contains(id));
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -545,7 +640,20 @@ class _ProjectPeopleSettingsSectionState
           ),
         ),
         const SizedBox(height: AppSpacing.medium),
-        _buildMembersTableHeader(textTheme, colors),
+        _buildMembersTableHeader(
+          textTheme,
+          colors,
+          allSelected: allSelected,
+          onSelectAll: (value) {
+            setState(() {
+              if (value == true) {
+                _selectedItemIds.addAll(otherTableIds);
+              } else {
+                _selectedItemIds.removeAll(otherTableIds);
+              }
+            });
+          },
+        ),
         ...people.map((m) => _buildMemberRow(m, l10n, textTheme, colors)),
       ],
     );
@@ -606,6 +714,171 @@ class _ProjectPeopleSettingsSectionState
           ),
         ],
       ),
+    );
+  }
+
+  void _showBulkRemoveConfirmation(
+    AppLocalizations l10n,
+    ThemeData textTheme,
+    ColorScheme colors,
+    List<GroupEntity> filteredGroups,
+    String projectId,
+  ) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.removeMemberConfirmTitle),
+        content: Text(l10n.removeMemberConfirmBody),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(l10n.cancelButton),
+          ),
+          TextButton(
+            onPressed: () {
+              final groupIds = filteredGroups.map((g) => g.id).toSet();
+              setState(() {
+                for (final id in _selectedItemIds.toList()) {
+                  if (groupIds.contains(id)) {
+                    context.read<GroupsBloc>().add(
+                      RemoveGroupRoleEvent(groupId: id, projectId: projectId),
+                    );
+                  } else {
+                    _localMembers.remove(id);
+                  }
+                }
+                _selectedItemIds.clear();
+              });
+              Navigator.of(context).pop();
+            },
+            child: Text(
+              l10n.removeMemberAction,
+              style: TextStyle(color: colors.error),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGroupRow(
+    GroupEntity group,
+    String projectId,
+    AppLocalizations l10n,
+    ThemeData textTheme,
+    ColorScheme colors,
+  ) {
+    final groupRoleInfo = group.roles
+        .where((r) => r.projectId == projectId)
+        .firstOrNull;
+    final groupRole = groupRoleInfo?.roleName ?? 'Contributor';
+    final avatarColor = _roleColors[groupRole] ?? colors.primaryContainer;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.extraSmall),
+      child: CheckboxListTile(
+        value: _selectedItemIds.contains(group.id),
+        onChanged: (value) {
+          setState(() {
+            if (value == true) {
+              _selectedItemIds.add(group.id);
+            } else {
+              _selectedItemIds.remove(group.id);
+            }
+          });
+        },
+        contentPadding: EdgeInsets.zero,
+        controlAffinity: ListTileControlAffinity.leading,
+        visualDensity: VisualDensity.compact,
+        dense: true,
+        title: Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: Row(
+                children: [
+                  AvatarUrlChip(
+                    avatarUrl: group.avatarUrl,
+                    backColor: avatarColor,
+                  ),
+                  const SizedBox(width: AppSpacing.small),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          group.name,
+                          style: textTheme.textTheme.bodySmall?.copyWith(
+                            fontWeight: FontWeight.w500,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          'Group',
+                          style: textTheme.textTheme.labelSmall?.copyWith(
+                            color: Colors.grey.shade600,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              flex: 3,
+              child: Wrap(
+                spacing: AppSpacing.extraSmall,
+                runSpacing: AppSpacing.extraSmall,
+                children: [_buildGroupRoleChip(groupRole, textTheme, colors)],
+              ),
+            ),
+            const SizedBox(width: 32),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGroupRoleChip(
+    String role,
+    ThemeData textTheme,
+    ColorScheme colors,
+  ) {
+    final chipColor = _roleColors[role] ?? Colors.grey.shade600;
+
+    return HoverWidget(
+      builder: (context, isHovered) {
+        return InkWell(
+          onTap: () => context.go(AppRouteKeys.roles),
+          borderRadius: AppRadius.extraSmallBorderRadius,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: isHovered
+                  ? chipColor.withValues(alpha: 0.2)
+                  : chipColor.withValues(alpha: 0.1),
+              borderRadius: AppRadius.extraSmallBorderRadius,
+              border: Border.all(color: chipColor.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  role,
+                  style: textTheme.textTheme.labelSmall?.copyWith(
+                    color: chipColor,
+                    fontSize: 11,
+                  ),
+                ),
+                if (isHovered)
+                  Icon(Icons.open_in_new, size: 12, color: chipColor),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }

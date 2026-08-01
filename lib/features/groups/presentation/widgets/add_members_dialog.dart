@@ -42,7 +42,7 @@ class AddMembersDialog extends StatefulWidget {
 class _AddMembersDialogState extends State<AddMembersDialog> {
   final _getUsers = GetIt.I<GetUsers>();
 
-  List<UserEntity>? _users;
+  List<UserEntity> _users = [];
   bool _isLoading = true;
 
   final _selectedUserIds = <String>{};
@@ -128,14 +128,6 @@ class _AddMembersDialogState extends State<AddMembersDialog> {
                         columns: [
                           DataColumn(
                             label: Text(
-                              '',
-                              style: textTheme.bodySmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                          DataColumn(
-                            label: Text(
                               'User',
                               style: textTheme.bodySmall?.copyWith(
                                 fontWeight: FontWeight.w600,
@@ -151,94 +143,40 @@ class _AddMembersDialogState extends State<AddMembersDialog> {
                             ),
                           ),
                         ],
-                        rows:
-                            _users?.map((user) {
-                              final isExisting = _existingUserIds.contains(
-                                user.id,
-                              );
-                              final isSelected = _selectedUserIds.contains(
-                                user.id,
-                              );
-                              return DataRow(
-                                selected: isSelected,
-                                onSelectChanged: isExisting
-                                    ? null
-                                    : (selected) {
-                                        if (selected == true) {
-                                          setState(
-                                            () => _selectedUserIds.add(user.id),
-                                          );
-                                        } else {
-                                          setState(
-                                            () => _selectedUserIds.remove(
-                                              user.id,
-                                            ),
-                                          );
-                                        }
-                                      },
-                                cells: [
-                                  DataCell(
-                                    Checkbox(
-                                      value: isSelected || isExisting,
-                                      onChanged: isExisting
-                                          ? null
-                                          : (value) {
-                                              setState(() {
-                                                if (value == true) {
-                                                  _selectedUserIds.add(user.id);
-                                                } else {
-                                                  _selectedUserIds.remove(
-                                                    user.id,
-                                                  );
-                                                }
-                                              });
-                                            },
-                                    ),
+                        rows: _users.map((user) {
+                          final isExisting = _existingUserIds.contains(user.id);
+                          final isSelected = _selectedUserIds.contains(user.id);
+                          return DataRow(
+                            selected: isSelected,
+                            onSelectChanged: isExisting
+                                ? null
+                                : (selected) {
+                                    if (selected == true) {
+                                      setState(
+                                        () => _selectedUserIds.add(user.id),
+                                      );
+                                    } else {
+                                      setState(
+                                        () => _selectedUserIds.remove(user.id),
+                                      );
+                                    }
+                                  },
+                            cells: [
+                              DataCell(Text(user.username)),
+
+                              DataCell(
+                                Text(
+                                  user.email,
+                                  style: textTheme.bodySmall?.copyWith(
+                                    color: isExisting
+                                        ? colors.onSurfaceVariant
+                                        : colors.onSurface,
                                   ),
-                                  DataCell(
-                                    Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        CircleAvatar(
-                                          radius: 14,
-                                          backgroundColor:
-                                              colors.primaryContainer,
-                                          child: Text(
-                                            user.initials,
-                                            style: textTheme.bodySmall
-                                                ?.copyWith(
-                                                  color:
-                                                      colors.onPrimaryContainer,
-                                                  fontSize: 10,
-                                                ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          user.fullName,
-                                          style: textTheme.bodySmall?.copyWith(
-                                            color: isExisting
-                                                ? colors.onSurfaceVariant
-                                                : colors.onSurface,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  DataCell(
-                                    Text(
-                                      user.email,
-                                      style: textTheme.bodySmall?.copyWith(
-                                        color: isExisting
-                                            ? colors.onSurfaceVariant
-                                            : colors.onSurface,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              );
-                            }).toList() ??
-                            [],
+                                ),
+                              ),
+                            ],
+                          );
+                        }).toList(),
                       ),
                     ),
                   ),

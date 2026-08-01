@@ -119,6 +119,14 @@ class GroupsSqliteDataSourceImpl implements GroupsRemoteDataSource {
   }
 
   @override
+  Future<void> removeGroupRole(String groupId, String projectId) async {
+    _sqlite.execute(
+      'DELETE FROM ${_rolesTable.tableName} WHERE ${_rolesTable.groupId} = ? AND project_id = ?',
+      [groupId, projectId],
+    );
+  }
+
+  @override
   Future<GroupModel> createGroup(GroupModel data) async {
     final json = data.toJson();
     if (json['id'] == null || json['id'].toString().isEmpty) {

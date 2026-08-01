@@ -10,6 +10,18 @@ abstract class UsersRemoteDataSource {
 }
 
 class UsersRemoteDataSourceImpl implements UsersRemoteDataSource {
+  static const List<String> _updatableColumns = [
+    'full_name',
+    'user_name',
+    'email',
+    'avatar_url',
+  ];
+
+  static const List<String> _insertableColumns = [
+    ..._updatableColumns,
+    'created_at',
+  ];
+
   final SupabaseClient supabase;
   final SupabaseClient? adminClient;
 
@@ -19,7 +31,7 @@ class UsersRemoteDataSourceImpl implements UsersRemoteDataSource {
   Future<List<UserModel>> getUsers() async {
     final response = await supabase
         .from('users')
-        .select('*')
+        .select('*, group_members(groups(name, group_projects(projects(name))))')
         .order('created_at', ascending: false);
     return (response as List).map((e) => UserModel.fromJson(e)).toList();
   }
@@ -27,7 +39,7 @@ class UsersRemoteDataSourceImpl implements UsersRemoteDataSource {
   @override
   Future<UserModel> getUserById(String id) async {
     final response =
-        await supabase.from('users').select('*').eq('id', id).single();
+        await supabase.from('users').select('*, group_members(groups(name, group_projects(projects(name))))').eq('id', id).single();
     return UserModel.fromJson(response);
   }
 
@@ -66,17 +78,27 @@ class UsersRemoteDataSourceImpl implements UsersRemoteDataSource {
     }
 
     // Fallback to original behavior if no adminClient or password is provided
+    final payload = <String, dynamic>{
+      for (final column in _insertableColumns)
+        if (data.containsKey(column)) column: data[column],
+    };
     final response =
-        await supabase.from('users').insert(data).select().single();
+        await supabase.from('users').insert(payload).select().single();
     return UserModel.fromJson(response);
   }
 
   @override
   Future<UserModel> updateUser(String id, Map<String, dynamic> data) async {
-    data.remove('id');
-    data['updated_at'] = DateTime.now().toIso8601String();
-    final response =
-        await supabase.from('users').update(data).eq('id', id).select().single();
+    final payload = <String, dynamic>{
+      for (final column in _updatableColumns)
+        if (data.containsKey(column)) column: data[column],
+    };
+    final response = await supabase
+        .from('users')
+        .update(payload)
+        .eq('id', id)
+        .select()
+        .single();
     return UserModel.fromJson(response);
   }
 

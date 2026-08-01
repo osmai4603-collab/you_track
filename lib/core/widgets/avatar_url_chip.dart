@@ -4,11 +4,13 @@ class AvatarUrlChip extends StatelessWidget {
   final String? avatarUrl;
   final double size;
   final IconData defaultIcon;
+  final Color? backColor;
 
   const AvatarUrlChip({
     super.key,
     this.avatarUrl,
     this.size = 32,
+    this.backColor,
     this.defaultIcon = Icons.person,
   });
 
@@ -18,7 +20,7 @@ class AvatarUrlChip extends StatelessWidget {
 
     return CircleAvatar(
       radius: size / 2,
-      backgroundColor: colors.primaryContainer,
+      backgroundColor: backColor ?? colors.primaryContainer,
       child: avatarUrl != null && avatarUrl!.isNotEmpty
           ? ClipOval(
               child: Image.network(
@@ -35,6 +37,7 @@ class AvatarUrlChip extends StatelessWidget {
             )
           : Icon(
               defaultIcon,
+
               size: size * 0.75,
               color: colors.onPrimaryContainer,
             ),

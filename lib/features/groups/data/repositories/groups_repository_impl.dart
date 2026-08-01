@@ -80,6 +80,19 @@ class GroupsRepositoryImpl implements GroupsRepository {
   }
 
   @override
+  Future<Either<Failure, void>> removeGroupRole(
+    String groupId,
+    String projectId,
+  ) async {
+    try {
+      await dataSource.removeGroupRole(groupId, projectId);
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, List<GroupRoleAssignmentEntity>>> getGroupRoles(
     String groupId,
   ) async {

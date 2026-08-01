@@ -6,6 +6,8 @@ class UserEntity extends Entity {
   final String? userName;
   final String? avatarUrl;
   final DateTime? createdAt;
+  final List<String> groups;
+  final List<String> projects;
 
   const UserEntity({
     required this.id,
@@ -13,6 +15,8 @@ class UserEntity extends Entity {
     this.userName,
     this.avatarUrl,
     this.createdAt,
+    this.groups = const [],
+    this.projects = const [],
   });
 
   String get userKey {
@@ -28,6 +32,8 @@ class UserEntity extends Entity {
     String? avatarUrl,
     bool clearAvatarUrl = false,
     DateTime? createdAt,
+    List<String>? groups,
+    List<String>? projects,
   }) {
     return UserEntity(
       id: id ?? this.id,
@@ -35,9 +41,11 @@ class UserEntity extends Entity {
       userName: clearFullName ? null : (fullName ?? this.userName),
       avatarUrl: clearAvatarUrl ? null : (avatarUrl ?? this.avatarUrl),
       createdAt: createdAt ?? this.createdAt,
+      groups: groups ?? this.groups,
+      projects: projects ?? this.projects,
     );
   }
 
   @override
-  List<Object?> get props => [id, email, userName, avatarUrl, createdAt];
+  List<Object?> get props => [id, email, userName, avatarUrl, createdAt, groups, projects];
 }

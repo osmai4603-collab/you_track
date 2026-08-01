@@ -1,4 +1,5 @@
 import 'package:issues_tracking/core/entities/user_data.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 final class UserDataModel extends UserData {
   const UserDataModel({
@@ -9,6 +10,7 @@ final class UserDataModel extends UserData {
   });
 
   factory UserDataModel.fromJson(Map<String, dynamic> data) {
+    printMap(title: 'UserData', data: data);
     return UserDataModel(
       id: data['id'],
       userName: data['user_name'],

@@ -1,4 +1,5 @@
 import 'package:issues_tracking/features/version_control/domain/entities/vcs_commit_entity.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class VcsCommitModel extends VcsCommitEntity {
   const VcsCommitModel({
@@ -30,6 +31,7 @@ class VcsCommitModel extends VcsCommitEntity {
   }
 
   factory VcsCommitModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'VcsCommit', data: json);
     return VcsCommitModel(
       id: (json['id'] ?? '').toString(),
       integrationId: (json['integration_id'] ?? '').toString(),

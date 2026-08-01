@@ -2,6 +2,7 @@ import 'package:issues_tracking/core/enums/server_type_enum.dart';
 import 'package:issues_tracking/core/enums/vcs_auth_mode_enum.dart';
 import 'package:issues_tracking/core/enums/vcs_connection_status_enum.dart';
 import 'package:issues_tracking/features/version_control/domain/entities/vcs_integration_entity.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
 
 class VcsIntegrationModel extends VcsIntegrationEntity {
   const VcsIntegrationModel({
@@ -55,6 +56,7 @@ class VcsIntegrationModel extends VcsIntegrationEntity {
   }
 
   factory VcsIntegrationModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'VcsIntegration', data: json);
     return VcsIntegrationModel(
       id: (json['id'] ?? '').toString(),
       projectId: (json['project_id'] ?? '').toString(),

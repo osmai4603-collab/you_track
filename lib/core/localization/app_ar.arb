@@ -523,5 +523,9 @@
     "placeholders": {
       "count": {}
     }
+  },
+  "permissionDeniedTooltip": "ليس لديك الصلاحية لتنفيذ هذا الإجراء",
+  "@permissionDeniedTooltip": {
+    "description": "رسالة تلميح تظهر عند تعطيل إجراء بسبب نقص الصلاحية"
   }
 }

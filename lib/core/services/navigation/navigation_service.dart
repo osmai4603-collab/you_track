@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
 import 'package:issues_tracking/core/services/navigation/agile_boards_navigation.dart';
@@ -104,7 +105,10 @@ sealed class NavigationService {
             BlocProvider(create: (_) => get_it<UsersBloc>()),
             BlocProvider(create: (_) => get_it<YouTrackShellCubit>()),
           ],
-          child: YouTrackShell(navigationShell: navigationShell),
+          child: ChangeNotifierProvider.value(
+            value: get_it<UserSession>(),
+            child: YouTrackShell(navigationShell: navigationShell),
+          ),
         ),
         branches: [
           // ╔════════════════════════════════════════════════════════════════════╗

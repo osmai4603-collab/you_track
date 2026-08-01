@@ -1597,6 +1597,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Are you sure you want to delete {count} custom field(s)?'**
   String customFieldsDeleteConfirmation(Object count);
+
+  /// Tooltip shown when an action is disabled due to missing permission
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to perform this action'**
+  String get permissionDeniedTooltip;
 }
 
 class _AppLocalizationsDelegate

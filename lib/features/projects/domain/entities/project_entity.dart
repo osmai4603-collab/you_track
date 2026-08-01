@@ -13,6 +13,8 @@ class ProjectEntity extends Entity {
   final DateTime createdAt;
   final bool isFavorite;
   final List<ProjectMemberEntity> members;
+  final String? visibility;
+  final List<String> recommendedVisibility;
 
   const ProjectEntity({
     required this.id,
@@ -25,6 +27,8 @@ class ProjectEntity extends Entity {
     required this.createdAt,
     this.isFavorite = false,
     this.members = const [],
+    this.visibility,
+    this.recommendedVisibility = const [],
   });
 
   @override
@@ -40,6 +44,8 @@ class ProjectEntity extends Entity {
     bool? isFavorite,
     List<String>? memberInitials,
     List<ProjectMemberEntity>? members,
+    String? visibility,
+    List<String>? recommendedVisibility,
   }) {
     return ProjectEntity(
       id: id ?? this.id,
@@ -52,6 +58,8 @@ class ProjectEntity extends Entity {
       createdAt: createdAt ?? this.createdAt,
       isFavorite: isFavorite ?? this.isFavorite,
       members: members ?? this.members,
+      visibility: visibility ?? this.visibility,
+      recommendedVisibility: recommendedVisibility ?? this.recommendedVisibility,
     );
   }
 
@@ -67,5 +75,7 @@ class ProjectEntity extends Entity {
     createdAt,
     isFavorite,
     members,
+    visibility,
+    recommendedVisibility,
   ];
 }
