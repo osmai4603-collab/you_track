@@ -30,7 +30,7 @@ class _ProjectSettingsPageState extends State<ProjectSettingsPage> {
     if (location.endsWith('/vcs')) return 3;
     if (location.endsWith('/notifications')) return 4;
     if (location.endsWith('/builds')) return 5;
-    if (location.endsWith('/time')) return 6;
+    if (location.endsWith('/time-tracking')) return 6;
     if (location.endsWith('/workflows')) return 7;
     if (location.endsWith('/apps')) return 8;
     return 0;

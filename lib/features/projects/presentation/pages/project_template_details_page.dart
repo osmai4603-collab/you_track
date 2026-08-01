@@ -34,19 +34,19 @@ class ProjectTemplateDetailsPage extends StatelessWidget {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ProjectsHeader(
-              breadcrumbs: [
-                BreadcrumbItem(
-                  title: localization.projectsTitle,
-                  onTap: (ctx) => ctx.go(AppRouteKeys.projects),
-                ),
-                BreadcrumbItem(
-                  title: localization.selectTemplateTitle,
-                  onTap: (ctx) => ctx.go(AppRouteKeys.projectTemplates),
-                ),
-                BreadcrumbItem(title: template.name),
-              ],
-            ),
+            // ProjectsHeader(
+            //   breadcrumbs: [
+            //     BreadcrumbItem(
+            //       title: localization.projectsTitle,
+            //       onTap: (ctx) => ctx.go(AppRouteKeys.projects),
+            //     ),
+            //     BreadcrumbItem(
+            //       title: localization.selectTemplateTitle,
+            //       onTap: (ctx) => ctx.go(AppRouteKeys.projectTemplates),
+            //     ),
+            //     BreadcrumbItem(title: template.name),
+            //   ],
+            // ),
             // ── المحتوى ──────────────────────────────────
             Expanded(
               child: SingleChildScrollView(

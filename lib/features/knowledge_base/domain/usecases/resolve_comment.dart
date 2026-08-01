@@ -3,7 +3,7 @@ import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_comment_repository.dart';
 
-class ResolveComment extends UseCase<void, ResolveCommentParams> {
+class ResolveComment extends UseCasePermission<void, ResolveCommentParams> {
   final ArticleCommentRepository repository;
   const ResolveComment(this.repository);
 

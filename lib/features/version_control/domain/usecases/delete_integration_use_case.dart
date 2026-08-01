@@ -3,7 +3,7 @@ import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/version_control/domain/repositories/version_control_repository.dart';
 
-class DeleteIntegrationUseCase extends UseCase<void, DeleteIntegrationParams> {
+class DeleteIntegrationUseCase extends UseCasePermission<void, DeleteIntegrationParams> {
   final VersionControlRepository repository;
 
   DeleteIntegrationUseCase(this.repository);

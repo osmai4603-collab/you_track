@@ -1,5 +1,7 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import '../../../../core/errors/failure.dart';
+import '../../../../core/usecase/permission_guard_mixin.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../entities/project_entity.dart';
 import '../repositories/projects_repository.dart';
@@ -12,13 +14,19 @@ class UpdateProjectParams extends Params {
   List<Object?> get props => [project];
 }
 
-class UpdateProjectUseCase implements UseCase<ProjectEntity, UpdateProjectParams> {
+class UpdateProjectUseCase extends UseCasePermission<ProjectEntity, UpdateProjectParams>
+    with PermissionGuardMixin<ProjectEntity, UpdateProjectParams> {
   final ProjectsRepository repository;
 
   UpdateProjectUseCase(this.repository);
 
   @override
+  Permission get requiredPermission => Permission.projectUpdateProject;
+
+  @override
   Future<Either<Failure, ProjectEntity>> call({required UpdateProjectParams params}) {
-    return repository.updateProject(params.project);
+    return runWithPermissionCheck(
+      action: () async => repository.updateProject(params.project),
+    );
   }
 }

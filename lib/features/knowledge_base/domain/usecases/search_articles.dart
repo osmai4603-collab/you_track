@@ -4,7 +4,7 @@ import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_repository.dart';
 
-class SearchArticles extends UseCase<List<Article>, SearchArticlesParams> {
+class SearchArticles extends UseCasePermission<List<Article>, SearchArticlesParams> {
   final ArticleRepository repository;
   const SearchArticles(this.repository);
 

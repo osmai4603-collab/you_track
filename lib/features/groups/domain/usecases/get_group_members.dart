@@ -14,7 +14,7 @@ class GetGroupMembersParams extends Params {
 }
 
 class GetGroupMembers
-    extends UseCase<List<GroupMemberEntity>, GetGroupMembersParams> {
+    extends UseCasePermission<List<GroupMemberEntity>, GetGroupMembersParams> {
   final GroupsRepository repository;
 
   GetGroupMembers(this.repository);

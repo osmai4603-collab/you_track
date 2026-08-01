@@ -5,7 +5,7 @@ import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/issues_repository.dart';
 
-class GetIssues extends UseCase<List<Issue>, GetIssuesParams> {
+class GetIssues extends UseCasePermission<List<Issue>, GetIssuesParams> {
   final IssuesRepository repository;
 
   GetIssues(this.repository);

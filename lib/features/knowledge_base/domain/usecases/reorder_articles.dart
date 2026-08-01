@@ -4,7 +4,7 @@ import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_repository.dart';
 
-class ReorderArticles extends UseCase<void, ReorderArticlesParams> {
+class ReorderArticles extends UseCasePermission<void, ReorderArticlesParams> {
   final ArticleRepository repository;
   const ReorderArticles(this.repository);
 

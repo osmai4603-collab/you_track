@@ -4,7 +4,7 @@ import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/issues_repository.dart';
 
-class GetIssueById extends UseCase<Issue, GetIssueByIdParams> {
+class GetIssueById extends UseCasePermission<Issue, GetIssueByIdParams> {
   final IssuesRepository repository;
 
   GetIssueById(this.repository);

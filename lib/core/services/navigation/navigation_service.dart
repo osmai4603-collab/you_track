@@ -26,7 +26,7 @@ import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.d
 import 'package:issues_tracking/features/issues/presentation/cubits/issue_form_cubit.dart';
 import 'package:issues_tracking/features/issues/presentation/pages/issue_form.dart';
 import 'package:issues_tracking/features/issues/presentation/pages/issues_page.dart';
-import 'package:issues_tracking/features/projects/presentation/pages/project_view_page.dart';
+import 'package:issues_tracking/features/projects/presentation/pages/project_shell_view.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/project_settings_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/projects_list_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/project_template_selection_page.dart';

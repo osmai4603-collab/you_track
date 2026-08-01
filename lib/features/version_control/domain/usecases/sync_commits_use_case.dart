@@ -5,7 +5,7 @@ import 'package:issues_tracking/features/version_control/domain/entities/vcs_com
 import 'package:issues_tracking/features/version_control/domain/repositories/version_control_repository.dart';
 
 class SyncCommitsUseCase
-    extends UseCase<List<VcsCommitEntity>, SyncCommitsParams> {
+    extends UseCasePermission<List<VcsCommitEntity>, SyncCommitsParams> {
   final VersionControlRepository repository;
 
   SyncCommitsUseCase(this.repository);

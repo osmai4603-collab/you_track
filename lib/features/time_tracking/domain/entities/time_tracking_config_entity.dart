@@ -42,7 +42,12 @@ class TimeTrackingConfigEntity extends Entity {
 
   @override
   List<Object?> get props => [
-        projectId, enabled, estimationFieldId, spentTimeFieldId,
-        aggregateSpentTime, aggregateEstimation, updatedAt,
-      ];
+    projectId,
+    enabled,
+    estimationFieldId,
+    spentTimeFieldId,
+    aggregateSpentTime,
+    aggregateEstimation,
+    updatedAt,
+  ];
 }

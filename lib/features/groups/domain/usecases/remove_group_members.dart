@@ -16,7 +16,7 @@ class RemoveGroupMembersParams extends Params {
   List<Object?> get props => [groupId, userIds];
 }
 
-class RemoveGroupMembers extends UseCase<void, RemoveGroupMembersParams> {
+class RemoveGroupMembers extends UseCasePermission<void, RemoveGroupMembersParams> {
   final GroupsRepository repository;
 
   RemoveGroupMembers(this.repository);

@@ -96,13 +96,10 @@ class TimeTrackingConfigCubit extends Cubit<TimeTrackingConfigState> {
   final GetAvailablePeriodFields _getAvailablePeriodFieldsUseCase;
 
   TimeTrackingConfigCubit({
-    required GetTimeTrackingConfig getConfigUseCase,
-    required SaveTimeTrackingConfig saveConfigUseCase,
-    required GetAvailablePeriodFields getAvailablePeriodFieldsUseCase,
-  })  : _getConfigUseCase = getConfigUseCase,
-        _saveConfigUseCase = saveConfigUseCase,
-        _getAvailablePeriodFieldsUseCase = getAvailablePeriodFieldsUseCase,
-        super(const TimeTrackingConfigInitial());
+    required this._getConfigUseCase,
+    required this._saveConfigUseCase,
+    required this._getAvailablePeriodFieldsUseCase,
+  })  : super(const TimeTrackingConfigInitial());
 
   Future<void> loadConfig(String projectId) async {
     emit(const TimeTrackingConfigLoading());

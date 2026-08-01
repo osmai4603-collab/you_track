@@ -36,7 +36,7 @@ class BoardCard extends Entity {
   @override
   BoardCard copyWith({
     String? id,
-    String? issueKey,
+    String? projectId,
     String? summary,
     IssueStateEnum? state,
     IssuePriorityTypeEnum? priority,
@@ -53,7 +53,7 @@ class BoardCard extends Entity {
   }) {
     return BoardCard(
       id: id ?? this.id,
-      issueKey: issueKey ?? this.issueKey,
+      issueKey: projectId ?? this.issueKey,
       summary: summary ?? this.summary,
       state: state ?? this.state,
       priority: priority ?? this.priority,

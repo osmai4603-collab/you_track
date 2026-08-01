@@ -9,7 +9,9 @@ import 'package:issues_tracking/features/roles/presentation/pages/role_form_page
 import 'package:issues_tracking/features/roles/presentation/widgets/roles_table_view.dart';
 
 class RolesPage extends StatefulWidget {
-  const RolesPage({super.key});
+  final String? userId;
+
+  const RolesPage({super.key, this.userId});
 
   @override
   State<RolesPage> createState() => _RolesPageState();
@@ -61,7 +63,7 @@ class _RolesPageState extends State<RolesPage> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Expanded(child: RolesTableView()),
+                  Expanded(child: RolesTableView(userId: widget.userId)),
                 ],
               ),
               AnimatedPositioned(

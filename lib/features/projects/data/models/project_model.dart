@@ -18,6 +18,9 @@ class ProjectModel extends ProjectEntity {
     super.members,
     super.visibility,
     super.recommendedVisibility,
+    super.hasTimeTracking,
+    super.estimation,
+    super.spentTime,
   });
 
   factory ProjectModel.fromEntity(ProjectEntity entity) {
@@ -36,6 +39,9 @@ class ProjectModel extends ProjectEntity {
           .toList(),
       visibility: entity.visibility,
       recommendedVisibility: entity.recommendedVisibility,
+      hasTimeTracking: entity.hasTimeTracking,
+      estimation: entity.estimation,
+      spentTime: entity.spentTime,
     );
   }
 
@@ -57,6 +63,17 @@ class ProjectModel extends ProjectEntity {
       recommendedVisibility: _tryParseRecommendedVisibility(
         json['recommended_visibility'],
       ),
+      hasTimeTracking: json['has_time_tracking'] == true,
+      estimation: json['estimation'] is int
+          ? json['estimation'] as int
+          : (json['estimation'] is num
+              ? (json['estimation'] as num).toInt()
+              : null),
+      spentTime: json['spent_time'] is int
+          ? json['spent_time'] as int
+          : (json['spent_time'] is num
+              ? (json['spent_time'] as num).toInt()
+              : null),
     );
   }
 
@@ -76,6 +93,9 @@ class ProjectModel extends ProjectEntity {
           .toList(),
       'visibility': visibility,
       'recommended_visibility': recommendedVisibility,
+      'has_time_tracking': hasTimeTracking,
+      'estimation': estimation,
+      'spent_time': spentTime,
     };
   }
 

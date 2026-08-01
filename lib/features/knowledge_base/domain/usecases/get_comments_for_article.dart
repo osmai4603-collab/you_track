@@ -5,7 +5,7 @@ import 'package:issues_tracking/features/knowledge_base/domain/entities/article_
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_comment_repository.dart';
 
 class GetCommentsForArticle
-    extends UseCase<List<ArticleComment>, GetCommentsForArticleParams> {
+    extends UseCasePermission<List<ArticleComment>, GetCommentsForArticleParams> {
   final ArticleCommentRepository repository;
   const GetCommentsForArticle(this.repository);
 

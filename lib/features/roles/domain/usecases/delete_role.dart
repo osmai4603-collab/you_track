@@ -12,7 +12,7 @@ class DeleteRoleParams extends Params {
   List<Object?> get props => [id];
 }
 
-class DeleteRole extends UseCase<void, DeleteRoleParams> {
+class DeleteRole extends UseCasePermission<void, DeleteRoleParams> {
   final RolesRepository repository;
 
   DeleteRole(this.repository);

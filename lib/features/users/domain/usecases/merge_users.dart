@@ -13,7 +13,7 @@ class MergeUsersParams extends Params {
   List<Object?> get props => [primaryUserId, secondaryUserId];
 }
 
-class MergeUsers extends UseCase<UserEntity, MergeUsersParams> {
+class MergeUsers extends UseCasePermission<UserEntity, MergeUsersParams> {
   final UsersRepository repository;
   MergeUsers(this.repository);
 

@@ -202,7 +202,7 @@ class DeleteUserParams extends Params {
   List<Object?> get props => [userId];
 }
 
-class DeleteUser extends UseCase<void, DeleteUserParams> {
+class DeleteUser extends UseCasePermission<void, DeleteUserParams> {
   final UsersRepository repository;
   DeleteUser(this.repository);
 
@@ -291,7 +291,7 @@ class BanUserParams extends Params {
   List<Object?> get props => [userId, isBanned];
 }
 
-class BanUser extends UseCase<UserEntity, BanUserParams> {
+class BanUser extends UseCasePermission<UserEntity, BanUserParams> {
   final UsersRepository repository;
   BanUser(this.repository);
 
@@ -365,7 +365,7 @@ class RemoveGroupMembersParams extends Params {
   List<Object?> get props => [groupId, userIds];
 }
 
-class RemoveGroupMembers extends UseCase<void, RemoveGroupMembersParams> {
+class RemoveGroupMembers extends UseCasePermission<void, RemoveGroupMembersParams> {
   final GroupsRepository repository;
   RemoveGroupMembers(this.repository);
 
@@ -448,7 +448,7 @@ class UpdateUserParams extends Params {
   List<Object?> get props => [user];
 }
 
-class UpdateUser extends UseCase<UserEntity, UpdateUserParams> {
+class UpdateUser extends UseCasePermission<UserEntity, UpdateUserParams> {
   final UsersRepository repository;
   UpdateUser(this.repository);
 
@@ -510,7 +510,7 @@ class MergeUsersParams extends Params {
   List<Object?> get props => [primaryUserId, secondaryUserId];
 }
 
-class MergeUsers extends UseCase<UserEntity, MergeUsersParams> {
+class MergeUsers extends UseCasePermission<UserEntity, MergeUsersParams> {
   final UsersRepository repository;
   MergeUsers(this.repository);
 

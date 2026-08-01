@@ -3,7 +3,7 @@ import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_repository.dart';
 
-class DeleteArticle extends UseCase<void, DeleteArticleParams> {
+class DeleteArticle extends UseCasePermission<void, DeleteArticleParams> {
   final ArticleRepository repository;
   const DeleteArticle(this.repository);
 

@@ -4,7 +4,7 @@ import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_repository.dart';
 
-class UpdateArticle extends UseCase<Article, UpdateArticleParams> {
+class UpdateArticle extends UseCasePermission<Article, UpdateArticleParams> {
   final ArticleRepository repository;
   const UpdateArticle(this.repository);
 

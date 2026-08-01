@@ -3,7 +3,7 @@ import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_repository.dart';
 
-class PublishArticle extends UseCase<void, PublishArticleParams> {
+class PublishArticle extends UseCasePermission<void, PublishArticleParams> {
   final ArticleRepository repository;
   const PublishArticle(this.repository);
 

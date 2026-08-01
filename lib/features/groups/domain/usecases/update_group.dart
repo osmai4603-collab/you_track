@@ -1,5 +1,7 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
+import 'package:issues_tracking/core/usecase/permission_guard_mixin.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_entity.dart';
 import 'package:issues_tracking/features/groups/domain/repositories/groups_repository.dart';
@@ -30,24 +32,30 @@ class UpdateGroupParams extends Params {
       [id, name, description, autoJoin, autoJoinDomains, twoFactorAuth, groupType, logo];
 }
 
-class UpdateGroup extends UseCase<GroupEntity, UpdateGroupParams> {
+class UpdateGroup extends UseCasePermission<GroupEntity, UpdateGroupParams>
+    with PermissionGuardMixin<GroupEntity, UpdateGroupParams> {
   final GroupsRepository repository;
 
   UpdateGroup(this.repository);
 
   @override
+  Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
+
+  @override
   Future<Either<Failure, GroupEntity>> call(
       {required UpdateGroupParams params}) {
-    return repository.updateGroup(
-      GroupEntity(
-        id: params.id,
-        name: params.name,
-        description: params.description,
-        autoJoin: params.autoJoin ?? false,
-        autoJoinDomains: params.autoJoinDomains ?? const [],
-        twoFactorAuth: params.twoFactorAuth ?? 'optional',
-        groupType: params.groupType ?? 'users',
-        logo: params.logo,
+    return runWithPermissionCheck(
+      action: () async => repository.updateGroup(
+        GroupEntity(
+          id: params.id,
+          name: params.name,
+          description: params.description,
+          autoJoin: params.autoJoin ?? false,
+          autoJoinDomains: params.autoJoinDomains ?? const [],
+          twoFactorAuth: params.twoFactorAuth ?? 'optional',
+          groupType: params.groupType ?? 'users',
+          logo: params.logo,
+        ),
       ),
     );
   }

@@ -15,6 +15,9 @@ class ProjectEntity extends Entity {
   final List<ProjectMemberEntity> members;
   final String? visibility;
   final List<String> recommendedVisibility;
+  final bool hasTimeTracking;
+  final int? estimation;
+  final int? spentTime;
 
   const ProjectEntity({
     required this.id,
@@ -29,13 +32,16 @@ class ProjectEntity extends Entity {
     this.members = const [],
     this.visibility,
     this.recommendedVisibility = const [],
+    this.hasTimeTracking = false,
+    this.estimation,
+    this.spentTime,
   });
 
   @override
   ProjectEntity copyWith({
     String? id,
     String? name,
-    String? issueKey,
+    String? projectId,
     String? description,
     bool? isArchived,
     ProjectTemplateType? templateType,
@@ -46,11 +52,14 @@ class ProjectEntity extends Entity {
     List<ProjectMemberEntity>? members,
     String? visibility,
     List<String>? recommendedVisibility,
+    bool? hasTimeTracking,
+    int? estimation,
+    int? spentTime,
   }) {
     return ProjectEntity(
       id: id ?? this.id,
       name: name ?? this.name,
-      projectId: issueKey ?? this.projectId,
+      projectId: projectId ?? this.projectId,
       description: description ?? this.description,
       isArchived: isArchived ?? this.isArchived,
       templateType: templateType ?? this.templateType,
@@ -60,6 +69,9 @@ class ProjectEntity extends Entity {
       members: members ?? this.members,
       visibility: visibility ?? this.visibility,
       recommendedVisibility: recommendedVisibility ?? this.recommendedVisibility,
+      hasTimeTracking: hasTimeTracking ?? this.hasTimeTracking,
+      estimation: estimation ?? this.estimation,
+      spentTime: spentTime ?? this.spentTime,
     );
   }
 
@@ -77,5 +89,8 @@ class ProjectEntity extends Entity {
     members,
     visibility,
     recommendedVisibility,
+    hasTimeTracking,
+    estimation,
+    spentTime,
   ];
 }

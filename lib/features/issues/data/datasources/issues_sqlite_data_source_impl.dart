@@ -162,6 +162,24 @@ class IssuesSqliteDataSourceImpl implements IssuesRemoteDataSource {
   }
 
   @override
+  Future<List<IssueModel>> getProjectIssues(String projectId) async {
+    final rows = _sqlite.query(
+      table: _issuesTable.tableName,
+      where: '${_issuesTable.projectId} = ?',
+      whereArgs: [projectId],
+      orderBy: 'created_at DESC',
+    );
+
+    final issues = <IssueModel>[];
+    for (final row in rows) {
+      final issue = Map<String, dynamic>.from(row);
+      issues.add(await _populateIssueRelations(issue));
+    }
+
+    return issues;
+  }
+
+  @override
   Future<List<IssueModel>> getIssues(IssueFilter filter) async {
     List<String> conditions = [];
     List<dynamic> args = [];

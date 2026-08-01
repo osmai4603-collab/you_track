@@ -81,15 +81,15 @@ class _CreateProjectFormPageState extends State<CreateProjectFormPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                ProjectsHeader(
-                  breadcrumbs: [
-                    BreadcrumbItem(
-                      title: localization.projectsTitle,
-                      onTap: (ctx) => ctx.go(AppRouteKeys.projects),
-                    ),
-                    BreadcrumbItem(title: localization.createProject),
-                  ],
-                ),
+                // ProjectsHeader(
+                //   breadcrumbs: [
+                //     BreadcrumbItem(
+                //       title: localization.projectsTitle,
+                //       onTap: (ctx) => ctx.go(AppRouteKeys.projects),
+                //     ),
+                //     BreadcrumbItem(title: localization.createProject),
+                //   ],
+                // ),
                 // ── نموذج الإدخال ──────────────────────────────
                 Padding(
                   padding:  .symmetric(horizontal: AppSpacing.extraLarge),

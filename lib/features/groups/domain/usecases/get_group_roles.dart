@@ -13,7 +13,7 @@ class GetGroupRolesParams extends Params {
   List<Object?> get props => [groupId];
 }
 
-class GetGroupRoles extends UseCase<List<GroupRoleAssignmentEntity>, GetGroupRolesParams> {
+class GetGroupRoles extends UseCasePermission<List<GroupRoleAssignmentEntity>, GetGroupRolesParams> {
   final GroupsRepository repository;
 
   GetGroupRoles(this.repository);

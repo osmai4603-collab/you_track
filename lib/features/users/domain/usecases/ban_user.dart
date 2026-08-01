@@ -13,7 +13,7 @@ class BanUserParams extends Params {
   List<Object?> get props => [userId, isBanned];
 }
 
-class BanUser extends UseCase<UserEntity, BanUserParams> {
+class BanUser extends UseCasePermission<UserEntity, BanUserParams> {
   final UsersRepository repository;
   BanUser(this.repository);
 

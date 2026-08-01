@@ -5,7 +5,7 @@ import 'package:issues_tracking/features/version_control/domain/entities/vcs_use
 import 'package:issues_tracking/features/version_control/domain/repositories/version_control_repository.dart';
 
 class ManageUserMappingUseCase
-    extends UseCase<List<VcsUserMappingEntity>, ManageUserMappingParams> {
+    extends UseCasePermission<List<VcsUserMappingEntity>, ManageUserMappingParams> {
   final VersionControlRepository repository;
 
   ManageUserMappingUseCase(this.repository);

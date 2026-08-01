@@ -1,5 +1,7 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import '../../../../core/errors/failure.dart';
+import '../../../../core/usecase/permission_guard_mixin.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../repositories/projects_repository.dart';
 
@@ -11,13 +13,19 @@ class DeleteProjectParams extends Params {
   List<Object?> get props => [id];
 }
 
-class DeleteProjectUseCase implements UseCase<Unit, DeleteProjectParams> {
+class DeleteProjectUseCase extends UseCasePermission<Unit, DeleteProjectParams>
+    with PermissionGuardMixin<Unit, DeleteProjectParams> {
   final ProjectsRepository repository;
 
   DeleteProjectUseCase(this.repository);
 
   @override
+  Permission get requiredPermission => Permission.projectDeleteProject;
+
+  @override
   Future<Either<Failure, Unit>> call({required DeleteProjectParams params}) {
-    return repository.deleteProject(params.id);
+    return runWithPermissionCheck(
+      action: () async => repository.deleteProject(params.id),
+    );
   }
 }

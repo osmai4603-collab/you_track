@@ -1,11 +1,12 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article_comment.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_comment_repository.dart';
 
 class AddComment
-    extends UseCase<ArticleComment, AddCommentParams> {
+    extends UseCasePermission<ArticleComment, AddCommentParams> {
   final ArticleCommentRepository repository;
   const AddComment(this.repository);
 
@@ -15,6 +16,9 @@ class AddComment
   }) async {
     return await repository.addComment(params.comment);
   }
+
+  @override
+  Permission get requiredPermission => Permission.commentCreateComment;
 }
 
 class AddCommentParams extends Params {

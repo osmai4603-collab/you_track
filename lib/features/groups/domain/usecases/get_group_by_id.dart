@@ -13,7 +13,7 @@ class GetGroupByIdParams extends Params {
   List<Object?> get props => [id];
 }
 
-class GetGroupById extends UseCase<GroupEntity, GetGroupByIdParams> {
+class GetGroupById extends UseCasePermission<GroupEntity, GetGroupByIdParams> {
   final GroupsRepository repository;
 
   GetGroupById(this.repository);

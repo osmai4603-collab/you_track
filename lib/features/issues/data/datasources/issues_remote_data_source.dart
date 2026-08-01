@@ -3,15 +3,13 @@ import 'package:issues_tracking/features/issues/data/models/build_model.dart';
 import 'package:issues_tracking/features/issues/data/models/sprint_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/issue_filter.dart';
-import '../../domain/entities/sprint.dart';
-import '../../domain/entities/tag.dart';
-import '../../domain/entities/issue_link.dart';
 import '../models/issue_model.dart';
 import '../models/tag_model.dart';
 import '../models/issue_link_model.dart';
 
 abstract class IssuesRemoteDataSource {
   Future<List<IssueModel>> getIssues(IssueFilter filter);
+  Future<List<IssueModel>> getProjectIssues(String projectId);
   Stream<IssueModel> streamIssues(IssueFilter filter);
   Future<IssueModel> getIssueById(String id);
   Future<List<TagModel>> getAllTags();
@@ -109,6 +107,21 @@ class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
     );
 
     return (response as List).map((e) => IssueModel.fromJson(e)).toList();
+  }
+
+  @override
+  Future<List<IssueModel>> getProjectIssues(String projectId) async {
+    try {
+      final response = await supabase
+          .from('issues')
+          .select('id, summary, issue_key')
+          .eq('project_id', projectId)
+          .order('created_at', ascending: false);
+
+      return (response as List).map((e) => IssueModel.fromJson(e)).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   void _fetchAndEmit(PostgresChangePayload payload) async {

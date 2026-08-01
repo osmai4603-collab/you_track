@@ -4,7 +4,7 @@ import '../../../../core/usecase/usecase.dart';
 import '../repositories/custom_fields_repository.dart';
 
 class ReplaceFieldValueUseCase
-    extends UseCase<void, ReplaceFieldValueParams> {
+    extends UseCasePermission<void, ReplaceFieldValueParams> {
   final CustomFieldsRepository repository;
 
   ReplaceFieldValueUseCase(this.repository);

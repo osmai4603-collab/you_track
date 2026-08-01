@@ -38,17 +38,17 @@ class _ProjectMembersPageState extends State<ProjectMembersPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        ProjectsHeader(
-          breadcrumbs: [
-            BreadcrumbItem(title: localization.projectsTitle),
-            BreadcrumbItem(title: 'People'),
-          ],
-          trailing: FilledButton.icon(
-            onPressed: () => AddProjectMembersPage.show(context, projectId: widget.projectId),
-            icon: const Icon(AppIcons.personAdd, size: 16),
-            label: Text(localization.addPeopleButton),
-          ),
-        ),
+        // ProjectsHeader(
+        //   breadcrumbs: [
+        //     BreadcrumbItem(title: localization.projectsTitle),
+        //     BreadcrumbItem(title: 'People'),
+        //   ],
+        //   trailing: FilledButton.icon(
+        //     onPressed: () => AddProjectMembersPage.show(context, projectId: widget.projectId),
+        //     icon: const Icon(AppIcons.personAdd, size: 16),
+        //     label: Text(localization.addPeopleButton),
+        //   ),
+        // ),
         // ── القائمة ──────────────────────────────────
         Expanded(
           child: BlocBuilder<ProjectMembersCubit, ProjectMembersState>(

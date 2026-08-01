@@ -5,7 +5,7 @@ import 'package:issues_tracking/features/version_control/domain/entities/vcs_int
 import 'package:issues_tracking/features/version_control/domain/repositories/version_control_repository.dart';
 
 class TestConnectionUseCase
-    extends UseCase<VcsIntegrationEntity, TestConnectionParams> {
+    extends UseCasePermission<VcsIntegrationEntity, TestConnectionParams> {
   final VersionControlRepository repository;
 
   TestConnectionUseCase(this.repository);

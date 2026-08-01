@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import '../cubits/time_tracking_config_cubit.dart';
 
 class TimeTrackingToggle extends StatelessWidget {
-  final TimeTrackingConfigLoaded state;
+  final bool enabled;
   final VoidCallback onToggle;
 
   const TimeTrackingToggle({
     super.key,
-    required this.state,
+    required this.enabled,
     required this.onToggle,
   });
 
@@ -15,10 +14,11 @@ class TimeTrackingToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return SwitchListTile(
       title: const Text('Enable Time Tracking'),
+      controlAffinity: ListTileControlAffinity.leading,
       subtitle: const Text(
         'Allow team members to track time spent on issues',
       ),
-      value: state.config.enabled,
+      value: enabled,
       onChanged: (value) {
         if (!value) {
           _showDisableConfirmation(context);

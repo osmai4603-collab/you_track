@@ -56,15 +56,15 @@ class _ProjectTemplateSelectionPageState
       child: Column(
         crossAxisAlignment: .start,
         children: [
-          ProjectsHeader(
-            breadcrumbs: [
-              BreadcrumbItem(
-                title: localization.projectsTitle,
-                onTap: (ctx) => ctx.go(AppRouteKeys.projects),
-              ),
-              BreadcrumbItem(title: localization.selectTemplateTitle),
-            ],
-          ),
+          // ProjectsHeader(
+          //   breadcrumbs: [
+          //     BreadcrumbItem(
+          //       title: localization.projectsTitle,
+          //       onTap: (ctx) => ctx.go(AppRouteKeys.projects),
+          //     ),
+          //     BreadcrumbItem(title: localization.selectTemplateTitle),
+          //   ],
+          // ),
           Expanded(
             child: BlocBuilder<ProjectCreationCubit, ProjectCreationState>(
               builder: (context, state) {

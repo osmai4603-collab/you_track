@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
-import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/entities/issue_data.dart';
 import 'package:issues_tracking/core/widgets/text_hover_widget.dart';
-import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
+import 'package:issues_tracking/features/issues/data/datasources/issues_remote_data_source.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
-import 'package:issues_tracking/features/projects/presentation/pages/project_notifications_settings_page.dart';
+import 'package:get_it/get_it.dart';
 
 class ProjectNotificationsSettingsSection extends StatefulWidget {
   const ProjectNotificationsSettingsSection({super.key});
@@ -38,13 +36,9 @@ class _ProjectNotificationsSettingsSectionState
     extends State<ProjectNotificationsSettingsSection> {
   IssueData? _selectedTemplate;
   bool _showDetailsPanel = false;
-  Map<String, dynamic>? _selectedTemplateDetails;
-
-  final List<IssueData> _issues = [
-    IssueData(id: 'issue-1', summary: 'Test Issue 1', issueKey: 'DEMO-16'),
-    IssueData(id: 'issue-2', summary: 'Test Issue 2', issueKey: 'DEMO-17'),
-    IssueData(id: 'issue-3', summary: 'Test Issue 3', issueKey: 'DEMO-18'),
-  ];
+  bool _isLoadingIssues = false;
+  String? _loadedProjectId;
+  List<IssueData> _issues = [];
 
   final List<TemplateData> _templates = [
     TemplateData(
@@ -123,6 +117,50 @@ class _ProjectNotificationsSettingsSectionState
     final projectId = context.read<ProjectDetailsCubit>().state.project?.id;
     if (projectId != null) {
       context.read<ProjectDetailsCubit>().loadProject(projectId);
+      _loadIssuesForProject(projectId);
+    }
+  }
+
+  Future<void> _loadIssuesForProject(String projectId) async {
+    if (_isLoadingIssues && _loadedProjectId == projectId) {
+      return;
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      _isLoadingIssues = true;
+      _loadedProjectId = projectId;
+    });
+
+    try {
+      final dataSource = GetIt.instance<IssuesRemoteDataSource>();
+      final issues = await dataSource.getProjectIssues(projectId);
+
+      if (!mounted) return;
+
+      setState(() {
+        _issues = issues
+            .map((issue) => IssueData(
+                  id: issue.id,
+                  summary: issue.summary,
+                  issueKey: issue.issueKey,
+                ))
+            .toList();
+        _selectedTemplate = _issues.isNotEmpty
+            ? (_issues.any((issue) => issue.id == _selectedTemplate?.id)
+                ? _issues.firstWhere((issue) => issue.id == _selectedTemplate!.id)
+                : _issues.first)
+            : null;
+        _isLoadingIssues = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _issues = [];
+        _selectedTemplate = null;
+        _isLoadingIssues = false;
+      });
     }
   }
 
@@ -138,6 +176,11 @@ class _ProjectNotificationsSettingsSectionState
 
     return BlocBuilder<ProjectDetailsCubit, ProjectDetailsState>(
       builder: (context, state) {
+        final projectId = state.project?.id;
+        if (projectId != null && projectId != _loadedProjectId) {
+          _loadIssuesForProject(projectId);
+        }
+
         if (state.status == ProjectDetailsStatus.loading) {
           return const Center(child: CircularProgressIndicator());
         }
@@ -269,16 +312,15 @@ class _ProjectNotificationsSettingsSectionState
                 style: textTheme.bodyMedium?.copyWith(color: Colors.grey),
               ),
               SizedBox(
-                width: 150,
+                width: 180,
                 child: DropdownButtonHideUnderline(
                   child: DropdownButton<IssueData>(
-                    menuWidth: 150,
+                    menuWidth: 180,
                     value: _getSelectedIssue(),
                     isDense: true,
-
                     hint: TextHoverWidget(
                       text: 'no selected',
-                      style: TextStyle(fontSize: 14),
+                      style: const TextStyle(fontSize: 14),
                       styleHover: TextStyle(
                         fontSize: 14,
                         color: colors.secondary,
@@ -293,7 +335,9 @@ class _ProjectNotificationsSettingsSectionState
                       return DropdownMenuItem<IssueData>(
                         value: issue,
                         child: Text(
-                          issue.issueKey,
+                          issue.issueKey.isNotEmpty
+                              ? issue.issueKey
+                              : issue.summary,
                           style: const TextStyle(fontSize: 14),
                         ),
                       );
@@ -302,7 +346,9 @@ class _ProjectNotificationsSettingsSectionState
                     selectedItemBuilder: (context) => _issues.map((issue) {
                       return Align(
                         child: Text(
-                          issue.issueKey,
+                          issue.issueKey.isNotEmpty
+                              ? issue.issueKey
+                              : issue.summary,
                           style: const TextStyle(fontSize: 14),
                         ),
                       );
@@ -345,10 +391,16 @@ class _ProjectNotificationsSettingsSectionState
   }
 
   IssueData? _getSelectedIssue() {
-    return _issues.firstWhere(
-      (issue) => issue.issueKey == _selectedTemplate,
-      orElse: () => _issues.first,
-    );
+    if (_selectedTemplate != null &&
+        _issues.any((issue) => issue.id == _selectedTemplate!.id)) {
+      return _issues.firstWhere((issue) => issue.id == _selectedTemplate!.id);
+    }
+
+    if (_issues.isNotEmpty) {
+      return _issues.first;
+    }
+
+    return null;
   }
 
   Widget _buildTemplatesTreeTable(ColorScheme colors, TextTheme textTheme) {

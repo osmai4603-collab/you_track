@@ -7,7 +7,9 @@ import 'package:issues_tracking/features/groups/presentation/bloc/groups_state.d
 import 'package:issues_tracking/features/groups/presentation/widgets/group_table_row.dart';
 
 class GroupsTableView extends StatelessWidget {
-  const GroupsTableView({super.key});
+  final String? userId;
+
+  const GroupsTableView({super.key, this.userId});
 
   @override
   Widget build(BuildContext context) {
@@ -17,7 +19,11 @@ class GroupsTableView extends StatelessWidget {
     return BlocBuilder<GroupsBloc, GroupsState>(
       builder: (context, state) {
         if (state is GroupsLoaded) {
-          if (state.groups.isEmpty) {
+          final displayedGroups = userId != null
+              ? state.groups.where((g) => g.members.any((m) => m.userId == userId)).toList()
+              : state.groups;
+
+          if (displayedGroups.isEmpty) {
             return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -53,9 +59,9 @@ class GroupsTableView extends StatelessWidget {
               Expanded(
                 child: ListView.separated(
                   separatorBuilder: (_, index) => const Divider(height: 1),
-                  itemCount: state.groups.length,
+                  itemCount: displayedGroups.length,
                   itemBuilder: (context, index) {
-                    final group = state.groups[index];
+                    final group = displayedGroups[index];
                     return GroupTableRow(
                       group: group,
                       isSelected: state.selectedGroupId == group.id,

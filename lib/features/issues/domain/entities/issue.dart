@@ -78,7 +78,7 @@ class Issue extends Entity {
   @override
   Issue copyWith({
     String? id,
-    String? issueKey,
+    String? projectId,
     int? issueNumber,
     String? summary,
     String? description,
@@ -116,7 +116,7 @@ class Issue extends Entity {
   }) {
     return Issue(
       id: id ?? this.id,
-      issueKey: issueKey ?? this.issueKey,
+      issueKey: projectId ?? this.issueKey,
       issueNumber: issueNumber ?? this.issueNumber,
       summary: summary ?? this.summary,
       description: description ?? this.description,

@@ -5,7 +5,12 @@ import '../cubits/custom_attributes_cubit.dart';
 import 'custom_attribute_form_dialog.dart';
 
 class CustomAttributesSection extends StatefulWidget {
-  const CustomAttributesSection({super.key});
+  final String? selectedWorkTypeName;
+
+  const CustomAttributesSection({
+    super.key,
+    this.selectedWorkTypeName,
+  });
 
   @override
   State<CustomAttributesSection> createState() => _CustomAttributesSectionState();
@@ -45,6 +50,34 @@ class _CustomAttributesSectionState extends State<CustomAttributesSection> {
             else if (state is CustomAttributesError)
               Center(child: SelectableText(state.message))
             else if (state is CustomAttributesLoaded) ...[
+              if (widget.selectedWorkTypeName != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.check_circle_outline,
+                          size: 18,
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Text(
+                            'Showing attributes for ${widget.selectedWorkTypeName}',
+                            style: Theme.of(context).textTheme.bodyMedium,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               if (state.attributes.isEmpty)
                 _buildEmptyState(context)
               else

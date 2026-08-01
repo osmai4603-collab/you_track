@@ -22,16 +22,16 @@ import 'package:issues_tracking/features/projects/presentation/cubits/project_de
 import 'package:issues_tracking/features/projects/presentation/cubits/project_members_cubit.dart';
 import 'package:issues_tracking/core/init_dependencies.dart' show get_it;
 
-class ProjectView extends StatefulWidget {
+class ProjectShellView extends StatefulWidget {
   final String projectId;
 
-  const ProjectView({super.key, required this.projectId});
+  const ProjectShellView({super.key, required this.projectId});
 
   @override
-  State<ProjectView> createState() => _ProjectViewState();
+  State<ProjectShellView> createState() => _ProjectShellViewState();
 }
 
-class _ProjectViewState extends State<ProjectView> {
+class _ProjectShellViewState extends State<ProjectShellView> {
   late final ProjectMembersCubit _membersCubit;
   late final ProjectDetailsCubit _projectDetailsCubit;
   late final IssuesBloc _issuesBloc;

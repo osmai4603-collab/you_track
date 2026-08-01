@@ -11,7 +11,7 @@ class DeleteUserParams extends Params {
   List<Object?> get props => [userId];
 }
 
-class DeleteUser extends UseCase<void, DeleteUserParams> {
+class DeleteUser extends UseCasePermission<void, DeleteUserParams> {
   final UsersRepository repository;
   DeleteUser(this.repository);
 

@@ -70,15 +70,15 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ProjectsHeader(
-              breadcrumbs: [
-                BreadcrumbItem(
-                  title: localization.projectsTitle,
-                  onTap: (ctx) => ctx.go(AppRouteKeys.projects),
-                ),
-                BreadcrumbItem(title: project.name),
-              ],
-            ),
+            // ProjectsHeader(
+            //   breadcrumbs: [
+            //     BreadcrumbItem(
+            //       title: localization.projectsTitle,
+            //       onTap: (ctx) => ctx.go(AppRouteKeys.projects),
+            //     ),
+            //     BreadcrumbItem(title: project.name),
+            //   ],
+            // ),
             // ── التبويبات الداخلية ──────────────────────────
             Container(
               decoration: BoxDecoration(

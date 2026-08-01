@@ -18,7 +18,7 @@ import 'package:issues_tracking/features/projects/presentation/pages/project_mem
 import 'package:issues_tracking/features/projects/presentation/pages/project_settings_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/project_template_details_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/project_template_selection_page.dart';
-import 'package:issues_tracking/features/projects/presentation/pages/project_view_page.dart';
+import 'package:issues_tracking/features/projects/presentation/pages/project_shell_view.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/projects_list_page.dart';
 import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
 import 'package:issues_tracking/features/projects/presentation/widgets/settings_sections/project_general_settings_section.dart';
@@ -110,7 +110,7 @@ final class ProjectNavigation extends StatefulShellBranch {
                 final projectId = state.pathParameters['projectId']!;
                 return CustomTransitionPage(
                   key: state.pageKey,
-                  child: ProjectView(projectId: projectId),
+                  child: ProjectShellView(projectId: projectId),
                   transitionsBuilder: _fadeTransition,
                 );
               },

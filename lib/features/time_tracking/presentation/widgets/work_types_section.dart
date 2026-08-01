@@ -5,7 +5,14 @@ import '../cubits/work_types_cubit.dart';
 import 'work_type_form_dialog.dart';
 
 class WorkTypesSection extends StatefulWidget {
-  const WorkTypesSection({super.key});
+  final String? selectedWorkTypeId;
+  final ValueChanged<WorkTypeEntity>? onWorkTypeSelected;
+
+  const WorkTypesSection({
+    super.key,
+    this.selectedWorkTypeId,
+    this.onWorkTypeSelected,
+  });
 
   @override
   State<WorkTypesSection> createState() => _WorkTypesSectionState();
@@ -94,9 +101,15 @@ class _WorkTypesSectionState extends State<WorkTypesSection> {
       },
       itemBuilder: (context, index) {
         final workType = workTypes[index];
+        final isSelected = widget.selectedWorkTypeId == workType.id;
+
         return Card(
           key: ValueKey(workType.id),
+          color: isSelected
+              ? Theme.of(context).colorScheme.primaryContainer
+              : null,
           child: ListTile(
+            onTap: () => widget.onWorkTypeSelected?.call(workType),
             leading: const Icon(Icons.drag_handle),
             title: Text(workType.name),
             subtitle: workType.description != null ? Text(workType.description!) : null,

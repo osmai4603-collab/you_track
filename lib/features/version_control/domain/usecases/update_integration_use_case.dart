@@ -5,7 +5,7 @@ import 'package:issues_tracking/features/version_control/domain/entities/vcs_int
 import 'package:issues_tracking/features/version_control/domain/repositories/version_control_repository.dart';
 
 class UpdateIntegrationUseCase
-    extends UseCase<VcsIntegrationEntity, UpdateIntegrationParams> {
+    extends UseCasePermission<VcsIntegrationEntity, UpdateIntegrationParams> {
   final VersionControlRepository repository;
 
   UpdateIntegrationUseCase(this.repository);

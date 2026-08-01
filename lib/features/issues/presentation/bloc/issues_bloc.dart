@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
+import 'package:issues_tracking/core/init_dependencies.dart';
 import 'package:issues_tracking/features/issues/domain/entities/tag.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_issues.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/stream_issues.dart';
@@ -9,8 +11,9 @@ import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dar
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:fpdart/fpdart.dart';
-import 'issues_event.dart';
-import 'issues_state.dart';
+import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
+import 'package:issues_tracking/features/issues/presentation/bloc/issues_state.dart';
 
 class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
   final GetIssues getIssues;
@@ -59,12 +62,29 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
     // final tagsResult = await repository.getAllTags();
     // final tags = tagsResult.fold((_) => <Tag>[], (t) => t);
 
+    // Check if the current user has permission to read issues
+    final userSession = _getUserSession();
+    if (userSession == null) {
+      emit(IssuesError('You must be logged in to view issues'));
+      return;
+    }
+
+    final hasPermission = userSession.hasPermission(Permission.issueReadIssue);
+    if (!hasPermission) {
+      emit(IssuesError('You don\'t have permission to view issues'));
+      return;
+    }
+    
     _subscription =
         streamIssues(params: GetIssuesParams(filter: _currentFilter)).listen((
           result,
         ) {
           add(IssuesStreamUpdated(result));
         });
+  }
+
+  UserSession? _getUserSession() {
+    return get_it<UserSession>();
   }
 
   Future<void> _onIssuesStreamUpdated(
@@ -113,9 +133,8 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
     Emitter<IssuesState> emit,
   ) async {
     if (state is IssuesLoaded) {
-      final current = state as IssuesLoaded;
       emit(
-        current.copyWith(
+        (state as IssuesLoaded).copyWith(
           selectedIssueId: event.issueId,
           clearSelectedIssue: event.issueId == null,
         ),
@@ -127,7 +146,6 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
     UpdateFilter event,
     Emitter<IssuesState> emit,
   ) async {
-    final current = state;
     emit(IssuesLoading());
 
     _subscription?.cancel();

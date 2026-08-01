@@ -23,3 +23,7 @@ class NetworkFailure extends Failure {
 class ValidationFailure extends Failure {
   const ValidationFailure([super.message = 'بيانات غير صالحة']);
 }
+
+class PermissionDeniedFailure extends Failure {
+  const PermissionDeniedFailure([super.message = 'لا يملك المستخدم الحالي صلاحية لتنفيذ هذه العملية']);
+}

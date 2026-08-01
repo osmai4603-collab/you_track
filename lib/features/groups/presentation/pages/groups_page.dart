@@ -9,7 +9,9 @@ import 'package:issues_tracking/features/groups/presentation/pages/group_form_pa
 import 'package:issues_tracking/features/groups/presentation/widgets/groups_table_view.dart';
 
 class GroupsPage extends StatefulWidget {
-  const GroupsPage({super.key});
+  final String? userId;
+
+  const GroupsPage({super.key, this.userId});
 
   @override
   State<GroupsPage> createState() => _GroupsPageState();
@@ -60,7 +62,7 @@ class _GroupsPageState extends State<GroupsPage> {
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Expanded(child: GroupsTableView()),
+                  Expanded(child: GroupsTableView(userId: widget.userId)),
                 ],
               ),
               AnimatedPositioned(
