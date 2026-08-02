@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/features/custom_fields/domain/entities/custom_field_entity.dart';
-import 'package:issues_tracking/core/enums/custom_field_type_enum.dart';
 
 class CustomFieldDetailsPanel extends StatelessWidget {
   final CustomFieldEntity field;
@@ -64,7 +63,7 @@ class CustomFieldDetailsPanel extends StatelessWidget {
               _buildDetailRow('Visibility', field.visibility, textTheme, colors),
               _buildDetailRow(
                 'Access Control',
-                field.accessControl?['type']?.toString() ?? 'Everyone',
+                field.accessControl['type']?.toString() ?? 'Everyone',
                 textTheme,
                 colors,
               ),

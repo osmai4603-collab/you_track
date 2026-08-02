@@ -53,7 +53,7 @@ class BoardCard extends Entity {
   }) {
     return BoardCard(
       id: id ?? this.id,
-      issueKey: projectId ?? this.issueKey,
+      issueKey: projectId ?? issueKey,
       summary: summary ?? this.summary,
       state: state ?? this.state,
       priority: priority ?? this.priority,

@@ -1,7 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/features/roles/data/datasources/roles_remote_data_source.dart';
-import 'package:issues_tracking/features/roles/data/models/role_model.dart';
 import 'package:issues_tracking/features/roles/domain/entities/role_entity.dart';
 import 'package:issues_tracking/features/roles/domain/repositories/roles_repository.dart';
 

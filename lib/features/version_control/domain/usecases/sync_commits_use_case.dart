@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/version_control/domain/entities/vcs_commit_entity.dart';
@@ -6,6 +7,9 @@ import 'package:issues_tracking/features/version_control/domain/repositories/ver
 
 class SyncCommitsUseCase
     extends UseCasePermission<List<VcsCommitEntity>, SyncCommitsParams> {
+  @override
+  Permission get requiredPermission => Permission.projectUpdateProject;
+
   final VersionControlRepository repository;
 
   SyncCommitsUseCase(this.repository);

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:issues_tracking/core/utils/printing.dart';
 import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 

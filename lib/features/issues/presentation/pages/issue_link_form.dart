@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:issues_tracking/core/entities/entity.dart';
 import 'package:issues_tracking/core/enums/issue_link_type.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';

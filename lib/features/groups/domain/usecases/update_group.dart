@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
-import 'package:issues_tracking/core/usecase/permission_guard_mixin.dart';
+
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_entity.dart';
 import 'package:issues_tracking/features/groups/domain/repositories/groups_repository.dart';
@@ -28,12 +28,19 @@ class UpdateGroupParams extends Params {
   });
 
   @override
-  List<Object?> get props =>
-      [id, name, description, autoJoin, autoJoinDomains, twoFactorAuth, groupType, logo];
+  List<Object?> get props => [
+    id,
+    name,
+    description,
+    autoJoin,
+    autoJoinDomains,
+    twoFactorAuth,
+    groupType,
+    logo,
+  ];
 }
 
-class UpdateGroup extends UseCasePermission<GroupEntity, UpdateGroupParams>
-    with PermissionGuardMixin<GroupEntity, UpdateGroupParams> {
+class UpdateGroup extends UseCasePermission<GroupEntity, UpdateGroupParams> {
   final GroupsRepository repository;
 
   UpdateGroup(this.repository);
@@ -42,10 +49,12 @@ class UpdateGroup extends UseCasePermission<GroupEntity, UpdateGroupParams>
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
   @override
-  Future<Either<Failure, GroupEntity>> call(
-      {required UpdateGroupParams params}) {
-    return runWithPermissionCheck(
-      action: () async => repository.updateGroup(
+  Future<Either<Failure, GroupEntity>> call({
+    required UpdateGroupParams params,
+  }) async {
+    final result = await hasPermission();
+    return result.fold((left) => Left(left), (right) async {
+      return await repository.updateGroup(
         GroupEntity(
           id: params.id,
           name: params.name,
@@ -56,7 +65,7 @@ class UpdateGroup extends UseCasePermission<GroupEntity, UpdateGroupParams>
           groupType: params.groupType ?? 'users',
           logo: params.logo,
         ),
-      ),
-    );
+      );
+    });
   }
 }

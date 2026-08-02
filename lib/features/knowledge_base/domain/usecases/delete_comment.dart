@@ -1,9 +1,13 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_comment_repository.dart';
 
 class DeleteComment extends UseCasePermission<void, DeleteCommentParams> {
+  @override
+  Permission get requiredPermission => Permission.commentDeleteArticleComment;
+
   final ArticleCommentRepository repository;
   const DeleteComment(this.repository);
 

@@ -6,8 +6,6 @@ import 'package:issues_tracking/core/constants/app_icons.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
-import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
-import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
 import '../cubits/projects_list_cubit.dart';
 import '../cubits/project_creation_cubit.dart';
 

@@ -150,10 +150,10 @@ class CustomFieldsRemoteDataSourceImpl implements CustomFieldsRemoteDataSource {
     String? filterValuesBasedOn,
   }) async {
     final payload = <String, dynamic>{
-      if (visibleTo != null) 'visible_to': visibleTo,
-      if (updatableBy != null) 'updatable_by': updatableBy,
-      if (showOnlyWhen != null) 'show_only_when': showOnlyWhen,
-      if (filterValuesBasedOn != null) 'filter_values_based_on': filterValuesBasedOn,
+      'visible_to': ?visibleTo,
+      'updatable_by': ?updatableBy,
+      'show_only_when': ?showOnlyWhen,
+      'filter_values_based_on': ?filterValuesBasedOn,
     };
     final response = await supabase
         .from('custom_fields')

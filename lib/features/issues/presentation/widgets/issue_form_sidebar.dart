@@ -346,7 +346,7 @@ class IssueFormSidebar extends StatelessWidget {
                   },
                 ),
               )
-              .toList(),
+              ,
         ],
       ),
     );

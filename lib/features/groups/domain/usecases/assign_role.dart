@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_role_assignment_entity.dart';
@@ -20,6 +21,9 @@ class AssignRoleParams extends Params {
 }
 
 class AssignRole extends UseCasePermission<GroupRoleAssignmentEntity, AssignRoleParams> {
+  @override
+  Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
+
   final GroupsRepository repository;
 
   AssignRole(this.repository);

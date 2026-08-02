@@ -1,9 +1,13 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/version_control/domain/repositories/version_control_repository.dart';
 
 class DeleteIntegrationUseCase extends UseCasePermission<void, DeleteIntegrationParams> {
+  @override
+  Permission get requiredPermission => Permission.projectUpdateProject;
+
   final VersionControlRepository repository;
 
   DeleteIntegrationUseCase(this.repository);

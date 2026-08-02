@@ -49,11 +49,9 @@ class ProjectMembersCubit extends Cubit<ProjectMembersState> {
   final AddProjectMemberUseCase _addProjectMemberUseCase;
 
   ProjectMembersCubit({
-    required GetProjectMembersUseCase getProjectMembersUseCase,
-    required AddProjectMemberUseCase addProjectMemberUseCase,
-  }) : _getProjectMembersUseCase = getProjectMembersUseCase,
-       _addProjectMemberUseCase = addProjectMemberUseCase,
-       super(const ProjectMembersState());
+    required this._getProjectMembersUseCase,
+    required this._addProjectMemberUseCase,
+  }) : super(const ProjectMembersState());
 
   Future<void> loadMembers(String projectId) async {
     emit(state.copyWith(status: ProjectMembersStatus.loading));

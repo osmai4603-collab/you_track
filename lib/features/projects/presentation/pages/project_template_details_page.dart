@@ -5,8 +5,6 @@ import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
-import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
-import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
 import '../cubits/project_creation_cubit.dart';
 
 /// صفحة 3: تفاصيل القالب المختار وحقوله الافتراضية
@@ -27,9 +25,6 @@ class ProjectTemplateDetailsPage extends StatelessWidget {
     return BlocBuilder<ProjectCreationCubit, ProjectCreationState>(
       builder: (context, state) {
         final template = state.selectedTemplate;
-        if (template == null) {
-          return const Center(child: CircularProgressIndicator());
-        }
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,

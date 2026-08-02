@@ -38,7 +38,7 @@ class UserEntity extends Entity {
     return UserEntity(
       id: id ?? this.id,
       email: email ?? this.email,
-      userName: clearFullName ? null : (fullName ?? this.userName),
+      userName: clearFullName ? null : (fullName ?? userName),
       avatarUrl: clearAvatarUrl ? null : (avatarUrl ?? this.avatarUrl),
       createdAt: createdAt ?? this.createdAt,
       groups: groups ?? this.groups,

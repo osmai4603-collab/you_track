@@ -1,9 +1,13 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_comment_repository.dart';
 
 class ResolveComment extends UseCasePermission<void, ResolveCommentParams> {
+  @override
+  Permission get requiredPermission => Permission.commentUpdateArticleComment;
+
   final ArticleCommentRepository repository;
   const ResolveComment(this.repository);
 
@@ -11,10 +15,7 @@ class ResolveComment extends UseCasePermission<void, ResolveCommentParams> {
   Future<Either<Failure, void>> call({
     required ResolveCommentParams params,
   }) async {
-    return await repository.resolveComment(
-      params.commentId,
-      params.resolvedBy,
-    );
+    return await repository.resolveComment(params.commentId, params.resolvedBy);
   }
 }
 

@@ -11,11 +11,11 @@ class IssueData extends Entity {
     required this.issueKey,
   });
   @override
-  IssueData copyWith({String? id, String? summary, String? projectId}) {
+  IssueData copyWith({String? id, String? summary, String? issueKey}) {
     return IssueData(
       id: id ?? this.id,
       summary: summary ?? this.summary,
-      issueKey: projectId ?? this.issueKey,
+      issueKey: issueKey ?? this.issueKey,
     );
   }
 

@@ -47,16 +47,12 @@ class CustomAttributesCubit extends Cubit<CustomAttributesState> {
   final String projectId;
 
   CustomAttributesCubit({
-    required GetCustomAttributes getAttributesUseCase,
-    required AddCustomAttribute addAttributeUseCase,
-    required UpdateCustomAttribute updateAttributeUseCase,
-    required DeleteCustomAttribute deleteAttributeUseCase,
+    required this._getAttributesUseCase,
+    required this._addAttributeUseCase,
+    required this._updateAttributeUseCase,
+    required this._deleteAttributeUseCase,
     required this.projectId,
-  })  : _getAttributesUseCase = getAttributesUseCase,
-        _addAttributeUseCase = addAttributeUseCase,
-        _updateAttributeUseCase = updateAttributeUseCase,
-        _deleteAttributeUseCase = deleteAttributeUseCase,
-        super(const CustomAttributesInitial());
+  })  : super(const CustomAttributesInitial());
 
   Future<void> loadAttributes() async {
     emit(const CustomAttributesLoading());

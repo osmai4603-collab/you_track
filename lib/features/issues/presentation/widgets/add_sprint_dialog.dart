@@ -55,7 +55,7 @@ class _AddSprintDialogState extends State<AddSprintDialog> {
     _isReleased = widget.sprint?.isReleased ?? false;
     
     if (widget.sprint != null) {
-      _selectedColorIndex = _colors.indexWhere((c) => c.value == widget.sprint!.color);
+      _selectedColorIndex = _colors.indexWhere((c) => c.toARGB32() == widget.sprint!.color);
       if (_selectedColorIndex == -1) _selectedColorIndex = 0;
     }
   }
@@ -227,7 +227,7 @@ class _AddSprintDialogState extends State<AddSprintDialog> {
                   onPressed: () {
                     if (_nameController.text.isEmpty) return;
                     final sprint = Sprint(
-                      id: widget.sprint?.id?.isNotEmpty == true 
+                      id: widget.sprint?.id.isNotEmpty == true 
                           ? widget.sprint!.id 
                           : DateTime.now().millisecondsSinceEpoch.toString(),
                       name: _nameController.text,
@@ -235,7 +235,7 @@ class _AddSprintDialogState extends State<AddSprintDialog> {
                       releaseDate: _releaseDate,
                       isReleased: _isReleased,
                       description: _descriptionController.text,
-                      color: _colors[_selectedColorIndex].value,
+                      color: _colors[_selectedColorIndex].toARGB32(),
                     );
                     widget.onSave(sprint);
                     Navigator.pop(context);

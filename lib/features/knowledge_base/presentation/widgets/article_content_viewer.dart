@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_markdown_plus/flutter_markdown_plus.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
-import 'package:issues_tracking/core/widgets/permission_guard.dart';
 import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article_comment.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/bloc/article_comment_bloc.dart';

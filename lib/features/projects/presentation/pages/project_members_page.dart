@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:issues_tracking/core/constants/app_icons.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
-import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
-import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
-import 'package:issues_tracking/features/projects/presentation/pages/add_project_members_page.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_state.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_entity.dart';

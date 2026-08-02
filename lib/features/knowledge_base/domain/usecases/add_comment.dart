@@ -18,7 +18,7 @@ class AddComment
   }
 
   @override
-  Permission get requiredPermission => Permission.commentCreateComment;
+  Permission get requiredPermission => Permission.commentCreateArticleComment;
 }
 
 class AddCommentParams extends Params {

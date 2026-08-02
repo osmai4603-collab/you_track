@@ -38,21 +38,19 @@ class _MakePrivateDialogState extends State<MakePrivateDialog> {
 
   void _initializeFromField() {
     final accessControl = widget.field.accessControl;
-    if (accessControl != null) {
-      if (accessControl['admins_only'] == true) {
-        _accessLevel = AccessLevel.adminsOnly;
-      } else {
-        final groups = accessControl['groups'] as List?;
-        final users = accessControl['users'] as List?;
-        if ((groups != null && groups.isNotEmpty) ||
-            (users != null && users.isNotEmpty)) {
-          _accessLevel = AccessLevel.custom;
-          if (groups != null) {
-            _selectedGroupIds.addAll(groups.cast<String>());
-          }
-          if (users != null) {
-            _selectedUserIds.addAll(users.cast<String>());
-          }
+    if (accessControl['admins_only'] == true) {
+      _accessLevel = AccessLevel.adminsOnly;
+    } else {
+      final groups = accessControl['groups'] as List?;
+      final users = accessControl['users'] as List?;
+      if ((groups != null && groups.isNotEmpty) ||
+          (users != null && users.isNotEmpty)) {
+        _accessLevel = AccessLevel.custom;
+        if (groups != null) {
+          _selectedGroupIds.addAll(groups.cast<String>());
+        }
+        if (users != null) {
+          _selectedUserIds.addAll(users.cast<String>());
         }
       }
     }
@@ -378,12 +376,10 @@ class _MakePrivateDialogState extends State<MakePrivateDialog> {
         break;
     }
 
-    if (accessControl != null) {
-      context.read<CustomFieldsCubit>().updateAccessControl(
-        fieldId: widget.field.id,
-        accessControl: accessControl,
-      );
-    }
+    context.read<CustomFieldsCubit>().updateAccessControl(
+      fieldId: widget.field.id,
+      accessControl: accessControl,
+    );
 
     Navigator.of(context).pop();
 

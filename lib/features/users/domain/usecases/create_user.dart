@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
-import 'package:issues_tracking/core/usecase/permission_guard_mixin.dart';
+
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 import 'package:issues_tracking/features/users/domain/repositories/users_repository.dart';
@@ -21,8 +21,7 @@ class CreateUserParams extends Params {
   List<Object?> get props => [displayName, email, password];
 }
 
-class CreateUser extends UseCasePermission<UserEntity, CreateUserParams>
-    with PermissionGuardMixin<UserEntity, CreateUserParams> {
+class CreateUser extends UseCasePermission<UserEntity, CreateUserParams> {
   final UsersRepository repository;
 
   CreateUser(this.repository);
@@ -31,9 +30,12 @@ class CreateUser extends UseCasePermission<UserEntity, CreateUserParams>
   Permission get requiredPermission => Permission.userCreateUser;
 
   @override
-  Future<Either<Failure, UserEntity>> call({required CreateUserParams params}) {
-    return runWithPermissionCheck(
-      action: () async => repository.createUser(
+  Future<Either<Failure, UserEntity>> call({
+    required CreateUserParams params,
+  }) async {
+    final result = await hasPermission();
+    return result.fold((left) => Left(left), (right) async {
+      return await repository.createUser(
         UserEntity(
           id: '',
           fullName: params.displayName,
@@ -41,7 +43,7 @@ class CreateUser extends UseCasePermission<UserEntity, CreateUserParams>
           email: params.email,
         ),
         password: params.password,
-      ),
-    );
+      );
+    });
   }
 }

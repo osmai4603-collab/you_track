@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
@@ -6,6 +7,9 @@ import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dar
 import 'package:issues_tracking/features/issues/domain/repositories/issues_repository.dart';
 
 class GetIssues extends UseCasePermission<List<Issue>, GetIssuesParams> {
+  @override
+  Permission get requiredPermission => Permission.issueReadIssue;
+
   final IssuesRepository repository;
 
   GetIssues(this.repository);

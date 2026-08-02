@@ -1,11 +1,16 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article_comment.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_comment_repository.dart';
 
 class GetCommentsForArticle
-    extends UseCasePermission<List<ArticleComment>, GetCommentsForArticleParams> {
+    extends
+        UseCasePermission<List<ArticleComment>, GetCommentsForArticleParams> {
+  @override
+  Permission get requiredPermission => Permission.commentReadArticleComment;
+
   final ArticleCommentRepository repository;
   const GetCommentsForArticle(this.repository);
 

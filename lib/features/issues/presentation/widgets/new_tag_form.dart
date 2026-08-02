@@ -115,7 +115,7 @@ class _NewTagFormState extends State<NewTagForm> {
     }
 
     return DropdownButtonFormField<String>(
-      value: state.ownerId,
+      initialValue: state.ownerId,
       decoration: const InputDecoration(
         labelText: 'Owner',
         border: OutlineInputBorder(),

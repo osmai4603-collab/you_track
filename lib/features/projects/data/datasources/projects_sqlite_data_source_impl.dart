@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:issues_tracking/core/errors/exceptions.dart';
 import 'package:issues_tracking/core/services/sqlite/sqlite_database_sync.dart';
 import 'package:issues_tracking/core/services/sqlite/tables/project_members_table.dart';

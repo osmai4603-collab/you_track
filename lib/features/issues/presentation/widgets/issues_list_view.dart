@@ -7,11 +7,9 @@ import 'package:issues_tracking/core/widgets/issue_state_chip.dart';
 import 'package:issues_tracking/core/widgets/issue_priority_chip.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/youtrack_shell_cubit.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
-import 'package:issues_tracking/core/enums/issue_state_enum.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_state.dart';
-import 'package:issues_tracking/features/issues/presentation/widgets/priority_icon.dart';
 
 class IssuesListView extends StatelessWidget {
   const IssuesListView({super.key});

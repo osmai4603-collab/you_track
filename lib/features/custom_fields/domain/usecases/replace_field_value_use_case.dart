@@ -1,10 +1,14 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import '../../../../core/errors/failure.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../repositories/custom_fields_repository.dart';
 
 class ReplaceFieldValueUseCase
     extends UseCasePermission<void, ReplaceFieldValueParams> {
+  @override
+  Permission get requiredPermission => Permission.projectUpdateProject;
+
   final CustomFieldsRepository repository;
 
   ReplaceFieldValueUseCase(this.repository);

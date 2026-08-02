@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
-import 'package:issues_tracking/core/theme/app_text_theme.dart';
 import 'package:issues_tracking/features/agile_boards/domain/entities/board_card.dart';
 import 'package:issues_tracking/features/agile_boards/domain/entities/board_column.dart';
 import 'package:issues_tracking/features/agile_boards/presentation/widgets/board_card_widget.dart';

@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_entity.dart';
@@ -14,6 +15,9 @@ class GetGroupByIdParams extends Params {
 }
 
 class GetGroupById extends UseCasePermission<GroupEntity, GetGroupByIdParams> {
+  @override
+  Permission get requiredPermission => Permission.systemLowLevelAdminRead;
+
   final GroupsRepository repository;
 
   GetGroupById(this.repository);

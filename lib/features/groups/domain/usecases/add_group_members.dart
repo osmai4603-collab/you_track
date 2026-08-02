@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_member_entity.dart';
@@ -19,6 +20,9 @@ class AddGroupMembersParams extends Params {
 
 class AddGroupMembers
     extends UseCasePermission<List<GroupMemberEntity>, AddGroupMembersParams> {
+  @override
+  Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
+
   final GroupsRepository repository;
 
   AddGroupMembers(this.repository);

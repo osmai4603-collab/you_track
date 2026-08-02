@@ -116,7 +116,7 @@ class Issue extends Entity {
   }) {
     return Issue(
       id: id ?? this.id,
-      issueKey: projectId ?? this.issueKey,
+      issueKey: projectId ?? issueKey,
       issueNumber: issueNumber ?? this.issueNumber,
       summary: summary ?? this.summary,
       description: description ?? this.description,

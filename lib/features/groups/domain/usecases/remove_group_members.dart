@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/groups/domain/repositories/groups_repository.dart';
@@ -17,6 +18,9 @@ class RemoveGroupMembersParams extends Params {
 }
 
 class RemoveGroupMembers extends UseCasePermission<void, RemoveGroupMembersParams> {
+  @override
+  Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
+
   final GroupsRepository repository;
 
   RemoveGroupMembers(this.repository);

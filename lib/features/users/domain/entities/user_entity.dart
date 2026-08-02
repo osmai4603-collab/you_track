@@ -40,11 +40,11 @@ class UserEntity extends Entity {
   }) {
     return UserEntity(
       id: id ?? this.id,
-      fullName: displayName ?? this.fullName,
+      fullName: displayName ?? fullName,
       username: username ?? this.username,
       email: email ?? this.email,
       avatarUrl: avatarUrl ?? this.avatarUrl,
-      createdAt: registrationDate ?? this.createdAt,
+      createdAt: registrationDate ?? createdAt,
       isBanned: isBanned ?? this.isBanned,
       groups: groups ?? this.groups,
       projects: projects ?? this.projects,

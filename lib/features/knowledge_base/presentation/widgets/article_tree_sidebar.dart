@@ -240,7 +240,7 @@ class ArticleTreeSidebar extends StatelessWidget {
     ArticleTreeLoaded state,
   ) {
     context.push(
-      AppRouteKeys.projectKnowledgeBasePath(state.projectId) + '/new',
+      '${AppRouteKeys.projectKnowledgeBasePath(state.projectId)}/new',
       extra: {
         'projectId': state.projectId,
         'parentId': parentArticle.id,

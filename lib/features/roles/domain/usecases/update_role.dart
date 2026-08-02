@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
-import 'package:issues_tracking/core/usecase/permission_guard_mixin.dart';
+
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/roles/domain/entities/role_entity.dart';
 import 'package:issues_tracking/features/roles/domain/repositories/roles_repository.dart';
@@ -21,8 +21,7 @@ class UpdateRoleParams extends Params {
   List<Object?> get props => [name, description, permissions];
 }
 
-class UpdateRole extends UseCasePermission<RoleEntity, UpdateRoleParams>
-    with PermissionGuardMixin<RoleEntity, UpdateRoleParams> {
+class UpdateRole extends UseCasePermission<RoleEntity, UpdateRoleParams> {
   final RolesRepository repository;
 
   UpdateRole(this.repository);
@@ -31,15 +30,18 @@ class UpdateRole extends UseCasePermission<RoleEntity, UpdateRoleParams>
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
   @override
-  Future<Either<Failure, RoleEntity>> call({required UpdateRoleParams params}) {
-    return runWithPermissionCheck(
-      action: () async => repository.updateRole(
+  Future<Either<Failure, RoleEntity>> call({
+    required UpdateRoleParams params,
+  }) async {
+    final result = await hasPermission();
+    return result.fold((left) => Left(left), (right) async {
+      return await repository.updateRole(
         RoleEntity(
           name: params.name,
           description: params.description,
           permissions: params.permissions,
         ),
-      ),
-    );
+      );
+    });
   }
 }

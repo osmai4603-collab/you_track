@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
@@ -15,6 +16,9 @@ class GetIssueById extends UseCasePermission<Issue, GetIssueByIdParams> {
   }) async {
     return await repository.getIssueById(params.id);
   }
+
+  @override
+  Permission get requiredPermission => .issueReadIssue;
 }
 
 class GetIssueByIdParams extends Params {

@@ -1,10 +1,14 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/roles/domain/entities/role_entity.dart';
 import 'package:issues_tracking/features/roles/domain/repositories/roles_repository.dart';
 
 class GetRoles extends UseCasePermission<List<RoleEntity>, NoParams> {
+  @override
+  Permission get requiredPermission => Permission.systemLowLevelAdminRead;
+
   final RolesRepository repository;
 
   GetRoles(this.repository);

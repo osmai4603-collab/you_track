@@ -5,7 +5,7 @@ import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
 
 mixin PermissionGuardMixin<ReturnType, ParamsType> {
-  Permission get requiredPermission => null;
+  Permission get requiredPermission;
 
   Future<Either<Failure, ReturnType>> runWithPermissionCheck({
     required Future<Either<Failure, ReturnType>> Function() action,
@@ -20,7 +20,7 @@ mixin PermissionGuardMixin<ReturnType, ParamsType> {
     }
 
     final effectivePermission = permission ?? requiredPermission;
-    if (effectivePermission != null && !userSession.hasPermission(effectivePermission)) {
+    if (!userSession.hasPermission(effectivePermission)) {
       return Left(
         PermissionDeniedFailure(
           'The current user does not have permission to execute this operation',

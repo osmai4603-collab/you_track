@@ -1,7 +1,4 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:issues_tracking/core/enums/issue_priority_type_enum.dart';
-import 'package:issues_tracking/core/enums/issue_state_enum.dart';
-import 'package:issues_tracking/core/enums/issue_type_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/features/issues/data/models/build_model.dart';
 import 'package:issues_tracking/features/issues/data/models/issue_model.dart';
@@ -11,7 +8,6 @@ import 'package:issues_tracking/features/issues/domain/entities/issue_attachment
 import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dart';
 import 'package:issues_tracking/features/issues/domain/entities/sprint.dart';
 import 'package:issues_tracking/features/issues/domain/entities/tag.dart';
-import 'package:issues_tracking/features/issues/domain/entities/issue_link.dart';
 import 'package:issues_tracking/features/issues/data/datasources/issues_remote_data_source.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/issues_repository.dart';
 

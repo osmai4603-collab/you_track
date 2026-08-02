@@ -44,9 +44,8 @@ class ProjectDetailsCubit extends Cubit<ProjectDetailsState> {
   final GetProjectByIdUseCase _getProjectByIdUseCase;
 
   ProjectDetailsCubit({
-    required GetProjectByIdUseCase getProjectByIdUseCase,
-  })  : _getProjectByIdUseCase = getProjectByIdUseCase,
-        super(const ProjectDetailsState());
+    required this._getProjectByIdUseCase,
+  })  : super(const ProjectDetailsState());
 
   Future<void> loadProject(String idOrKey) async {
     emit(state.copyWith(status: ProjectDetailsStatus.loading));

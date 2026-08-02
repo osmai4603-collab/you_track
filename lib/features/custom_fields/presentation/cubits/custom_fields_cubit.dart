@@ -57,25 +57,16 @@ class CustomFieldsCubit extends Cubit<CustomFieldsState> {
   final UpdateAdvancedFieldSettingsUseCase _updateAdvancedSettingsUseCase;
 
   CustomFieldsCubit({
-    required GetCustomFieldsUseCase getFieldsUseCase,
-    required AddCustomFieldUseCase addFieldUseCase,
-    required UpdateCustomFieldUseCase updateFieldUseCase,
-    required DeleteCustomFieldsUseCase deleteFieldsUseCase,
-    required ReorderCustomFieldsUseCase reorderFieldsUseCase,
-    required UpdateFieldVisibilityUseCase updateVisibilityUseCase,
-    required UpdateFieldAccessControlUseCase updateAccessControlUseCase,
-    required ReplaceFieldValueUseCase replaceFieldValueUseCase,
-    required UpdateAdvancedFieldSettingsUseCase updateAdvancedSettingsUseCase,
-  }) : _getFieldsUseCase = getFieldsUseCase,
-       _addFieldUseCase = addFieldUseCase,
-       _updateFieldUseCase = updateFieldUseCase,
-       _deleteFieldsUseCase = deleteFieldsUseCase,
-       _reorderFieldsUseCase = reorderFieldsUseCase,
-       _updateVisibilityUseCase = updateVisibilityUseCase,
-       _updateAccessControlUseCase = updateAccessControlUseCase,
-       _replaceFieldValueUseCase = replaceFieldValueUseCase,
-       _updateAdvancedSettingsUseCase = updateAdvancedSettingsUseCase,
-       super(const CustomFieldsInitial());
+    required this._getFieldsUseCase,
+    required this._addFieldUseCase,
+    required this._updateFieldUseCase,
+    required this._deleteFieldsUseCase,
+    required this._reorderFieldsUseCase,
+    required this._updateVisibilityUseCase,
+    required this._updateAccessControlUseCase,
+    required this._replaceFieldValueUseCase,
+    required this._updateAdvancedSettingsUseCase,
+  }) : super(const CustomFieldsInitial());
 
   Future<void> loadFields(String projectId) async {
     emit(const CustomFieldsLoading());

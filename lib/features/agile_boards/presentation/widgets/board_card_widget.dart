@@ -3,7 +3,6 @@ import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/theme/app_text_theme.dart';
-import 'package:issues_tracking/core/widgets/issue_priority_chip.dart';
 import 'package:issues_tracking/core/widgets/text_hover_widget.dart';
 import 'package:issues_tracking/features/agile_boards/domain/entities/board_card.dart';
 

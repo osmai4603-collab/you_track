@@ -65,7 +65,7 @@ class _AddLinkDialogState extends State<AddLinkDialog> {
             const SizedBox(height: 20),
             _buildLabel('Link type'),
             DropdownButtonFormField<IssueLinkType>(
-              value: _selectedLinkType,
+              initialValue: _selectedLinkType,
               isExpanded: true,
               decoration: const InputDecoration(
                 contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),

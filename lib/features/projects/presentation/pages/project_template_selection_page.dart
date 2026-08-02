@@ -8,8 +8,6 @@ import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/enums/project_template_enum.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import '../cubits/project_creation_cubit.dart';
-import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
-import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
 
 /// صفحة 2: اختيار قالب المشروع
 class ProjectTemplateSelectionPage extends StatefulWidget {

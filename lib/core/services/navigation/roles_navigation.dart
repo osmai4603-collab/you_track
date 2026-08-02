@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/services/navigation/app_navigation.dart';

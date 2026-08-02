@@ -88,7 +88,7 @@ class _GroupsPageState extends State<GroupsPage> {
   }
 
   Widget _buildSearchField() {
-    return Container(
+    return SizedBox(
       height: 30,
       child: TextFormField(
         controller: _searchController,

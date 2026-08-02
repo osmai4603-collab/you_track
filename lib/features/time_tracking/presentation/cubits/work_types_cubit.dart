@@ -49,18 +49,13 @@ class WorkTypesCubit extends Cubit<WorkTypesState> {
   final String projectId;
 
   WorkTypesCubit({
-    required GetWorkTypes getWorkTypesUseCase,
-    required AddWorkType addWorkTypeUseCase,
-    required UpdateWorkType updateWorkTypeUseCase,
-    required DeleteWorkType deleteWorkTypeUseCase,
-    required ReorderWorkTypes reorderWorkTypesUseCase,
+    required this._getWorkTypesUseCase,
+    required this._addWorkTypeUseCase,
+    required this._updateWorkTypeUseCase,
+    required this._deleteWorkTypeUseCase,
+    required this._reorderWorkTypesUseCase,
     required this.projectId,
-  })  : _getWorkTypesUseCase = getWorkTypesUseCase,
-        _addWorkTypeUseCase = addWorkTypeUseCase,
-        _updateWorkTypeUseCase = updateWorkTypeUseCase,
-        _deleteWorkTypeUseCase = deleteWorkTypeUseCase,
-        _reorderWorkTypesUseCase = reorderWorkTypesUseCase,
-        super(const WorkTypesInitial());
+  })  : super(const WorkTypesInitial());
 
   Future<void> loadWorkTypes() async {
     emit(const WorkTypesLoading());

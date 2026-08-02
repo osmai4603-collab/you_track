@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:equatable/equatable.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
@@ -18,10 +19,14 @@ abstract class UseCase<ReturnType, ParamsType extends Params> {
 }
 
 abstract class UseCasePermission<ReturnType, ParamsType extends Params> extends UseCase<ReturnType, ParamsType> {
+  const UseCasePermission();
 
   Permission get requiredPermission;
 
-  Future<Either<Failure, bool>> hasPermission() async {
+  Future<Either<Failure, ReturnType>> execute({required ParamsType params});
+
+  @protected
+  Future<Either<Failure, bool>> hasPermission({required ParamsType params}) async {
     final userSession = get_it<UserSession>();
 
     if (userSession.currentUser == null) {
@@ -38,6 +43,15 @@ abstract class UseCasePermission<ReturnType, ParamsType extends Params> extends 
       );
     }
     return const Right(true);
+  }
+
+  @override
+  Future<Either<Failure, ReturnType>> call({required ParamsType params}) async {
+    final permissionCheck = await hasPermission(params: params);
+    return permissionCheck.fold(
+      (failure) => Left(failure),
+      (_) => execute(params: params),
+    );
   }
 }
 

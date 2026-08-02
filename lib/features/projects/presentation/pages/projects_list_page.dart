@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_icons.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
-import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
 import 'package:issues_tracking/core/widgets/project_chip.dart';
@@ -15,12 +14,9 @@ import 'package:issues_tracking/core/widgets/youtrack_state.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_member_entity.dart';
-import 'package:issues_tracking/features/projects/presentation/pages/projects_shell_page.dart';
 import '../cubits/projects_list_cubit.dart';
 import '../cubits/project_details_cubit.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
-import 'package:issues_tracking/features/projects/presentation/widgets/projects_breadcrumb_header.dart';
-import 'package:issues_tracking/core/widgets/permission_guard.dart';
 
 final List<Color> _projectColors = const [
   Color(0xFF4285F4), // Blue

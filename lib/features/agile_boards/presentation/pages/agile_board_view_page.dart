@@ -193,7 +193,7 @@ class _AgileBoardViewPageState extends YouTrackState<AgileBoardViewPage> {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.medium),
       decoration: BoxDecoration(
         border: Border(
-          bottom: BorderSide(color: colors.outlineVariant.withOpacity(0.5)),
+          bottom: BorderSide(color: colors.outlineVariant.withValues(alpha: 0.5)),
         ),
       ),
       child: Row(

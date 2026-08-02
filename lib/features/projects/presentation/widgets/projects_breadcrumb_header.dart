@@ -41,7 +41,7 @@ class ProjectsBreadcrumbHeader extends StatelessWidget {
               children: _buildBreadcrumbs(context, colors, textTheme),
             ),
           ),
-          if (trailing != null) trailing!,
+          ?trailing,
         ],
       ),
     );

@@ -1,7 +1,7 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
-import 'package:issues_tracking/core/usecase/permission_guard_mixin.dart';
+
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/groups/domain/repositories/groups_repository.dart';
 
@@ -14,8 +14,7 @@ class DeleteGroupParams extends Params {
   List<Object?> get props => [id];
 }
 
-class DeleteGroup extends UseCasePermission<void, DeleteGroupParams>
-    with PermissionGuardMixin<void, DeleteGroupParams> {
+class DeleteGroup extends UseCasePermission<void, DeleteGroupParams> {
   final GroupsRepository repository;
 
   DeleteGroup(this.repository);
@@ -24,9 +23,12 @@ class DeleteGroup extends UseCasePermission<void, DeleteGroupParams>
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
   @override
-  Future<Either<Failure, void>> call({required DeleteGroupParams params}) {
-    return runWithPermissionCheck(
-      action: () async => repository.deleteGroup(params.id),
-    );
+  Future<Either<Failure, void>> call({
+    required DeleteGroupParams params,
+  }) async {
+    final result = await hasPermission();
+    return result.fold((left) => Left(left), (right) async {
+      return await repository.deleteGroup(params.id);
+    });
   }
 }

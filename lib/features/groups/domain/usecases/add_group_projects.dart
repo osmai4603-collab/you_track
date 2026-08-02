@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_project_entity.dart';
@@ -19,6 +20,9 @@ class AddGroupProjectsParams extends Params {
 
 class AddGroupProjects
     extends UseCasePermission<List<GroupProjectEntity>, AddGroupProjectsParams> {
+  @override
+  Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
+
   final GroupsRepository repository;
 
   AddGroupProjects(this.repository);

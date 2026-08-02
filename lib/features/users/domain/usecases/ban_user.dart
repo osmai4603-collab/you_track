@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
@@ -18,11 +19,20 @@ class BanUser extends UseCasePermission<UserEntity, BanUserParams> {
   BanUser(this.repository);
 
   @override
-  Future<Either<Failure, UserEntity>> call({required BanUserParams params}) async {
-    final userResult = await repository.getUserById(params.userId);
-    return userResult.fold(
-      (failure) => Left(failure),
-      (user) => repository.updateUser(user.copyWith(isBanned: params.isBanned)),
-    );
+  Permission get requiredPermission => .userUpdateUser;
+
+  @override
+  Future<Either<Failure, UserEntity>> call({
+    required BanUserParams params,
+  }) async {
+    final result = await hasPermission();
+    return result.fold((left) => Left(left), (right) async {
+      final userResult = await repository.getUserById(params.userId);
+      return userResult.fold(
+        (failure) => Left(failure),
+        (user) =>
+            repository.updateUser(user.copyWith(isBanned: params.isBanned)),
+      );
+    });
   }
 }

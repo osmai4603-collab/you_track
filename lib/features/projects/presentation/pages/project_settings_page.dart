@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
-import '../widgets/projects_breadcrumb_header.dart';
 import '../widgets/project_settings_sidebar.dart';
 
 class ProjectSettingsPage extends StatefulWidget {

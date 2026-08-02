@@ -3,7 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
-import 'package:issues_tracking/core/usecase/permission_guard_mixin.dart';
+
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/auth/domain/entities/user_entity.dart';
 import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
@@ -14,18 +14,19 @@ class TestParams extends Params {
   const TestParams();
 }
 
-class TestUseCase extends UseCasePermission<String, TestParams>
-    with PermissionGuardMixin<String, TestParams> {
+class TestUseCase extends UseCasePermission<String, TestParams> {
   const TestUseCase();
 
   @override
   Permission get requiredPermission => Permission.projectCreateProject;
 
   @override
-  Future<Either<Failure, String>> call({required TestParams params}) {
-    return runWithPermissionCheck(
-      action: () async => const Right('ok'),
-    );
+  Future<Either<Failure, String>> call({required TestParams params}) async {
+    final permissionCheck = await hasPermission();
+    if (permissionCheck.isLeft()) {
+      return Left(permissionCheck.getLeft().toNullable()!);
+    }
+    return const Right('ok');
   }
 }
 
@@ -34,7 +35,7 @@ void main() {
 
   setUp(() {
     sl = GetIt.instance;
-    sl.unregister<UserSession>(instance: sl<UserSession>()); 
+    sl.unregister<UserSession>(instance: sl<UserSession>());
   });
 
   tearDown(() {
@@ -44,13 +45,15 @@ void main() {
   test('returns permission denied when user lacks permission', () async {
     sl.registerLazySingleton<UserSession>(() => UserSession());
     sl<UserSession>().setUser(
-      const UserEntity(id: 'u1', email: 'user@example.com', groups: [], projects: []),
+      const UserEntity(
+        id: 'u1',
+        email: 'user@example.com',
+        groups: [],
+        projects: [],
+      ),
     );
     sl<UserSession>().setPermissions(
-      const UserPermissionsEntity(
-        roleAssignments: [],
-        ownedProjectIds: [],
-      ),
+      const UserPermissionsEntity(roleAssignments: [], ownedProjectIds: []),
     );
 
     final result = await const TestUseCase().call(params: const TestParams());
@@ -65,7 +68,12 @@ void main() {
   test('executes action when user has permission', () async {
     sl.registerLazySingleton<UserSession>(() => UserSession());
     sl<UserSession>().setUser(
-      const UserEntity(id: 'u1', email: 'user@example.com', groups: [], projects: []),
+      const UserEntity(
+        id: 'u1',
+        email: 'user@example.com',
+        groups: [],
+        projects: [],
+      ),
     );
     sl<UserSession>().setPermissions(
       const UserPermissionsEntity(
