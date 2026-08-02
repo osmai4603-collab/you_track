@@ -12,6 +12,7 @@ import 'package:issues_tracking/features/issues/presentation/widgets/add_sprint_
 import 'package:issues_tracking/features/issues/presentation/widgets/new_tag_dialog.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/add_build_dialog.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/add_link_dialog.dart';
+import 'package:issues_tracking/features/projects/domain/entities/subsystem_entity.dart';
 
 class IssueFormSidebar extends StatelessWidget {
   const IssueFormSidebar({super.key});
@@ -128,11 +129,12 @@ class IssueFormSidebar extends StatelessWidget {
                 ),
                 _buildField(
                   label: 'Subsystem',
-                  value: state.subsystem.displayName(localization),
+                  value: state.subsystem?.name ?? 'No Subsystem',
                   onTap: () => _showSubsystemPicker(
                     context,
                     state.subsystem,
                     localization,
+                    state.availableSubsystems,
                   ),
                 ),
                 _buildField(
@@ -225,18 +227,19 @@ class IssueFormSidebar extends StatelessWidget {
 
   void _showSubsystemPicker(
     BuildContext context,
-    IssueSubsystemEnum current,
+    SubsystemEntity? current,
     AppLocalizations localization,
+    List<SubsystemEntity> availableSubsystems,
   ) {
     showModalBottomSheet(
       context: context,
       builder: (context) => _PickerSheet(
         title: 'Subsystem',
-        children: IssueSubsystemEnum.values
+        children: availableSubsystems
             .map(
               (s) => ListTile(
-                title: Text(s.displayName(localization)),
-                trailing: s == current ? const Icon(Icons.check) : null,
+                title: Text(s.name),
+                trailing: s.id == current?.id ? const Icon(Icons.check) : null,
                 onTap: () {
                   context.read<IssueFormCubit>().updateSubsystem(s);
                   Navigator.pop(context);
@@ -592,11 +595,13 @@ class IssueFormSidebar extends StatelessWidget {
             title: const Text('New Tag'),
             onTap: () async {
               Navigator.pop(context);
+              final project = state.availableProjects.firstWhereOrNull((p) => p.projectId == state.projectKey);
               final newTag = await NewTagDialog.show(
                 context,
                 projectId:
+                    project?.id ??
                     state.projectKey ??
-                    'DEM', // TODO: Get from state correctly if needed
+                    'DEMO', // TODO: Get from state correctly if needed
                 currentIssueId: state.isEditing ? state.issueId : null,
               );
               if (newTag != null && context.mounted) {
