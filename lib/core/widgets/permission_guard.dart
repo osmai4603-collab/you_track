@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 
 class PermissionGuard extends StatelessWidget {
   final Permission permission;
@@ -32,7 +32,7 @@ class PermissionGuard extends StatelessWidget {
 
     return Tooltip(
       message: tooltipMessage ?? l10n.permissionDeniedTooltip,
-      child: IgnorePointer(child: Opacity(opacity: 0.4, child: child)),
+      child: IgnorePointer(child: child),
     );
   }
 }

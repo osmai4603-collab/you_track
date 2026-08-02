@@ -10,10 +10,12 @@ import 'package:issues_tracking/features/issues/domain/entities/issue_attachment
 import 'package:issues_tracking/features/issues/domain/entities/issue_link.dart';
 import 'package:issues_tracking/features/issues/domain/entities/sprint.dart';
 import 'package:issues_tracking/features/issues/domain/entities/tag.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/projects/domain/entities/subsystem_entity.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/issues_repository.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/get_subsystems_use_case.dart';
 
 import 'package:issues_tracking/features/projects/domain/usecases/get_projects_use_case.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/get_project_members_use_case.dart';
@@ -21,7 +23,6 @@ import 'package:issues_tracking/features/issues/domain/usecases/get_builds_use_c
 import 'package:issues_tracking/features/issues/domain/usecases/get_sprints_use_case.dart';
 import '../../../../core/usecase/usecase.dart';
 
-import '../../../../core/enums/issue_subsystem_enum.dart';
 import 'issue_form_state.dart';
 
 class IssueFormCubit extends Cubit<IssueFormState> {
@@ -30,6 +31,7 @@ class IssueFormCubit extends Cubit<IssueFormState> {
   final GetProjectMembersUseCase getProjectMembersUseCase;
   final GetBuildsUseCase getBuildsUseCase;
   final GetSprintsUseCase getSprintsUseCase;
+  final GetSubsystemsUseCase getSubsystemsUseCase;
 
   IssueFormCubit({
     required this.repository,
@@ -37,6 +39,7 @@ class IssueFormCubit extends Cubit<IssueFormState> {
     required this.getProjectMembersUseCase,
     required this.getBuildsUseCase,
     required this.getSprintsUseCase,
+    required this.getSubsystemsUseCase,
   }) : super(const IssueFormState());
 
   void initWithProject(String projectKey) {
@@ -85,6 +88,14 @@ class IssueFormCubit extends Cubit<IssueFormState> {
       buildsResult.fold(
         (failure) => null,
         (builds) => emit(state.copyWith(availableBuilds: builds)),
+      );
+
+      final subsystemsResult = await getSubsystemsUseCase(
+        params: GetSubsystemsParams(projectId: project.id),
+      );
+      subsystemsResult.fold(
+        (failure) => null,
+        (subsystems) => emit(state.copyWith(availableSubsystems: subsystems)),
       );
     } catch (e) {
       // Ignore if project not found
@@ -166,7 +177,7 @@ class IssueFormCubit extends Cubit<IssueFormState> {
     emit(state.copyWith(clearAssignee: true));
   }
 
-  void updateSubsystem(IssueSubsystemEnum value) {
+  void updateSubsystem(SubsystemEntity? value) {
     emit(state.copyWith(subsystem: value));
   }
 
@@ -310,7 +321,7 @@ class IssueFormCubit extends Cubit<IssueFormState> {
       assigneeName: state.assigneeName,
       reporterId: userSession.currentUser?.id ?? 'anonymous',
       reporterName: userSession.currentUser?.email ?? 'Anonymous',
-      subsystem: state.subsystem,
+      subsystemId: state.subsystem?.id,
       fixVersions: state.fixVersions,
       build: state.build,
       tags: state.tags,

@@ -17,6 +17,12 @@ class DeleteComment extends UseCasePermission<void, DeleteCommentParams> {
   }) async {
     return await repository.deleteComment(params.commentId);
   }
+  
+  @override
+  Future<Either<Failure, void>> execute({required DeleteCommentParams params}) {
+    return repository.deleteComment(params.commentId);
+  }
+  
 }
 
 class DeleteCommentParams extends Params {

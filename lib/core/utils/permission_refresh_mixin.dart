@@ -1,6 +1,6 @@
 import 'package:issues_tracking/core/init_dependencies.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/get_user_permissions_use_case.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/users/domain/usecases/get_user_permissions_use_case.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 
 mixin PermissionRefreshMixin {
   Future<void> refreshUserPermissions() async {

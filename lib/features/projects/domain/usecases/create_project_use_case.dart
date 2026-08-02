@@ -24,12 +24,7 @@ class CreateProjectUseCase
   Permission get requiredPermission => Permission.projectCreateProject;
 
   @override
-  Future<Either<Failure, ProjectEntity>> call({
-    required CreateProjectParams params,
-  }) async {
-    final result = await hasPermission();
-    return result.fold((left) => Left(left), (right) async {
-      return await repository.createProject(params.project);
-    });
+  Future<Either<Failure, ProjectEntity>> execute({required CreateProjectParams params}) {
+    return repository.createProject(params.project);
   }
 }

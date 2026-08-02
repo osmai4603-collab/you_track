@@ -1,6 +1,4 @@
-import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
-import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_repository.dart';
 
@@ -12,10 +10,8 @@ class DeleteArticle extends UseCasePermission<void, DeleteArticleParams> {
   const DeleteArticle(this.repository);
 
   @override
-  Future<Either<Failure, void>> call({
-    required DeleteArticleParams params,
-  }) async {
-    return await repository.deleteArticle(params.articleId);
+  execute({required DeleteArticleParams params}) {
+    return repository.deleteArticle(params.articleId);
   }
 }
 

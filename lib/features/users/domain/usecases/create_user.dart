@@ -30,20 +30,15 @@ class CreateUser extends UseCasePermission<UserEntity, CreateUserParams> {
   Permission get requiredPermission => Permission.userCreateUser;
 
   @override
-  Future<Either<Failure, UserEntity>> call({
-    required CreateUserParams params,
-  }) async {
-    final result = await hasPermission();
-    return result.fold((left) => Left(left), (right) async {
-      return await repository.createUser(
-        UserEntity(
-          id: '',
-          fullName: params.displayName,
-          username: params.email.split('@').first,
-          email: params.email,
-        ),
-        password: params.password,
-      );
-    });
+  Future<Either<Failure, UserEntity>> execute({required CreateUserParams params}) {
+    return repository.createUser(
+      UserEntity(
+        id: '',
+        fullName: params.displayName,
+        username: params.email.split('@').first,
+        email: params.email,
+      ),
+      password: params.password,
+    );
   }
 }

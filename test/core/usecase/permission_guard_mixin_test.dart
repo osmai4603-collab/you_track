@@ -6,7 +6,7 @@ import 'package:issues_tracking/core/errors/failure.dart';
 
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/auth/domain/entities/user_entity.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 import 'package:issues_tracking/core/entities/user_permissions_entity.dart';
 import 'package:issues_tracking/core/entities/user_role_assignment.dart';
 
@@ -21,12 +21,8 @@ class TestUseCase extends UseCasePermission<String, TestParams> {
   Permission get requiredPermission => Permission.projectCreateProject;
 
   @override
-  Future<Either<Failure, String>> call({required TestParams params}) async {
-    final permissionCheck = await hasPermission();
-    if (permissionCheck.isLeft()) {
-      return Left(permissionCheck.getLeft().toNullable()!);
-    }
-    return const Right('ok');
+  Future<Either<Failure, String>> execute({required TestParams params}) {
+    return Future.value(const Right('ok'));
   }
 }
 

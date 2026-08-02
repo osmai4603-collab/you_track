@@ -15,7 +15,7 @@ class CreateIntegrationUseCase
   CreateIntegrationUseCase(this.repository);
 
   @override
-  Future<Either<Failure, VcsIntegrationEntity>> call(
+  Future<Either<Failure, VcsIntegrationEntity>> execute(
       {required CreateIntegrationParams params}) {
     return repository.createIntegration(params.integration);
   }

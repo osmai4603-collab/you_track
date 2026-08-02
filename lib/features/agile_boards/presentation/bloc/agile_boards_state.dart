@@ -14,11 +14,28 @@ class AgileBoardsLoading extends AgileBoardsState {}
 
 class AgileBoardsLoaded extends AgileBoardsState {
   final AgileBoard board;
+  final String? highlightedCardId;
 
-  const AgileBoardsLoaded({required this.board});
+  const AgileBoardsLoaded({
+    required this.board,
+    this.highlightedCardId,
+  });
+
+  AgileBoardsLoaded copyWith({
+    AgileBoard? board,
+    String? highlightedCardId,
+    bool clearHighlightedCard = false,
+  }) {
+    return AgileBoardsLoaded(
+      board: board ?? this.board,
+      highlightedCardId: clearHighlightedCard
+          ? null
+          : (highlightedCardId ?? this.highlightedCardId),
+    );
+  }
 
   @override
-  List<Object?> get props => [board];
+  List<Object?> get props => [board, highlightedCardId];
 }
 
 class AgileBoardsError extends AgileBoardsState {

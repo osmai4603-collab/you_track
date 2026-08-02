@@ -2,7 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/entities/user_permissions_entity.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
-import 'package:issues_tracking/features/auth/domain/repositories/user_permissions_repository.dart';
+import 'package:issues_tracking/features/users/domain/repositories/users_repository.dart';
 
 class GetUserPermissionsParams extends Params {
   final String userId;
@@ -15,7 +15,7 @@ class GetUserPermissionsParams extends Params {
 
 class GetUserPermissionsUseCase
     implements UseCase<UserPermissionsEntity, GetUserPermissionsParams> {
-  final UserPermissionsRepository repository;
+  final UsersRepository repository;
 
   GetUserPermissionsUseCase(this.repository);
 

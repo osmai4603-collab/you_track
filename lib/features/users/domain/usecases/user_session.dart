@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:issues_tracking/core/entities/user_permissions_entity.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
-import 'package:issues_tracking/features/auth/domain/entities/user_entity.dart';
+import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 
 class UserSession extends ChangeNotifier {
   UserEntity? _currentUser;

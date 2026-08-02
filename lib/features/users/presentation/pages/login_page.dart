@@ -5,9 +5,9 @@ import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/theme/app_fonts.dart';
-import 'package:issues_tracking/features/auth/presentation/cubits/login_cubit.dart';
-import 'package:issues_tracking/features/auth/presentation/widgets/login_header.dart';
-import 'package:issues_tracking/features/auth/presentation/widgets/login_form_card.dart';
+import 'package:issues_tracking/features/users/presentation/bloc/cubits/login_cubit.dart';
+import 'package:issues_tracking/features/users/presentation/widgets/widgets/login_header.dart';
+import 'package:issues_tracking/features/users/presentation/widgets/widgets/login_form_card.dart';
 
 /// صفحة تسجيل الدخول الرئيسية بتصميم YouTrack.
 ///

@@ -1,6 +1,9 @@
 import 'dart:convert';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/exceptions.dart';
 import 'package:issues_tracking/core/services/sqlite/sqlite_database_sync.dart';
+import 'package:issues_tracking/core/services/sqlite/tables/group_roles_table.dart';
+import 'package:issues_tracking/core/services/sqlite/tables/roles_table.dart';
 import 'package:issues_tracking/core/services/sqlite/tables/users_table.dart';
 import 'package:issues_tracking/core/services/sqlite/tables/group_members_table.dart';
 import 'package:issues_tracking/core/services/sqlite/tables/groups_table.dart';
@@ -8,12 +11,17 @@ import 'package:issues_tracking/core/services/sqlite/tables/group_projects_table
 import 'package:issues_tracking/core/services/sqlite/tables/projects_table.dart';
 import 'package:issues_tracking/features/users/data/datasources/users_remote_data_source.dart';
 import 'package:issues_tracking/features/users/data/models/user_model.dart';
+import 'package:issues_tracking/features/users/data/models/user_permissions_model.dart';
+import 'package:issues_tracking/features/users/data/models/user_role_assignment_model.dart';
+import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 
 class UsersSqliteDataSourceImpl implements UsersRemoteDataSource {
   final SqliteDatabaseSync _sqlite;
   final UsersTable _table = const UsersTable();
   final GroupMembersTable _groupMembersTable = const GroupMembersTable();
   final GroupsTable _groupsTable = const GroupsTable();
+  final GroupRolesTable _groupRolesTable = const GroupRolesTable();
+  final RolesTable _rolesTable = const RolesTable();
   final GroupProjectsTable _groupProjectsTable = const GroupProjectsTable();
   final ProjectsTable _projectsTable = const ProjectsTable();
 
@@ -170,5 +178,108 @@ class UsersSqliteDataSourceImpl implements UsersRemoteDataSource {
     );
 
     return getUserById(id);
+  }
+
+  @override
+  Future<UserPermissionsModel> getUserPermissions(String userId) async {
+    final roleAssignments = <UserRoleAssignmentModel>[];
+    final ownedProjectIds = <String>[];
+
+    // 1. Get groups user belongs to
+    final groupMembers = _sqlite.query(
+      table: _groupMembersTable.tableName,
+      where: '${_groupMembersTable.userId} = ?',
+      whereArgs: [userId],
+    );
+
+    for (final member in groupMembers) {
+      final groupId = member[_groupMembersTable.groupId].toString();
+
+      // 2. Get roles for each group
+      final groupRoles = _sqlite.query(
+        table: _groupRolesTable.tableName,
+        where: '${_groupRolesTable.groupId} = ?',
+        whereArgs: [groupId],
+      );
+
+      for (final groupRole in groupRoles) {
+        final roleName = groupRole[_groupRolesTable.roleName].toString();
+        final projectId = groupRole[_groupRolesTable.projectId]!;
+
+        // 3. Get permissions for the role
+        final role = _sqlite.fetchFirst(
+          tableName: _rolesTable.tableName,
+          where: '${_rolesTable.name} = ?',
+          whereArgs: [roleName],
+        );
+
+        if (role != null) {
+          final permissionsString = role[_rolesTable.permissions]?.toString();
+          List<dynamic> permissionsList = [];
+          if (permissionsString != null && permissionsString.isNotEmpty) {
+            try {
+              permissionsList = jsonDecode(permissionsString) as List<dynamic>;
+            } catch (_) {}
+          }
+
+          final permissions = <Permission>[];
+          for (final entry in permissionsList) {
+            try {
+              permissions.add(Permission.of(entry.toString()));
+            } catch (_) {
+              // Skip unknown permission names
+            }
+          }
+
+          roleAssignments.add(UserRoleAssignmentModel(
+            roleName: roleName,
+            permissions: permissions,
+            projectId: projectId,
+            groupId: groupId,
+          ));
+        }
+      }
+    }
+
+    // 4. Get owned projects
+    final projects = _sqlite.query(
+      table: _projectsTable.tableName,
+      where: '${_projectsTable.ownerId} = ?',
+      whereArgs: [userId],
+    );
+
+    for (final project in projects) {
+      final pid = project[_projectsTable.id]?.toString();
+      if (pid != null && pid.isNotEmpty) {
+        ownedProjectIds.add(pid);
+      }
+    }
+
+    return UserPermissionsModel(
+      roleAssignments: roleAssignments,
+      ownedProjectIds: ownedProjectIds,
+    );
+  }
+
+  @override
+  Future<UserEntity> login(String email, String password) async {
+    final row = _sqlite.fetchFirst(
+      tableName: _table.tableName,
+      where: '${_table.email} = ?',
+      whereArgs: [email],
+    );
+
+    if (row == null) {
+      throw DatabaseException('Login failed: invalid email or user not found locally');
+    }
+
+    final storedPassword = row['password']?.toString();
+    final hasMatchingPassword = storedPassword == null || storedPassword.isEmpty || storedPassword == password;
+
+    if (!hasMatchingPassword) {
+      throw DatabaseException('Login failed: invalid password');
+    }
+
+    return UserModel.fromJson(_parseDataFromSqlite(row));
   }
 }

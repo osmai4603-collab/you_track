@@ -1,5 +1,6 @@
 import 'package:equatable/equatable.dart';
 import 'package:issues_tracking/core/enums/issue_state_enum.dart';
+import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 
 abstract class AgileBoardsEvent extends Equatable {
   const AgileBoardsEvent();
@@ -35,3 +36,27 @@ class MoveCardEvent extends AgileBoardsEvent {
   @override
   List<Object?> get props => [issueId, newState, oldState];
 }
+
+class StartIssueUpdatesEvent extends AgileBoardsEvent {
+  final String projectId;
+  final String? sprintId;
+
+  const StartIssueUpdatesEvent({
+    required this.projectId,
+    this.sprintId,
+  });
+
+  @override
+  List<Object?> get props => [projectId, sprintId];
+}
+
+class IssueUpdatedEvent extends AgileBoardsEvent {
+  final Issue issue;
+
+  const IssueUpdatedEvent(this.issue);
+
+  @override
+  List<Object?> get props => [issue];
+}
+
+class ClearHighlightedCardEvent extends AgileBoardsEvent {}

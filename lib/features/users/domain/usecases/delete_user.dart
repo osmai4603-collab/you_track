@@ -18,12 +18,9 @@ class DeleteUser extends UseCasePermission<void, DeleteUserParams> {
 
   @override
   Permission get requiredPermission => .userDeleteUser;
-
+  
   @override
-  Future<Either<Failure, void>> call({required DeleteUserParams params}) async {
-    final result = await hasPermission();
-    return result.fold((left) => Left(left), (right) async {
-      return await repository.deleteUser(params.userId);
-    });
+  Future<Either<Failure, void>> execute({required DeleteUserParams params}) {
+    return repository.deleteUser(params.userId);
   }
 }

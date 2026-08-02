@@ -9,9 +9,11 @@ import 'package:issues_tracking/features/issues/presentation/cubits/issue_form_c
 import 'package:issues_tracking/features/issues/presentation/cubits/issue_form_state.dart';
 import 'package:issues_tracking/features/issues/presentation/pages/issue_form.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/add_sprint_dialog.dart';
+import 'package:issues_tracking/features/issues/presentation/widgets/add_subsystem_dialog.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/new_tag_dialog.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/add_build_dialog.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/add_link_dialog.dart';
+import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
 import 'package:issues_tracking/features/projects/domain/entities/subsystem_entity.dart';
 
 class IssueFormSidebar extends StatelessWidget {
@@ -235,18 +237,31 @@ class IssueFormSidebar extends StatelessWidget {
       context: context,
       builder: (context) => _PickerSheet(
         title: 'Subsystem',
-        children: availableSubsystems
-            .map(
-              (s) => ListTile(
-                title: Text(s.name),
-                trailing: s.id == current?.id ? const Icon(Icons.check) : null,
-                onTap: () {
-                  context.read<IssueFormCubit>().updateSubsystem(s);
-                  Navigator.pop(context);
+        children: [
+          ListTile(
+            leading: const Icon(Icons.add),
+            title: const Text('New Subsystem'),
+            onTap: () {
+              Navigator.pop(context);
+              AddSubsystemDialog.show(
+                context,
+                onSave: (subsystem) {
+                  context.read<IssueFormCubit>().updateSubsystem(subsystem);
                 },
-              ),
-            )
-            .toList(),
+              );
+            },
+          ),
+          ...availableSubsystems.map(
+            (s) => ListTile(
+              title: Text(s.name),
+              trailing: s.id == current?.id ? const Icon(Icons.check) : null,
+              onTap: () {
+                context.read<IssueFormCubit>().updateSubsystem(s);
+                Navigator.pop(context);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -595,7 +610,7 @@ class IssueFormSidebar extends StatelessWidget {
             title: const Text('New Tag'),
             onTap: () async {
               Navigator.pop(context);
-              final project = state.availableProjects.firstWhereOrNull((p) => p.projectId == state.projectKey);
+              final project = state.availableProjects.cast<ProjectEntity?>().firstWhere((p) => p?.projectId == state.projectKey, orElse: () => null);
               final newTag = await NewTagDialog.show(
                 context,
                 projectId:

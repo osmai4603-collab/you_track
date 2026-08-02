@@ -7,7 +7,7 @@ import 'package:issues_tracking/core/services/sqlite/tables/tags_table.dart';
 import 'package:issues_tracking/features/issues/data/datasources/tag_remote_datasource.dart';
 import 'package:issues_tracking/features/issues/data/models/tag_model.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 
 class TagSqliteDatasourceImpl implements TagRemoteDatasource {
   final SqliteDatabaseSync _sqlite;

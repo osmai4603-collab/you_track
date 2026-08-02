@@ -13,7 +13,7 @@ class DeleteIntegrationUseCase extends UseCasePermission<void, DeleteIntegration
   DeleteIntegrationUseCase(this.repository);
 
   @override
-  Future<Either<Failure, void>> call(
+  Future<Either<Failure, void>> execute(
       {required DeleteIntegrationParams params}) {
     return repository.deleteIntegration(params.integrationId);
   }

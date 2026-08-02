@@ -19,6 +19,11 @@ class AddComment
 
   @override
   Permission get requiredPermission => Permission.commentCreateArticleComment;
+  
+  @override
+  Future<Either<Failure, ArticleComment>> execute({required AddCommentParams params}) {
+    return repository.addComment(params.comment);
+  }
 }
 
 class AddCommentParams extends Params {

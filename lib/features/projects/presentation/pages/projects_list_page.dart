@@ -12,7 +12,7 @@ import 'package:issues_tracking/core/widgets/project_chip.dart';
 import 'package:issues_tracking/core/widgets/text_hover_widget.dart';
 import 'package:issues_tracking/core/widgets/youtrack_state.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_member_entity.dart';
 import '../cubits/projects_list_cubit.dart';
 import '../cubits/project_details_cubit.dart';

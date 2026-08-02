@@ -1,16 +1,8 @@
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
-import 'package:issues_tracking/features/auth/data/datasources/auth_remote_data_source.dart';
-import 'package:issues_tracking/features/auth/data/datasources/auth_sqlite_data_source_impl.dart';
-import 'package:issues_tracking/features/auth/data/datasources/user_permissions_data_source.dart';
-import 'package:issues_tracking/features/auth/data/datasources/user_permissions_sqlite_data_source_impl.dart';
-import 'package:issues_tracking/features/auth/data/repositories/auth_repository_impl.dart';
-import 'package:issues_tracking/features/auth/data/repositories/user_permissions_repository_impl.dart';
-import 'package:issues_tracking/features/auth/domain/repositories/auth_repository.dart';
-import 'package:issues_tracking/features/auth/domain/repositories/user_permissions_repository.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/get_user_permissions_use_case.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/login_use_case.dart';
-import 'package:issues_tracking/features/auth/presentation/cubits/login_cubit.dart';
+import 'package:issues_tracking/features/users/domain/usecases/get_user_permissions_use_case.dart';
+import 'package:issues_tracking/features/users/domain/usecases/login_use_case.dart';
+import 'package:issues_tracking/features/users/presentation/bloc/cubits/login_cubit.dart';
 import 'package:issues_tracking/features/issues/data/datasources/issues_sqlite_data_source_impl.dart';
 import 'package:issues_tracking/features/issues/data/datasources/tag_sqlite_datasource_impl.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/get_project_templates_use_case.dart';
@@ -48,6 +40,7 @@ import 'package:issues_tracking/features/projects/data/datasources/projects_sqli
 import 'package:issues_tracking/features/projects/data/repositories/projects_repository_impl.dart';
 import 'package:issues_tracking/features/projects/domain/repositories/projects_repository.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/get_projects_use_case.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/get_subsystems_use_case.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_sprints_use_case.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/get_project_by_id_use_case.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/create_project_use_case.dart';
@@ -146,7 +139,7 @@ import 'package:issues_tracking/features/knowledge_base/presentation/cubits/arti
 import 'package:issues_tracking/features/knowledge_base/presentation/cubits/article_search_cubit.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/cubits/article_notification_cubit.dart';
 
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 import 'package:issues_tracking/features/issues/data/datasources/tag_remote_datasource.dart';
 import 'package:issues_tracking/features/issues/data/repositories/tags_repository_impl.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/tags_repository.dart';
@@ -235,7 +228,6 @@ Future<void> initDependencies({bool isOffline = false}) async {
   _initCustomFieldsFeature(isOffline: isOffline);
   _initVersionControlFeature(isOffline: isOffline);
   _initTimeTrackingFeature(isOffline: isOffline);
-  _initAuthFeature(isOffline: isOffline);
   _initKnowledgeBaseFeature(isOffline: isOffline);
   _initAgileBoardsFeature(isOffline: isOffline);
   _initGroupsFeature(isOffline: isOffline);
@@ -329,6 +321,7 @@ void _initIssuesFeature({required bool isOffline}) {
   get_it.registerFactory(
     () => IssueFormCubit(
       repository: get_it(),
+      getSubsystemsUseCase: get_it(),
       getSprintsUseCase: get_it(),
       getBuildsUseCase: get_it(),
       getProjectsUseCase: get_it(),
@@ -367,6 +360,7 @@ void _initProjectsFeature({required bool isOffline}) {
   // UseCases
   get_it.registerLazySingleton(() => GetProjectsUseCase(get_it()));
   get_it.registerLazySingleton(() => GetProjectMembersUseCase(get_it()));
+  get_it.registerLazySingleton(() => GetSubsystemsUseCase(get_it()));
   get_it.registerLazySingleton(() => GetSprintsUseCase(get_it()));
   get_it.registerLazySingleton(() => GetBuildsUseCase(get_it()));
   get_it.registerLazySingleton(() => GetProjectByIdUseCase(get_it()));
@@ -595,55 +589,6 @@ void _initKnowledgeBaseFeature({required bool isOffline}) {
   );
 }
 
-void _initAuthFeature({required bool isOffline}) {
-  get_it.registerLazySingleton<AuthRemoteDataSource>(
-    () => isOffline
-        ? AuthSqliteDataSourceImpl(get_it())
-        : AuthRemoteDataSourceImpl(get_it()),
-  );
-
-  get_it.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(get_it()),
-  );
-
-  get_it.registerLazySingleton<LoginUseCase>(() => LoginUseCase(get_it()));
-
-  get_it.registerLazySingleton<UserPermissionsDataSource>(
-    () => UserPermissionsSqliteDataSourceImpl(get_it()),
-  );
-
-  get_it.registerLazySingleton<UserPermissionsRepository>(
-    () => UserPermissionsRepositoryImpl(dataSource: get_it()),
-  );
-
-  get_it.registerLazySingleton<GetUserPermissionsUseCase>(
-    () => GetUserPermissionsUseCase(get_it()),
-  );
-
-  get_it.registerFactory(() => LoginCubit(loginUseCase: get_it()));
-
-  get_it.registerLazySingleton<UserSession>(() => UserSession());
-}
-
-void _initAgileBoardsFeature({required bool isOffline}) {
-  get_it.registerLazySingleton<AgileBoardsRemoteDataSource>(
-    () => AgileBoardsSupabaseDataSource(get_it()),
-  );
-
-  get_it.registerLazySingleton<AgileBoardsRepository>(
-    () => AgileBoardsRepositoryImpl(get_it()),
-  );
-
-  get_it.registerLazySingleton(() => GetBoardDetailsUseCase(get_it()));
-  get_it.registerLazySingleton(() => MoveCardUseCase(get_it()));
-
-  get_it.registerFactory(
-    () => AgileBoardsBloc(
-      getBoardDetailsUseCase: get_it(),
-      moveCardUseCase: get_it(),
-    ),
-  );
-}
 
 void _initGroupsFeature({required bool isOffline}) {
   get_it.registerLazySingleton<GroupsRemoteDataSource>(
@@ -720,6 +665,38 @@ void _initUsersFeature({required bool isOffline}) {
 
   get_it.registerLazySingleton<UsersRepository>(
     () => UsersRepositoryImpl(get_it()),
+  );
+
+  get_it.registerLazySingleton<LoginUseCase>(
+    () => LoginUseCase(get_it()),
+  );
+  get_it.registerLazySingleton<GetUserPermissionsUseCase>(
+    () => GetUserPermissionsUseCase(get_it()),
+  );
+
+  get_it.registerFactory(() => LoginCubit(loginUseCase: get_it()));
+
+  get_it.registerLazySingleton<UserSession>(() => UserSession());
+}
+
+void _initAgileBoardsFeature({required bool isOffline}) {
+  get_it.registerLazySingleton<AgileBoardsRemoteDataSource>(
+    () => AgileBoardsSupabaseDataSource(get_it()),
+  );
+
+  get_it.registerLazySingleton<AgileBoardsRepository>(
+    () => AgileBoardsRepositoryImpl(get_it()),
+  );
+
+  get_it.registerLazySingleton(() => GetBoardDetailsUseCase(get_it()));
+  get_it.registerLazySingleton(() => MoveCardUseCase(get_it()));
+
+  get_it.registerFactory(
+    () => AgileBoardsBloc(
+      getBoardDetailsUseCase: get_it(),
+      moveCardUseCase: get_it(),
+      streamIssues: get_it(),
+    ),
   );
 
   get_it.registerLazySingleton(() => GetUsers(get_it()));

@@ -15,7 +15,7 @@ class GetIntegrationsUseCase
   GetIntegrationsUseCase(this.repository);
 
   @override
-  Future<Either<Failure, List<VcsIntegrationEntity>>> call(
+  Future<Either<Failure, List<VcsIntegrationEntity>>> execute(
       {required GetIntegrationsParams params}) {
     return repository.getIntegrations(params.projectId);
   }

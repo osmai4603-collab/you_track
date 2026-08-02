@@ -25,14 +25,9 @@ class CreateGroup extends UseCasePermission<GroupEntity, CreateGroupParams> {
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
   @override
-  Future<Either<Failure, GroupEntity>> call({
-    required CreateGroupParams params,
-  }) async {
-    final result = await hasPermission();
-    return result.fold((left) => Left(left), (right) async {
-      return await repository.createGroup(
-        GroupEntity(id: '', name: params.name, description: params.description),
-      );
-    });
+  Future<Either<Failure, GroupEntity>> execute({required CreateGroupParams params}) {
+   return repository.createGroup(
+      GroupEntity(id: '', name: params.name, description: params.description),
+    );
   }
 }

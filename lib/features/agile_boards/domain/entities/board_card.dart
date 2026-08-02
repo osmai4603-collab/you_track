@@ -41,7 +41,7 @@ class BoardCard extends Entity {
     IssueStateEnum? state,
     IssuePriorityTypeEnum? priority,
     IssueTypeEnum? issueType,
-    IssueSubsystemEnum? subsystem,
+    IssueSubsystemEnum? subsystemId,
     String? assigneeAvatarUrl,
     bool clearAssigneeAvatarUrl = false,
     String? assigneeName,
@@ -58,7 +58,7 @@ class BoardCard extends Entity {
       state: state ?? this.state,
       priority: priority ?? this.priority,
       issueType: issueType ?? this.issueType,
-      subsystem: subsystem ?? this.subsystem,
+      subsystem: subsystemId ?? this.subsystem,
       assigneeAvatarUrl: clearAssigneeAvatarUrl
           ? null
           : (assigneeAvatarUrl ?? this.assigneeAvatarUrl),

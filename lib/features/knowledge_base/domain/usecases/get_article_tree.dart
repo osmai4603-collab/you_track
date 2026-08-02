@@ -14,10 +14,8 @@ class GetArticleTree
   const GetArticleTree(this.repository);
 
   @override
-  Future<Either<Failure, List<Article>>> call({
-    required GetArticleTreeParams params,
-  }) async {
-    return await repository.getArticleTree(params.projectId);
+  Future<Either<Failure, List<Article>>> execute({required GetArticleTreeParams params}) {
+    return repository.getArticleTree(params.projectId);
   }
 }
 

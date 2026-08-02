@@ -25,7 +25,7 @@ class IssueModel extends Issue {
     super.assigneeAvatarUrl,
     required super.reporterId,
     required super.reporterName,
-    super.subsystem,
+    super.subsystemId,
     super.fixVersions,
     super.build,
     super.tags,
@@ -61,9 +61,7 @@ class IssueModel extends Issue {
       assigneeAvatarUrl: json['assignee_avatar_url']?.toString(),
       reporterId: (json['reporter_id'] ?? '').toString(),
       reporterName: (json['reporter_name'] ?? '').toString(),
-      subsystem: json['subsystem'] != null
-          ? IssueSubsystemEnum.of(json['subsystem'])
-          : IssueSubsystemEnum.noValue,
+      subsystemId: json['subsystem_id'],
       fixVersions: (json['fix_versions'] ?? '').toString(),
       build: json['build'] != null
           ? BuildModel.fromJson(json['build'] as Map<String, dynamic>)
@@ -113,10 +111,10 @@ class IssueModel extends Issue {
       'assignee_avatar_url': assigneeAvatarUrl,
       'reporter_id': reporterId,
       'reporter_name': reporterName,
-      'subsystem': subsystem.name,
+      'subsystem_id': subsystemId,
       'fix_versions': fixVersions,
       'build_id': build?.id,
-      'tags': tags.map((t) => (t as TagModel).toJson()).toList(),
+      // 'tags': tags.map((t) => (t as TagModel).toJson()).toList(),
       'created_at': createdAt.toIso8601String(),
       'updated_at': updatedAt.toIso8601String(),
       'due_date': dueDate?.toIso8601String(),
@@ -129,9 +127,9 @@ class IssueModel extends Issue {
       'is_starred': isStarred,
       'parent_id': parentId,
       'visibility': visibility,
-      'sprints': sprints
-          .map((s) => (s as SprintModel).toJson())
-          .toList(),
+      // 'sprints': sprints
+      //     .map((s) => (s as SprintModel).toJson())
+      //     .toList(),
       'issue_links': links.map((l) => (l as IssueLinkModel).toJson()).toList(),
     };
   }
@@ -167,7 +165,7 @@ class IssueModel extends Issue {
       assigneeAvatarUrl: issue.assigneeAvatarUrl,
       reporterId: issue.reporterId,
       reporterName: issue.reporterName,
-      subsystem: issue.subsystem,
+      subsystemId: issue.subsystemId,
       fixVersions: issue.fixVersions,
       build: issue.build,
       tags: issue.tags,

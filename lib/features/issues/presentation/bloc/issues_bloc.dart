@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
 import 'package:issues_tracking/features/issues/domain/entities/tag.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_issues.dart';
@@ -11,7 +10,7 @@ import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dar
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:fpdart/fpdart.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_state.dart';
 
@@ -69,18 +68,26 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
       return;
     }
 
-    final hasPermission = userSession.hasPermission(Permission.issueReadIssue);
-    if (!hasPermission) {
-      emit(IssuesError('You don\'t have permission to view issues'));
-      return;
-    }
-    
+    final result = await getIssues(params: GetIssuesParams(filter: _currentFilter));
+
     _subscription =
         streamIssues(params: GetIssuesParams(filter: _currentFilter)).listen((
           result,
         ) {
           add(IssuesStreamUpdated(result));
         });
+    emit(IssuesLoaded(
+      issues: result.getOrElse((f) => []),
+      filteredIssues: [],
+      allTags: [],
+      filter: _currentFilter,
+      selectedIssueId: null,
+      selectedIssueIds: {},
+      searchType: IssueSearchType.simple,
+      layoutType: IssueLayoutType.list,
+      structureType: IssueStructureType.flat,
+      previewType: null,
+    ));
   }
 
   UserSession? _getUserSession() {
@@ -97,32 +104,40 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
 
     result.fold((failure) => emit(IssuesError(failure.message)), (issues) {
       final currentState = state;
+      final currentFilter = currentState is IssuesLoaded
+          ? currentState.filter
+          : const IssueFilter();
+      final currentSelectedIssueId = currentState is IssuesLoaded
+          ? currentState.selectedIssueId
+          : null;
+      final Set<String> currentSelectedIssueIds = currentState is IssuesLoaded
+          ? currentState.selectedIssueIds
+          : <String>{};
+      final currentSearchType = currentState is IssuesLoaded
+          ? currentState.searchType
+          : IssueSearchType.simple;
+      final currentLayoutType = currentState is IssuesLoaded
+          ? currentState.layoutType
+          : IssueLayoutType.list;
+      final currentStructureType = currentState is IssuesLoaded
+          ? currentState.structureType
+          : IssueStructureType.flat;
+      final currentPreviewType = currentState is IssuesLoaded
+          ? currentState.previewType
+          : null;
+
       emit(
         IssuesLoaded(
           issues: issues,
           filteredIssues: issues,
           allTags: tags,
-          filter: currentState is IssuesLoaded
-              ? currentState.filter
-              : const IssueFilter(),
-          selectedIssueId: currentState is IssuesLoaded
-              ? currentState.selectedIssueId
-              : null,
-          selectedIssueIds: currentState is IssuesLoaded
-              ? currentState.selectedIssueIds
-              : {},
-          searchType: currentState is IssuesLoaded
-              ? currentState.searchType
-              : IssueSearchType.simple,
-          layoutType: currentState is IssuesLoaded
-              ? currentState.layoutType
-              : IssueLayoutType.list,
-          structureType: currentState is IssuesLoaded
-              ? currentState.structureType
-              : IssueStructureType.flat,
-          previewType: currentState is IssuesLoaded
-              ? currentState.previewType
-              : null,
+          filter: currentFilter,
+          selectedIssueId: currentSelectedIssueId,
+          selectedIssueIds: currentSelectedIssueIds,
+          searchType: currentSearchType,
+          layoutType: currentLayoutType,
+          structureType: currentStructureType,
+          previewType: currentPreviewType,
         ),
       );
     });

@@ -23,12 +23,7 @@ class DeleteGroup extends UseCasePermission<void, DeleteGroupParams> {
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
   @override
-  Future<Either<Failure, void>> call({
-    required DeleteGroupParams params,
-  }) async {
-    final result = await hasPermission();
-    return result.fold((left) => Left(left), (right) async {
-      return await repository.deleteGroup(params.id);
-    });
+  Future<Either<Failure, void>> execute({required DeleteGroupParams params}) {
+    return repository.deleteGroup(params.id);
   }
 }

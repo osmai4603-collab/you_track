@@ -23,9 +23,7 @@ class GetGroupById extends UseCasePermission<GroupEntity, GetGroupByIdParams> {
   GetGroupById(this.repository);
 
   @override
-  Future<Either<Failure, GroupEntity>> call({
-    required GetGroupByIdParams params,
-  }) {
+  Future<Either<Failure, GroupEntity>> execute({required GetGroupByIdParams params}) {
     return repository.getGroupById(params.id);
   }
 }

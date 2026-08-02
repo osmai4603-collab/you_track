@@ -12,7 +12,7 @@ class ResolveComment extends UseCasePermission<void, ResolveCommentParams> {
   const ResolveComment(this.repository);
 
   @override
-  Future<Either<Failure, void>> call({
+  Future<Either<Failure, void>> execute({
     required ResolveCommentParams params,
   }) async {
     return await repository.resolveComment(params.commentId, params.resolvedBy);

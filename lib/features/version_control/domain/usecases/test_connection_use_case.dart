@@ -15,7 +15,7 @@ class TestConnectionUseCase
   TestConnectionUseCase(this.repository);
 
   @override
-  Future<Either<Failure, VcsIntegrationEntity>> call(
+  Future<Either<Failure, VcsIntegrationEntity>> execute(
       {required TestConnectionParams params}) {
     return repository.testConnection(params.integrationId);
   }

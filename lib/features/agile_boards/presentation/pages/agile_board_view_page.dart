@@ -37,6 +37,12 @@ class _AgileBoardViewPageState extends YouTrackState<AgileBoardViewPage> {
     super.initState();
     _bloc = get_it<AgileBoardsBloc>();
     _loadBoard();
+    _bloc.add(
+      StartIssueUpdatesEvent(
+        projectId: widget.projectId,
+        sprintId: _selectedSprintId,
+      ),
+    );
   }
 
   void _loadBoard() {
@@ -147,6 +153,7 @@ class _AgileBoardViewPageState extends YouTrackState<AgileBoardViewPage> {
                                         return Expanded(
                                           child: BoardColumnWidget(
                                             column: column,
+                                            highlightedCardId: state.highlightedCardId,
                                             onCardDropped: (card, newColumn) {
                                               _bloc.add(
                                                 MoveCardEvent(

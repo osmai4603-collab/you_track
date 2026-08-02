@@ -1,10 +1,10 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
-import 'package:issues_tracking/features/auth/domain/entities/user_entity.dart';
-import 'package:issues_tracking/features/auth/domain/repositories/auth_repository.dart';
+import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
+import 'package:issues_tracking/features/users/domain/repositories/users_repository.dart';
 
 class LoginUseCase {
-  final AuthRepository repository;
+  final UsersRepository repository;
 
   LoginUseCase(this.repository);
 

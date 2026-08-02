@@ -8,7 +8,8 @@ import 'package:issues_tracking/features/projects/data/models/project_member_mod
 import 'package:issues_tracking/features/projects/data/models/project_model.dart';
 import 'package:issues_tracking/features/projects/data/models/project_template_model.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/projects/data/models/subsystem_model.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 
 class ProjectsSqliteDataSourceImpl implements ProjectsRemoteDataSource {
   final SqliteDatabaseSync _sqlite;
@@ -153,7 +154,7 @@ class ProjectsSqliteDataSourceImpl implements ProjectsRemoteDataSource {
 
   @override
   Future<ProjectModel> updateProject(ProjectModel project) async {
-    final json = project.toJson()..remove('members');
+    final json = project.toJson();
 
     if (json.containsKey('is_archived') && json['is_archived'] is bool) {
       json['is_archived'] = json['is_archived'] ? 1 : 0;
@@ -161,16 +162,38 @@ class ProjectsSqliteDataSourceImpl implements ProjectsRemoteDataSource {
     if (json.containsKey('is_favorite') && json['is_favorite'] is bool) {
       json['is_favorite'] = json['is_favorite'] ? 1 : 0;
     }
-
-    final id = json['id'].toString();
     json.remove('id');
 
     final setClause = json.keys.map((k) => '$k = ?').join(', ');
     _sqlite.execute(
       'UPDATE ${_projectsTable.tableName} SET $setClause WHERE ${_projectsTable.id} = ?',
-      [...json.values, id],
+      [...json.values, project.id],
     );
 
-    return getProjectById(id);
+    return getProjectById(project.id);
+  }
+
+  @override
+  Future<List<SubsystemModel>> getSubsystems(String projectId) async {
+    final rows = _sqlite.query(
+      table: 'issue_subsystems',
+      where: 'project_id = ?',
+      whereArgs: [projectId],
+      orderBy: 'name ASC',
+    );
+    return rows.map((row) => SubsystemModel.fromJson(row)).toList();
+  }
+  
+  @override
+  Future<SubsystemModel> createSubsystem(SubsystemModel model) async {
+    final json = model.toJson();
+    if (json['id'] == null || json['id'].toString().isEmpty) {
+      json['id'] = DateTime.now().millisecondsSinceEpoch.toString();
+    }
+
+    _sqlite.insert(table: 'issue_subsystems', data: json);
+
+    // Convert back to model
+    return SubsystemModel.fromJson(json);
   }
 }

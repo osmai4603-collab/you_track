@@ -9,8 +9,8 @@ import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/theme/app_fonts.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
-import 'package:issues_tracking/features/auth/presentation/cubits/login_cubit.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/users/presentation/bloc/cubits/login_cubit.dart';
 
 class LoginFormCard extends StatefulWidget {
   const LoginFormCard({super.key});

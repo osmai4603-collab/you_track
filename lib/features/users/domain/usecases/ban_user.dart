@@ -22,16 +22,11 @@ class BanUser extends UseCasePermission<UserEntity, BanUserParams> {
   Permission get requiredPermission => .userUpdateUser;
 
   @override
-  Future<Either<Failure, UserEntity>> call({
-    required BanUserParams params,
-  }) async {
-    final result = await hasPermission();
-    return result.fold((left) => Left(left), (right) async {
-      final userResult = await repository.getUserById(params.userId);
+  Future<Either<Failure, UserEntity>> execute({required BanUserParams params}) {
+    return repository.getUserById(params.userId).then((userResult) {
       return userResult.fold(
         (failure) => Left(failure),
-        (user) =>
-            repository.updateUser(user.copyWith(isBanned: params.isBanned)),
+        (user) => repository.updateUser(user.copyWith(isBanned: params.isBanned)),
       );
     });
   }

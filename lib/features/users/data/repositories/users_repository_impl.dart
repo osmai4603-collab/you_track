@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/entities/user_permissions_entity.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/features/users/data/datasources/users_remote_data_source.dart';
 import 'package:issues_tracking/features/users/data/models/user_model.dart';
@@ -7,8 +8,10 @@ import 'package:issues_tracking/features/users/domain/repositories/users_reposit
 
 class UsersRepositoryImpl implements UsersRepository {
   final UsersRemoteDataSource dataSource;
-
-  UsersRepositoryImpl(this.dataSource);
+  
+  UsersRepositoryImpl(
+    this.dataSource,
+  );
 
   @override
   Future<Either<Failure, List<UserEntity>>> getUsers() async {
@@ -57,6 +60,26 @@ class UsersRepositoryImpl implements UsersRepository {
     try {
       await dataSource.deleteUser(id);
       return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserEntity>> login(String email, String password) async {
+    try {
+      final user = await dataSource.login(email, password);
+      return Right(user);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, UserPermissionsEntity>> getUserPermissions(String userId) async {
+    try {
+      final permissions = await dataSource.getUserPermissions(userId);
+      return Right(permissions);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

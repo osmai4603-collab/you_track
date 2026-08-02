@@ -34,10 +34,9 @@ abstract class IssuesRemoteDataSource {
 class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
   final SupabaseClient supabase;
   final _controller = StreamController<IssueModel>.broadcast();
-  RealtimeChannel? _channel;
 
   IssuesRemoteDataSourceImpl(this.supabase) {
-    _channel = supabase
+    supabase
         .channel('public:issues')
         .onPostgresChanges(
           event: PostgresChangeEvent.all,
@@ -140,6 +139,10 @@ class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
     return _controller.stream;
   }
 
+  void listenTo({required void Function(IssueModel) onData}) {
+    _controller.stream.listen(onData);
+  }
+
   @override
   Future<IssueModel> getIssueById(String id) async {
     final response = await supabase
@@ -206,7 +209,11 @@ class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
         .from('issues')
         .insert(issueData)
         .select()
-        .single();
+        .maybeSingle();
+    
+    if(response == null) {
+      throw Exception('Failed to create issue. No response from server.');
+    }
 
     final createdIssue = IssueModel.fromJson(response);
 

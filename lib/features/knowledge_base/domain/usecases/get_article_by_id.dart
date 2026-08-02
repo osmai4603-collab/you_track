@@ -18,6 +18,11 @@ class GetArticleById extends UseCasePermission<Article, GetArticleByIdParams> {
   }) async {
     return await repository.getArticleById(params.articleId);
   }
+
+  @override
+  Future<Either<Failure, Article>> execute({required GetArticleByIdParams params}) {
+    return repository.getArticleById(params.articleId);
+  }
 }
 
 class GetArticleByIdParams extends Params {

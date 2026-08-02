@@ -29,6 +29,7 @@ final class IssuesNavigation extends AppNavigation {
                   getBuildsUseCase: get_it(),
                   repository: get_it(),
                   getProjectsUseCase: get_it(),
+                  getSubsystemsUseCase: get_it(),
                   getProjectMembersUseCase: get_it(),
                 ),
                 child: IssueForm(projectKey: projectKey),
@@ -48,6 +49,7 @@ final class IssuesNavigation extends AppNavigation {
                 create: (context) => IssueFormCubit(
                   getSprintsUseCase: get_it(),
                   getBuildsUseCase: get_it(),
+                  getSubsystemsUseCase: get_it(),
                   repository: get_it(),
                   getProjectsUseCase: get_it(),
                   getProjectMembersUseCase: get_it(),

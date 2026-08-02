@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_event.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_state.dart';
 import 'package:issues_tracking/features/groups/presentation/widgets/group_table_row.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 
 class GroupsTableView extends StatelessWidget {
   final String? userId;
@@ -19,9 +21,18 @@ class GroupsTableView extends StatelessWidget {
     return BlocBuilder<GroupsBloc, GroupsState>(
       builder: (context, state) {
         if (state is GroupsLoaded) {
-          final displayedGroups = userId != null
-              ? state.groups.where((g) => g.members.any((m) => m.userId == userId)).toList()
-              : state.groups;
+          final userSession = context.watch<UserSession>();
+          final currentUserId = userSession.currentUser?.id;
+          final canReadAllGroups = userSession.hasPermission(Permission.systemLowLevelAdminRead);
+
+          final displayedGroups = state.groups.where((g) {
+            if (userId != null && !g.members.any((m) => m.userId == userId)) {
+              return false;
+            }
+            if (canReadAllGroups) return true;
+            if (currentUserId == null) return false;
+            return g.members.any((m) => m.userId == currentUserId);
+          }).toList();
 
           if (displayedGroups.isEmpty) {
             return Center(

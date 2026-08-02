@@ -22,7 +22,7 @@ class DeleteRole extends UseCasePermission<void, DeleteRoleParams> {
   DeleteRole(this.repository);
 
   @override
-  Future<Either<Failure, void>> call({required DeleteRoleParams params}) {
+  Future<Either<Failure, void>> execute({required DeleteRoleParams params}) {
     return repository.deleteRole(params.id);
   }
 }

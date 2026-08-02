@@ -15,7 +15,7 @@ class ManageUserMappingUseCase
   ManageUserMappingUseCase(this.repository);
 
   @override
-  Future<Either<Failure, List<VcsUserMappingEntity>>> call(
+  Future<Either<Failure, List<VcsUserMappingEntity>>> execute(
       {required ManageUserMappingParams params}) async {
     if (params.deleteMappingId != null) {
       final deleteResult =

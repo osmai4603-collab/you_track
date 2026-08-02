@@ -12,7 +12,7 @@ import 'package:issues_tracking/features/time_tracking/presentation/widgets/time
 import 'package:issues_tracking/features/time_tracking/presentation/widgets/field_configuration_section.dart';
 import 'package:issues_tracking/features/time_tracking/presentation/widgets/work_item_attribute_dialog.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 
 class ProjectTimeTrackingSettingsSection extends StatefulWidget {
   final String projectId;
@@ -272,6 +272,8 @@ class _ProjectTimeTrackingSettingsSectionState
       hasTimeTracking: !project.hasTimeTracking,
     );
 
+    debugPrint('Updating project id: ${project.id}, toggle to ${updatedProject.hasTimeTracking}');
+
     final result = await get_it<UpdateProjectUseCase>()(
       params: UpdateProjectParams(project: updatedProject),
     );
@@ -280,6 +282,7 @@ class _ProjectTimeTrackingSettingsSectionState
 
     result.fold(
       (failure) {
+        debugPrint('UpdateProject failed: ${failure.message}');
         setState(() {
           _isProjectSaving = false;
         });

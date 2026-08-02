@@ -14,7 +14,8 @@ class GetGroups extends UseCasePermission<List<GroupEntity>, NoParams> {
   GetGroups(this.repository);
 
   @override
-  Future<Either<Failure, List<GroupEntity>>> call({required NoParams params}) {
+  Future<Either<Failure, List<GroupEntity>>> execute({required NoParams params}) {
     return repository.getGroups();
   }
+  
 }

@@ -29,9 +29,7 @@ class AssignRole extends UseCasePermission<GroupRoleAssignmentEntity, AssignRole
   AssignRole(this.repository);
 
   @override
-  Future<Either<Failure, GroupRoleAssignmentEntity>> call({
-    required AssignRoleParams params,
-  }) {
+  Future<Either<Failure, GroupRoleAssignmentEntity>> execute({required AssignRoleParams params}) {
     return repository.assignRole(
       GroupRoleAssignmentEntity(
         id: '',

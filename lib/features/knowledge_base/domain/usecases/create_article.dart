@@ -18,6 +18,11 @@ class CreateArticle extends UseCasePermission<Article, CreateArticleParams> {
   }) async {
     return await repository.createArticle(params.article);
   }
+  
+  @override
+  Future<Either<Failure, Article>> execute({required CreateArticleParams params}) {
+    return repository.createArticle(params.article);
+  }
 }
 
 class CreateArticleParams extends Params {

@@ -11,6 +11,7 @@ import 'package:issues_tracking/features/issues/domain/entities/issue_link.dart'
 
 import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_member_entity.dart';
+import 'package:issues_tracking/features/projects/domain/entities/subsystem_entity.dart';
 
 class IssueFormState extends Equatable {
   final String summary;
@@ -21,7 +22,7 @@ class IssueFormState extends Equatable {
   final IssueTypeEnum issueType;
   final String? assigneeId;
   final String? assigneeName;
-  final IssueSubsystemEnum subsystem;
+  final SubsystemEntity? subsystem;
   final String fixVersions;
   final Build? build;
   final Duration? estimation;
@@ -43,6 +44,8 @@ class IssueFormState extends Equatable {
   final String? projectKey;
   final String? errorMessage;
 
+  final List<SubsystemEntity> availableSubsystems;
+
   const IssueFormState({
     this.summary = '',
     this.description = '',
@@ -52,7 +55,7 @@ class IssueFormState extends Equatable {
     this.issueType = IssueTypeEnum.task,
     this.assigneeId,
     this.assigneeName,
-    this.subsystem = IssueSubsystemEnum.noValue,
+    this.subsystem,
     this.fixVersions = '',
     this.build,
     this.estimation,
@@ -73,6 +76,7 @@ class IssueFormState extends Equatable {
     this.issueId,
     this.projectKey,
     this.errorMessage,
+    this.availableSubsystems = const [],
   });
 
   bool get isDirty =>
@@ -105,7 +109,7 @@ class IssueFormState extends Equatable {
     String? assigneeId,
     String? assigneeName,
     bool clearAssignee = false,
-    IssueSubsystemEnum? subsystem,
+    SubsystemEntity? subsystem,
     String? fixVersions,
     Build? build,
     bool clearBuild = false,
@@ -130,6 +134,7 @@ class IssueFormState extends Equatable {
     String? projectKey,
     String? errorMessage,
     bool clearErrorMessage = false,
+    List<SubsystemEntity>? availableSubsystems,
   }) {
     return IssueFormState(
       summary: summary ?? this.summary,
@@ -163,6 +168,7 @@ class IssueFormState extends Equatable {
       errorMessage: clearErrorMessage
           ? null
           : (errorMessage ?? this.errorMessage),
+      availableSubsystems: availableSubsystems ?? this.availableSubsystems,
     );
   }
 
@@ -197,5 +203,6 @@ class IssueFormState extends Equatable {
     issueId,
     projectKey,
     errorMessage,
+    availableSubsystems,
   ];
 }

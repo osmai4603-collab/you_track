@@ -8,12 +8,14 @@ import 'package:issues_tracking/features/agile_boards/presentation/widgets/board
 
 class BoardColumnWidget extends StatelessWidget {
   final BoardColumn column;
+  final String? highlightedCardId;
   final Function(BoardCard card, BoardColumn newColumn) onCardDropped;
   final VoidCallback onAddPressed;
 
   const BoardColumnWidget({
     super.key,
     required this.column,
+    this.highlightedCardId,
     required this.onCardDropped,
     required this.onAddPressed,
   });
@@ -59,6 +61,7 @@ class BoardColumnWidget extends StatelessWidget {
                     child: BoardCardWidget(
                       card: card,
                       localization: localization,
+                      isHighlighted: card.id == highlightedCardId,
                     ),
                   ),
                 ),

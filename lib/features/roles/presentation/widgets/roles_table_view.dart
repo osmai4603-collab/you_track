@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/features/roles/presentation/bloc/roles_bloc.dart';
 import 'package:issues_tracking/features/roles/presentation/bloc/roles_event.dart';
 import 'package:issues_tracking/features/roles/presentation/bloc/roles_state.dart';
 import 'package:issues_tracking/features/roles/presentation/widgets/role_table_row.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_state.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 
 class RolesTableView extends StatelessWidget {
   final String? userId;
@@ -33,13 +35,23 @@ class RolesTableView extends StatelessWidget {
               return const Center(child: CircularProgressIndicator());
             }
 
+            final userSession = context.watch<UserSession>();
+            final currentUserId = userSession.currentUser?.id;
+            final canReadAllGroups = userSession.hasPermission(Permission.systemLowLevelAdminRead);
+
+            final visibleGroups = gState.groups.where((g) {
+              if (userId != null && !g.members.any((m) => m.userId == userId)) {
+                return false;
+              }
+              if (canReadAllGroups) return true;
+              if (currentUserId == null) return false;
+              return g.members.any((m) => m.userId == currentUserId);
+            }).toList();
+
             final assignedRoleNames = <String>{};
-            for (final g in gState.groups) {
-              final isMember = g.members.any((m) => m.userId == userId);
-              if (isMember) {
-                for (final r in g.roles) {
-                  assignedRoleNames.add(r.roleName);
-                }
+            for (final g in visibleGroups) {
+              for (final r in g.roles) {
+                assignedRoleNames.add(r.roleName);
               }
             }
 

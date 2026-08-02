@@ -1,13 +1,10 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/login_use_case.dart';
-import 'package:issues_tracking/features/auth/domain/entities/user_entity.dart';
-import 'package:issues_tracking/core/init_dependencies.dart'
-    as issues_tracking_sl;
-import 'package:issues_tracking/features/auth/domain/usecases/get_user_permissions_use_case.dart'
-    as issues_tracking_gup;
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart'
-    as issues_tracking_us;
+import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
+import 'package:issues_tracking/features/users/domain/usecases/login_use_case.dart';
+import 'package:issues_tracking/core/init_dependencies.dart';
+import 'package:issues_tracking/features/users/domain/usecases/get_user_permissions_use_case.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 
 enum LoginStatus { initial, loading, success, failure }
 
@@ -60,15 +57,13 @@ class LoginCubit extends Cubit<LoginState> {
         );
       },
       (user) async {
-        final getPermissions = issues_tracking_sl
-            .get_it<issues_tracking_gup.GetUserPermissionsUseCase>();
+        final getPermissions = get_it<GetUserPermissionsUseCase>();
         final permissionsResult = await getPermissions(
-          params: issues_tracking_gup.GetUserPermissionsParams(userId: user.id),
+          params: GetUserPermissionsParams(userId: user.id),
         );
 
         permissionsResult.fold((failure) {}, (permissions) {
-          final userSession = issues_tracking_sl
-              .get_it<issues_tracking_us.UserSession>();
+          final userSession = get_it<UserSession>();
           userSession.setPermissions(permissions);
         });
 

@@ -1,22 +1,36 @@
+import 'dart:async';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/enums/issue_state_enum.dart';
+import 'package:issues_tracking/core/enums/issue_subsystem_enum.dart';
+import 'package:issues_tracking/features/agile_boards/domain/entities/board_card.dart';
 import 'package:issues_tracking/features/agile_boards/domain/entities/board_column.dart';
 import 'package:issues_tracking/features/agile_boards/domain/entities/board_swimlane.dart';
 import 'package:issues_tracking/features/agile_boards/domain/use_cases/get_board_details_use_case.dart';
 import 'package:issues_tracking/features/agile_boards/domain/use_cases/move_card_use_case.dart';
 import 'package:issues_tracking/features/agile_boards/presentation/bloc/agile_boards_event.dart';
 import 'package:issues_tracking/features/agile_boards/presentation/bloc/agile_boards_state.dart';
+import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
+import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/get_issues.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/stream_issues.dart';
 
 class AgileBoardsBloc extends Bloc<AgileBoardsEvent, AgileBoardsState> {
   final GetBoardDetailsUseCase getBoardDetailsUseCase;
   final MoveCardUseCase moveCardUseCase;
+  final StreamIssues streamIssues;
+  StreamSubscription<Issue>? _issueSubscription;
 
   AgileBoardsBloc({
     required this.getBoardDetailsUseCase,
     required this.moveCardUseCase,
+    required this.streamIssues,
   }) : super(AgileBoardsInitial()) {
     on<LoadBoardDetailsEvent>(_onLoadBoardDetails);
     on<MoveCardEvent>(_onMoveCard);
+    on<StartIssueUpdatesEvent>(_onStartIssueUpdates);
+    on<IssueUpdatedEvent>(_onIssueUpdated);
+    on<ClearHighlightedCardEvent>(_onClearHighlightedCard);
   }
 
   Future<void> _onLoadBoardDetails(
@@ -124,5 +138,143 @@ class AgileBoardsBloc extends Bloc<AgileBoardsEvent, AgileBoardsState> {
         // Successfully updated on server
       },
     );
+  }
+
+  Future<void> _onStartIssueUpdates(
+    StartIssueUpdatesEvent event,
+    Emitter<AgileBoardsState> emit,
+  ) async {
+    _issueSubscription?.cancel();
+    _issueSubscription = streamIssues(
+      params: GetIssuesParams(
+        filter: IssueFilter(projectFilter: event.projectId),
+      ),
+    ).listen(
+      (issue) => add(IssueUpdatedEvent(issue)),
+      onError: (_) {},
+    );
+  }
+
+  Future<void> _onIssueUpdated(
+    IssueUpdatedEvent event,
+    Emitter<AgileBoardsState> emit,
+  ) async {
+    if (state is! AgileBoardsLoaded) return;
+
+    final currentState = state as AgileBoardsLoaded;
+    final board = currentState.board;
+    final issue = event.issue;
+    final issueId = issue.id;
+
+    bool cardFound = false;
+    final List<BoardSwimlane> newSwimlanes = [];
+    BoardCard? movedCard;
+
+    for (final swimlane in board.swimlanes) {
+      final newColumns = <BoardColumn>[];
+      for (final column in swimlane.columns) {
+        final cardIndex = column.cards.indexWhere((c) => c.id == issueId);
+        if (cardIndex != -1) {
+          cardFound = true;
+          final currentCard = column.cards[cardIndex];
+          final updatedCard = currentCard.copyWith(
+            summary: issue.summary,
+            state: issue.state,
+            priority: issue.priority,
+            issueType: issue.issueType,
+            subsystemId: _parseSubsystem(issue.subsystemId),
+            assigneeAvatarUrl: issue.assigneeAvatarUrl,
+            assigneeName: issue.assigneeName,
+            estimation: issue.estimation,
+          );
+
+          if (issue.state == column.state) {
+            final updatedCards = List<BoardCard>.from(column.cards)
+              ..[cardIndex] = updatedCard;
+            newColumns.add(column.copyWith(cards: updatedCards));
+          } else {
+            movedCard = updatedCard;
+            final updatedCards = List<BoardCard>.from(column.cards)
+              ..removeAt(cardIndex);
+            newColumns.add(column.copyWith(cards: updatedCards));
+          }
+        } else {
+          newColumns.add(column);
+        }
+      }
+      newSwimlanes.add(swimlane.copyWith(columns: newColumns));
+    }
+
+    if (!cardFound) return;
+
+    if (movedCard != null) {
+      for (var i = 0; i < newSwimlanes.length; i++) {
+        final swimlane = newSwimlanes[i];
+        final targetIndex = swimlane.columns.indexWhere(
+          (column) => column.state == issue.state,
+        );
+        if (targetIndex != -1) {
+          final targetColumn = swimlane.columns[targetIndex];
+          final updatedCards = List<BoardCard>.from(targetColumn.cards)
+            ..add(movedCard);
+          final updatedColumns = List<BoardColumn>.from(swimlane.columns)
+            ..[targetIndex] = targetColumn.copyWith(cards: updatedCards);
+          newSwimlanes[i] = swimlane.copyWith(columns: updatedColumns);
+          break;
+        }
+      }
+    }
+
+    final newColumnCounts = <IssueStateEnum, int>{};
+    for (final header in board.headers) {
+      final count = newSwimlanes.fold<int>(
+        0,
+        (sum, swimlane) => sum +
+            swimlane.columns
+                .firstWhere((column) => column.state == header)
+                .cards
+                .length,
+      );
+      newColumnCounts[header] = count;
+    }
+
+    final newBoard = board.copyWith(
+      swimlanes: newSwimlanes,
+      columnCounts: newColumnCounts,
+    );
+
+    emit(currentState.copyWith(
+      board: newBoard,
+      highlightedCardId: issueId,
+    ));
+
+    Future.delayed(const Duration(seconds: 4), () {
+      if (this.state is AgileBoardsLoaded &&
+          (this.state as AgileBoardsLoaded).highlightedCardId == issueId) {
+        add(ClearHighlightedCardEvent());
+      }
+    });
+  }
+
+  Future<void> _onClearHighlightedCard(
+    ClearHighlightedCardEvent event,
+    Emitter<AgileBoardsState> emit,
+  ) async {
+    if (state is AgileBoardsLoaded) {
+      emit((state as AgileBoardsLoaded).copyWith(
+        clearHighlightedCard: true,
+      ));
+    }
+  }
+
+  IssueSubsystemEnum _parseSubsystem(String? subsystemId) {
+    if (subsystemId == null || subsystemId.isEmpty) {
+      return IssueSubsystemEnum.noValue;
+    }
+    try {
+      return IssueSubsystemEnum.of(subsystemId);
+    } catch (_) {
+      return IssueSubsystemEnum.noValue;
+    }
   }
 }

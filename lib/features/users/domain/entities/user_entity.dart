@@ -12,6 +12,12 @@ class UserEntity extends Entity {
   final List<String> projects;
   final String initials;
 
+
+  String get userKey {
+    return (username).length >= 2 ? '${username[0]}${username[1]}' : '';
+  }
+
+
   const UserEntity({
     required this.id,
     required this.fullName,
@@ -65,4 +71,5 @@ class UserEntity extends Entity {
     projects,
     initials,
   ];
+
 }

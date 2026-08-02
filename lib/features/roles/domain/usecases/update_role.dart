@@ -30,18 +30,13 @@ class UpdateRole extends UseCasePermission<RoleEntity, UpdateRoleParams> {
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
   @override
-  Future<Either<Failure, RoleEntity>> call({
-    required UpdateRoleParams params,
-  }) async {
-    final result = await hasPermission();
-    return result.fold((left) => Left(left), (right) async {
-      return await repository.updateRole(
-        RoleEntity(
-          name: params.name,
-          description: params.description,
-          permissions: params.permissions,
-        ),
-      );
-    });
+  Future<Either<Failure, RoleEntity>> execute({required UpdateRoleParams params}) {
+    return repository.updateRole(
+      RoleEntity(
+        name: params.name,
+        description: params.description,
+        permissions: params.permissions,
+      ),
+    );
   }
 }

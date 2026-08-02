@@ -23,12 +23,7 @@ class DeleteProjectUseCase
   Permission get requiredPermission => Permission.projectDeleteProject;
 
   @override
-  Future<Either<Failure, Unit>> call({
-    required DeleteProjectParams params,
-  }) async {
-    final result = await hasPermission();
-    return result.fold((left) => Left(left), (right) async {
-      return await repository.deleteProject(params.id);
-    });
+  Future<Either<Failure, Unit>> execute({required DeleteProjectParams params}) {
+    return repository.deleteProject(params.id);
   }
 }

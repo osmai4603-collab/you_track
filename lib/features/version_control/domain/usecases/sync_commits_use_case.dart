@@ -15,7 +15,7 @@ class SyncCommitsUseCase
   SyncCommitsUseCase(this.repository);
 
   @override
-  Future<Either<Failure, List<VcsCommitEntity>>> call(
+  Future<Either<Failure, List<VcsCommitEntity>>> execute(
       {required SyncCommitsParams params}) {
     return repository.getCommits(params.integrationId, taskId: params.taskId);
   }

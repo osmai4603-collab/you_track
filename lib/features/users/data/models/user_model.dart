@@ -30,6 +30,11 @@ class UserModel extends UserEntity {
     );
   }
 
+  static UserModel? tryParseFromJson(Map<String, dynamic>? data) {
+    if (data == null) return null;
+    return UserModel.fromJson(data);
+  }
+
   factory UserModel.fromJson(Map<String, dynamic> data) {
     printMap(title: 'User', data: data);
 
@@ -75,7 +80,7 @@ class UserModel extends UserEntity {
       email: data['email'],
       avatarUrl: data['avatar_url'],
       createdAt: DateTime.tryParse(data['created_at'] ?? ''),
-      isBanned: data['is_banned'] == true,
+      isBanned: data['is_banned'] as bool? ?? false,
       groups: parsedGroups,
       projects: parsedProjects,
     );

@@ -4,11 +4,11 @@ import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 
 abstract class Params extends Equatable {
   const Params();
-  
+
   @override
   List<Object?> get props => [];
 }
@@ -18,7 +18,8 @@ abstract class UseCase<ReturnType, ParamsType extends Params> {
   Future<Either<Failure, ReturnType>> call({required ParamsType params});
 }
 
-abstract class UseCasePermission<ReturnType, ParamsType extends Params> extends UseCase<ReturnType, ParamsType> {
+abstract class UseCasePermission<ReturnType, ParamsType extends Params>
+    extends UseCase<ReturnType, ParamsType> {
   const UseCasePermission();
 
   Permission get requiredPermission;
@@ -26,7 +27,9 @@ abstract class UseCasePermission<ReturnType, ParamsType extends Params> extends 
   Future<Either<Failure, ReturnType>> execute({required ParamsType params});
 
   @protected
-  Future<Either<Failure, bool>> hasPermission({required ParamsType params}) async {
+  Future<Either<Failure, bool>> hasPermission({
+    required ParamsType params,
+  }) async {
     final userSession = get_it<UserSession>();
 
     if (userSession.currentUser == null) {

@@ -24,9 +24,7 @@ class GetGroupMembers
   GetGroupMembers(this.repository);
 
   @override
-  Future<Either<Failure, List<GroupMemberEntity>>> call({
-    required GetGroupMembersParams params,
-  }) {
+  Future<Either<Failure, List<GroupMemberEntity>>> execute({required GetGroupMembersParams params}) {
     return repository.getGroupMembers(params.groupId);
   }
 }

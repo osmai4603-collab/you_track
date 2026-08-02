@@ -1,5 +1,6 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
+import 'package:issues_tracking/core/entities/user_permissions_entity.dart';
 import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 
 abstract class UsersRepository {
@@ -8,4 +9,6 @@ abstract class UsersRepository {
   Future<Either<Failure, UserEntity>> createUser(UserEntity user, {String? password});
   Future<Either<Failure, UserEntity>> updateUser(UserEntity user);
   Future<Either<Failure, void>> deleteUser(String id);
+  Future<Either<Failure, UserEntity>> login(String email, String password);
+  Future<Either<Failure, UserPermissionsEntity>> getUserPermissions(String userId);
 }

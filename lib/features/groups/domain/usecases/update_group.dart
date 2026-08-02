@@ -49,23 +49,20 @@ class UpdateGroup extends UseCasePermission<GroupEntity, UpdateGroupParams> {
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
   @override
-  Future<Either<Failure, GroupEntity>> call({
-    required UpdateGroupParams params,
-  }) async {
-    final result = await hasPermission();
-    return result.fold((left) => Left(left), (right) async {
-      return await repository.updateGroup(
-        GroupEntity(
-          id: params.id,
-          name: params.name,
-          description: params.description,
-          autoJoin: params.autoJoin ?? false,
-          autoJoinDomains: params.autoJoinDomains ?? const [],
-          twoFactorAuth: params.twoFactorAuth ?? 'optional',
-          groupType: params.groupType ?? 'users',
-          logo: params.logo,
-        ),
-      );
-    });
+  Future<Either<Failure, GroupEntity>> execute({required UpdateGroupParams params}) {
+    return repository.updateGroup(
+      GroupEntity(
+        id: params.id,
+        name: params.name,
+        description: params.description,
+        autoJoin: params.autoJoin ?? false,
+        autoJoinDomains: params.autoJoinDomains ?? const [],
+        twoFactorAuth: params.twoFactorAuth ?? 'optional',
+        groupType: params.groupType ?? 'users',
+        logo: params.logo,
+      ),
+    );
   }
+
+  
 }

@@ -14,7 +14,7 @@ class GetRoles extends UseCasePermission<List<RoleEntity>, NoParams> {
   GetRoles(this.repository);
 
   @override
-  Future<Either<Failure, List<RoleEntity>>> call({required NoParams params}) {
+  Future<Either<Failure, List<RoleEntity>>> execute({required NoParams params}) {
     return repository.getRoles();
   }
 }

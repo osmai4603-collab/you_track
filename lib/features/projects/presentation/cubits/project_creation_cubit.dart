@@ -2,7 +2,7 @@ import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/enums/project_template_enum.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 import '../../domain/entities/project_entity.dart';
 import '../../domain/entities/project_member_entity.dart';
 import '../../domain/usecases/add_project_member_use_case.dart';

@@ -2,7 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 
 mixin PermissionGuardMixin<ReturnType, ParamsType> {
   Permission get requiredPermission;

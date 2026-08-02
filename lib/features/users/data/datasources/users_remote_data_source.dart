@@ -1,3 +1,7 @@
+import 'package:issues_tracking/core/enums/permission_enum.dart';
+import 'package:issues_tracking/core/errors/exceptions.dart';
+import 'package:issues_tracking/features/users/data/models/user_permissions_model.dart';
+import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/user_model.dart';
 
@@ -7,6 +11,8 @@ abstract class UsersRemoteDataSource {
   Future<UserModel> createUser(Map<String, dynamic> data, {String? password});
   Future<UserModel> updateUser(String id, Map<String, dynamic> data);
   Future<void> deleteUser(String id);
+  Future<UserEntity> login(String email, String password);
+  Future<UserPermissionsModel> getUserPermissions(String userId);
 }
 
 class UsersRemoteDataSourceImpl implements UsersRemoteDataSource {
@@ -22,14 +28,14 @@ class UsersRemoteDataSourceImpl implements UsersRemoteDataSource {
     'created_at',
   ];
 
-  final SupabaseClient supabase;
+  final SupabaseClient _supabase;
   final SupabaseClient? adminClient;
 
-  UsersRemoteDataSourceImpl(this.supabase, {this.adminClient});
+  UsersRemoteDataSourceImpl(this._supabase, {this.adminClient});
 
   @override
   Future<List<UserModel>> getUsers() async {
-    final response = await supabase
+    final response = await _supabase
         .from('users')
         .select('*, group_members(groups(name, group_projects(projects(name))))')
         .order('created_at', ascending: false);
@@ -39,7 +45,7 @@ class UsersRemoteDataSourceImpl implements UsersRemoteDataSource {
   @override
   Future<UserModel> getUserById(String id) async {
     final response =
-        await supabase.from('users').select('*, group_members(groups(name, group_projects(projects(name))))').eq('id', id).single();
+        await _supabase.from('users').select('*, group_members(groups(name, group_projects(projects(name))))').eq('id', id).single();
     return UserModel.fromJson(response);
   }
 
@@ -62,7 +68,7 @@ class UsersRemoteDataSourceImpl implements UsersRemoteDataSource {
 
       if (res.user != null) {
         try {
-          final userRecord = await supabase
+          final userRecord = await _supabase
               .from('users')
               .select('*')
               .eq('id', res.user!.id)
@@ -83,7 +89,7 @@ class UsersRemoteDataSourceImpl implements UsersRemoteDataSource {
         if (data.containsKey(column)) column: data[column],
     };
     final response =
-        await supabase.from('users').insert(payload).select().single();
+        await _supabase.from('users').insert(payload).select().single();
     return UserModel.fromJson(response);
   }
 
@@ -93,7 +99,7 @@ class UsersRemoteDataSourceImpl implements UsersRemoteDataSource {
       for (final column in _updatableColumns)
         if (data.containsKey(column)) column: data[column],
     };
-    final response = await supabase
+    final response = await _supabase
         .from('users')
         .update(payload)
         .eq('id', id)
@@ -104,6 +110,105 @@ class UsersRemoteDataSourceImpl implements UsersRemoteDataSource {
 
   @override
   Future<void> deleteUser(String id) async {
-    await supabase.from('users').delete().eq('id', id);
+    await _supabase.from('users').delete().eq('id', id);
+  }
+  
+  @override
+  Future<UserPermissionsModel> getUserPermissions(String userId) async {
+    final roleAssignments = <Map<String, dynamic>>[];
+    final ownedProjectIds = <String>[];
+
+    final groupMembersResponse = await _supabase
+        .from('group_members')
+        .select('group_id')
+        .eq('user_id', userId);
+
+    final groupMembers = groupMembersResponse as List<dynamic>;
+
+    for (final member in groupMembers) {
+      final groupId = member['group_id']?.toString();
+      if (groupId == null || groupId.isEmpty) {
+        continue;
+      }
+
+      final groupRolesResponse = await _supabase
+          .from('group_roles')
+          .select('role_name, project_id')
+          .eq('group_id', groupId);
+
+      final groupRoles = groupRolesResponse as List<dynamic>;
+
+      for (final groupRole in groupRoles) {
+        final roleName = groupRole['role_name']?.toString();
+        if (roleName == null || roleName.isEmpty) {
+          continue;
+        }
+
+        final roleResponse = await _supabase
+            .from('roles')
+            .select('permissions')
+            .eq('name', roleName)
+            .maybeSingle();
+
+        final permissions = <String>[];
+        if (roleResponse != null) {
+          final rawPermissions = roleResponse['permissions'] as List<dynamic>?;
+          permissions.addAll(
+            rawPermissions?.map((entry) => entry.toString()) ?? <String>[],
+          );
+        }
+
+        final projectId = groupRole['project_id']?.toString();
+        roleAssignments.add({
+          'role_name': roleName,
+          'permissions': permissions
+              .map((permission) => Permission.of(permission).name)
+              .toList(),
+          'project_id': projectId?.isEmpty == true ? null : projectId,
+          'group_id': groupId,
+        });
+      }
+    }
+
+    final projectsResponse = await _supabase
+        .from('projects')
+        .select('id')
+        .eq('owner_id', userId);
+
+    final projects = projectsResponse as List<dynamic>;
+    for (final project in projects) {
+      final projectId = project['id']?.toString();
+      if (projectId != null && projectId.isNotEmpty) {
+        ownedProjectIds.add(projectId);
+      }
+    }
+
+    return UserPermissionsModel.fromJson({
+      'role_assignments': roleAssignments,
+      'owned_project_ids': ownedProjectIds,
+    });
+  }
+  
+  @override
+  Future<UserEntity> login(String email, String password) async {
+    final authResponse = await _supabase.auth.signInWithPassword(
+      email: email,
+      password: password,
+    );
+    final authUser = authResponse.user;
+    if (authUser == null) {
+      throw Exception('Login failed: no user authenticated');
+    }
+
+    final userData = await _supabase
+        .from('users')
+        .select()
+        .eq('id', authUser.id)
+        .maybeSingle();
+    if (userData == null) {
+      throw DatabaseException('No User Found for id: ${authUser.id}');
+    }
+
+    return UserModel.fromJson(userData);
   }
 }

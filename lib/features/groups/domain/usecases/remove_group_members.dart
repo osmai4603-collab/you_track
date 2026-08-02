@@ -26,7 +26,7 @@ class RemoveGroupMembers extends UseCasePermission<void, RemoveGroupMembersParam
   RemoveGroupMembers(this.repository);
 
   @override
-  Future<Either<Failure, void>> call({
+  Future<Either<Failure, void>> execute({
     required RemoveGroupMembersParams params,
   }) {
     return repository.removeGroupMembers(params.groupId, params.userIds);

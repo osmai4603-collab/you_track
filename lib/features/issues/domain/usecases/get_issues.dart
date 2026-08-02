@@ -15,7 +15,7 @@ class GetIssues extends UseCasePermission<List<Issue>, GetIssuesParams> {
   GetIssues(this.repository);
 
   @override
-  Future<Either<Failure, List<Issue>>> call({
+  Future<Either<Failure, List<Issue>>> execute({
     required GetIssuesParams params,
   }) async {
     return await repository.getIssues(params.filter);

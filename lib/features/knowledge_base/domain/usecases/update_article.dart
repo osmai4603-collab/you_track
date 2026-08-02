@@ -13,7 +13,7 @@ class UpdateArticle extends UseCasePermission<Article, UpdateArticleParams> {
   const UpdateArticle(this.repository);
 
   @override
-  Future<Either<Failure, Article>> call({
+  Future<Either<Failure, Article>> execute({
     required UpdateArticleParams params,
   }) async {
     return await repository.updateArticle(params.article);

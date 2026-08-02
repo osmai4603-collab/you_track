@@ -15,7 +15,7 @@ class UpdateIntegrationUseCase
   UpdateIntegrationUseCase(this.repository);
 
   @override
-  Future<Either<Failure, VcsIntegrationEntity>> call(
+  Future<Either<Failure, VcsIntegrationEntity>> execute(
       {required UpdateIntegrationParams params}) {
     return repository.updateIntegration(params.integration);
   }

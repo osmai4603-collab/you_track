@@ -30,18 +30,13 @@ class CreateRole extends UseCasePermission<RoleEntity, CreateRoleParams> {
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
   @override
-  Future<Either<Failure, RoleEntity>> call({
-    required CreateRoleParams params,
-  }) async {
-    final result = await hasPermission();
-    return result.fold((left) => Left(left), (right) async {
-      return await repository.createRole(
-        RoleEntity(
-          name: params.name,
-          description: params.description,
-          permissions: params.permissions,
-        ),
-      );
-    });
+  Future<Either<Failure, RoleEntity>> execute({required CreateRoleParams params}) {
+    return repository.createRole(
+      RoleEntity(
+        name: params.name,
+        description: params.description,
+        permissions: params.permissions,
+      ),
+    );
   }
 }

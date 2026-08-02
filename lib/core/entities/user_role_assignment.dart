@@ -4,13 +4,13 @@ import 'package:issues_tracking/core/enums/permission_enum.dart';
 class UserRoleAssignment extends Entity {
   final String roleName;
   final List<Permission> permissions;
-  final String? projectId; // null means global permission
+  final String projectId; // null means global permission
   final String groupId;
 
   const UserRoleAssignment({
     required this.roleName,
     required this.permissions,
-    this.projectId,
+    required this.projectId,
     required this.groupId,
   });
 

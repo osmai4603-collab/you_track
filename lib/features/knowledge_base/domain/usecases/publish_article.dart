@@ -12,10 +12,8 @@ class PublishArticle extends UseCasePermission<void, PublishArticleParams> {
   const PublishArticle(this.repository);
 
   @override
-  Future<Either<Failure, void>> call({
-    required PublishArticleParams params,
-  }) async {
-    return await repository.publishArticle(params.articleId);
+  Future<Either<Failure, void>> execute({required PublishArticleParams params}) {
+    return repository.publishArticle(params.articleId);
   }
 }
 

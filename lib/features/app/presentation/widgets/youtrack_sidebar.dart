@@ -10,7 +10,7 @@ import 'package:issues_tracking/core/widgets/permission_guard.dart';
 import 'package:issues_tracking/core/widgets/user_icon_widget.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/app_cubit.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/app_state.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 
 class YouTrackSidebar extends StatefulWidget {
   const YouTrackSidebar({super.key});
@@ -263,7 +263,7 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
     return MenuAnchor(
       controller: _adminMenuController,
       alignmentOffset: Offset(_isCollapsed ? 80 : 200, -40),
-      menuChildren: _buildAdminMenu(context),
+      menuChildren: _buildAdministrationsMenu(context),
       style: MenuStyle(
         backgroundColor: WidgetStatePropertyAll(Colors.blueGrey.shade900),
         shape: WidgetStatePropertyAll(
@@ -519,7 +519,7 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
                     child: Padding(
                       padding: const EdgeInsets.only(left: AppSpacing.medium),
                       child: Text(
-                        '${session.currentUser?.userName}',
+                        '${session.currentUser?.username}',
                         style: TextStyle(color: textColor, fontSize: 14),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -671,7 +671,8 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
       context: context,
       icon: Icons.notifications_outlined,
       label: 'Notifications',
-      route: '/notifications',
+      route: '',
+      onTap: () {},
       currentRoute: currentRoute,
       textColor: textColor,
       selectedTextColor: selectedTextColor,
@@ -762,7 +763,7 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
     );
   }
 
-  List<Widget> _buildAdminMenu(BuildContext context) {
+  List<Widget> _buildAdministrationsMenu(BuildContext context) {
     const textColor = Color(0xFFC0C1C7);
     final itemStyle = ButtonStyle(
       foregroundColor: WidgetStatePropertyAll(textColor),
@@ -820,7 +821,7 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
           ),
           MenuItemButton(
             style: itemStyle,
-            onPressed: () {},
+            onPressed: () => context.go(AppRouteKeys.groups),
             child: const Text('Groups'),
           ),
           MenuItemButton(

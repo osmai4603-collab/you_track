@@ -12,7 +12,7 @@ class BoardSwimlane extends Entity {
   List<Object?> get props => [subsystem, columns];
 
   @override
-  Entity copyWith({IssueSubsystemEnum? subsystem, List<BoardColumn>? columns}) {
+  BoardSwimlane copyWith({IssueSubsystemEnum? subsystem, List<BoardColumn>? columns}) {
     return BoardSwimlane(
       subsystem: subsystem ?? this.subsystem,
       columns: columns ?? this.columns,

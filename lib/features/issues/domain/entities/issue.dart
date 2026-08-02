@@ -2,7 +2,6 @@ import 'package:issues_tracking/core/entities/entity.dart';
 import 'package:issues_tracking/core/enums/issue_priority_type_enum.dart';
 import 'package:issues_tracking/core/enums/issue_state_enum.dart';
 import 'package:issues_tracking/core/enums/issue_type_enum.dart';
-import 'package:issues_tracking/core/enums/issue_subsystem_enum.dart';
 import 'package:issues_tracking/features/issues/domain/entities/build.dart';
 import 'package:issues_tracking/features/issues/domain/entities/sprint.dart';
 import 'package:issues_tracking/features/issues/domain/entities/tag.dart';
@@ -22,7 +21,7 @@ class Issue extends Entity {
   final String? assigneeAvatarUrl;
   final String reporterId;
   final String reporterName;
-  final IssueSubsystemEnum subsystem;
+  final String? subsystemId;
   final String fixVersions;
   final Build? build;
   final List<Tag> tags;
@@ -55,7 +54,7 @@ class Issue extends Entity {
     this.assigneeAvatarUrl,
     required this.reporterId,
     required this.reporterName,
-    this.subsystem = IssueSubsystemEnum.noValue,
+    this.subsystemId,
     this.fixVersions = '',
     this.build,
     this.tags = const [],
@@ -91,7 +90,7 @@ class Issue extends Entity {
     bool clearAssignee = false,
     String? reporterId,
     String? reporterName,
-    IssueSubsystemEnum? subsystem,
+    String? subsystemId,
     String? fixVersions,
     Build? build,
     bool clearBuild = false,
@@ -116,7 +115,7 @@ class Issue extends Entity {
   }) {
     return Issue(
       id: id ?? this.id,
-      issueKey: projectId ?? issueKey,
+      issueKey: issueKey,
       issueNumber: issueNumber ?? this.issueNumber,
       summary: summary ?? this.summary,
       description: description ?? this.description,
@@ -130,7 +129,7 @@ class Issue extends Entity {
           : (assigneeAvatarUrl ?? this.assigneeAvatarUrl),
       reporterId: reporterId ?? this.reporterId,
       reporterName: reporterName ?? this.reporterName,
-      subsystem: subsystem ?? this.subsystem,
+      subsystemId: subsystemId ?? this.subsystemId,
       fixVersions: fixVersions ?? this.fixVersions,
       build: clearBuild ? null : (build ?? this.build),
       tags: tags ?? this.tags,
@@ -166,7 +165,7 @@ class Issue extends Entity {
     assigneeAvatarUrl,
     reporterId,
     reporterName,
-    subsystem,
+    subsystemId,
     fixVersions,
     build,
     tags,

@@ -28,9 +28,7 @@ class AddGroupProjects
   AddGroupProjects(this.repository);
 
   @override
-  Future<Either<Failure, List<GroupProjectEntity>>> call({
-    required AddGroupProjectsParams params,
-  }) {
+  Future<Either<Failure, List<GroupProjectEntity>>> execute({required AddGroupProjectsParams params}) {
     return repository.addGroupProjects(params.groupId, params.projectIds);
   }
 }

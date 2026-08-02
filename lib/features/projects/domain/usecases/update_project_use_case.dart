@@ -23,12 +23,7 @@ class UpdateProjectUseCase
   Permission get requiredPermission => Permission.projectUpdateProject;
 
   @override
-  Future<Either<Failure, ProjectEntity>> call({
-    required UpdateProjectParams params,
-  }) async {
-    final result = await hasPermission();
-    return result.fold((left) => Left(left), (right) async {
-      return await repository.updateProject(params.project);
-    });
+  Future<Either<Failure, ProjectEntity>> execute({required UpdateProjectParams params}) {
+    return repository.updateProject(params.project);
   }
 }

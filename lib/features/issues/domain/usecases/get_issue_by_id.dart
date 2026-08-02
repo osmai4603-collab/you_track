@@ -11,7 +11,7 @@ class GetIssueById extends UseCasePermission<Issue, GetIssueByIdParams> {
   GetIssueById(this.repository);
 
   @override
-  Future<Either<Failure, Issue>> call({
+  Future<Either<Failure, Issue>> execute({
     required GetIssueByIdParams params,
   }) async {
     return await repository.getIssueById(params.id);

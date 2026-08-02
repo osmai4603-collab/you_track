@@ -23,12 +23,7 @@ class ArchiveProjectUseCase
   Permission get requiredPermission => Permission.projectUpdateProject;
 
   @override
-  Future<Either<Failure, Unit>> call({
-    required ArchiveProjectParams params,
-  }) async {
-    final result = await hasPermission();
-    return result.fold((left) => Left(left), (right) async {
-      return await repository.archiveProject(params.id);
-    });
+  Future<Either<Failure, Unit>> execute({required ArchiveProjectParams params}) {
+    return repository.archiveProject(params.id);
   }
 }

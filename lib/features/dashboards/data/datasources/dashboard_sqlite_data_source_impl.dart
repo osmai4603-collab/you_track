@@ -6,7 +6,7 @@ import 'package:issues_tracking/features/dashboards/data/datasources/dashboard_r
 import 'package:issues_tracking/features/dashboards/data/models/dashboard_model.dart';
 import 'package:issues_tracking/features/dashboards/data/models/dashboard_widget_model.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 
 class DashboardSqliteDataSourceImpl implements DashboardRemoteDataSource {
   final SqliteDatabaseSync _sqlite;

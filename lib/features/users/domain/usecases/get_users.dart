@@ -14,12 +14,7 @@ class GetUsers extends UseCasePermission<List<UserEntity>, NoParams> {
   Permission get requiredPermission => .userReadUserDetails;
 
   @override
-  Future<Either<Failure, List<UserEntity>>> call({
-    required NoParams params,
-  }) async {
-    final result = await hasPermission();
-    return result.fold((left) => Left(left), (right) async {
-      return await repository.getUsers();
-    });
+  Future<Either<Failure, List<UserEntity>>> execute({ NoParams params = const NoParams() }) {
+    return repository.getUsers();
   }
 }

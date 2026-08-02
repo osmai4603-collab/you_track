@@ -34,9 +34,7 @@ class ProjectModel extends ProjectEntity {
       ownerId: entity.ownerId,
       createdAt: entity.createdAt,
       isFavorite: entity.isFavorite,
-      members: entity.members
-          .map((m) => ProjectMemberModel.fromEntity(m))
-          .toList(),
+      members: entity.members,
       visibility: entity.visibility,
       recommendedVisibility: entity.recommendedVisibility,
       hasTimeTracking: entity.hasTimeTracking,
@@ -88,9 +86,6 @@ class ProjectModel extends ProjectEntity {
       'owner_id': ownerId,
       'created_at': createdAt.toIso8601String(),
       'is_favorite': isFavorite,
-      'group_members': members
-          .map((m) => (m as ProjectMemberModel).toJson())
-          .toList(),
       'visibility': visibility,
       'recommended_visibility': recommendedVisibility,
       'has_time_tracking': hasTimeTracking,

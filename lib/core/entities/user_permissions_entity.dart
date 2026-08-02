@@ -13,15 +13,20 @@ class UserPermissionsEntity extends Entity {
 
   bool hasGlobalPermission(Permission permission) {
     return roleAssignments
-        .where((role) => role.projectId == null)
         .any((role) => role.permissions.contains(permission));
+  }
+
+
+  bool hasGlobalAnyPermission(List<Permission> permissions) {
+    return roleAssignments
+        .any((role) => role.permissions.any((p) => permissions.contains(p)));
   }
 
   bool hasProjectPermission(String projectId, Permission permission) {
     if (isProjectOwner(projectId)) return true;
     
     return roleAssignments
-        .where((role) => role.projectId == projectId || role.projectId == null)
+        .where((role) => role.projectId == projectId)
         .any((role) => role.permissions.contains(permission));
   }
 
@@ -36,7 +41,7 @@ class UserPermissionsEntity extends Entity {
     
     final permissions = <Permission>{};
     for (final role in roleAssignments) {
-      if (role.projectId == projectId || role.projectId == null) {
+      if (role.projectId == projectId) {
         permissions.addAll(role.permissions);
       }
     }
@@ -48,15 +53,7 @@ class UserPermissionsEntity extends Entity {
     
     for (final role in roleAssignments) {
       if (role.permissions.contains(permission)) {
-        if (role.projectId == null) {
-          // If they have it globally, we don't know the exhaustive list of projects here,
-          // but we can at least return all projects they are explicitly assigned to with this permission.
-          // Wait, if it's global, they have it on all projects. This is tricky.
-          // For now, let's just return the projects they are explicitly assigned to.
-          // If needed, the caller should check `hasGlobalPermission` first.
-        } else {
-          projectIds.add(role.projectId!);
-        }
+        projectIds.add(role.projectId);
       }
     }
     return projectIds.toList();

@@ -19,14 +19,9 @@ class UpdateUser extends UseCasePermission<UserEntity, UpdateUserParams> {
 
   @override
   Permission get requiredPermission => Permission.userUpdateUser;
-
+  
   @override
-  Future<Either<Failure, UserEntity>> call({
-    required UpdateUserParams params,
-  }) async {
-    final result = await hasPermission();
-    return result.fold((left) => Left(left), (right) async {
-      return await repository.updateUser(params.user);
-    });
+  Future<Either<Failure, UserEntity>> execute({required UpdateUserParams params}) {
+    return repository.updateUser(params.user);
   }
 }

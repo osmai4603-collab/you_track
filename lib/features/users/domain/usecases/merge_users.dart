@@ -25,40 +25,35 @@ class MergeUsers extends UseCasePermission<UserEntity, MergeUsersParams> {
   Permission get requiredPermission => .systemLowLevelAdminWrite;
 
   @override
-  Future<Either<Failure, UserEntity>> call({
+  Future<Either<Failure, UserEntity>> execute({
     required MergeUsersParams params,
   }) async {
-    final result = await hasPermission();
-    return result.fold((left) => Left(left), (right) async {
-      final primaryResult = await repository.getUserById(params.primaryUserId);
-      final secondaryResult = await repository.getUserById(
-        params.secondaryUserId,
-      );
+    final primaryResult = await repository.getUserById(params.primaryUserId);
+    final secondaryResult = await repository.getUserById(
+      params.secondaryUserId,
+    );
 
-      return primaryResult.fold(
-        (failure) => Left(failure),
-        (primary) =>
-            secondaryResult.fold((failure) => Left(failure), (secondary) async {
-              final mergedGroups = {
-                ...primary.groups,
-                ...secondary.groups,
-              }.toList();
-              final mergedProjects = {
-                ...primary.projects,
-                ...secondary.projects,
-              }.toList();
+    return primaryResult.fold(
+      (failure) => Left(failure),
+      (primary) => secondaryResult.fold((failure) => Left(failure), (
+        secondary,
+      ) async {
+        final mergedGroups = {...primary.groups, ...secondary.groups}.toList();
+        final mergedProjects = {
+          ...primary.projects,
+          ...secondary.projects,
+        }.toList();
 
-              final merged = primary.copyWith(
-                groups: mergedGroups,
-                projects: mergedProjects,
-              );
+        final merged = primary.copyWith(
+          groups: mergedGroups,
+          projects: mergedProjects,
+        );
 
-              final updateResult = await repository.updateUser(merged);
-              await repository.deleteUser(params.secondaryUserId);
+        final updateResult = await repository.updateUser(merged);
+        await repository.deleteUser(params.secondaryUserId);
 
-              return updateResult;
-            }),
-      );
-    });
+        return updateResult;
+      }),
+    );
   }
 }

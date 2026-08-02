@@ -1,4 +1,6 @@
-import 'package:issues_tracking/features/auth/domain/entities/user_entity.dart';
+
+
+import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 
 import '../../../../core/entities/entity.dart';
 
@@ -10,7 +12,7 @@ class ProjectMemberEntity extends Entity {
   final String userId;
   final UserEntity? userData;
 
-  String get name => userData?.userName ?? '';
+  String get name => userData?.username ?? '';
   String get userKey => userData?.userKey ?? '';
   String get email => userData?.email ?? '';
   String? get avatarUrl => userData?.avatarUrl;

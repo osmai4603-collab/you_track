@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:issues_tracking/features/users/presentation/pages/login_page.dart';
 import 'package:provider/provider.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
@@ -12,7 +13,7 @@ import 'package:issues_tracking/core/services/navigation/groups_navigation.dart'
 import 'package:issues_tracking/core/services/navigation/roles_navigation.dart';
 import 'package:issues_tracking/core/services/navigation/users_navigation.dart';
 import 'package:issues_tracking/core/services/navigation/report_navigation.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 import 'package:issues_tracking/features/dashboards/presentation/bloc/dashboard_bloc.dart';
 import 'package:issues_tracking/features/dashboards/presentation/bloc/dashboard_event.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/youtrack_shell_cubit.dart';
@@ -22,7 +23,6 @@ import 'package:issues_tracking/features/users/presentation/bloc/users_bloc.dart
 import 'package:issues_tracking/features/app/presentation/widgets/youtrack_shell.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
-import 'package:issues_tracking/features/auth/presentation/pages/login_page.dart';
 
 /// **هيكلية المسارات:**
 /// ```

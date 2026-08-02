@@ -1,9 +1,11 @@
 import 'package:issues_tracking/core/init_dependencies.dart';
-import 'package:issues_tracking/features/auth/domain/usecases/user_session.dart';
+import 'package:issues_tracking/core/utils/printing.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/project_model.dart';
 import '../models/project_member_model.dart';
 import '../models/project_template_model.dart';
+import '../models/subsystem_model.dart';
 
 abstract class ProjectsRemoteDataSource {
   Future<List<ProjectModel>> getProjects();
@@ -15,6 +17,9 @@ abstract class ProjectsRemoteDataSource {
   Future<void> deleteProject(String id);
   Future<List<ProjectMemberModel>> getProjectMembers(String projectId);
   Future<ProjectMemberModel> addProjectMember(ProjectMemberModel member);
+  Future<List<SubsystemModel>> getSubsystems(String projectId);
+
+  Future<SubsystemModel> createSubsystem(SubsystemModel model);
 }
 
 class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
@@ -60,8 +65,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
       ..remove('is_archived')
       ..remove('is_template')
       ..remove('is_favorite')
-      ..remove('created_at')
-      ..remove('owner_id');
+      ..remove('created_at');
 
     final userSession = get_it<UserSession>();
     if (userSession.currentUser != null) {
@@ -78,13 +82,19 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
 
   @override
   Future<ProjectModel> updateProject(ProjectModel project) async {
-    final json = project.toJson()..remove('members');
+    final json = project.toJson()..remove('group_members')..remove('id');
+    printMap(title: 'Updating Project WHERE id = ${project.id}', data: json);
     final response = await supabase
         .from('projects')
         .update(json)
         .eq('id', project.id)
         .select()
-        .single();
+        .maybeSingle();
+
+    if (response == null) {
+      throw Exception('No project updated. Project not found or update not allowed (RLS).');
+    }
+    printMap(title: 'Updated Project', data: response);
     return ProjectModel.fromJson(response);
   }
 
@@ -175,5 +185,33 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
         .select()
         .single();
     return ProjectMemberModel.fromJson(response);
+  }
+
+  @override
+  Future<List<SubsystemModel>> getSubsystems(String projectId) async {
+    try {
+      final response = await supabase
+          .from('issue_subsystems')
+          .select()
+          .eq('project_id', projectId)
+          .order('name', ascending: true);
+      return (response as List).map((e) => SubsystemModel.fromJson(e)).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+  
+  @override
+  Future<SubsystemModel> createSubsystem(SubsystemModel model) async {
+    final data = model.toJson()..remove('id');
+    final response = await supabase
+        .from('issue_subsystems')
+        .insert(data)
+        .select()
+        .maybeSingle();
+    if (response == null) {
+      throw Exception('No subsystem created. Insertion failed or not allowed (RLS).');
+    }
+    return SubsystemModel.fromJson(response);
   }
 }

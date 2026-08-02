@@ -13,10 +13,8 @@ class ReorderArticles extends UseCasePermission<void, ReorderArticlesParams> {
   const ReorderArticles(this.repository);
 
   @override
-  Future<Either<Failure, void>> call({
-    required ReorderArticlesParams params,
-  }) async {
-    return await repository.reorderArticles(params.articles);
+  Future<Either<Failure, void>> execute({required ReorderArticlesParams params}) {
+    return repository.reorderArticles(params.articles);
   }
 }
 

@@ -9,10 +9,7 @@ class AddGroupMembersParams extends Params {
   final String groupId;
   final List<String> userIds;
 
-  const AddGroupMembersParams({
-    required this.groupId,
-    required this.userIds,
-  });
+  const AddGroupMembersParams({required this.groupId, required this.userIds});
 
   @override
   List<Object?> get props => [groupId, userIds];
@@ -28,7 +25,7 @@ class AddGroupMembers
   AddGroupMembers(this.repository);
 
   @override
-  Future<Either<Failure, List<GroupMemberEntity>>> call({
+  Future<Either<Failure, List<GroupMemberEntity>>> execute({
     required AddGroupMembersParams params,
   }) {
     return repository.addGroupMembers(params.groupId, params.userIds);

@@ -29,6 +29,9 @@
 | `starting_number` | `int4` |  Nullable |
 | `visibility` | `uuid` |  Nullable |
 | `recommended_visibility` | `_uuid` |  Nullable |
+| `has_time_tracking` | `bool` |  |
+| `estimation` | `int8` |  Nullable |
+| `spent_time` | `int8` |  Nullable |
 
 ## Table `project_members`
 
@@ -480,6 +483,63 @@
 | `group_id` | `uuid` |  |
 | `project_id` | `uuid` |  |
 
+## Table `time_tracking_configs`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `project_id` | `uuid` |  Unique |
+| `enabled` | `bool` |  |
+| `estimation_field_id` | `uuid` |  Nullable |
+| `spent_time_field_id` | `uuid` |  Nullable |
+| `aggregate_spent_time` | `bool` |  |
+| `aggregate_estimation` | `bool` |  |
+| `updated_at` | `timestamptz` |  |
+
+## Table `work_item_attributes`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `project_id` | `uuid` |  |
+| `name` | `text` |  |
+| `is_active` | `bool` |  |
+| `sort_order` | `int4` |  |
+| `created_at` | `timestamptz` |  |
+| `updated_at` | `timestamptz` |  |
+
+## Table `attribute_values`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `value` | `text` |  |
+| `created_at` | `timestamptz` |  |
+| `updated_at` | `timestamptz` |  |
+| `attribute_id` | `uuid` |  |
+| `color` | `int8` |  |
+| `first_letter` | `text` |  |
+
+## Table `issue_subsystems`
+
+### Columns
+
+| Name | Type | Constraints |
+|------|------|-------------|
+| `id` | `uuid` | Primary |
+| `created_at` | `timestamptz` |  |
+| `project_id` | `uuid` |  |
+| `name` | `text` |  |
+| `owner_id` | `uuid` |  |
+| `color` | `int4` |  |
+| `first_letter` | `text` |  |
+
 ## Custom Types / Enums
 
 ### `vcs_provider_type`
@@ -562,6 +622,7 @@
 |--------|---------|-------|--------|-------|------------|
 | `Anyone can view projects` | SELECT | public | PERMISSIVE | `true` | — |
 | `Authenticated users can create projects` | INSERT | authenticated | PERMISSIVE | — | `true` |
+| `projects owner full access` | ALL | authenticated | PERMISSIVE | `(owner_id = ( SELECT auth.uid() AS uid))` | `(owner_id = ( SELECT auth.uid() AS uid))` |
 
 ### `issues`
 
@@ -684,6 +745,15 @@
 | `vcs_integrations_update` | UPDATE | public | PERMISSIVE | `(project_id IN ( SELECT project_members.project_id    FROM project_members   WHERE ((project_members.user_id = auth.uid()) AND (project_members.role = ANY (ARRAY['owner'::text, 'admin'::text])))))` | — |
 | `vcs_integrations_delete` | DELETE | public | PERMISSIVE | `(project_id IN ( SELECT project_members.project_id    FROM project_members   WHERE ((project_members.user_id = auth.uid()) AND (project_members.role = ANY (ARRAY['owner'::text, 'admin'::text])))))` | — |
 
+### `attribute_values`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `custom_work_item_attributes_update` | UPDATE | public | PERMISSIVE | `true` | `true` |
+| `custom_work_item_attributes_delete` | DELETE | public | PERMISSIVE | `true` | — |
+| `custom_work_item_attributes_select` | SELECT | public | PERMISSIVE | `true` | — |
+| `custom_work_item_attributes_insert` | INSERT | public | PERMISSIVE | — | `true` |
+
 ### `vcs_user_mappings`
 
 | Policy | Command | Roles | Action | USING | WITH CHECK |
@@ -706,4 +776,26 @@
 | `vcs_pull_requests_select` | SELECT | public | PERMISSIVE | `(task_id IN ( SELECT issues.id    FROM issues   WHERE true))` | — |
 | `vcs_pull_requests_insert` | INSERT | public | PERMISSIVE | — | `true` |
 | `vcs_pull_requests_update` | UPDATE | public | PERMISSIVE | `true` | — |
+
+### `time_tracking_configs`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `project member read` | SELECT | authenticated | PERMISSIVE | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = time_tracking_configs.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = time_tracking_configs.project_id) AND (p.owner_id = auth.uid())))))` | — |
+| `project member write` | INSERT | authenticated | PERMISSIVE | — | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = time_tracking_configs.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = time_tracking_configs.project_id) AND (p.owner_id = auth.uid())))))` |
+| `project member update` | UPDATE | authenticated | PERMISSIVE | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = time_tracking_configs.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = time_tracking_configs.project_id) AND (p.owner_id = auth.uid())))))` | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = time_tracking_configs.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = time_tracking_configs.project_id) AND (p.owner_id = auth.uid())))))` |
+| `project member delete` | DELETE | authenticated | PERMISSIVE | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = time_tracking_configs.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = time_tracking_configs.project_id) AND (p.owner_id = auth.uid())))))` | — |
+| `time_tracking_configs_select` | SELECT | public | PERMISSIVE | `true` | — |
+| `time_tracking_configs_insert` | INSERT | public | PERMISSIVE | — | `true` |
+| `time_tracking_configs_update` | UPDATE | public | PERMISSIVE | `true` | `true` |
+| `time_tracking_configs_delete` | DELETE | public | PERMISSIVE | `true` | — |
+
+### `work_item_attributes`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `work_types_select` | SELECT | public | PERMISSIVE | `true` | — |
+| `work_types_insert` | INSERT | public | PERMISSIVE | — | `true` |
+| `work_types_update` | UPDATE | public | PERMISSIVE | `true` | `true` |
+| `work_types_delete` | DELETE | public | PERMISSIVE | `true` | — |
 

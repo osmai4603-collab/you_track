@@ -13,7 +13,7 @@ class SearchArticles extends UseCasePermission<List<Article>, SearchArticlesPara
   const SearchArticles(this.repository);
 
   @override
-  Future<Either<Failure, List<Article>>> call({
+  Future<Either<Failure, List<Article>>> execute({
     required SearchArticlesParams params,
   }) async {
     return await repository.searchArticles(params.projectId, params.query);

@@ -23,9 +23,7 @@ class GetGroupRoles extends UseCasePermission<List<GroupRoleAssignmentEntity>, G
   GetGroupRoles(this.repository);
 
   @override
-  Future<Either<Failure, List<GroupRoleAssignmentEntity>>> call({
-    required GetGroupRolesParams params,
-  }) {
+  Future<Either<Failure, List<GroupRoleAssignmentEntity>>> execute({required GetGroupRolesParams params}) {
     return repository.getGroupRoles(params.groupId);
   }
 }

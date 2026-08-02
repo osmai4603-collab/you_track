@@ -8,12 +8,14 @@ import 'package:issues_tracking/features/agile_boards/domain/entities/board_card
 
 class BoardCardWidget extends StatelessWidget {
   final BoardCard card;
+  final bool isHighlighted;
   final VoidCallback? onTap;
   final AppLocalizations localization;
 
   const BoardCardWidget({
     super.key,
     required this.card,
+    this.isHighlighted = false,
     this.onTap,
     required this.localization,
   });
@@ -21,15 +23,29 @@ class BoardCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-    final textTheme = TextTheme.of(context);
+    final textTheme = Theme.of(context).textTheme;
     final priorityColor = _getPriorityColor(card.priority.name, colors);
 
     final cardContent = Container(
       margin: EdgeInsets.zero,
       decoration: BoxDecoration(
-        color: colors.surfaceContainerLowest,
+        color: isHighlighted
+            ? colors.secondaryContainer.withValues(alpha: 0.18)
+            : colors.surfaceContainerLowest,
         borderRadius: AppRadius.smallBorderRadius,
-        border: Border.all(color: colors.outline),
+        border: Border.all(
+          color: isHighlighted ? colors.secondary : colors.outline,
+          width: isHighlighted ? 1.6 : 1,
+        ),
+        boxShadow: isHighlighted
+            ? [
+                BoxShadow(
+                  color: colors.secondary.withValues(alpha: 0.15),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ]
+            : null,
       ),
       child: ClipRRect(
         borderRadius: AppRadius.smallBorderRadius,
@@ -175,36 +191,6 @@ class BoardCardWidget extends StatelessWidget {
       ),
       childWhenDragging: Opacity(opacity: 0.3, child: cardContent),
       child: cardContent,
-    );
-  }
-
-  Widget _buildTag(
-    ColorScheme colors, {
-    IconData? icon,
-    Color? iconColor,
-    required String text,
-  }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-      decoration: BoxDecoration(
-        color: colors.surfaceContainerHighest,
-        borderRadius: AppRadius.smallBorderRadius,
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (icon != null) ...[
-            Icon(icon, size: 12, color: iconColor ?? colors.onSurfaceVariant),
-            const SizedBox(width: 4),
-          ],
-          Text(
-            text,
-            style: AppTextTheme.light.labelSmall?.copyWith(
-              color: colors.onSurfaceVariant,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
