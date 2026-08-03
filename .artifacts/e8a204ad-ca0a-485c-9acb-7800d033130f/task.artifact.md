@@ -1,0 +1,2 @@
+- [ ] Update `GroupsSqliteDataSourceImpl.getGroups` signature and implementation
+- [ ] Verify changes with `analyze_file`

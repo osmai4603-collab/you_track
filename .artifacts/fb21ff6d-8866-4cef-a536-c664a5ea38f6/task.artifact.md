@@ -1,0 +1,3 @@
+- `[ ]` Update `IssuesPage` to trigger `LoadIssues` and show search bar
+- `[ ]` Update `IssuesBloc` to fetch tags and handle filtered loading correctly
+- `[ ]` Verify changes

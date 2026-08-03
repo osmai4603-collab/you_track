@@ -1,0 +1,2 @@
+- [ ] Register `AddSubsystemUseCase` in `lib/core/init_dependencies.dart`
+- [ ] Verify registration
