@@ -1,2 +1,3 @@
-- [ ] Update `GroupsSqliteDataSourceImpl.getGroups` signature and implementation
-- [ ] Verify changes with `analyze_file`
+- [x] Fix errors in `all_usecases_test.dart`
+- [x] Fix errors in `permission_guard_mixin_test.dart`
+- [x] Verify changes with `analyze_file`

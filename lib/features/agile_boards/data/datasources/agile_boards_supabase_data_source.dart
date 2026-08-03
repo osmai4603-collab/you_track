@@ -18,7 +18,7 @@ class AgileBoardsSupabaseDataSource implements AgileBoardsRemoteDataSource {
   Future<List<BoardCardModel>> getBoardCards(String projectId, {String? sprintId}) async {
     var query = supabase
         .from('issues')
-        .select('*, sprints(*)')
+        .select('*, sprints(*), subsystem:issue_subsystems(*)')
         .eq('project_id', projectId);
 
     final response = await query;

@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import '../../../../core/errors/failure.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../entities/work_type_entity.dart';
@@ -19,10 +20,16 @@ class AddWorkTypeParams extends Params {
   List<Object?> get props => [projectId, name, description];
 }
 
-class AddWorkType implements UseCase<WorkTypeEntity, AddWorkTypeParams> {
+class AddWorkType extends UseCase<WorkTypeEntity, AddWorkTypeParams> {
   final TimeTrackingRepository repository;
 
   const AddWorkType(this.repository);
+
+  @override
+  Permission get requiredPermission => Permission.projectUpdateProject;
+
+  @override
+  String? getProjectId(AddWorkTypeParams params) => params.projectId;
 
   @override
   Future<Either<Failure, WorkTypeEntity>> call({

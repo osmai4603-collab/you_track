@@ -241,11 +241,37 @@ class GroupsSqliteDataSourceImpl implements GroupsRemoteDataSource {
   }
 
   @override
-  Future<List<GroupModel>> getGroups() async {
-    final rows = _sqlite.query(
-      table: _groupsTable.tableName,
-      orderBy: 'created_at DESC',
-    );
+  Future<List<GroupModel>> getGroups({String? userId}) async {
+    List<Map<String, dynamic>> rows;
+
+    if (userId != null) {
+      final memberRows = _sqlite.query(
+        table: _membersTable.tableName,
+        where: '${_membersTable.userId} = ?',
+        whereArgs: [userId],
+      );
+      final groupIds = memberRows
+          .map((e) => e[_membersTable.groupId].toString())
+          .toList();
+
+      if (groupIds.isEmpty) {
+        return [];
+      }
+
+      final whereClause = groupIds.map((_) => '?').join(', ');
+      rows = _sqlite.query(
+        table: _groupsTable.tableName,
+        where: '${_groupsTable.id} IN ($whereClause)',
+        whereArgs: groupIds,
+        orderBy: 'created_at DESC',
+      );
+    } else {
+      rows = _sqlite.query(
+        table: _groupsTable.tableName,
+        orderBy: 'created_at DESC',
+      );
+    }
+
     for (final row in rows) {
       row['group_members'] = _queryMembersWithUsers(row['id'].toString());
       row['group_roles'] = _queryRolesWithProjects(row['id'].toString());

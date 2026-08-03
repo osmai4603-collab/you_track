@@ -39,12 +39,14 @@ class Issue extends Entity {
   final List<String> visibility;
   final List<Sprint> sprints;
   final List<IssueLink> links;
+  final String projectId;
 
   const Issue({
     required this.id,
     required this.issueKey,
     required this.issueNumber,
     required this.summary,
+    required this.projectId,
     this.description = '',
     this.state = IssueStateEnum.toDo,
     this.priority = IssuePriorityTypeEnum.normal,
@@ -116,6 +118,7 @@ class Issue extends Entity {
     return Issue(
       id: id ?? this.id,
       issueKey: issueKey,
+      projectId: projectId ?? this.projectId,
       issueNumber: issueNumber ?? this.issueNumber,
       summary: summary ?? this.summary,
       description: description ?? this.description,
@@ -184,4 +187,5 @@ class Issue extends Entity {
     sprints,
     links,
   ];
+
 }

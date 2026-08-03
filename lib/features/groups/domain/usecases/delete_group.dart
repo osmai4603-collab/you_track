@@ -14,7 +14,7 @@ class DeleteGroupParams extends Params {
   List<Object?> get props => [id];
 }
 
-class DeleteGroup extends UseCasePermission<void, DeleteGroupParams> {
+class DeleteGroup extends UseCase<void, DeleteGroupParams> {
   final GroupsRepository repository;
 
   DeleteGroup(this.repository);
@@ -23,7 +23,7 @@ class DeleteGroup extends UseCasePermission<void, DeleteGroupParams> {
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
   @override
-  Future<Either<Failure, void>> execute({required DeleteGroupParams params}) {
+  Future<Either<Failure, void>> call({required DeleteGroupParams params}) {
     return repository.deleteGroup(params.id);
   }
 }

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
 import 'package:issues_tracking/core/widgets/issue_priority_chip.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/add_sprint_dialog.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
@@ -81,12 +83,24 @@ class IssuesSidebar extends StatelessWidget {
           Expanded(
             child: BlocBuilder<IssuesBloc, IssuesState>(
               builder: (context, state) {
+                Widget content;
                 if (state is IssuesLoading) {
-                  return const Center(child: CircularProgressIndicator());
+                  content = Center(
+                    key: const ValueKey('issues-sidebar-loading'),
+                    child: SizedBox(
+                      width: 220,
+                      child: ShimmerLoading.list(itemCount: 4),
+                    ),
+                  );
                 } else if (state is IssuesLoaded) {
-                  return _IssueList(issues: state.issues);
+                  content = _IssueList(issues: state.issues);
+                } else {
+                  content = const SizedBox.shrink(
+                    key: ValueKey('issues-sidebar-empty'),
+                  );
                 }
-                return const SizedBox.shrink();
+
+                return AnimatedContentSwitcher(child: content);
               },
             ),
           ),

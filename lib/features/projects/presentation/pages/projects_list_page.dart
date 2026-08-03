@@ -7,10 +7,12 @@ import 'package:issues_tracking/core/constants/app_icons.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
 import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
 import 'package:issues_tracking/core/widgets/project_chip.dart';
 import 'package:issues_tracking/core/widgets/text_hover_widget.dart';
 import 'package:issues_tracking/core/widgets/youtrack_state.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_member_entity.dart';
@@ -56,6 +58,9 @@ class _ProjectsListPageState extends YouTrackState<ProjectsListPage> {
     //   Permission.projectCreateProject,
     // );
 
+    final colors = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Column(
       children: [
         // ProjectsHeader(
@@ -74,45 +79,55 @@ class _ProjectsListPageState extends YouTrackState<ProjectsListPage> {
         Expanded(
           child: BlocBuilder<ProjectsListCubit, ProjectsListState>(
             builder: (context, state) {
+              Widget content;
+
               if (state.status == ProjectsListStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
-              }
-              if (state.status == ProjectsListStatus.failure) {
-                return Center(
+                content = SizedBox(
+                  key: const ValueKey('projects-loading'),
+                  width: 800,
+                  child: ShimmerLoading.list(itemCount: 10),
+                );
+              } else if (state.status == ProjectsListStatus.failure) {
+                content = Center(
+                  key: const ValueKey('projects-error'),
                   child: SelectableText(
                     state.errorMessage ?? '',
                     style: textTheme.bodyMedium?.copyWith(color: colors.error),
                   ),
                 );
+              } else {
+                final projects = state.filteredProjects;
+                if (projects.isEmpty) {
+                  content = Center(
+                    key: const ValueKey('projects-empty'),
+                    child: Text(
+                      localization.noProjectsFound,
+                      style: textTheme.bodyMedium?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                  );
+                } else {
+                  content = Align(
+                    key: const ValueKey('projects-list'),
+                    child: SizedBox(
+                      width: 800,
+                      child: ListView.separated(
+                        itemCount: projects.length,
+                        separatorBuilder: (_, _) => Divider(
+                          height: 1,
+                          color: colors.outlineVariant.withValues(alpha: 0.3),
+                        ),
+                        itemBuilder: (context, index) {
+                          return ProjectListTile(projectEntity: projects[index]);
+                        },
+                      ),
+                    ),
+                  );
+                }
               }
 
-              final projects = state.filteredProjects;
-              if (projects.isEmpty) {
-                return Center(
-                  child: Text(
-                    localization.noProjectsFound,
-                    style: textTheme.bodyMedium?.copyWith(
-                      color: colors.onSurfaceVariant,
-                    ),
-                  ),
-                );
-              }
-
-              return Align(
-                child: SizedBox(
-                  width: 800,
-                  child: ListView.separated(
-                    itemCount: projects.length,
-                    separatorBuilder: (_, _) => Divider(
-                      height: 1,
-                      color: colors.outlineVariant.withValues(alpha: 0.3),
-                    ),
-                    itemBuilder: (context, index) {
-                      return ProjectListTile(projectEntity: projects[index]);
-                    },
-                  ),
-                ),
-              );
+              return AnimatedContentSwitcher(child: content);
             },
           ),
         ),

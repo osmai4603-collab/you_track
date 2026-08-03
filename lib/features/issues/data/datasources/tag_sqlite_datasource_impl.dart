@@ -5,6 +5,7 @@ import 'package:issues_tracking/core/services/sqlite/tables/tag_permissions_tabl
 import 'package:issues_tracking/core/services/sqlite/tables/tag_subscriptions_table.dart';
 import 'package:issues_tracking/core/services/sqlite/tables/tags_table.dart';
 import 'package:issues_tracking/features/issues/data/datasources/tag_remote_datasource.dart';
+import 'package:issues_tracking/features/issues/data/models/issue_link_model.dart';
 import 'package:issues_tracking/features/issues/data/models/tag_model.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
 import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
@@ -148,5 +149,39 @@ class TagSqliteDatasourceImpl implements TagRemoteDatasource {
       whereArgs: [projectId, name],
     );
     return rows.isEmpty;
+  }
+
+  @override
+  Future<List<IssueLinkModel>> getLinksByIssueId({required String issueId}) async {
+    final rows = _sqlite.query(
+      table: 'issue_links', // Assuming it's already registered by Issues feature
+      where: 'issue_id = ?',
+      whereArgs: [issueId],
+    );
+    return rows.map((row) => IssueLinkModel.fromJson(row)).toList();
+  }
+
+  @override
+  Future<List<TagModel>> getTagsByIssueId({required String issueId}) async {
+    final rows = _sqlite.query(
+      table: _issueTagsTable.tableName,
+      where: '${_issueTagsTable.issueId} = ?',
+      whereArgs: [issueId],
+    );
+
+    final tagIds = rows.map((row) => row[_issueTagsTable.tagId]).toList();
+
+    if (tagIds.isEmpty) {
+      return [];
+    }
+
+    final tagsRows = _sqlite.query(
+      table: _tagsTable.tableName,
+      where:
+          '${_tagsTable.id} IN (${List.filled(tagIds.length, '?').join(', ')})',
+      whereArgs: tagIds,
+    );
+
+    return tagsRows.map((row) => TagModel.fromJson(row)).toList();
   }
 }

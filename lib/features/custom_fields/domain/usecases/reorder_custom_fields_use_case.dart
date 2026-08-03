@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import '../../../../core/errors/failure.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../repositories/custom_fields_repository.dart';
@@ -19,10 +20,16 @@ class ReorderCustomFieldsParams extends Params {
 }
 
 class ReorderCustomFieldsUseCase
-    implements UseCase<void, ReorderCustomFieldsParams> {
+    extends UseCase<void, ReorderCustomFieldsParams> {
   final CustomFieldsRepository repository;
 
   ReorderCustomFieldsUseCase(this.repository);
+
+  @override
+  Permission get requiredPermission => Permission.projectUpdateProject;
+
+  @override
+  String? getProjectId(ReorderCustomFieldsParams params) => params.projectId;
 
   @override
   Future<Either<Failure, void>> call({

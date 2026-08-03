@@ -6,19 +6,23 @@ import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/issues_repository.dart';
 
-class GetIssues extends UseCasePermission<List<Issue>, GetIssuesParams> {
-  @override
-  Permission get requiredPermission => Permission.issueReadIssue;
+class GetIssues extends UseCase<List<Issue>, GetIssuesParams> {
+  // @override
+  // Permission get requiredPermission => Permission.issueReadIssue;
+
+  // @override
+  // String? getProjectId(GetIssuesParams params) => params.filter.projectFilter;
 
   final IssuesRepository repository;
 
   GetIssues(this.repository);
 
   @override
-  Future<Either<Failure, List<Issue>>> execute({
+  Future<Either<Failure, List<Issue>>> call({
     required GetIssuesParams params,
   }) async {
-    return await repository.getIssues(params.filter);
+    final result = await repository.getIssues(params.filter);
+    return result;
   }
 }
 

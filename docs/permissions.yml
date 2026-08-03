@@ -1,0 +1,406 @@
+permissions:
+  - name: "read-project-basic"
+    description: "View basic project properties and content. With Read User Basic, view the members of the project team."
+    entity: "Project"
+    operation: "Read"
+    dependent_permissions:
+      - "read-project-full"
+      - "read-issue"
+      - "read-issue-private-fields"
+      - "create-issue"
+      - "view-watchers"
+      - "view-voters"
+      - "read-article"
+      - "create-article"
+      - "update-article"
+      - "delete-article"
+      - "read-article-comment"
+      - "create-article-comment"
+      - "update-article-comment"
+      - "delete-article-comment"
+      - "update-issue-private-fields"
+      - "override-visibility-restrictions"
+      - "update-project"
+      - "delete-project"
+
+  - name: "create-project"
+    description: "Create new projects."
+    entity: "Project"
+    operation: "Create"
+
+  - name: "read-project-full"
+    description: "View all project properties and content, including roles that are granted to the project team and the roles that are assigned to other users and groups in the project."
+    entity: "Project"
+    operation: "Read"
+    implied_permissions:
+      - "read-project-basic"
+    dependent_permissions:
+      - "update-project"
+      - "delete-project"
+
+  - name: "update-project"
+    description: "Edit project settings, manage access, and configure project features such as fields, workflows, apps, time tracking, and integrations."
+    entity: "Project"
+    operation: "Update"
+    implied_permissions:
+      - "read-project-full"
+      - "read-project-basic"
+
+  - name: "delete-project"
+    description: "Delete projects."
+    entity: "Project"
+    operation: "Delete"
+    implied_permissions:
+      - "read-project-full"
+      - "read-project-basic"
+
+  - name: "read-organization"
+    description: "View organizations and their attributes."
+    entity: "Organization"
+    operation: "Read"
+    dependent_permissions:
+      - "update-organization"
+      - "delete-organization"
+
+  - name: "update-organization"
+    description: "Edit organization attributes, manage project assignments and access rights."
+    entity: "Organization"
+    operation: "Update"
+    implied_permissions:
+      - "read-organization"
+
+  - name: "create-organization"
+    description: "Create new organizations."
+    entity: "Organization"
+    operation: "Create"
+
+  - name: "delete-organization"
+    description: "Permanently remove organization records from the system."
+    entity: "Organization"
+    operation: "Delete"
+    implied_permissions:
+      - "read-organization"
+
+  - name: "update-self"
+    description: "Edit own profile data."
+    entity: "User profile"
+    operation: "Update"
+    dependent_permissions:
+      - "update-user"
+
+  - name: "read-user-basic"
+    description: "View the list of registered users and read the ID, login, name, and avatar for each user."
+    entity: "User"
+    operation: "Read"
+    dependent_permissions:
+      - "read-user-details"
+      - "update-user"
+      - "delete-user"
+
+  - name: "read-user-details"
+    description: "View additional profile details for all registered users. Does not grant access to personal settings or account security details."
+    entity: "User"
+    operation: "Read"
+    implied_permissions:
+      - "read-user-basic"
+    dependent_permissions:
+      - "update-user"
+      - "delete-user"
+
+  - name: "update-user"
+    description: "Edit user profile data. Ban, merge, and anonymize user accounts."
+    entity: "User"
+    operation: "Update"
+    implied_permissions:
+      - "read-user-details"
+      - "update-self"
+      - "read-user-basic"
+
+  - name: "create-user"
+    description: "Create new user accounts. Invite users to register their own accounts."
+    entity: "User"
+    operation: "Create"
+
+  - name: "delete-user"
+    description: "Delete user accounts."
+    entity: "User"
+    operation: "Delete"
+    implied_permissions:
+      - "read-user-details"
+      - "read-user-basic"
+
+  - name: "low-level-admin-read"
+    description: "Read-only access to low-level administrative settings. Includes permission to view integrations with third-party services and metrics."
+    entity: "System"
+    operation: "Admin"
+    dependent_permissions:
+      - "low-level-admin-write"
+
+  - name: "low-level-admin-write"
+    description: "Manage low-level administrative actions. Includes permission to integrate with third-party services and back up the database. Requires low-level read administration."
+    entity: "System"
+    operation: "Admin"
+    implied_permissions:
+      - "low-level-admin-read"
+
+  - name: "read-issue"
+    description: "View issues (public fields only)"
+    entity: "Issue"
+    operation: "Read"
+    implied_permissions:
+      - "read-project-basic"
+
+  - name: "read-issue-private-fields"
+    description: "View issue private fields"
+    entity: "Issue"
+    operation: "Read"
+    implied_permissions:
+      - "read-project-basic"
+    dependent_permissions:
+      - "update-issue-private-fields"
+      - "override-visibility-restrictions"
+
+  - name: "update-issue"
+    description: "Update public fields of any issue"
+    entity: "Issue"
+    operation: "Update"
+    dependent_permissions:
+      - "update-issue-private-fields"
+
+  - name: "create-issue"
+    description: "Create new issue (also allows viewing and updating public fields in reported issues)"
+    entity: "Issue"
+    operation: "Create"
+    implied_permissions:
+      - "read-project-basic"
+
+  - name: "delete-issue"
+    description: "Delete issues"
+    entity: "Issue"
+    operation: "Delete"
+
+  - name: "link-issues"
+    description: "Set relationships between issues"
+    entity: "Issue"
+    operation: "Link"
+
+  - name: "update-issue-private-fields"
+    description: "Update issue private fields"
+    entity: "Issue"
+    operation: "Update"
+    implied_permissions:
+      - "read-issue-private-fields"
+      - "update-issue"
+      - "read-project-basic"
+
+  - name: "apply-commands-silently"
+    description: "Apply commands to issues without generating notifications"
+    entity: "Issue"
+    operation: "Update"
+
+  - name: "view-watchers"
+    description: "View the list of users who are watching an issue (available in full issue view)"
+    entity: "Issue"
+    operation: "Read"
+    implied_permissions:
+      - "read-project-basic"
+
+  - name: "update-watchers"
+    description: "Set another user as a watcher for an issue"
+    entity: "Issue"
+    operation: "Update"
+
+  - name: "view-voters"
+    description: "View the list of users who have voted for an issue (available in full issue view)"
+    entity: "Issue"
+    operation: "Read"
+    implied_permissions:
+      - "read-project-basic"
+
+  - name: "add-attachment"
+    description: "Attach files or screenshots to issues"
+    entity: "Attachment"
+    operation: "Create"
+
+  - name: "update-attachment"
+    description: "Modify files attached to issue and modify attachment visibility"
+    entity: "Attachment"
+    operation: "Update"
+
+  - name: "delete-attachment"
+    description: "Delete files attached to issues"
+    entity: "Attachment"
+    operation: "Delete"
+
+  - name: "create-issue-comment"
+    description: "Comment issues"
+    entity: "Comment"
+    operation: "Create"
+
+  - name: "read-issue-comment"
+    description: "View issues comments"
+    entity: "Comment"
+    operation: "Read"
+    dependent_permissions:
+      - "update-not-own-issue-comment"
+      - "delete-not-own-comment-and-permanent-comment-delete"
+
+  - name: "update-issue-comment"
+    description: "Edit own issue comments"
+    entity: "Comment"
+    operation: "Update"
+
+  - name: "delete-issue-comment"
+    description: "Delete comments that you have added to issues"
+    entity: "Comment"
+    operation: "Delete"
+
+  - name: "update-not-own-issue-comment"
+    description: "Edit comments that were added to issues by other users"
+    entity: "Comment"
+    operation: "Update"
+    implied_permissions:
+      - "read-issue-comment"
+
+  - name: "delete-not-own-comment-and-permanent-comment-delete"
+    description: "Delete comments that other users added to issues. Also grants permission to delete comments permanently, whether the user is the comment author or not."
+    entity: "Comment"
+    operation: "Delete"
+    implied_permissions:
+      - "read-issue-comment"
+
+  - name: "read-article-comment"
+    description: "Read comments that are posted to articles in the knowledge base"
+    entity: "Comment"
+    operation: "Read"
+    implied_permissions:
+      - "read-article"
+      - "read-project-basic"
+    dependent_permissions:
+      - "create-article-comment"
+      - "update-article-comment"
+      - "delete-article-comment"
+
+  - name: "create-article-comment"
+    description: "Add comments to articles in the knowledge base"
+    entity: "Comment"
+    operation: "Create"
+    implied_permissions:
+      - "read-article-comment"
+      - "read-article"
+      - "read-project-basic"
+
+  - name: "update-article-comment"
+    description: "Update comments that other users posted to articles in the knowledge base"
+    entity: "Comment"
+    operation: "Update"
+    implied_permissions:
+      - "read-article-comment"
+      - "read-article"
+      - "read-project-basic"
+
+  - name: "delete-article-comment"
+    description: "Delete comments that other users posted to articles in the knowledge base"
+    entity: "Comment"
+    operation: "Delete"
+    implied_permissions:
+      - "read-article-comment"
+      - "read-article"
+      - "read-project-basic"
+
+  - name: "override-visibility-restrictions"
+    description: "View issues, comments, attachments, and articles that are hidden by visibility settings"
+    entity: "Visibility"
+    operation: "Read"
+    implied_permissions:
+      - "read-issue-private-fields"
+      - "read-project-basic"
+
+  - name: "read-work-item"
+    description: "View issue work items"
+    entity: "Issue work item"
+    operation: "Read"
+    dependent_permissions:
+      - "update-not-own-work-item"
+
+  - name: "update-work-item"
+    description: "Add and edit work items"
+    entity: "Issue work item"
+    operation: "Update"
+    dependent_permissions:
+      - "update-not-own-work-item"
+
+  - name: "update-not-own-work-item"
+    description: "Edit work items created by other users"
+    entity: "Issue work item"
+    operation: "Update"
+    implied_permissions:
+      - "read-work-item"
+      - "update-work-item"
+
+  - name: "create-work-item"
+    description: "Create work items"
+    entity: "Issue work item"
+    operation: "Create"
+    dependent_permissions:
+      - "create-not-own-work-item"
+
+  - name: "create-not-own-work-item"
+    description: "Create work items for other users"
+    entity: "Issue work item"
+    operation: "Create"
+    implied_permissions:
+      - "create-work-item"
+
+  - name: "read-article"
+    description: "Read articles that are posted to the knowledge base"
+    entity: "Article"
+    operation: "Read"
+    implied_permissions:
+      - "read-project-basic"
+    dependent_permissions:
+      - "create-article"
+      - "update-article"
+      - "delete-article"
+      - "read-article-comment"
+      - "create-article-comment"
+      - "update-article-comment"
+      - "delete-article-comment"
+
+  - name: "create-article"
+    description: "Add articles to the knowledge base"
+    entity: "Article"
+    operation: "Create"
+    implied_permissions:
+      - "read-article"
+      - "read-project-basic"
+
+  - name: "update-article"
+    description: "Update articles in the knowledge base"
+    entity: "Article"
+    operation: "Update"
+    implied_permissions:
+      - "read-article"
+      - "read-project-basic"
+
+  - name: "delete-article"
+    description: "Delete article from the knowledge base"
+    entity: "Article"
+    operation: "Delete"
+    implied_permissions:
+      - "read-article"
+      - "read-project-basic"
+
+  - name: "read-app-content"
+    description: "Read app and workflow scripts, configuration files, logs, and export archives"
+    entity: "App"
+    operation: "Read"
+    dependent_permissions:
+      - "update-app-content"
+
+  - name: "update-app-content"
+    description: "Create, import, update, and delete app and workflow scripts and configuration files"
+    entity: "App"
+    operation: "Update"
+    implied_permissions:
+      - "read-app-content"

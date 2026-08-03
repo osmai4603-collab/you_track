@@ -6,6 +6,6 @@
 - [x] Ensure `IssueFormActionBar` correctly triggers `submit` and handles success navigation.
 - [x] Add `subsystem`, `fixVersions`, and `fixedInBuild` to `Issue` entity.
 - [x] Update `IssueModel` to handle new fields.
-- [x] Update `IssueFormState` to use `IssueSubsystemEnum`.
+- [x] Update `IssueFormState` to use `SubsystemEntity`.
 - [x] Implement missing pickers in `IssueFormSidebar`.
 - [x] Verify creation and update logic with manual tests.

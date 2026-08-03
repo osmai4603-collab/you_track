@@ -4,7 +4,7 @@ import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_repository.dart';
 
-class PublishArticle extends UseCasePermission<void, PublishArticleParams> {
+class PublishArticle extends UseCase<void, PublishArticleParams> {
   @override
   Permission get requiredPermission => Permission.articleUpdateArticle;
 
@@ -12,7 +12,7 @@ class PublishArticle extends UseCasePermission<void, PublishArticleParams> {
   const PublishArticle(this.repository);
 
   @override
-  Future<Either<Failure, void>> execute({required PublishArticleParams params}) {
+  Future<Either<Failure, void>> call({required PublishArticleParams params}) {
     return repository.publishArticle(params.articleId);
   }
 }

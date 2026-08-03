@@ -21,7 +21,7 @@ class CreateUserParams extends Params {
   List<Object?> get props => [displayName, email, password];
 }
 
-class CreateUser extends UseCasePermission<UserEntity, CreateUserParams> {
+class CreateUser extends UseCase<UserEntity, CreateUserParams> {
   final UsersRepository repository;
 
   CreateUser(this.repository);
@@ -30,7 +30,7 @@ class CreateUser extends UseCasePermission<UserEntity, CreateUserParams> {
   Permission get requiredPermission => Permission.userCreateUser;
 
   @override
-  Future<Either<Failure, UserEntity>> execute({required CreateUserParams params}) {
+  Future<Either<Failure, UserEntity>> call({required CreateUserParams params}) {
     return repository.createUser(
       UserEntity(
         id: '',

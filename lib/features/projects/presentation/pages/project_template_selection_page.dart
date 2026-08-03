@@ -7,6 +7,8 @@ import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/enums/project_template_enum.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import '../cubits/project_creation_cubit.dart';
 
 /// صفحة 2: اختيار قالب المشروع
@@ -66,11 +68,16 @@ class _ProjectTemplateSelectionPageState
           Expanded(
             child: BlocBuilder<ProjectCreationCubit, ProjectCreationState>(
               builder: (context, state) {
-                if (state.status == ProjectCreationStatus.loading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+                Widget content;
 
-                return Padding(
+                if (state.status == ProjectCreationStatus.loading) {
+                  content = Center(
+                    key: const ValueKey('project-template-loading'),
+                    child: SizedBox(width: 480, child: ShimmerLoading.list(itemCount: 6)),
+                  );
+                } else {
+                  content = Padding(
+                    key: const ValueKey('project-template-loaded'),
                   padding: AppSpacing.paddingAllMedium,
                   child: Column(
                     spacing: AppSpacing.medium,
@@ -194,7 +201,10 @@ class _ProjectTemplateSelectionPageState
                       ),
                     ],
                   ),
-                );
+                  );
+                }
+
+                return AnimatedContentSwitcher(child: content);
               },
             ),
           ),

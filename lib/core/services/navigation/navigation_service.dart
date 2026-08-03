@@ -13,6 +13,10 @@ import 'package:issues_tracking/core/services/navigation/groups_navigation.dart'
 import 'package:issues_tracking/core/services/navigation/roles_navigation.dart';
 import 'package:issues_tracking/core/services/navigation/users_navigation.dart';
 import 'package:issues_tracking/core/services/navigation/report_navigation.dart';
+import 'package:issues_tracking/core/services/navigation/knowledge_base_navigation.dart';
+import 'package:issues_tracking/core/services/navigation/time_sheets_navigation.dart';
+import 'package:issues_tracking/core/services/navigation/gantt_chart_navigation.dart';
+import 'package:issues_tracking/core/services/navigation/white_boards_navigation.dart';
 import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 import 'package:issues_tracking/features/dashboards/presentation/bloc/dashboard_bloc.dart';
 import 'package:issues_tracking/features/dashboards/presentation/bloc/dashboard_event.dart';
@@ -118,6 +122,26 @@ sealed class NavigationService {
           // ║                         Reports Branch                             ║
           // ╚════════════════════════════════════════════════════════════════════╝
           ReportNavigation(),
+
+          // ╔════════════════════════════════════════════════════════════════════╗
+          // ║                       Knowledge Base Branch                       ║
+          // ╚════════════════════════════════════════════════════════════════════╝
+          KnowledgeBaseNavigation(),
+
+          // ╔════════════════════════════════════════════════════════════════════╗
+          // ║                        Time Sheets Branch                          ║
+          // ╚════════════════════════════════════════════════════════════════════╝
+          TimeSheetsNavigation(),
+
+          // ╔════════════════════════════════════════════════════════════════════╗
+          // ║                       White Boards Branch                          ║
+          // ╚════════════════════════════════════════════════════════════════════╝
+          WhiteBoardsNavigation(),
+
+          // ╔════════════════════════════════════════════════════════════════════╗
+          // ║                       Gantt Chart Branch                          ║
+          // ╚════════════════════════════════════════════════════════════════════╝
+          GanttChartNavigation(),
 
           // ╔════════════════════════════════════════════════════════════════════╗
           // ║                        Projects Branch                             ║

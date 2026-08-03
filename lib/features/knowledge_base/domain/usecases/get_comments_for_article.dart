@@ -21,10 +21,12 @@ class GetCommentsForArticle
     return await repository.getComments(params.articleId);
   }
 
-  @override
-  Future<Either<Failure, List<ArticleComment>>> execute({required GetCommentsForArticleParams params}) {
-    return repository.getComments(params.articleId);
-  }
+  // @override
+  // Future<Either<Failure, List<ArticleComment>>> call({
+  //   required GetCommentsForArticleParams params,
+  // }) {
+  //   return repository.getComments(params.articleId);
+  // }
 }
 
 class GetCommentsForArticleParams extends Params {

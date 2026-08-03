@@ -45,7 +45,7 @@ enum CustomFieldType {
   issueType('issue-type', IssueTypeEnum.values),
   priority('priority', IssuePriorityTypeEnum.values),
   state('state', IssueStateEnum.values),
-  subsystem('subsystem', IssueSubsystemEnum.values);
+  subsystem('subsystem', SubsystemEntity.values);
 }
 ```
 

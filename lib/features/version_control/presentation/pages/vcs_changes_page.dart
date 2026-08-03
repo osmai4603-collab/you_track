@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import 'package:issues_tracking/core/enums/vcs_pr_state_enum.dart';
 import 'package:issues_tracking/features/version_control/domain/entities/vcs_commit_entity.dart';
 import 'package:issues_tracking/features/version_control/domain/entities/vcs_integration_entity.dart';
@@ -166,7 +167,10 @@ class _VcsChangesPageState extends State<VcsChangesPage>
 
   Widget _buildContent(ColorScheme colors, TextTheme textTheme) {
     if (_isLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+        key: const ValueKey('vcs-changes-loading'),
+        child: SizedBox(width: 480, child: ShimmerLoading.list(itemCount: 6)),
+      );
     }
 
     if (_integrations.isEmpty) {

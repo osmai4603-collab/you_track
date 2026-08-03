@@ -8,6 +8,8 @@ import 'package:issues_tracking/features/issues/presentation/widgets/issue_detai
 import 'package:issues_tracking/features/issues/presentation/widgets/issues_table_view.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/issues_list_view.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/issues_tree_view.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
 
 class IssuesPage extends StatefulWidget {
   final String? projectId;
@@ -25,15 +27,17 @@ class _IssuesPageState extends State<IssuesPage> {
   @override
   void initState() {
     super.initState();
-    if (widget.projectId != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        if (widget.projectId != null) {
           context.read<IssuesBloc>().add(
-            UpdateFilter(IssueFilter(projectFilter: widget.projectId)),
-          );
+                UpdateFilter(IssueFilter(projectFilter: widget.projectId)),
+              );
+        } else {
+          context.read<IssuesBloc>().add(const LoadIssues());
         }
-      });
-    }
+      }
+    });
   }
 
   @override
@@ -41,12 +45,21 @@ class _IssuesPageState extends State<IssuesPage> {
     return BlocBuilder<IssuesBloc, IssuesState>(
       builder: (context, state) {
         final showPanel = state is IssuesLoaded && state.selectedIssueId != null;
+        Widget content;
+
         if (state is IssuesLoading) {
-          return const Center(child: CircularProgressIndicator());
+          content = ShimmerLoading.list(
+            key: const ValueKey('issues-loading'),
+            itemCount: 6,
+          );
         } else if (state is IssuesError) {
-          return Center(child: SelectableText(state.message));
+          content = Center(
+            key: const ValueKey('issues-error'),
+            child: SelectableText(state.message),
+          );
         } else if (state is IssuesLoaded) {
-          return Stack(
+          content = Stack(
+            key: const ValueKey('issues-loaded'),
             children: [
               Column(
                 children: [
@@ -72,8 +85,11 @@ class _IssuesPageState extends State<IssuesPage> {
               ),
             ],
           );
+        } else {
+          content = const SizedBox.shrink(key: ValueKey('issues-empty'));
         }
-        return const SizedBox.shrink();
+
+        return AnimatedContentSwitcher(child: content);
       },
     );
   }

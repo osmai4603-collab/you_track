@@ -104,6 +104,7 @@ class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
       _getSortField(filter.sortField),
       ascending: filter.sortAscending,
     );
+    print('length: ${response.length}');
 
     return (response as List).map((e) => IssueModel.fromJson(e)).toList();
   }

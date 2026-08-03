@@ -4,8 +4,7 @@ import '../../../../core/errors/failure.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../repositories/custom_fields_repository.dart';
 
-class ReplaceFieldValueUseCase
-    extends UseCasePermission<void, ReplaceFieldValueParams> {
+class ReplaceFieldValueUseCase extends UseCase<void, ReplaceFieldValueParams> {
   @override
   Permission get requiredPermission => Permission.projectUpdateProject;
 
@@ -14,7 +13,9 @@ class ReplaceFieldValueUseCase
   ReplaceFieldValueUseCase(this.repository);
 
   @override
-  Future<Either<Failure, void>> execute({required ReplaceFieldValueParams params}) {
+  Future<Either<Failure, void>> call({
+    required ReplaceFieldValueParams params,
+  }) {
     return repository.replaceFieldValue(
       fieldId: params.fieldId,
       oldValue: params.oldValue,

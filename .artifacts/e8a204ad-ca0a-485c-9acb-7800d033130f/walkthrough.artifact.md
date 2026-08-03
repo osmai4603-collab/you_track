@@ -1,61 +1,50 @@
-# Walkthrough - Fixing `GroupsSqliteDataSourceImpl.getGroups` Override
+# Walkthrough - Fixing UseCase Tests
 
-I have updated the `GroupsSqliteDataSourceImpl.getGroups` method to correctly override the `GroupsRemoteDataSource.getGroups` interface method by adding the missing `userId` parameter and implementing the corresponding filtering logic.
+I have resolved the compilation errors in `all_usecases_test.dart` and `permission_guard_mixin_test.dart` that were caused by recent changes to the `UserEntity`, `UserPermissionsEntity`, and `UserRoleAssignment` classes.
 
 ## Changes Made
 
-### Data Sources
+### Tests
 
-#### [GroupsSqliteDataSourceImpl](file:///home/osmsoftwareengineering/flutter_projects/you_track/lib/features/groups/data/datasources/groups_sqlite_data_source_impl.dart)
+#### [all_usecases_test.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/test/core/usecase/all_usecases_test.dart) and [permission_guard_mixin_test.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/test/core/usecase/permission_guard_mixin_test.dart)
 
-- Updated `getGroups` signature to include `userId` as an optional named parameter.
-- Modified the implementation to filter groups by `userId` if provided:
-    - First, it queries the `group_members` table to find all `group_id`s associated with the given `userId`.
-    - Then, it fetches group details from the `groups` table only for those `group_id`s.
-    - If `userId` is null, it continues to fetch all groups as before.
+- **Fixed Imports**: Removed the invalid import for `UserEntity` from `features/auth` and ensured it points to `features/users`.
+- **Updated `UserEntity`**: Added the required `fullName` and `username` parameters to all `UserEntity` instantiations.
+- **Updated `UserPermissionsEntity`**: Removed the `const` keyword since the class now has a non-const constructor with logic.
+- **Updated `UserRoleAssignment`**: Changed `projectId: null` to `projectId: 'global'` because `projectId` is now a non-nullable `String`.
 
 ```diff
-   @override
--  Future<List<GroupModel>> getGroups() async {
--    final rows = _sqlite.query(
--      table: _groupsTable.tableName,
--      orderBy: 'created_at DESC',
--    );
-+  Future<List<GroupModel>> getGroups({String? userId}) async {
-+    List<Map<String, dynamic>> rows;
-+
-+    if (userId != null) {
-+      final memberRows = _sqlite.query(
-+        table: _membersTable.tableName,
-+        where: '${_membersTable.userId} = ?',
-+        whereArgs: [userId],
-+      );
-+      final groupIds = memberRows
-+          .map((e) => e[_membersTable.groupId].toString())
-+          .toList();
-+
-+      if (groupIds.isEmpty) {
-+        return [];
-+      }
-+
-+      final whereClause = groupIds.map((_) => '?').join(', ');
-+      rows = _sqlite.query(
-+        table: _groupsTable.tableName,
-+        where: '${_groupsTable.id} IN ($whereClause)',
-+        whereArgs: groupIds,
-+        orderBy: 'created_at DESC',
-+      );
-+    } else {
-+      rows = _sqlite.query(
-+        table: _groupsTable.tableName,
-+        orderBy: 'created_at DESC',
-+      );
-+    }
-+
-     for (final row in rows) {
+-        sl<UserSession>().setUser(
+-           const UserEntity(
+-            id: 'u1',
+-            email: 'user@example.com',
+-            groups: [],
+-            projects: [],
+-          ),
+-        );
++        sl<UserSession>().setUser(
++           const UserEntity(
++            id: 'u1',
++            fullName: 'User One',
++            username: 'user1',
++            email: 'user@example.com',
++            groups: [],
++            projects: [],
++          ),
++        );
+```
+
+```diff
+-        sl<UserSession>().setPermissions(
+-          const UserPermissionsEntity(roleAssignments: [], ownedProjectIds: []),
+-        );
++        sl<UserSession>().setPermissions(
++          UserPermissionsEntity(roleAssignments: [], ownedProjectIds: []),
++        );
 ```
 
 ## Verification Results
 
 ### Automated Tests
-- Ran `analyze_file` on `groups_sqlite_data_source_impl.dart`, which returned no errors. This confirms that the signature now correctly overrides the base class and that the new logic is syntactically valid.
+- Ran `analyze_file` on both `all_usecases_test.dart` and `permission_guard_mixin_test.dart`.
+- Both files are now free of compilation errors and warnings.

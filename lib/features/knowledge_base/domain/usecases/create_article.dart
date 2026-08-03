@@ -5,9 +5,12 @@ import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_repository.dart';
 
-class CreateArticle extends UseCasePermission<Article, CreateArticleParams> {
+class CreateArticle extends UseCase<Article, CreateArticleParams> {
   @override
   Permission get requiredPermission => Permission.articleCreateArticle;
+
+  @override
+  String? getProjectId(CreateArticleParams params) => params.article.projectId;
 
   final ArticleRepository repository;
   const CreateArticle(this.repository);
@@ -18,11 +21,11 @@ class CreateArticle extends UseCasePermission<Article, CreateArticleParams> {
   }) async {
     return await repository.createArticle(params.article);
   }
-  
-  @override
-  Future<Either<Failure, Article>> execute({required CreateArticleParams params}) {
-    return repository.createArticle(params.article);
-  }
+
+  // @override
+  // Future<Either<Failure, Article>> call({required CreateArticleParams params}) {
+  //   return repository.createArticle(params.article);
+  // }
 }
 
 class CreateArticleParams extends Params {

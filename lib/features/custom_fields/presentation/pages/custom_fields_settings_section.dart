@@ -9,6 +9,7 @@ import 'package:issues_tracking/features/custom_fields/presentation/widgets/repl
 import 'package:issues_tracking/features/custom_fields/presentation/widgets/make_private_dialog.dart';
 import 'package:reorderables/reorderables.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
 import 'package:issues_tracking/features/custom_fields/presentation/widgets/custom_field_details_panel.dart';
 import 'package:issues_tracking/features/custom_fields/presentation/widgets/advanced_field_settings_dialog.dart';
@@ -297,7 +298,10 @@ class _ProjectSettingCustomFieldsSectionState
     TextTheme textTheme,
   ) {
     if (state is CustomFieldsInitial || state is CustomFieldsLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+        key: const ValueKey('custom-fields-loading'),
+        child: SizedBox(width: 480, child: ShimmerLoading.list(itemCount: 6)),
+      );
     }
 
     if (state is CustomFieldsError && state is! CustomFieldsLoaded) {
@@ -928,12 +932,6 @@ class _ProjectSettingCustomFieldsSectionState
   void _closePanel() {
     setState(() {
       _isPanelOpen = false;
-    });
-  }
-
-  void _openDetailsPanel() {
-    setState(() {
-      _isDetailsPanelOpen = true;
     });
   }
 

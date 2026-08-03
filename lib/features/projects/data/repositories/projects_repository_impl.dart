@@ -124,11 +124,32 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
   }
 
   @override
+  Future<Either<Failure, SubsystemEntity>> getSubsystemById(String id) async {
+    try {
+      final subsystem = await remoteDataSource.getSubsystemById(id);
+      return Right(subsystem);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, SubsystemEntity>> createSubsystem(SubsystemEntity subsystem) async {
     try {
       final model = SubsystemModel.fromEntity(subsystem);
       final created = await remoteDataSource.createSubsystem(model);
       return Right(created);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+  
+  @override
+  Future<Either<Failure, SubsystemEntity>> addSubsystem(SubsystemEntity subsystem) async {
+    try {
+      final model = SubsystemModel.fromEntity(subsystem);
+      final added = await remoteDataSource.addSubsystem(model);
+      return Right(added);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

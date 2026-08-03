@@ -3,10 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/enums/issue_priority_type_enum.dart';
 import 'package:issues_tracking/core/enums/issue_state_enum.dart';
 import 'package:issues_tracking/core/enums/issue_type_enum.dart';
-import 'package:issues_tracking/core/enums/issue_subsystem_enum.dart';
+import 'package:issues_tracking/core/init_dependencies.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
+import 'package:issues_tracking/core/widgets/avatar_url_chip.dart';
+import 'package:issues_tracking/core/widgets/issue_priority_chip.dart';
+import 'package:issues_tracking/core/widgets/issue_state_chip.dart';
 import 'package:issues_tracking/features/issues/presentation/cubits/issue_form_cubit.dart';
-import 'package:issues_tracking/features/issues/presentation/cubits/issue_form_state.dart';
 import 'package:issues_tracking/features/issues/presentation/pages/issue_form.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/add_sprint_dialog.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/add_subsystem_dialog.dart';
@@ -15,6 +17,8 @@ import 'package:issues_tracking/features/issues/presentation/widgets/add_build_d
 import 'package:issues_tracking/features/issues/presentation/widgets/add_link_dialog.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
 import 'package:issues_tracking/features/projects/domain/entities/subsystem_entity.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/get_subsystems_use_case.dart';
+import 'package:issues_tracking/features/projects/presentation/widgets/project_icon.dart';
 
 class IssueFormSidebar extends StatelessWidget {
   const IssueFormSidebar({super.key});
@@ -22,208 +26,179 @@ class IssueFormSidebar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final localization = AppLocalizations.of(context)!;
-    return BlocBuilder<IssueFormCubit, IssueFormState>(
-      builder: (context, state) {
-        return Container(
-          width: 280,
-          decoration: ShapeDecoration(
-            color: ColorScheme.of(context).surfaceContainerHigh,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-          ),
-          padding: const EdgeInsets.all(12),
-          child: SingleChildScrollView(
-            child: Column(
-              spacing: 16,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Align(
-                  alignment: .centerEnd,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        '${state.isEditing ? 0 : 0}',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      IconButton(
-                        onPressed: _onFavoritePressed,
-                        icon: Icon(
-                          state.isEditing ? Icons.star : Icons.star_border,
-                          size: 20,
-                          color: Colors.grey,
-                        ),
-                      ),
-                      const SizedBox(width: 20),
-                    ],
+    final textTheme = TextTheme.of(context);
+    final colors = ColorScheme.of(context);
+    final cubit = context.watch<IssueFormCubit>();
+    return Container(
+      width: 280,
+      decoration: ShapeDecoration(
+        color: ColorScheme.of(context).surfaceContainerHigh,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      padding: const EdgeInsets.all(12),
+      child: SingleChildScrollView(
+        child: Column(
+          spacing: 16,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Align(
+              alignment: .centerEnd,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    '${cubit.state.isEditing ? 0 : 0}',
+                    style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
-                ),
-                _buildField(
-                  label: 'Project',
-                  value: state.projectKey ?? 'Demo project',
-                  leading: Container(
-                    width: 16,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      color: YTColors.mainColor,
-                      borderRadius: BorderRadius.circular(3),
-                    ),
-                    child: Center(
-                      child: Text(
-                        (state.projectKey ?? 'DEM')
-                            .substring(
-                              0,
-                              (state.projectKey ?? 'DEM').length > 3
-                                  ? 3
-                                  : (state.projectKey ?? 'DEM').length,
-                            )
-                            .toUpperCase(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 7,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+                  IconButton(
+                    onPressed: _onFavoritePressed,
+                    icon: Icon(
+                      cubit.state.isEditing ? Icons.star : Icons.star_border,
+                      size: 20,
+                      color: Colors.grey,
                     ),
                   ),
-                  onTap: () => _showProjectPicker(context, state),
-                ),
-                _buildField(
-                  label: 'Priority',
-                  value: state.priority.displayName(localization),
-                  leading: ColorBadge(
-                    letter: state.priority.displayName(localization)[0],
-                    backgroundColor: Color(state.priority.color),
-                    foregroundColor: Colors.white,
-                  ),
-                  onTap: () => _showPriorityPicker(
-                    context,
-                    state.priority,
-                    localization,
-                  ),
-                ),
-                _buildField(
-                  label: 'State',
-                  value: state.state.displayName(localization),
-                  leading: ColorBadge(
-                    letter: state.state.displayName(localization)[0],
-                    backgroundColor: Color(state.state.color),
-                    foregroundColor: Colors.white,
-                  ),
-                  onTap: () =>
-                      _showStatePicker(context, state.state, localization),
-                ),
-                _buildField(
-                  label: 'Type',
-                  value: state.issueType.displayName(localization),
-                  onTap: () =>
-                      _showTypePicker(context, state.issueType, localization),
-                ),
-                _buildField(
-                  label: 'Assignee',
-                  value: state.assigneeName ?? 'Unassigned',
-                  onTap: () => _showAssigneePicker(context, state),
-                ),
-                _buildField(
-                  label: 'Subsystem',
-                  value: state.subsystem?.name ?? 'No Subsystem',
-                  onTap: () => _showSubsystemPicker(
-                    context,
-                    state.subsystem,
-                    localization,
-                    state.availableSubsystems,
-                  ),
-                ),
-                _buildField(
-                  label: 'Fix versions',
-                  value: state.fixVersions.isEmpty
-                      ? 'Unscheduled'
-                      : state.fixVersions,
-                  onTap: () => _showTextPicker(
-                    context,
-                    'Fix versions',
-                    state.fixVersions,
-                    (v) => context.read<IssueFormCubit>().updateFixVersions(v),
-                  ),
-                ),
-                _buildField(
-                  label: 'Fixed in build',
-                  value: state.build?.name ?? 'Next Build',
-                  onTap: () => _showBuildPicker(context, state),
-                ),
-                _buildField(
-                  label: 'Sprints',
-                  value: state.sprints.isEmpty
-                      ? 'No Sprints'
-                      : state.sprints.map((s) => s.name).join(', '),
-                  onTap: () => _showSprintsPicker(context, state),
-                ),
-                _buildField(
-                  label: 'Estimation',
-                  value: state.estimation != null
-                      ? '${state.estimation!.inHours}h ${state.estimation!.inMinutes % 60}m'
-                      : '?',
-                  onTap: () => _showDurationPicker(
-                    context,
-                    'Estimation',
-                    state.estimation,
-                    (duration) => context
-                        .read<IssueFormCubit>()
-                        .updateEstimation(duration),
-                  ),
-                ),
-                _buildField(
-                  label: 'Spent time',
-                  value: state.spentTime != null
-                      ? '${state.spentTime!.inHours}h ${state.spentTime!.inMinutes % 60}m'
-                      : '?',
-                  onTap: () => _showDurationPicker(
-                    context,
-                    'Spent time',
-                    state.spentTime,
-                    (duration) => context
-                        .read<IssueFormCubit>()
-                        .updateSpentTime(duration),
-                  ),
-                ),
-                _buildField(
-                  label: 'Tags',
-                  value: state.tags.isEmpty
-                      ? 'Add tags...'
-                      : state.tags.map((t) => t.name).join(', '),
-                  onTap: () => _showTagsPicker(context, state),
-                ),
-                _buildField(
-                  label: 'Links',
-                  value: state.links.isEmpty
-                      ? 'Add links...'
-                      : '${state.links.length} links',
-                  onTap: () => _showLinksPicker(context, state),
-                ),
-              ],
+                  const SizedBox(width: 20),
+                ],
+              ),
             ),
-          ),
-        );
-      },
-    );
-  }
+            CompactFieldWidget(
+              label: 'Project',
+              trailing: cubit.state.project == null
+                  ? null
+                  : ProjectIcon(projectCode: cubit.state.project!.projectId),
+              value: cubit.state.project?.name ?? 'No project selected',
 
-  Widget _buildField({
-    required String label,
-    required String value,
-    Widget? leading,
-    VoidCallback? onTap,
-  }) {
-    return CompactFieldWidget(
-      label: label,
-      value: value,
-      leading: leading,
-      onTap: onTap,
+              onTap: () => _showProjectPicker(context),
+            ),
+            CompactFieldWidget(
+              label: 'Priority',
+              value: cubit.state.priority.displayName(localization),
+              leading: IssuePriorityChip(
+                textTheme: textTheme,
+                colors: colors,
+                localization: localization,
+                type: cubit.state.priority,
+              ),
+              onTap: () => _showPriorityPicker(
+                context,
+                cubit.state.priority,
+                localization,
+              ),
+            ),
+            CompactFieldWidget(
+              label: 'State',
+              value: cubit.state.state.displayName(localization),
+              trailing: IssueStateChip(
+                textTheme: textTheme,
+                colors: colors,
+                localization: localization,
+                state: cubit.state.state,
+              ),
+              onTap: () =>
+                  _showStatePicker(context, cubit.state.state, localization),
+            ),
+            CompactFieldWidget(
+              label: 'Type',
+              trailing: IssueTypeChip(
+                textTheme: textTheme,
+                colors: colors,
+                localization: localization,
+                type: cubit.state.issueType,
+              ),
+              value: cubit.state.issueType.displayName(localization),
+              onTap: () =>
+                  _showTypePicker(context, cubit.state.issueType, localization),
+            ),
+            CompactFieldWidget(
+              label: 'Assignee',
+              trailing: cubit.state.assignee == null
+                  ? null
+                  : AvatarUrlChip(avatarUrl: cubit.state.assignee?.avatarUrl),
+              value: cubit.state.assignee?.name ?? 'Unassigned',
+              onTap: () => _showAssigneePicker(context, cubit),
+            ),
+            CompactFieldWidget(
+              label: 'Subsystem',
+              trailing: cubit.state.assignee == null
+                  ? null
+                  : IssueSubsystemChip(subsystem: cubit.state.subsystem!),
+              value: cubit.state.subsystem?.name ?? 'No Subsystem',
+              onTap: () => _showSubsystemPicker(
+                context,
+                cubit.state.subsystem,
+                localization,
+                cubit.subsystems,
+              ),
+            ),
+            CompactFieldWidget(
+              label: 'Fix versions',
+              value: cubit.state.fixVersions.isEmpty
+                  ? 'Unscheduled'
+                  : cubit.state.fixVersions,
+              onTap: () => _showTextPicker(
+                context,
+                'Fix versions',
+                cubit.state.fixVersions,
+                (v) => context.read<IssueFormCubit>().updateFixVersions(v),
+              ),
+            ),
+            CompactFieldWidget(
+              label: 'Fixed in build',
+              value: cubit.state.build?.name ?? 'Next Build',
+              onTap: () => _showBuildPicker(context, cubit),
+            ),
+            CompactFieldWidget(
+              label: 'Sprints',
+              value: cubit.availableSprints.isEmpty
+                  ? 'No Sprints'
+                  : cubit.availableSprints.map((s) => s.name).join(', '),
+              onTap: () => _showSprintsPicker(context, cubit),
+            ),
+            CompactFieldWidget(
+              label: 'Estimation',
+              value: cubit.state.estimation != null
+                  ? '${cubit.state.estimation!.inHours}h ${cubit.state.estimation!.inMinutes % 60}m'
+                  : '?',
+              onTap: () => _showDurationPicker(
+                context,
+                'Estimation',
+                cubit.state.estimation,
+                (duration) =>
+                    context.read<IssueFormCubit>().updateEstimation(duration),
+              ),
+            ),
+            CompactFieldWidget(
+              label: 'Spent time',
+              value: cubit.state.spentTime != null
+                  ? '${cubit.state.spentTime!.inHours}h ${cubit.state.spentTime!.inMinutes % 60}m'
+                  : '?',
+              onTap: () => _showDurationPicker(
+                context,
+                'Spent time',
+                cubit.state.spentTime,
+                (duration) =>
+                    context.read<IssueFormCubit>().updateSpentTime(duration),
+              ),
+            ),
+            CompactFieldWidget(
+              label: 'Tags',
+              value: cubit.tags.isEmpty
+                  ? 'Add tags...'
+                  : cubit.tags.map((t) => t.name).join(', '),
+              onTap: () => _showTagsPicker(context, cubit),
+            ),
+            CompactFieldWidget(
+              label: 'Links',
+              value: cubit.links.isEmpty
+                  ? 'Add links...'
+                  : '${cubit.links.length} links',
+              onTap: () => _showLinksPicker(context, cubit),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -232,90 +207,89 @@ class IssueFormSidebar extends StatelessWidget {
     SubsystemEntity? current,
     AppLocalizations localization,
     List<SubsystemEntity> availableSubsystems,
-  ) {
-    showModalBottomSheet(
+  ) async {
+    final cubit = context.read<IssueFormCubit>();
+    List<SubsystemEntity> subsystems = availableSubsystems;
+    if (cubit.state.project != null) {
+      final result = await get_it<GetSubsystemsUseCase>().call(
+        params: GetSubsystemsParams(projectId: cubit.state.project!.projectId),
+      );
+      result.fold((_) => [], (systems) => subsystems = systems);
+    }
+    if (context.mounted == false) return;
+    final result = await showModalBottomSheet(
       context: context,
-      builder: (context) => _PickerSheet(
+      builder: (contextModal) => _PickerSheet(
         title: 'Subsystem',
         children: [
           ListTile(
             leading: const Icon(Icons.add),
             title: const Text('New Subsystem'),
             onTap: () {
-              Navigator.pop(context);
-              AddSubsystemDialog.show(
-                context,
-                onSave: (subsystem) {
-                  context.read<IssueFormCubit>().updateSubsystem(subsystem);
-                },
-              );
+              Navigator.pop(contextModal, 'new system');
             },
           ),
-          ...availableSubsystems.map(
-            (s) => ListTile(
-              title: Text(s.name),
-              trailing: s.id == current?.id ? const Icon(Icons.check) : null,
-              onTap: () {
-                context.read<IssueFormCubit>().updateSubsystem(s);
-                Navigator.pop(context);
-              },
+          ...subsystems.map(
+            (subsystem) => ListTile(
+              title: Text(subsystem.name),
+              trailing: subsystem.id == current?.id
+                  ? const Icon(Icons.check)
+                  : null,
+              onTap: () => Navigator.pop(contextModal, subsystem),
             ),
           ),
         ],
       ),
     );
+    if (result == null) return;
+    if (result is String && context.mounted) {
+      final subsystem = await AddSubsystemDialog.show(
+        context,
+        projectId: cubit.state.project!.projectId,
+      );
+      if (subsystem != null && context.mounted) {
+        cubit.updateSubsystem(subsystem);
+      }
+      return;
+    }
+    if (result is SubsystemEntity) {
+      cubit.updateSubsystem(result);
+    }
   }
 
-  void _showProjectPicker(BuildContext context, IssueFormState state) {
-    if (state.availableProjects.isEmpty) return;
-    showModalBottomSheet(
+  void _showProjectPicker(BuildContext context) async {
+    final cubit = context.read<IssueFormCubit>();
+    if (cubit.availableProjects.isEmpty) return;
+
+    final projectSelected = await showModalBottomSheet<ProjectEntity>(
       context: context,
       builder: (sheetContext) => _PickerSheet(
         title: 'Project',
-        children: state.availableProjects
+        children: cubit.availableProjects
             .map(
-              (p) => ListTile(
-                leading: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: YTColors.mainColor,
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Center(
-                    child: Text(
-                      p.projectId
-                          .substring(
-                            0,
-                            p.projectId.length > 3 ? 3 : p.projectId.length,
-                          )
-                          .toUpperCase(),
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ),
-                ),
-                title: Text(p.name),
-                subtitle: Text(p.projectId),
-                trailing: p.projectId == state.projectKey
+              (project) => ListTile(
+                leading: ProjectIcon(projectCode: project.projectId),
+                title: Text(project.name),
+                subtitle: Text(project.projectId),
+                trailing: project.projectId == cubit.state.project?.projectId
                     ? const Icon(Icons.check)
                     : null,
                 onTap: () {
-                  context.read<IssueFormCubit>().updateProjectKey(p.projectId);
-                  Navigator.pop(context);
+                  Navigator.pop(sheetContext, project);
                 },
               ),
             )
             .toList(),
       ),
     );
+    if (projectSelected != null && context.mounted) {
+      cubit.updateProject(projectSelected);
+    }
   }
 
-  void _showAssigneePicker(BuildContext context, IssueFormState state) {
+  void _showAssigneePicker(BuildContext context, IssueFormCubit state) {
     if (state.projectMembers.isEmpty) return;
+    final cubit = context.read<IssueFormCubit>();
     showModalBottomSheet(
       context: context,
       builder: (sheetContext) => _PickerSheet(
@@ -328,43 +302,43 @@ class IssueFormSidebar extends StatelessWidget {
               child: Icon(Icons.person_off, size: 16, color: Colors.white),
             ),
             title: const Text('Unassigned'),
-            trailing: state.assigneeId == null ? const Icon(Icons.check) : null,
+            trailing: state.state.assignee == null
+                ? const Icon(Icons.check)
+                : null,
             onTap: () {
-              context.read<IssueFormCubit>().clearAssignee();
+              cubit.clearAssignee();
               Navigator.pop(sheetContext);
             },
           ),
-          ...state.projectMembers
-              .map(
-                (m) => ListTile(
-                  leading: CircleAvatar(
-                    radius: 12,
-                    backgroundImage: m.avatarUrl != null
-                        ? NetworkImage(m.avatarUrl!)
-                        : null,
-                    backgroundColor: YTColors.mainColor,
-                    child: m.avatarUrl == null
-                        ? Text(
-                            m.name.isNotEmpty ? m.name[0].toUpperCase() : '?',
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                            ),
-                          )
-                        : null,
-                  ),
-                  title: Text(m.name),
-                  subtitle: Text(m.email),
-                  trailing: m.id == state.assigneeId
-                      ? const Icon(Icons.check)
-                      : null,
-                  onTap: () {
-                    context.read<IssueFormCubit>().updateAssignee(m.id, m.name);
-                    Navigator.pop(sheetContext);
-                  },
-                ),
-              )
-              ,
+          ...state.projectMembers.map(
+            (m) => ListTile(
+              leading: CircleAvatar(
+                radius: 12,
+                backgroundImage: m.avatarUrl != null
+                    ? NetworkImage(m.avatarUrl!)
+                    : null,
+                backgroundColor: YTColors.mainColor,
+                child: m.avatarUrl == null
+                    ? Text(
+                        m.name.isNotEmpty ? m.name[0].toUpperCase() : '?',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                        ),
+                      )
+                    : null,
+              ),
+              title: Text(m.name),
+              subtitle: Text(m.email),
+              trailing: m.id == state.state.assignee?.id
+                  ? const Icon(Icons.check)
+                  : null,
+              onTap: () {
+                cubit.updateAssignee(m);
+                Navigator.pop(sheetContext);
+              },
+            ),
+          ),
         ],
       ),
     );
@@ -599,7 +573,7 @@ class IssueFormSidebar extends StatelessWidget {
     );
   }
 
-  void _showTagsPicker(BuildContext context, IssueFormState state) {
+  void _showTagsPicker(BuildContext context, IssueFormCubit state) {
     showModalBottomSheet(
       context: context,
       builder: (sheetContext) => _PickerSheet(
@@ -610,14 +584,18 @@ class IssueFormSidebar extends StatelessWidget {
             title: const Text('New Tag'),
             onTap: () async {
               Navigator.pop(context);
-              final project = state.availableProjects.cast<ProjectEntity?>().firstWhere((p) => p?.projectId == state.projectKey, orElse: () => null);
+              final project = state.availableProjects
+                  .cast<ProjectEntity?>()
+                  .firstWhere(
+                    (p) => p?.id == state.state.project?.id,
+                    orElse: () => null,
+                  );
               final newTag = await NewTagDialog.show(
                 context,
-                projectId:
-                    project?.id ??
-                    state.projectKey ??
-                    'DEMO', // TODO: Get from state correctly if needed
-                currentIssueId: state.isEditing ? state.issueId : null,
+                projectId: project!.id,
+                currentIssueId: state.state.isEditing
+                    ? state.state.issueId
+                    : null,
               );
               if (newTag != null && context.mounted) {
                 context.read<IssueFormCubit>().addTag(newTag);
@@ -639,7 +617,7 @@ class IssueFormSidebar extends StatelessWidget {
     );
   }
 
-  void _showLinksPicker(BuildContext context, IssueFormState state) {
+  void _showLinksPicker(BuildContext context, IssueFormCubit state) {
     showModalBottomSheet(
       context: context,
       builder: (sheetContext) => _PickerSheet(
@@ -652,7 +630,7 @@ class IssueFormSidebar extends StatelessWidget {
               Navigator.pop(context);
               AddLinkDialog.show(
                 context,
-                currentIssueId: state.issueId,
+                currentIssueId: state.state.issueId,
                 onSave: (link) {
                   context.read<IssueFormCubit>().addLink(link);
                 },
@@ -674,7 +652,7 @@ class IssueFormSidebar extends StatelessWidget {
     );
   }
 
-  void _showBuildPicker(BuildContext context, IssueFormState state) {
+  void _showBuildPicker(BuildContext context, IssueFormCubit state) {
     showModalBottomSheet(
       context: context,
       builder: (sheetContext) => _PickerSheet(
@@ -695,7 +673,9 @@ class IssueFormSidebar extends StatelessWidget {
           ),
           ListTile(
             title: const Text('Next Build'),
-            trailing: state.build == null ? const Icon(Icons.check) : null,
+            trailing: state.state.build == null
+                ? const Icon(Icons.check)
+                : null,
             onTap: () {
               context.read<IssueFormCubit>().updateBuild(null);
               Navigator.pop(context);
@@ -707,7 +687,7 @@ class IssueFormSidebar extends StatelessWidget {
               subtitle: build.date != null
                   ? Text(build.date!.toLocal().toString().split(' ')[0])
                   : null,
-              trailing: state.build?.id == build.id
+              trailing: state.state.build?.id == build.id
                   ? const Icon(Icons.check)
                   : null,
               onTap: () {
@@ -721,7 +701,7 @@ class IssueFormSidebar extends StatelessWidget {
     );
   }
 
-  void _showSprintsPicker(BuildContext context, IssueFormState state) {
+  void _showSprintsPicker(BuildContext context, IssueFormCubit state) {
     showModalBottomSheet(
       context: context,
       builder: (sheetContext) => _PickerSheet(
@@ -740,7 +720,7 @@ class IssueFormSidebar extends StatelessWidget {
               );
             },
           ),
-          ...state.sprints.map(
+          ...state.availableSprints.map(
             (sprint) => ListTile(
               leading: Container(
                 width: 12,

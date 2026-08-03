@@ -21,7 +21,7 @@ class UpdateRoleParams extends Params {
   List<Object?> get props => [name, description, permissions];
 }
 
-class UpdateRole extends UseCasePermission<RoleEntity, UpdateRoleParams> {
+class UpdateRole extends UseCase<RoleEntity, UpdateRoleParams> {
   final RolesRepository repository;
 
   UpdateRole(this.repository);
@@ -30,7 +30,7 @@ class UpdateRole extends UseCasePermission<RoleEntity, UpdateRoleParams> {
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
   @override
-  Future<Either<Failure, RoleEntity>> execute({required UpdateRoleParams params}) {
+  Future<Either<Failure, RoleEntity>> call({required UpdateRoleParams params}) {
     return repository.updateRole(
       RoleEntity(
         name: params.name,

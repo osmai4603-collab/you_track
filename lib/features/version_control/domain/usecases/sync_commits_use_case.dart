@@ -6,7 +6,7 @@ import 'package:issues_tracking/features/version_control/domain/entities/vcs_com
 import 'package:issues_tracking/features/version_control/domain/repositories/version_control_repository.dart';
 
 class SyncCommitsUseCase
-    extends UseCasePermission<List<VcsCommitEntity>, SyncCommitsParams> {
+    extends UseCase<List<VcsCommitEntity>, SyncCommitsParams> {
   @override
   Permission get requiredPermission => Permission.projectUpdateProject;
 
@@ -15,8 +15,9 @@ class SyncCommitsUseCase
   SyncCommitsUseCase(this.repository);
 
   @override
-  Future<Either<Failure, List<VcsCommitEntity>>> execute(
-      {required SyncCommitsParams params}) {
+  Future<Either<Failure, List<VcsCommitEntity>>> call({
+    required SyncCommitsParams params,
+  }) {
     return repository.getCommits(params.integrationId, taskId: params.taskId);
   }
 }

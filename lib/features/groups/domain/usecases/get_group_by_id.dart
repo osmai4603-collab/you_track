@@ -14,7 +14,7 @@ class GetGroupByIdParams extends Params {
   List<Object?> get props => [id];
 }
 
-class GetGroupById extends UseCasePermission<GroupEntity, GetGroupByIdParams> {
+class GetGroupById extends UseCase<GroupEntity, GetGroupByIdParams> {
   @override
   Permission get requiredPermission => Permission.systemLowLevelAdminRead;
 
@@ -23,7 +23,9 @@ class GetGroupById extends UseCasePermission<GroupEntity, GetGroupByIdParams> {
   GetGroupById(this.repository);
 
   @override
-  Future<Either<Failure, GroupEntity>> execute({required GetGroupByIdParams params}) {
+  Future<Either<Failure, GroupEntity>> call({
+    required GetGroupByIdParams params,
+  }) {
     return repository.getGroupById(params.id);
   }
 }

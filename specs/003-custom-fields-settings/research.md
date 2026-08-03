@@ -21,13 +21,13 @@ Research findings to resolve unknowns for implementing the Custom Fields Setting
 
 **Decision**: Map existing enums to a unified `CustomFieldType` enum in the custom_fields feature.
 
-**Rationale**: The existing enums (IssueTypeEnum, IssuePriorityTypeEnum, IssueStateEnum, IssueSubsystemEnum) are defined in `lib/core/enums/` and use a sealed class pattern. Each custom field's type should be stored as a string identifier (e.g., `"issue-type"`, `"priority"`, `"state"`, `"subsystem"`) and the matching enum is resolved at display time. This avoids tight coupling between the custom fields feature and the specific enum implementations.
+**Rationale**: The existing enums (IssueTypeEnum, IssuePriorityTypeEnum, IssueStateEnum, SubsystemEntity) are defined in `lib/core/enums/` and use a sealed class pattern. Each custom field's type should be stored as a string identifier (e.g., `"issue-type"`, `"priority"`, `"state"`, `"subsystem"`) and the matching enum is resolved at display time. This avoids tight coupling between the custom fields feature and the specific enum implementations.
 
 **Field types available**:
 - `issue-type` → IssueTypeEnum (8 values: bug, cosmetic, exception, feature, task, usability-problem, performance-problem, epic)
 - `priority` → IssuePriorityTypeEnum (5 values: show-stopper, critical, major, normal, minor)
 - `state` → IssueStateEnum (3 values: to-do, in-progress, done)
-- `subsystem` → IssueSubsystemEnum (4 values: no-value, issue-tracking, project-management, migration)
+- `subsystem` → SubsystemEntity (4 values: no-value, issue-tracking, project-management, migration)
 
 ## 3. Supabase Table Schema
 

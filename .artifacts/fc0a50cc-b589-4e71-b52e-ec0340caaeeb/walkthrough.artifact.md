@@ -6,7 +6,7 @@ I have successfully activated the `IssueForm` for both creating new issues and e
 
 ### 1. Data Persistence & Model Updates
 I updated the `Issue` entity and `IssueModel` to include previously missing fields that are part of the YouTrack-like form:
-- **Subsystem**: Now uses `IssueSubsystemEnum` for better type safety.
+- **Subsystem**: Now uses `SubsystemEntity` for better type safety.
 - **Fix Versions**: Added to track which versions the issue is planned for.
 - **Fixed in Build**: Tracks the specific build where the fix is included.
 

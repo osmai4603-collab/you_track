@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/cubits/issue_form_cubit.dart';
-import 'package:issues_tracking/features/issues/presentation/cubits/issue_form_state.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/issue_visibility_picker.dart';
 
 class IssueFormActionBar extends StatelessWidget {
@@ -18,19 +18,19 @@ class IssueFormActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<IssueFormCubit, IssueFormState>(
-      builder: (context, state) {
-        return Container(
+    final cubit = context.watch<IssueFormCubit>();
+    final state = cubit.state;
+    return Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
-            border: Border(
-              top: BorderSide(color: Colors.grey.shade300),
-            ),
+            border: Border(top: BorderSide(color: Colors.grey.shade300)),
           ),
           child: Row(
             children: [
               FilledButton(
-                onPressed: state.canSubmit ? (onSubmit ?? () => _submit(context)) : null,
+                onPressed: state.canSubmit
+                    ? (onSubmit ?? () => _submit(context))
+                    : null,
                 child: Text(state.isEditing ? 'Update' : 'Create'),
               ),
               const SizedBox(width: 4),
@@ -57,10 +57,10 @@ class IssueFormActionBar extends StatelessWidget {
               ),
               const SizedBox(width: 12),
               OutlinedButton.icon(
-                onPressed: () => _showVisibilityPicker(context, state),
+                onPressed: () => _showVisibilityPicker(context, cubit),
                 icon: const Icon(Icons.visibility, size: 16),
                 label: Text(
-                  _visibilityLabel(state.visibility),
+                  _visibilityLabel(cubit.visibility),
                   style: const TextStyle(fontSize: 12),
                 ),
               ),
@@ -68,16 +68,12 @@ class IssueFormActionBar extends StatelessWidget {
               if (state.isEditing)
                 TextButton(
                   onPressed: onDelete ?? () => _confirmDelete(context),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.red,
-                  ),
+                  style: TextButton.styleFrom(foregroundColor: Colors.red),
                   child: const Text('Delete'),
                 ),
             ],
           ),
         );
-      },
-    );
   }
 
   String _visibilityLabel(List<String> visibility) {
@@ -98,16 +94,21 @@ class IssueFormActionBar extends StatelessWidget {
     context.read<IssueFormCubit>().submit();
   }
 
-  void _showVisibilityPicker(BuildContext context, IssueFormState state) {
-    showDialog(
+  void _showVisibilityPicker(BuildContext context, IssueFormCubit state) async {
+    final result = await showDialog<List<String>>(
       context: context,
-      builder: (context) => IssueVisibilityPicker(
-        currentVisibility: state.visibility,
-        onVisibilityChanged: (visibility) {
-          context.read<IssueFormCubit>().updateVisibility(visibility);
-        },
+      builder: (dialogContext) => BlocProvider.value(
+        value: context.read<GroupsBloc>(),
+        child: IssueVisibilityPicker(
+          currentVisibility: state.visibility,
+          onVisibilityChanged: (_) {}, // handled via dialog result
+        ),
       ),
     );
+
+    if (result != null && context.mounted) {
+      context.read<IssueFormCubit>().updateVisibility(result);
+    }
   }
 
   void _confirmDelete(BuildContext context) {
@@ -124,7 +125,9 @@ class IssueFormActionBar extends StatelessWidget {
           FilledButton(
             onPressed: () {
               Navigator.pop(context);
-              context.read<IssueFormCubit>().delete();
+              if (onDelete != null) {
+                onDelete!();
+              }
               Navigator.pop(context);
             },
             style: FilledButton.styleFrom(backgroundColor: Colors.red),

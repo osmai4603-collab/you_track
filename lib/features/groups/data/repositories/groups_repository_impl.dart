@@ -15,9 +15,9 @@ class GroupsRepositoryImpl implements GroupsRepository {
   GroupsRepositoryImpl(this.dataSource);
 
   @override
-  Future<Either<Failure, List<GroupEntity>>> getGroups() async {
+  Future<Either<Failure, List<GroupEntity>>> getGroups({String? userId}) async {
     try {
-      final groups = await dataSource.getGroups();
+      final groups = await dataSource.getGroups(userId: userId);
       return Right(groups);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

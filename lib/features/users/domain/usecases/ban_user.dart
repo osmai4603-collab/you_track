@@ -14,7 +14,7 @@ class BanUserParams extends Params {
   List<Object?> get props => [userId, isBanned];
 }
 
-class BanUser extends UseCasePermission<UserEntity, BanUserParams> {
+class BanUser extends UseCase<UserEntity, BanUserParams> {
   final UsersRepository repository;
   BanUser(this.repository);
 
@@ -22,11 +22,12 @@ class BanUser extends UseCasePermission<UserEntity, BanUserParams> {
   Permission get requiredPermission => .userUpdateUser;
 
   @override
-  Future<Either<Failure, UserEntity>> execute({required BanUserParams params}) {
+  Future<Either<Failure, UserEntity>> call({required BanUserParams params}) {
     return repository.getUserById(params.userId).then((userResult) {
       return userResult.fold(
         (failure) => Left(failure),
-        (user) => repository.updateUser(user.copyWith(isBanned: params.isBanned)),
+        (user) =>
+            repository.updateUser(user.copyWith(isBanned: params.isBanned)),
       );
     });
   }

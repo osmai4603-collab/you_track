@@ -13,7 +13,7 @@ class DeleteRoleParams extends Params {
   List<Object?> get props => [id];
 }
 
-class DeleteRole extends UseCasePermission<void, DeleteRoleParams> {
+class DeleteRole extends UseCase<void, DeleteRoleParams> {
   @override
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
@@ -22,7 +22,7 @@ class DeleteRole extends UseCasePermission<void, DeleteRoleParams> {
   DeleteRole(this.repository);
 
   @override
-  Future<Either<Failure, void>> execute({required DeleteRoleParams params}) {
+  Future<Either<Failure, void>> call({required DeleteRoleParams params}) {
     return repository.deleteRole(params.id);
   }
 }

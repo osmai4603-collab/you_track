@@ -8,7 +8,11 @@ abstract class GroupsEvent extends Equatable {
 }
 
 class LoadGroups extends GroupsEvent {
-  const LoadGroups();
+  final String? userId;
+  const LoadGroups({this.userId});
+
+  @override
+  List<Object?> get props => [userId];
 }
 
 class SelectGroup extends GroupsEvent {

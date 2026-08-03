@@ -8,7 +8,7 @@
 
 ## Summary
 
-Add a Custom Fields management page within the project settings section. Project administrators can view, add, edit, delete, and reorder custom fields via a table UI with drag-and-drop. Fields are typed from existing enums (IssueTypeEnum, IssuePriorityTypeEnum, IssueStateEnum, IssueSubsystemEnum) and persisted per-project via Supabase. The feature follows the existing Clean Architecture pattern with a new `custom_fields` feature module under `lib/features/`.
+Add a Custom Fields management page within the project settings section. Project administrators can view, add, edit, delete, and reorder custom fields via a table UI with drag-and-drop. Fields are typed from existing enums (IssueTypeEnum, IssuePriorityTypeEnum, IssueStateEnum, SubsystemEntity) and persisted per-project via Supabase. The feature follows the existing Clean Architecture pattern with a new `custom_fields` feature module under `lib/features/`.
 
 ## Technical Context
 

@@ -1,5 +1,5 @@
 import 'package:issues_tracking/core/entities/entity.dart';
-import 'package:issues_tracking/core/enums/issue_subsystem_enum.dart';
+
 
 class SubsystemEntity extends Entity {
   final String id;
@@ -24,7 +24,7 @@ class SubsystemEntity extends Entity {
     String? name,
     String? projectId,
     String? ownerId,
-    IssueSubsystemEnum? subsystemType,
+    SubsystemEntity? subsystemType,
     int? color,
     String? firstLetter,
   }) {
@@ -47,4 +47,15 @@ class SubsystemEntity extends Entity {
     color,
     firstLetter,
   ];
+
+  factory SubsystemEntity.create({required String id, required String name, required String projectId, required String ownerId, required int color}) {
+    return SubsystemEntity(
+      id: id,
+      name: name,
+      projectId: projectId,
+      ownerId: ownerId,
+      color: color,
+      firstLetter: name.isNotEmpty ? name[0].toUpperCase() : 'S',
+    );
+  }
 }

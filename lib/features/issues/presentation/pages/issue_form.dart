@@ -49,6 +49,7 @@ class CompactFieldWidget extends StatelessWidget {
   final String label;
   final String value;
   final Widget? leading;
+  final Widget? trailing;
   final VoidCallback? onTap;
 
   const CompactFieldWidget({
@@ -56,6 +57,7 @@ class CompactFieldWidget extends StatelessWidget {
     required this.label,
     required this.value,
     this.leading,
+    this.trailing,
     this.onTap,
   });
 
@@ -78,22 +80,29 @@ class CompactFieldWidget extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 if (leading != null) ...[leading!, const SizedBox(width: 6)],
-                TextHoverWidget(
-                  text: value,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: ColorScheme.of(context).primary,
-                    fontWeight: FontWeight.w400,
+                Expanded(
+                  child: Row(
+                    children: [
+                      TextHoverWidget(
+                        text: value,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: ColorScheme.of(context).primary,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        styleHover: TextStyle(
+                          fontSize: 14,
+                          color: ColorScheme.of(context).secondary,
+                          fontWeight: FontWeight.w400,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(width: 4),
+                      Icon(Icons.arrow_drop_down, color: YTColors.iconColor),
+                    ],
                   ),
-                  styleHover: TextStyle(
-                    fontSize: 14,
-                    color: ColorScheme.of(context).secondary,
-                    fontWeight: FontWeight.w400,
-                  ),
-                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(width: 4),
-                Icon(Icons.arrow_drop_down, color: YTColors.iconColor),
+                ?trailing,
               ],
             ),
           ],
@@ -143,9 +152,9 @@ class ColorBadge extends StatelessWidget {
 
 class IssueForm extends StatefulWidget {
   final String? issueId;
-  final String projectKey;
+  final String? projectKey;
 
-  const IssueForm({super.key, this.issueId, this.projectKey = 'DEM'});
+  const IssueForm({super.key, this.issueId, this.projectKey});
 
   @override
   State<IssueForm> createState() => _IssueFormState();
@@ -170,11 +179,7 @@ class _IssueFormState extends State<IssueForm> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final cubit = context.read<IssueFormCubit>();
-      if (widget.issueId != null) {
-        cubit.loadIssue(widget.issueId!);
-      } else {
-        cubit.initWithProject(widget.projectKey);
-      }
+      cubit.initIssue(issueId: widget.issueId);
     });
   }
 

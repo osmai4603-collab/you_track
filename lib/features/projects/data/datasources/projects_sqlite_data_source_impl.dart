@@ -183,6 +183,20 @@ class ProjectsSqliteDataSourceImpl implements ProjectsRemoteDataSource {
     );
     return rows.map((row) => SubsystemModel.fromJson(row)).toList();
   }
+
+  @override
+  Future<SubsystemModel> getSubsystemById(String id) async {
+    final rows = _sqlite.query(
+      table: 'issue_subsystems',
+      where: 'id = ?',
+      whereArgs: [id],
+      limit: 1,
+    );
+    if (rows.isEmpty) {
+      throw Exception('Subsystem not found with id: $id');
+    }
+    return SubsystemModel.fromJson(rows.first);
+  }
   
   @override
   Future<SubsystemModel> createSubsystem(SubsystemModel model) async {
@@ -193,6 +207,19 @@ class ProjectsSqliteDataSourceImpl implements ProjectsRemoteDataSource {
 
     _sqlite.insert(table: 'issue_subsystems', data: json);
 
+    // Convert back to model
+    return SubsystemModel.fromJson(json);
+  }
+  
+  @override
+  Future<SubsystemModel> addSubsystem(SubsystemModel model) async {
+    final json = model.toJson();
+    if (json['id'] == null || json['id'].toString().isEmpty) {
+      json['id'] = DateTime.now().millisecondsSinceEpoch.toString();
+    }
+
+    _sqlite.insert(table: 'issue_subsystems', data: json);
+    
     // Convert back to model
     return SubsystemModel.fromJson(json);
   }

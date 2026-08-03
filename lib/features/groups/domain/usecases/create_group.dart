@@ -16,7 +16,7 @@ class CreateGroupParams extends Params {
   List<Object?> get props => [name, description];
 }
 
-class CreateGroup extends UseCasePermission<GroupEntity, CreateGroupParams> {
+class CreateGroup extends UseCase<GroupEntity, CreateGroupParams> {
   final GroupsRepository repository;
 
   CreateGroup(this.repository);
@@ -25,8 +25,10 @@ class CreateGroup extends UseCasePermission<GroupEntity, CreateGroupParams> {
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
   @override
-  Future<Either<Failure, GroupEntity>> execute({required CreateGroupParams params}) {
-   return repository.createGroup(
+  Future<Either<Failure, GroupEntity>> call({
+    required CreateGroupParams params,
+  }) {
+    return repository.createGroup(
       GroupEntity(id: '', name: params.name, description: params.description),
     );
   }

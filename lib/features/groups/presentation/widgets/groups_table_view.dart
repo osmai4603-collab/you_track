@@ -7,6 +7,7 @@ import 'package:issues_tracking/features/groups/presentation/bloc/groups_event.d
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_state.dart';
 import 'package:issues_tracking/features/groups/presentation/widgets/group_table_row.dart';
 import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 
 class GroupsTableView extends StatelessWidget {
   final String? userId;
@@ -35,6 +36,7 @@ class GroupsTableView extends StatelessWidget {
           }).toList();
 
           if (displayedGroups.isEmpty) {
+            final canCreateGroup = userSession.hasPermission(Permission.systemLowLevelAdminWrite);
             return Center(
               child: Column(
                 mainAxisSize: MainAxisSize.min,
@@ -51,13 +53,15 @@ class GroupsTableView extends StatelessWidget {
                       color: colors.onSurfaceVariant,
                     ),
                   ),
-                  const SizedBox(height: AppSpacing.extraSmall),
-                  Text(
-                    'Create a new group to get started',
-                    style: textTheme.bodySmall?.copyWith(
-                      color: colors.onSurfaceVariant,
+                  if (canCreateGroup) ...[
+                    const SizedBox(height: AppSpacing.extraSmall),
+                    Text(
+                      'Create a new group to get started',
+                      style: textTheme.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
                     ),
-                  ),
+                  ],
                 ],
               ),
             );
@@ -87,7 +91,7 @@ class GroupsTableView extends StatelessWidget {
           );
         }
 
-        return const Center(child: CircularProgressIndicator());
+        return ShimmerLoading.table();
       },
     );
   }

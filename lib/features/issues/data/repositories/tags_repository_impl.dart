@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/enums/tag_permission_scope_enum.dart';
 import 'package:issues_tracking/core/enums/tag_subscription_event_enum.dart';
+import 'package:issues_tracking/features/issues/domain/entities/issue_link.dart';
 import '../../domain/entities/tag.dart';
 import '../../domain/entities/project_member.dart';
 import '../../domain/repositories/tags_repository.dart';
@@ -60,14 +61,21 @@ class TagsRepositoryImpl implements TagsRepository {
     required String projectId,
   }) async {
     try {
-      final membersData = await dataSource.getProjectMembers(projectId: projectId);
+      final membersData = await dataSource.getProjectMembers(
+        projectId: projectId,
+      );
       final members = membersData.map((e) {
         final userData = e['users'] as Map<String, dynamic>?;
         return ProjectMember(
           id: e['user_id']?.toString() ?? e['id']?.toString() ?? '',
-          name: userData?['full_name']?.toString() ?? e['name']?.toString() ?? 'Unknown',
+          name:
+              userData?['full_name']?.toString() ??
+              e['name']?.toString() ??
+              'Unknown',
           email: userData?['email']?.toString() ?? e['email']?.toString(),
-          avatarUrl: userData?['avatar_url']?.toString() ?? e['avatar_url']?.toString(),
+          avatarUrl:
+              userData?['avatar_url']?.toString() ??
+              e['avatar_url']?.toString(),
         );
       }).toList();
       return Right(members);
@@ -82,8 +90,33 @@ class TagsRepositoryImpl implements TagsRepository {
     required String projectId,
   }) async {
     try {
-      final isUnique = await dataSource.isTagNameUnique(name: name, projectId: projectId);
+      final isUnique = await dataSource.isTagNameUnique(
+        name: name,
+        projectId: projectId,
+      );
       return Right(isUnique);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<Tag>>> getTagsByIssueId({
+    required String issueId,
+  }) async {
+    try {
+      final tags = await dataSource.getTagsByIssueId(issueId: issueId);
+      return Right(tags);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<IssueLink>>> getLinksByIssueId({required String issueId}) async {
+    try {
+      final links = await dataSource.getLinksByIssueId(issueId: issueId);
+      return Right(links);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

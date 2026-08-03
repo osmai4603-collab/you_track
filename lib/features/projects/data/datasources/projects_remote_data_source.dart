@@ -18,8 +18,11 @@ abstract class ProjectsRemoteDataSource {
   Future<List<ProjectMemberModel>> getProjectMembers(String projectId);
   Future<ProjectMemberModel> addProjectMember(ProjectMemberModel member);
   Future<List<SubsystemModel>> getSubsystems(String projectId);
+  Future<SubsystemModel> getSubsystemById(String id);
 
   Future<SubsystemModel> createSubsystem(SubsystemModel model);
+
+  Future<SubsystemModel> addSubsystem(SubsystemModel model);
 }
 
 class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
@@ -82,7 +85,9 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
 
   @override
   Future<ProjectModel> updateProject(ProjectModel project) async {
-    final json = project.toJson()..remove('group_members')..remove('id');
+    final json = project.toJson()
+      ..remove('group_members')
+      ..remove('id');
     printMap(title: 'Updating Project WHERE id = ${project.id}', data: json);
     final response = await supabase
         .from('projects')
@@ -92,7 +97,9 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
         .maybeSingle();
 
     if (response == null) {
-      throw Exception('No project updated. Project not found or update not allowed (RLS).');
+      throw Exception(
+        'No project updated. Project not found or update not allowed (RLS).',
+      );
     }
     printMap(title: 'Updated Project', data: response);
     return ProjectModel.fromJson(response);
@@ -114,51 +121,52 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
         .from('project_members')
         .select('*, users(*)')
         .eq('project_id', projectId);
-        
+
     final directMembers = (directResponse as List)
         .map((e) => ProjectMemberModel.fromJson(e))
         .toList();
-        
+
     // جلب المجموعات المرتبطة بالمشروع
     final groupProjectsResponse = await supabase
         .from('group_projects')
         .select('group_id')
         .eq('project_id', projectId);
-        
+
     final groupIds = (groupProjectsResponse as List)
         .map((e) => e['group_id'] as String)
         .toList();
-        
+
     if (groupIds.isEmpty) {
       return directMembers;
     }
-    
+
     // جلب أعضاء المجموعات المرتبطة بالمشروع مع بيانات المستخدم
     final groupMembersResponse = await supabase
         .from('group_members')
         .select('user_id, group_id, users(*)')
         .inFilter('group_id', groupIds);
-        
+
     // جلب أدوار المجموعات ضمن هذا المشروع
     final groupRolesResponse = await supabase
         .from('group_roles')
         .select('group_id, role_name')
         .eq('project_id', projectId)
         .inFilter('group_id', groupIds);
-        
+
     final groupRoles = <String, String>{};
     for (final gr in (groupRolesResponse as List)) {
       groupRoles[gr['group_id'] as String] = gr['role_name'] as String;
     }
-    
+
     final inheritedMembersMap = <String, ProjectMemberModel>{};
     for (final gm in (groupMembersResponse as List)) {
       final userId = gm['user_id'] as String;
       final groupId = gm['group_id'] as String;
-      final role = groupRoles[groupId] ?? 'Contributor'; 
-      
+      final role = groupRoles[groupId] ?? 'Contributor';
+
       // تجنب التكرار إذا كان المستخدم موجوداً بالفعل كعضو مباشر
-      if (!directMembers.any((m) => m.userId == userId) && !inheritedMembersMap.containsKey(userId)) {
+      if (!directMembers.any((m) => m.userId == userId) &&
+          !inheritedMembersMap.containsKey(userId)) {
         final userData = gm['users'];
         if (userData != null) {
           inheritedMembersMap[userId] = ProjectMemberModel.fromJson({
@@ -172,7 +180,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
         }
       }
     }
-    
+
     return [...directMembers, ...inheritedMembersMap.values];
   }
 
@@ -200,7 +208,17 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
       return [];
     }
   }
-  
+
+  @override
+  Future<SubsystemModel> getSubsystemById(String id) async {
+    final response = await supabase
+        .from('issue_subsystems')
+        .select()
+        .eq('id', id)
+        .single();
+    return SubsystemModel.fromJson(response);
+  }
+
   @override
   Future<SubsystemModel> createSubsystem(SubsystemModel model) async {
     final data = model.toJson()..remove('id');
@@ -210,8 +228,28 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
         .select()
         .maybeSingle();
     if (response == null) {
-      throw Exception('No subsystem created. Insertion failed or not allowed (RLS).');
+      throw Exception(
+        'No subsystem created. Insertion failed or not allowed (RLS).',
+      );
     }
     return SubsystemModel.fromJson(response);
+  }
+
+  @override
+  Future<SubsystemModel> addSubsystem(SubsystemModel model) {
+    final data = model.toJson()..remove('id');
+    return supabase
+        .from('issue_subsystems')
+        .insert(data)
+        .select()
+        .maybeSingle()
+        .then((response) {
+          if (response == null) {
+            throw Exception(
+              'No subsystem added. Insertion failed or not allowed (RLS).',
+            );
+          }
+          return SubsystemModel.fromJson(response);
+        });
   }
 }

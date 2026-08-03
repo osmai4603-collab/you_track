@@ -6,7 +6,7 @@ import 'package:issues_tracking/features/version_control/domain/entities/vcs_use
 import 'package:issues_tracking/features/version_control/domain/repositories/version_control_repository.dart';
 
 class ManageUserMappingUseCase
-    extends UseCasePermission<List<VcsUserMappingEntity>, ManageUserMappingParams> {
+    extends UseCase<List<VcsUserMappingEntity>, ManageUserMappingParams> {
   @override
   Permission get requiredPermission => Permission.projectUpdateProject;
 
@@ -15,11 +15,13 @@ class ManageUserMappingUseCase
   ManageUserMappingUseCase(this.repository);
 
   @override
-  Future<Either<Failure, List<VcsUserMappingEntity>>> execute(
-      {required ManageUserMappingParams params}) async {
+  Future<Either<Failure, List<VcsUserMappingEntity>>> call({
+    required ManageUserMappingParams params,
+  }) async {
     if (params.deleteMappingId != null) {
-      final deleteResult =
-          await repository.deleteUserMapping(params.deleteMappingId!);
+      final deleteResult = await repository.deleteUserMapping(
+        params.deleteMappingId!,
+      );
       return deleteResult.fold(
         (failure) => Left(failure),
         (_) => repository.getUserMappings(params.integrationId),
@@ -27,8 +29,9 @@ class ManageUserMappingUseCase
     }
 
     if (params.newMapping != null) {
-      final createResult =
-          await repository.createUserMapping(params.newMapping!);
+      final createResult = await repository.createUserMapping(
+        params.newMapping!,
+      );
       return createResult.fold(
         (failure) => Left(failure),
         (_) => repository.getUserMappings(params.integrationId),

@@ -1,16 +1,26 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import '../entities/project_member.dart';
 import '../repositories/tags_repository.dart';
 
-class GetProjectMembers implements UseCase<List<ProjectMember>, GetProjectMembersParams> {
+class GetProjectMembers
+    extends UseCase<List<ProjectMember>, GetProjectMembersParams> {
   final TagsRepository repository;
 
   GetProjectMembers(this.repository);
 
   @override
-  Future<Either<Failure, List<ProjectMember>>> call({required GetProjectMembersParams params}) {
+  Permission get requiredPermission => Permission.projectReadProjectBasic;
+
+  @override
+  String? getProjectId(GetProjectMembersParams params) => params.projectId;
+
+  @override
+  Future<Either<Failure, List<ProjectMember>>> call({
+    required GetProjectMembersParams params,
+  }) {
     return repository.getProjectMembers(projectId: params.projectId);
   }
 }

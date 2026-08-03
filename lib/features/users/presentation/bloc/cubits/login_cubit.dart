@@ -37,8 +37,9 @@ class LoginState extends Equatable {
 
 class LoginCubit extends Cubit<LoginState> {
   final LoginUseCase _loginUseCase;
+  final GetUserPermissionsUseCase _getUserPermissionsUseCase;
 
-  LoginCubit({required this._loginUseCase}) : super(const LoginState());
+  LoginCubit({required this._loginUseCase, required this._getUserPermissionsUseCase}) : super(const LoginState());
 
   Future<void> login(String email, String password) async {
     if (email.isEmpty || password.isEmpty) return;
@@ -57,17 +58,27 @@ class LoginCubit extends Cubit<LoginState> {
         );
       },
       (user) async {
-        final getPermissions = get_it<GetUserPermissionsUseCase>();
-        final permissionsResult = await getPermissions(
+        final permissionsResult = await _getUserPermissionsUseCase(
           params: GetUserPermissionsParams(userId: user.id),
         );
 
-        permissionsResult.fold((failure) {}, (permissions) {
-          final userSession = get_it<UserSession>();
-          userSession.setPermissions(permissions);
-        });
-
-        emit(state.copyWith(status: LoginStatus.success, user: user));
+        await permissionsResult.fold(
+          (failure) async {
+            final userSession = get_it<UserSession>();
+            userSession.clearUser();
+            emit(
+              state.copyWith(
+                status: LoginStatus.failure,
+                errorMessage: failure.message,
+              ),
+            );
+          },
+          (permissions) async {
+            final userSession = get_it<UserSession>();
+            userSession.setPermissions(permissions);
+            emit(state.copyWith(status: LoginStatus.success, user: user));
+          },
+        );
       },
     );
   }

@@ -9,7 +9,7 @@ This plan outlines the steps to activate the `IssueForm` for both adding and edi
 > - Deletion logic is implemented but requires a confirmation dialog.
 > - The `projectKey` is currently defaulted to 'DEM'.
 > - **New Fields**: `subsystem`, `fixVersions`, and `fixedInBuild` will be added to the `Issue` entity and database model to ensure full form persistence.
-> - **Enums**: `subsystem` will be changed from `String` to `IssueSubsystemEnum`.
+> - **Enums**: `subsystem` will be changed from `String` to `SubsystemEntity`.
 
 ## Proposed Changes
 
@@ -24,15 +24,15 @@ This plan outlines the steps to activate the `IssueForm` for both adding and edi
 ### Presentation Layer
 
 #### [MODIFY] [issue_form_state.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/lib/features/issues/presentation/cubits/issue_form_state.dart)
-- Change `subsystem` type to `IssueSubsystemEnum`.
+- Change `subsystem` type to `SubsystemEntity`.
 - Ensure all fields are correctly initialized.
 
 #### [MODIFY] [issue_form_cubit.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/lib/features/issues/presentation/cubits/issue_form_cubit.dart)
-- Update `updateSubsystem` to accept `IssueSubsystemEnum`.
+- Update `updateSubsystem` to accept `SubsystemEntity`.
 - Map all `state` fields (including new ones) to the `Issue` entity in the `submit()` method.
 
 #### [MODIFY] [issue_form_sidebar.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/lib/features/issues/presentation/widgets/issue_form_sidebar.dart)
-- Implement `_showSubsystemPicker` using `IssueSubsystemEnum.values`.
+- Implement `_showSubsystemPicker` using `SubsystemEntity.values`.
 - Implement placeholders for Assignee, Fix versions, and Fixed in build pickers.
 
 #### [MODIFY] [issue_form.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/lib/features/issues/presentation/pages/issue_form.dart)

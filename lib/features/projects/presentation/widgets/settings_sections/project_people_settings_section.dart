@@ -5,8 +5,10 @@ import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
 import 'package:issues_tracking/core/widgets/avatar_url_chip.dart';
 import 'package:issues_tracking/core/widgets/hover_widget.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_event.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_member_entity.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
@@ -117,49 +119,55 @@ class _ProjectPeopleSettingsSectionState
                 .where((m) => m.roles.isEmpty)
                 .toList();
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.large),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSearchFilterBar(
-                    l10n,
-                    textTheme,
-                    colors,
-                    filteredGroups,
-                    projectId,
+            Widget content;
+            if (state.status == ProjectMembersStatus.loading) {
+              content = Center(
+                key: const ValueKey('project-people-loading'),
+                child: SizedBox(
+                  width: 480,
+                  child: ShimmerLoading.list(itemCount: 6),
+                ),
+              );
+            } else if (state.status == ProjectMembersStatus.failure) {
+              content = Padding(
+                key: const ValueKey('project-people-error'),
+                padding: const EdgeInsets.all(AppSpacing.large),
+                child: Center(
+                  child: SelectableText(
+                    state.errorMessage ?? '',
+                    style: textTheme.textTheme.bodySmall?.copyWith(
+                      color: colors.error,
+                    ),
                   ),
-                  const SizedBox(height: AppSpacing.large),
-                  _buildProjectTeamHeader(
-                    teamMembers.length + filteredGroups.length,
-                    project?.ownerId ?? '',
-                    l10n,
-                    textTheme,
-                    colors,
-                  ),
-                  const SizedBox(height: AppSpacing.medium),
-                  if (state.status == ProjectMembersStatus.loading)
-                    const Padding(
-                      padding: EdgeInsets.all(AppSpacing.large),
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  else if (state.status == ProjectMembersStatus.failure)
-                    Padding(
-                      padding: const EdgeInsets.all(AppSpacing.large),
-                      child: Center(
-                        child: SelectableText(
-                          state.errorMessage ?? '',
-                          style: textTheme.textTheme.bodySmall?.copyWith(
-                            color: colors.error,
-                          ),
-                        ),
-                      ),
-                    )
-                  else if (teamMembers.isEmpty &&
-                      otherPeople.isEmpty &&
-                      filteredGroups.isEmpty)
-                    _buildEmptyState(l10n, textTheme, colors)
-                  else ...[
+                ),
+              );
+            } else if (teamMembers.isEmpty &&
+                otherPeople.isEmpty &&
+                filteredGroups.isEmpty) {
+              content = _buildEmptyState(l10n, textTheme, colors);
+            } else {
+              content = SingleChildScrollView(
+                key: const ValueKey('project-people-loaded'),
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.large),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSearchFilterBar(
+                      l10n,
+                      textTheme,
+                      colors,
+                      filteredGroups,
+                      projectId,
+                    ),
+                    const SizedBox(height: AppSpacing.large),
+                    _buildProjectTeamHeader(
+                      teamMembers.length + filteredGroups.length,
+                      project?.ownerId ?? '',
+                      l10n,
+                      textTheme,
+                      colors,
+                    ),
+                    const SizedBox(height: AppSpacing.medium),
                     Builder(
                       builder: (context) {
                         final mainTableIds = [
@@ -201,11 +209,13 @@ class _ProjectPeopleSettingsSectionState
                       textTheme,
                       colors,
                     ),
+                    const SizedBox(height: AppSpacing.extraLarge),
                   ],
-                  const SizedBox(height: AppSpacing.extraLarge),
-                ],
-              ),
-            );
+                ),
+              );
+            }
+
+            return AnimatedContentSwitcher(child: content);
           },
         );
       },

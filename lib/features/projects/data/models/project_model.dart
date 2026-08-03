@@ -43,34 +43,41 @@ class ProjectModel extends ProjectEntity {
     );
   }
 
-  factory ProjectModel.fromJson(Map<String, dynamic> json) {
-    printMap(title: 'Project', data: json);
-    // print('project: $json');
+  factory ProjectModel.fromJson(Map<String, dynamic>? json) {
+    final safeJson = json ?? <String, dynamic>{};
+    printMap(title: 'Project', data: safeJson);
+
     return ProjectModel(
-      id: json['id'],
-      name: json['name'],
-      projectId: json['project_id'],
-      description: json['description'],
-      isArchived: json['is_archived'] == true,
-      templateType: ProjectTemplateType.of(json['template_type']),
-      ownerId: json['owner_id'] ?? '',
-      createdAt: DateTime.tryParse(json['created_at']) ?? DateTime.now(),
-      isFavorite: json['is_favorite'] == true,
-      members: ProjectMemberModel.fromListJson(json['group_members']),
-      visibility: json['visibility'],
-      recommendedVisibility: _tryParseRecommendedVisibility(
-        json['recommended_visibility'],
+      id: safeJson['id']?.toString() ?? '',
+      name: safeJson['name']?.toString() ?? '',
+      projectId: safeJson['project_id']?.toString() ?? '',
+      description: safeJson['description']?.toString(),
+      isArchived: safeJson['is_archived'] == true,
+      templateType: ProjectTemplateType.of(safeJson['template_type']),
+      ownerId: safeJson['owner_id']?.toString() ?? '',
+      createdAt: DateTime.tryParse(safeJson['created_at']?.toString() ?? '') ?? DateTime.now(),
+      isFavorite: safeJson['is_favorite'] == true,
+      members: ProjectMemberModel.fromListJson(
+        safeJson['group_members'] is List ? safeJson['group_members'] as List : null,
       ),
-      hasTimeTracking: json['has_time_tracking'] == true,
-      estimation: json['estimation'] is int
-          ? json['estimation'] as int
-          : (json['estimation'] is num
-              ? (json['estimation'] as num).toInt()
+      visibility: safeJson['visibility'] is String
+          ? safeJson['visibility'] as String
+          : null,
+      recommendedVisibility: _tryParseRecommendedVisibility(
+        safeJson['recommended_visibility'] is List
+            ? safeJson['recommended_visibility'] as List<dynamic>
+            : null,
+      ),
+      hasTimeTracking: safeJson['has_time_tracking'] == true,
+      estimation: safeJson['estimation'] is int
+          ? safeJson['estimation'] as int
+          : (safeJson['estimation'] is num
+              ? (safeJson['estimation'] as num).toInt()
               : null),
-      spentTime: json['spent_time'] is int
-          ? json['spent_time'] as int
-          : (json['spent_time'] is num
-              ? (json['spent_time'] as num).toInt()
+      spentTime: safeJson['spent_time'] is int
+          ? safeJson['spent_time'] as int
+          : (safeJson['spent_time'] is num
+              ? (safeJson['spent_time'] as num).toInt()
               : null),
     );
   }

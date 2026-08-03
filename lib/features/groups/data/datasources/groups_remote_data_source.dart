@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:issues_tracking/core/errors/exceptions.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/group_member_model.dart';
@@ -6,7 +7,7 @@ import '../models/group_project_model.dart';
 import '../models/group_role_assignment_model.dart';
 
 abstract class GroupsRemoteDataSource {
-  Future<List<GroupModel>> getGroups();
+  Future<List<GroupModel>> getGroups({String? userId});
   Future<GroupModel> getGroupById(String id);
   Future<GroupModel> createGroup(GroupModel data);
   Future<GroupModel> updateGroup(String id, GroupModel data);
@@ -35,11 +36,18 @@ class GroupsRemoteDataSourceImpl implements GroupsRemoteDataSource {
   GroupsRemoteDataSourceImpl(this.supabase);
 
   @override
-  Future<List<GroupModel>> getGroups() async {
-    final response = await supabase
-        .from('groups')
-        .select('*, group_members(*, users(id, user_name, email, avatar_url)), group_roles(*, projects(*)), group_projects(*, projects(*))')
-        .order('created_at', ascending: false);
+  Future<List<GroupModel>> getGroups({String? userId}) async {
+    final selectString =
+        '*, group_members${userId != null ? "!inner" : ""}(*, users(id, user_name, email, avatar_url)), group_roles(*, projects(*)), group_projects(*, projects(*))';
+    var query = supabase.from('groups').select(selectString);
+
+    if (userId != null) {
+      query = query.eq('group_members.user_id', userId);
+    }
+
+    debugPrint('from groups $selectString');
+
+    final response = await query.order('created_at', ascending: false);
     return (response as List).map((e) => GroupModel.fromJson(e)).toList();
   }
 

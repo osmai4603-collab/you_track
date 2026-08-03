@@ -5,15 +5,18 @@ import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_repository.dart';
 
-class SearchArticles extends UseCasePermission<List<Article>, SearchArticlesParams> {
+class SearchArticles extends UseCase<List<Article>, SearchArticlesParams> {
   @override
   Permission get requiredPermission => Permission.articleReadArticle;
+
+  @override
+  String? getProjectId(SearchArticlesParams params) => params.projectId;
 
   final ArticleRepository repository;
   const SearchArticles(this.repository);
 
   @override
-  Future<Either<Failure, List<Article>>> execute({
+  Future<Either<Failure, List<Article>>> call({
     required SearchArticlesParams params,
   }) async {
     return await repository.searchArticles(params.projectId, params.query);

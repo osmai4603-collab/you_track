@@ -20,6 +20,7 @@ class IssuesRepositoryImpl implements IssuesRepository {
   Future<Either<Failure, List<Issue>>> getIssues(IssueFilter filter) async {
     try {
       final issues = await dataSource.getIssues(filter);
+      print('length: ${issues.length}');
       return Right(issues);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

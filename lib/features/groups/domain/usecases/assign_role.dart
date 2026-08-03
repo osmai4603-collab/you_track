@@ -20,7 +20,7 @@ class AssignRoleParams extends Params {
   List<Object?> get props => [groupId, roleName, projectId];
 }
 
-class AssignRole extends UseCasePermission<GroupRoleAssignmentEntity, AssignRoleParams> {
+class AssignRole extends UseCase<GroupRoleAssignmentEntity, AssignRoleParams> {
   @override
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
@@ -29,7 +29,9 @@ class AssignRole extends UseCasePermission<GroupRoleAssignmentEntity, AssignRole
   AssignRole(this.repository);
 
   @override
-  Future<Either<Failure, GroupRoleAssignmentEntity>> execute({required AssignRoleParams params}) {
+  Future<Either<Failure, GroupRoleAssignmentEntity>> call({
+    required AssignRoleParams params,
+  }) {
     return repository.assignRole(
       GroupRoleAssignmentEntity(
         id: '',

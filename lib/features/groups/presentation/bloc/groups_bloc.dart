@@ -47,7 +47,7 @@ class GroupsBloc extends Bloc<GroupsEvent, GroupsState> with PermissionRefreshMi
     Emitter<GroupsState> emit,
   ) async {
     emit(GroupsLoading());
-    final result = await getGroups(params: const NoParams());
+    final result = await getGroups(params: GetGroupsParams(userId: event.userId));
     result.fold(
       (failure) => emit(GroupsError(failure.message)),
       (groups) => emit(GroupsLoaded(groups: groups)),

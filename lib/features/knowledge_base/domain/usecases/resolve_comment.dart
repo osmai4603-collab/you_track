@@ -4,7 +4,7 @@ import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_comment_repository.dart';
 
-class ResolveComment extends UseCasePermission<void, ResolveCommentParams> {
+class ResolveComment extends UseCase<void, ResolveCommentParams> {
   @override
   Permission get requiredPermission => Permission.commentUpdateArticleComment;
 
@@ -12,7 +12,7 @@ class ResolveComment extends UseCasePermission<void, ResolveCommentParams> {
   const ResolveComment(this.repository);
 
   @override
-  Future<Either<Failure, void>> execute({
+  Future<Either<Failure, void>> call({
     required ResolveCommentParams params,
   }) async {
     return await repository.resolveComment(params.commentId, params.resolvedBy);

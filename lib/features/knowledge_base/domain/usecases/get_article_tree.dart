@@ -5,16 +5,20 @@ import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_repository.dart';
 
-class GetArticleTree
-    extends UseCasePermission<List<Article>, GetArticleTreeParams> {
+class GetArticleTree extends UseCase<List<Article>, GetArticleTreeParams> {
   @override
   Permission get requiredPermission => Permission.articleReadArticle;
+
+  @override
+  String? getProjectId(GetArticleTreeParams params) => params.projectId;
 
   final ArticleRepository repository;
   const GetArticleTree(this.repository);
 
   @override
-  Future<Either<Failure, List<Article>>> execute({required GetArticleTreeParams params}) {
+  Future<Either<Failure, List<Article>>> call({
+    required GetArticleTreeParams params,
+  }) {
     return repository.getArticleTree(params.projectId);
   }
 }

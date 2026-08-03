@@ -5,16 +5,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_attachment.dart';
 import 'package:issues_tracking/features/issues/presentation/cubits/issue_form_cubit.dart';
-import 'package:issues_tracking/features/issues/presentation/cubits/issue_form_state.dart';
 
 class IssueFormAttachmentZone extends StatelessWidget {
   const IssueFormAttachmentZone({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<IssueFormCubit, IssueFormState>(
-      builder: (context, state) {
-        return Column(
+    final cubit = context.read<IssueFormCubit>();
+    return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GestureDetector(
@@ -57,16 +55,14 @@ class IssueFormAttachmentZone extends StatelessWidget {
                 ),
               ),
             ),
-            if (state.attachments.isNotEmpty) ...[
+            if (cubit.attachments.isNotEmpty) ...[
               const SizedBox(height: 8),
-              ...state.attachments.map(
+              ...cubit.attachments.map(
                 (attachment) => _AttachmentItem(attachment: attachment),
               ),
             ],
           ],
         );
-      },
-    );
   }
 
   void _pickFiles(BuildContext context) async {

@@ -7,6 +7,13 @@ import 'package:issues_tracking/features/roles/presentation/bloc/roles_event.dar
 import 'package:issues_tracking/features/roles/presentation/bloc/roles_state.dart';
 import 'package:issues_tracking/features/roles/presentation/pages/role_form_page.dart';
 import 'package:issues_tracking/features/roles/presentation/widgets/roles_table_view.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
+
+import '../../../groups/presentation/bloc/groups_bloc.dart';
+import '../../../groups/presentation/bloc/groups_event.dart';
 
 class RolesPage extends StatefulWidget {
   final String? userId;
@@ -24,6 +31,7 @@ class _RolesPageState extends State<RolesPage> {
   void initState() {
     super.initState();
     context.read<RolesBloc>().add(const LoadRoles());
+    context.read<GroupsBloc>().add(LoadGroups(userId: widget.userId));
   }
 
   @override
@@ -37,12 +45,19 @@ class _RolesPageState extends State<RolesPage> {
     return BlocBuilder<RolesBloc, RolesState>(
       builder: (context, state) {
         final showPanel = state is RolesLoaded && state.selectedRoleId != null;
+        Widget content;
+
         if (state is RolesLoading) {
-          return const Center(child: CircularProgressIndicator());
+          content = ShimmerLoading.table(
+            key: const ValueKey('roles-loading'),
+          );
         } else if (state is RolesError) {
-          return Center(child: SelectableText(state.message));
+          content = Center(
+            key: const ValueKey('roles-error'),
+            child: SelectableText(state.message),
+          );
         } else if (state is RolesLoaded) {
-          return Stack(
+          content = Stack(
             children: [
               Column(
                 children: [
@@ -53,12 +68,13 @@ class _RolesPageState extends State<RolesPage> {
                       children: [
                         Expanded(child: _buildSearchField()),
                         const SizedBox(width: 8),
-                        FilledButton.icon(
-                          onPressed: () =>
-                              context.push(AppRouteKeys.createRole),
-                          icon: const Icon(Icons.add, size: 18),
-                          label: const Text('Add role'),
-                        ),
+                        if (context.watch<UserSession>().hasPermission(Permission.systemLowLevelAdminWrite))
+                          FilledButton.icon(
+                            onPressed: () =>
+                                context.push(AppRouteKeys.createRole),
+                            icon: const Icon(Icons.add, size: 18),
+                            label: const Text('Add role'),
+                          ),
                       ],
                     ),
                   ),
@@ -82,8 +98,11 @@ class _RolesPageState extends State<RolesPage> {
               ),
             ],
           );
+        } else {
+          content = const SizedBox.shrink(key: ValueKey('roles-empty'));
         }
-        return const SizedBox.shrink();
+
+        return AnimatedContentSwitcher(child: content);
       },
     );
   }

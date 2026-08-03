@@ -3,7 +3,7 @@ import 'package:issues_tracking/core/utils/printing.dart';
 import 'package:issues_tracking/features/users/data/models/user_role_assignment_model.dart';
 
 class UserPermissionsModel extends UserPermissionsEntity {
-  const UserPermissionsModel({
+   UserPermissionsModel({
     required super.roleAssignments,
     required super.ownedProjectIds,
   });

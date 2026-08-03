@@ -6,7 +6,7 @@ import 'package:issues_tracking/features/version_control/domain/entities/vcs_int
 import 'package:issues_tracking/features/version_control/domain/repositories/version_control_repository.dart';
 
 class TestConnectionUseCase
-    extends UseCasePermission<VcsIntegrationEntity, TestConnectionParams> {
+    extends UseCase<VcsIntegrationEntity, TestConnectionParams> {
   @override
   Permission get requiredPermission => Permission.projectReadProjectBasic;
 
@@ -15,8 +15,9 @@ class TestConnectionUseCase
   TestConnectionUseCase(this.repository);
 
   @override
-  Future<Either<Failure, VcsIntegrationEntity>> execute(
-      {required TestConnectionParams params}) {
+  Future<Either<Failure, VcsIntegrationEntity>> call({
+    required TestConnectionParams params,
+  }) {
     return repository.testConnection(params.integrationId);
   }
 }

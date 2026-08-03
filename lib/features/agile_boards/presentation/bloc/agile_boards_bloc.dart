@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/enums/issue_state_enum.dart';
-import 'package:issues_tracking/core/enums/issue_subsystem_enum.dart';
+
 import 'package:issues_tracking/features/agile_boards/domain/entities/board_card.dart';
 import 'package:issues_tracking/features/agile_boards/domain/entities/board_column.dart';
 import 'package:issues_tracking/features/agile_boards/domain/entities/board_swimlane.dart';
@@ -14,17 +14,20 @@ import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_issues.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/stream_issues.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/get_subsystem_by_id_use_case.dart';
 
 class AgileBoardsBloc extends Bloc<AgileBoardsEvent, AgileBoardsState> {
   final GetBoardDetailsUseCase getBoardDetailsUseCase;
   final MoveCardUseCase moveCardUseCase;
   final StreamIssues streamIssues;
+  final GetSubsystemByIdUseCase getSubsystemById;
   StreamSubscription<Issue>? _issueSubscription;
 
   AgileBoardsBloc({
     required this.getBoardDetailsUseCase,
     required this.moveCardUseCase,
     required this.streamIssues,
+    required this.getSubsystemById,
   }) : super(AgileBoardsInitial()) {
     on<LoadBoardDetailsEvent>(_onLoadBoardDetails);
     on<MoveCardEvent>(_onMoveCard);
@@ -177,12 +180,23 @@ class AgileBoardsBloc extends Bloc<AgileBoardsEvent, AgileBoardsState> {
         if (cardIndex != -1) {
           cardFound = true;
           final currentCard = column.cards[cardIndex];
+          var subsystem = currentCard.subsystem;
+          if (issue.subsystemId != null) {
+            final subsystemResult = await getSubsystemById(
+              params: GetSubsystemByIdParams(id: issue.subsystemId!),
+            );
+            subsystem = subsystemResult.fold(
+              (_) => currentCard.subsystem,
+              (value) => value,
+            );
+          }
+
           final updatedCard = currentCard.copyWith(
             summary: issue.summary,
             state: issue.state,
             priority: issue.priority,
             issueType: issue.issueType,
-            subsystemId: _parseSubsystem(issue.subsystemId),
+            subsystem: subsystem,
             assigneeAvatarUrl: issue.assigneeAvatarUrl,
             assigneeName: issue.assigneeName,
             estimation: issue.estimation,
@@ -249,8 +263,8 @@ class AgileBoardsBloc extends Bloc<AgileBoardsEvent, AgileBoardsState> {
     ));
 
     Future.delayed(const Duration(seconds: 4), () {
-      if (this.state is AgileBoardsLoaded &&
-          (this.state as AgileBoardsLoaded).highlightedCardId == issueId) {
+      if (state is AgileBoardsLoaded &&
+          (state as AgileBoardsLoaded).highlightedCardId == issueId) {
         add(ClearHighlightedCardEvent());
       }
     });
@@ -267,14 +281,4 @@ class AgileBoardsBloc extends Bloc<AgileBoardsEvent, AgileBoardsState> {
     }
   }
 
-  IssueSubsystemEnum _parseSubsystem(String? subsystemId) {
-    if (subsystemId == null || subsystemId.isEmpty) {
-      return IssueSubsystemEnum.noValue;
-    }
-    try {
-      return IssueSubsystemEnum.of(subsystemId);
-    } catch (_) {
-      return IssueSubsystemEnum.noValue;
-    }
-  }
 }

@@ -24,14 +24,7 @@ final class IssuesNavigation extends AppNavigation {
             return CustomTransitionPage(
               key: state.pageKey,
               child: BlocProvider(
-                create: (context) => IssueFormCubit(
-                  getSprintsUseCase: get_it(),
-                  getBuildsUseCase: get_it(),
-                  repository: get_it(),
-                  getProjectsUseCase: get_it(),
-                  getSubsystemsUseCase: get_it(),
-                  getProjectMembersUseCase: get_it(),
-                ),
+                create: (context) => get_it<IssueFormCubit>(),
                 child: IssueForm(projectKey: projectKey),
               ),
               transitionsBuilder: AppNavigation.fadeTransition,
@@ -46,14 +39,7 @@ final class IssuesNavigation extends AppNavigation {
             return CustomTransitionPage(
               key: state.pageKey,
               child: BlocProvider(
-                create: (context) => IssueFormCubit(
-                  getSprintsUseCase: get_it(),
-                  getBuildsUseCase: get_it(),
-                  getSubsystemsUseCase: get_it(),
-                  repository: get_it(),
-                  getProjectsUseCase: get_it(),
-                  getProjectMembersUseCase: get_it(),
-                ),
+                create: (context) => get_it<IssueFormCubit>(),
                 child: IssueForm(issueId: issueId),
               ),
               transitionsBuilder: AppNavigation.fadeTransition,

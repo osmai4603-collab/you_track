@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/bloc/article_tree_bloc.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/bloc/article_tree_event.dart';
@@ -16,40 +18,54 @@ class ArticleTreeSidebar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ArticleTreeBloc, ArticleTreeState>(
       builder: (context, state) {
+        Widget content;
         if (state is ArticleTreeLoading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (state is ArticleTreeError) {
-          return Center(child: SelectableText(state.message));
-        }
-        if (state is ArticleTreeLoaded) {
+          content = Center(
+            key: const ValueKey('article-tree-loading'),
+            child: SizedBox(
+              width: 240,
+              child: ShimmerLoading.tree(itemCount: 6),
+            ),
+          );
+        } else if (state is ArticleTreeError) {
+          content = Center(
+            key: const ValueKey('article-tree-error'),
+            child: SelectableText(state.message),
+          );
+        } else if (state is ArticleTreeLoaded) {
           final rootArticles = state.tree['root'] ?? [];
           if (rootArticles.isEmpty) {
-            return const Center(
+            content = const Center(
+              key: ValueKey('article-tree-empty'),
               child: Text('No articles yet'),
             );
+          } else {
+            content = ReorderableListView(
+              key: const ValueKey('article-tree-loaded'),
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              onReorder: (oldIndex, newIndex) {
+                if (newIndex > oldIndex) newIndex--;
+                final reordered = List<Article>.from(rootArticles);
+                final item = reordered.removeAt(oldIndex);
+                reordered.insert(newIndex, item);
+                context.read<ArticleTreeBloc>().add(
+                      ReorderArticlesInTree(
+                        projectId: state.projectId,
+                        parentParentId: 'root',
+                        articleIds: reordered.map((a) => a.id).toList(),
+                      ),
+                    );
+              },
+              children: rootArticles.map((article) {
+                return _buildNode(context, article, state, 0);
+              }).toList(),
+            );
           }
-          return ReorderableListView(
-            padding: const EdgeInsets.symmetric(vertical: 8),
-            onReorder: (oldIndex, newIndex) {
-              if (newIndex > oldIndex) newIndex--;
-              final reordered = List<Article>.from(rootArticles);
-              final item = reordered.removeAt(oldIndex);
-              reordered.insert(newIndex, item);
-              context.read<ArticleTreeBloc>().add(
-                    ReorderArticlesInTree(
-                      projectId: state.projectId,
-                      parentParentId: 'root',
-                      articleIds: reordered.map((a) => a.id).toList(),
-                    ),
-                  );
-            },
-            children: rootArticles.map((article) {
-              return _buildNode(context, article, state, 0);
-            }).toList(),
-          );
+        } else {
+          content = const SizedBox.shrink(key: ValueKey('article-tree-empty-state'));
         }
-        return const SizedBox.shrink();
+
+        return AnimatedContentSwitcher(child: content);
       },
     );
   }

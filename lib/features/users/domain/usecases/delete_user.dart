@@ -12,15 +12,15 @@ class DeleteUserParams extends Params {
   List<Object?> get props => [userId];
 }
 
-class DeleteUser extends UseCasePermission<void, DeleteUserParams> {
+class DeleteUser extends UseCase<void, DeleteUserParams> {
   final UsersRepository repository;
   DeleteUser(this.repository);
 
   @override
   Permission get requiredPermission => .userDeleteUser;
-  
+
   @override
-  Future<Either<Failure, void>> execute({required DeleteUserParams params}) {
+  Future<Either<Failure, void>> call({required DeleteUserParams params}) {
     return repository.deleteUser(params.userId);
   }
 }

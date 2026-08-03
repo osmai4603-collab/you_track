@@ -32,6 +32,7 @@
 | `has_time_tracking` | `bool` |  |
 | `estimation` | `int8` |  Nullable |
 | `spent_time` | `int8` |  Nullable |
+| `key` | `text` |  Nullable |
 
 ## Table `project_members`
 
@@ -74,7 +75,7 @@
 | `is_starred` | `bool` |  Nullable |
 | `parent_id` | `uuid` |  Nullable |
 | `visibility` | `_text` |  Nullable |
-| `subsystem` | `text` |  |
+| `subsystem_id` | `uuid` |  |
 | `fix_versions` | `text` |  |
 | `fixed_in_build` | `text` |  |
 | `build_id` | `uuid` |  Nullable |
@@ -616,29 +617,102 @@
 
 ## RLS Policies
 
-### `projects`
+### `time_tracking_configs`
 
 | Policy | Command | Roles | Action | USING | WITH CHECK |
 |--------|---------|-------|--------|-------|------------|
-| `Anyone can view projects` | SELECT | public | PERMISSIVE | `true` | — |
-| `Authenticated users can create projects` | INSERT | authenticated | PERMISSIVE | — | `true` |
-| `projects owner full access` | ALL | authenticated | PERMISSIVE | `(owner_id = ( SELECT auth.uid() AS uid))` | `(owner_id = ( SELECT auth.uid() AS uid))` |
+| `project member delete` | DELETE | authenticated | PERMISSIVE | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = time_tracking_configs.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = time_tracking_configs.project_id) AND (p.owner_id = auth.uid())))))` | — |
+| `project member read` | SELECT | authenticated | PERMISSIVE | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = time_tracking_configs.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = time_tracking_configs.project_id) AND (p.owner_id = auth.uid())))))` | — |
+| `project member update` | UPDATE | authenticated | PERMISSIVE | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = time_tracking_configs.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = time_tracking_configs.project_id) AND (p.owner_id = auth.uid())))))` | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = time_tracking_configs.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = time_tracking_configs.project_id) AND (p.owner_id = auth.uid())))))` |
+| `project member write` | INSERT | authenticated | PERMISSIVE | — | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = time_tracking_configs.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = time_tracking_configs.project_id) AND (p.owner_id = auth.uid())))))` |
+| `time_tracking_configs_delete` | DELETE | public | PERMISSIVE | `true` | — |
+| `time_tracking_configs_insert` | INSERT | public | PERMISSIVE | — | `true` |
+| `time_tracking_configs_select` | SELECT | public | PERMISSIVE | `true` | — |
+| `time_tracking_configs_update` | UPDATE | public | PERMISSIVE | `true` | `true` |
+
+### `groups`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `groups_select_membership` | SELECT | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM group_members gm   WHERE ((gm.group_id = groups.id) AND (gm.user_id = auth.uid()))))` | — |
+
+### `group_members`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `group_members_delete` | DELETE | authenticated | PERMISSIVE | `is_group_member(group_id)` | — |
+| `group_members_insert` | INSERT | authenticated | PERMISSIVE | — | `is_group_member(group_id)` |
+| `group_members_select` | SELECT | authenticated | PERMISSIVE | `is_group_member(group_id)` | — |
+| `group_members_update` | UPDATE | authenticated | PERMISSIVE | `is_group_member(group_id)` | `is_group_member(group_id)` |
+
+### `vcs_commits`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `vcs_commits_insert` | INSERT | public | PERMISSIVE | — | `true` |
+| `vcs_commits_select` | SELECT | public | PERMISSIVE | `(task_id IN ( SELECT issues.id    FROM issues   WHERE true))` | — |
+
+### `articles`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `articles_delete` | DELETE | public | PERMISSIVE | `(auth.uid() IS NOT NULL)` | — |
+| `articles_insert` | INSERT | public | PERMISSIVE | — | `((auth.uid() IS NOT NULL) AND (created_by = auth.uid()))` |
+| `articles_select` | SELECT | public | PERMISSIVE | `(auth.uid() IS NOT NULL)` | — |
+| `articles_update` | UPDATE | public | PERMISSIVE | `(auth.uid() IS NOT NULL)` | — |
+
+### `fixed_in_builds`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `fixed_in_builds_select` | SELECT | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = fixed_in_builds."projectId") AND ((p.owner_id = auth.uid()) OR (EXISTS ( SELECT 1            FROM project_members pm           WHERE ((pm.project_id = p.id) AND (pm.user_id = auth.uid()))))))))` | — |
+| `fixed_in_builds_write` | ALL | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = fixed_in_builds."projectId") AND (p.owner_id = auth.uid()))))` | `(EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = fixed_in_builds."projectId") AND (p.owner_id = auth.uid()))))` |
+
+### `work_item_attributes`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `work_types_delete` | DELETE | public | PERMISSIVE | `true` | — |
+| `work_types_insert` | INSERT | public | PERMISSIVE | — | `true` |
+| `work_types_select` | SELECT | public | PERMISSIVE | `true` | — |
+| `work_types_update` | UPDATE | public | PERMISSIVE | `true` | `true` |
+
+### `attribute_values`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `custom_work_item_attributes_delete` | DELETE | public | PERMISSIVE | `true` | — |
+| `custom_work_item_attributes_insert` | INSERT | public | PERMISSIVE | — | `true` |
+| `custom_work_item_attributes_select` | SELECT | public | PERMISSIVE | `true` | — |
+| `custom_work_item_attributes_update` | UPDATE | public | PERMISSIVE | `true` | `true` |
+
+### `article_comments`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `article_comments_delete` | DELETE | public | PERMISSIVE | `(auth.uid() IS NOT NULL)` | — |
+| `article_comments_insert` | INSERT | public | PERMISSIVE | — | `((auth.uid() IS NOT NULL) AND (author_id = auth.uid()))` |
+| `article_comments_select` | SELECT | public | PERMISSIVE | `(auth.uid() IS NOT NULL)` | — |
+| `article_comments_update` | UPDATE | public | PERMISSIVE | `(auth.uid() IS NOT NULL)` | — |
+
+### `users`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `users_select_own` | SELECT | authenticated | PERMISSIVE | `(id = auth.uid())` | — |
+| `users_update_own` | UPDATE | authenticated | PERMISSIVE | `(id = auth.uid())` | `(id = auth.uid())` |
 
 ### `issues`
 
 | Policy | Command | Roles | Action | USING | WITH CHECK |
 |--------|---------|-------|--------|-------|------------|
-| `Anyone can view issues` | SELECT | public | PERMISSIVE | `true` | — |
 | `Authenticated users can create issues` | INSERT | authenticated | PERMISSIVE | — | `true` |
 | `Users can update issues they reported or assigned to` | UPDATE | authenticated | PERMISSIVE | `((auth.uid() = reporter_id) OR (auth.uid() = assignee_id))` | `((auth.uid() = reporter_id) OR (auth.uid() = assignee_id))` |
-
-### `comments`
-
-| Policy | Command | Roles | Action | USING | WITH CHECK |
-|--------|---------|-------|--------|-------|------------|
-| `Anyone can view comments` | SELECT | public | PERMISSIVE | `true` | — |
-| `Authenticated users can insert comments` | INSERT | authenticated | PERMISSIVE | — | `(auth.uid() = user_id)` |
-| `Users can update their own comments` | UPDATE | authenticated | PERMISSIVE | `(auth.uid() = user_id)` | `(auth.uid() = user_id)` |
+| `issues_delete` | DELETE | authenticated | PERMISSIVE | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = issues.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = issues.project_id) AND (p.owner_id = auth.uid())))))` | — |
+| `issues_insert` | INSERT | authenticated | PERMISSIVE | — | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = issues.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = issues.project_id) AND (p.owner_id = auth.uid())))))` |
+| `issues_select` | SELECT | authenticated | PERMISSIVE | `((EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = issues.project_id) AND (p.owner_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = issues.project_id) AND (pm.user_id = auth.uid())))))` | — |
+| `issues_select_authenticated_only` | SELECT | authenticated | PERMISSIVE | `((EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = issues.project_id) AND (p.owner_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = issues.project_id) AND (pm.user_id = auth.uid())))))` | — |
+| `issues_update` | UPDATE | authenticated | PERMISSIVE | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = issues.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = issues.project_id) AND (p.owner_id = auth.uid())))))` | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = issues.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = issues.project_id) AND (p.owner_id = auth.uid())))))` |
 
 ### `attachments`
 
@@ -647,6 +721,8 @@
 | `Anyone can view attachments` | SELECT | public | PERMISSIVE | `true` | — |
 | `Authenticated users can insert attachments` | INSERT | authenticated | PERMISSIVE | — | `(auth.uid() = user_id)` |
 | `Users can update own attachments` | UPDATE | authenticated | PERMISSIVE | `(auth.uid() = user_id)` | `(auth.uid() = user_id)` |
+| `attachments_select` | SELECT | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM issues i   WHERE ((i.id = attachments.issue_id) AND ((i.project_id IN ( SELECT pm.project_id            FROM project_members pm           WHERE (pm.user_id = auth.uid()))) OR (EXISTS ( SELECT 1            FROM projects p           WHERE ((p.id = i.project_id) AND (p.owner_id = auth.uid()))))))))` | — |
+| `attachments_write` | ALL | authenticated | PERMISSIVE | `((user_id = auth.uid()) AND (EXISTS ( SELECT 1    FROM issues i   WHERE ((i.id = attachments.issue_id) AND ((i.project_id IN ( SELECT pm.project_id            FROM project_members pm           WHERE (pm.user_id = auth.uid()))) OR (EXISTS ( SELECT 1            FROM projects p           WHERE ((p.id = i.project_id) AND (p.owner_id = auth.uid())))))))))` | `((user_id = auth.uid()) AND (EXISTS ( SELECT 1    FROM issues i   WHERE ((i.id = attachments.issue_id) AND ((i.project_id IN ( SELECT pm.project_id            FROM project_members pm           WHERE (pm.user_id = auth.uid()))) OR (EXISTS ( SELECT 1            FROM projects p           WHERE ((p.id = i.project_id) AND (p.owner_id = auth.uid())))))))))` |
 
 ### `issue_links`
 
@@ -655,65 +731,53 @@
 | `Anyone can view issue links` | SELECT | public | PERMISSIVE | `true` | — |
 | `Authenticated users can create issue links` | INSERT | authenticated | PERMISSIVE | — | `true` |
 | `Authenticated users can delete issue links` | DELETE | authenticated | PERMISSIVE | `true` | — |
+| `issue_links_select` | SELECT | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM issues si   WHERE ((si.id = issue_links.source_issue_id) AND ((si.project_id IN ( SELECT pm.project_id            FROM project_members pm           WHERE (pm.user_id = auth.uid()))) OR (EXISTS ( SELECT 1            FROM projects p           WHERE ((p.id = si.project_id) AND (p.owner_id = auth.uid()))))))))` | — |
+| `issue_links_write` | ALL | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM issues si   WHERE ((si.id = issue_links.source_issue_id) AND (EXISTS ( SELECT 1            FROM projects p           WHERE ((p.id = si.project_id) AND (p.owner_id = auth.uid())))))))` | `(EXISTS ( SELECT 1    FROM issues si   WHERE ((si.id = issue_links.source_issue_id) AND (EXISTS ( SELECT 1            FROM projects p           WHERE ((p.id = si.project_id) AND (p.owner_id = auth.uid())))))))` |
+
+### `custom_fields`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `custom_fields_select` | SELECT | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = custom_fields.project_id) AND ((p.owner_id = auth.uid()) OR (EXISTS ( SELECT 1            FROM project_members pm           WHERE ((pm.project_id = p.id) AND (pm.user_id = auth.uid()))))))))` | — |
+| `custom_fields_write` | ALL | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = custom_fields.project_id) AND (p.owner_id = auth.uid()))))` | `(EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = custom_fields.project_id) AND (p.owner_id = auth.uid()))))` |
 
 ### `notifications`
 
 | Policy | Command | Roles | Action | USING | WITH CHECK |
 |--------|---------|-------|--------|-------|------------|
-| `Users can view own notifications` | SELECT | authenticated | PERMISSIVE | `(auth.uid() = user_id)` | — |
 | `Users can update own notifications` | UPDATE | authenticated | PERMISSIVE | `(auth.uid() = user_id)` | `(auth.uid() = user_id)` |
+| `Users can view own notifications` | SELECT | authenticated | PERMISSIVE | `(auth.uid() = user_id)` | — |
+| `notifications_select` | SELECT | authenticated | PERMISSIVE | `(user_id = auth.uid())` | — |
+| `notifications_write` | ALL | authenticated | PERMISSIVE | `(user_id = auth.uid())` | `(user_id = auth.uid())` |
 
-### `dashboards`
+### `dashboard_shares`
 
 | Policy | Command | Roles | Action | USING | WITH CHECK |
 |--------|---------|-------|--------|-------|------------|
-| `Users can view own dashboards` | SELECT | public | PERMISSIVE | `(auth.uid() = owner_id)` | — |
-| `Users can view shared dashboards` | SELECT | public | PERMISSIVE | `(id IN ( SELECT dashboard_shares.dashboard_id    FROM dashboard_shares   WHERE (dashboard_shares.user_id = auth.uid())))` | — |
-| `Users can manage own dashboards` | ALL | public | PERMISSIVE | `(auth.uid() = owner_id)` | — |
-| `Anyone can view dashboards` | SELECT | public | PERMISSIVE | `true` | — |
-| `Anyone can create dashboards` | INSERT | public | PERMISSIVE | — | `true` |
+| `dashboard_shares_write` | ALL | authenticated | PERMISSIVE | `is_dashboard_owner(dashboard_id)` | `is_dashboard_owner(dashboard_id)` |
 
 ### `dashboard_widgets`
 
 | Policy | Command | Roles | Action | USING | WITH CHECK |
 |--------|---------|-------|--------|-------|------------|
+| `Anyone can add widgets` | INSERT | public | PERMISSIVE | — | `true` |
+| `Anyone can view dashboard widgets` | SELECT | public | PERMISSIVE | `true` | — |
 | `Users can manage widgets of own dashboards` | ALL | public | PERMISSIVE | `(dashboard_id IN ( SELECT dashboards.id    FROM dashboards   WHERE (dashboards.owner_id = auth.uid())))` | — |
 | `Users can view widgets of shared dashboards` | SELECT | public | PERMISSIVE | `(dashboard_id IN ( SELECT dashboard_shares.dashboard_id    FROM dashboard_shares   WHERE (dashboard_shares.user_id = auth.uid())))` | — |
-| `Anyone can view dashboard widgets` | SELECT | public | PERMISSIVE | `true` | — |
-| `Anyone can add widgets` | INSERT | public | PERMISSIVE | — | `true` |
+| `dashboard_widgets_select` | SELECT | authenticated | PERMISSIVE | `((dashboard_id IN ( SELECT d.id    FROM dashboards d   WHERE (d.owner_id = auth.uid()))) OR (dashboard_id IN ( SELECT ds.dashboard_id    FROM dashboard_shares ds   WHERE (ds.user_id = auth.uid()))))` | — |
+| `dashboard_widgets_write` | ALL | authenticated | PERMISSIVE | `(dashboard_id IN ( SELECT d.id    FROM dashboards d   WHERE (d.owner_id = auth.uid())))` | `(dashboard_id IN ( SELECT d.id    FROM dashboards d   WHERE (d.owner_id = auth.uid())))` |
 
-### `articles`
-
-| Policy | Command | Roles | Action | USING | WITH CHECK |
-|--------|---------|-------|--------|-------|------------|
-| `articles_select` | SELECT | public | PERMISSIVE | `(auth.uid() IS NOT NULL)` | — |
-| `articles_insert` | INSERT | public | PERMISSIVE | — | `((auth.uid() IS NOT NULL) AND (created_by = auth.uid()))` |
-| `articles_update` | UPDATE | public | PERMISSIVE | `(auth.uid() IS NOT NULL)` | — |
-| `articles_delete` | DELETE | public | PERMISSIVE | `(auth.uid() IS NOT NULL)` | — |
-
-### `article_comments`
+### `dashboards`
 
 | Policy | Command | Roles | Action | USING | WITH CHECK |
 |--------|---------|-------|--------|-------|------------|
-| `article_comments_select` | SELECT | public | PERMISSIVE | `(auth.uid() IS NOT NULL)` | — |
-| `article_comments_insert` | INSERT | public | PERMISSIVE | — | `((auth.uid() IS NOT NULL) AND (author_id = auth.uid()))` |
-| `article_comments_update` | UPDATE | public | PERMISSIVE | `(auth.uid() IS NOT NULL)` | — |
-| `article_comments_delete` | DELETE | public | PERMISSIVE | `(auth.uid() IS NOT NULL)` | — |
-
-### `article_notifications`
-
-| Policy | Command | Roles | Action | USING | WITH CHECK |
-|--------|---------|-------|--------|-------|------------|
-| `article_notifications_select` | SELECT | public | PERMISSIVE | `(recipient_id = auth.uid())` | — |
-| `article_notifications_insert` | INSERT | public | PERMISSIVE | — | `true` |
-| `article_notifications_update` | UPDATE | public | PERMISSIVE | `(recipient_id = auth.uid())` | — |
-
-### `tags`
-
-| Policy | Command | Roles | Action | USING | WITH CHECK |
-|--------|---------|-------|--------|-------|------------|
-| `Anyone can view tags` | SELECT | public | PERMISSIVE | `true` | — |
-| `Authenticated users can manage tags` | ALL | authenticated | PERMISSIVE | `true` | `true` |
+| `Anyone can create dashboards` | INSERT | public | PERMISSIVE | — | `true` |
+| `Anyone can view dashboards` | SELECT | public | PERMISSIVE | `true` | — |
+| `Users can manage own dashboards` | ALL | public | PERMISSIVE | `(auth.uid() = owner_id)` | — |
+| `Users can view own dashboards` | SELECT | public | PERMISSIVE | `(auth.uid() = owner_id)` | — |
+| `Users can view shared dashboards` | SELECT | public | PERMISSIVE | `(id IN ( SELECT dashboard_shares.dashboard_id    FROM dashboard_shares   WHERE (dashboard_shares.user_id = auth.uid())))` | — |
+| `dashboards_select` | SELECT | authenticated | PERMISSIVE | `((owner_id = auth.uid()) OR (id IN ( SELECT ds.dashboard_id    FROM dashboard_shares ds   WHERE (ds.user_id = auth.uid()))))` | — |
+| `dashboards_write` | ALL | authenticated | PERMISSIVE | `(owner_id = auth.uid())` | `(owner_id = auth.uid())` |
 
 ### `tag_permissions`
 
@@ -721,6 +785,15 @@
 |--------|---------|-------|--------|-------|------------|
 | `Anyone can view tag_permissions` | SELECT | public | PERMISSIVE | `true` | — |
 | `Authenticated users can manage tag_permissions` | ALL | authenticated | PERMISSIVE | `true` | `true` |
+
+### `tags`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `Anyone can view tags` | SELECT | public | PERMISSIVE | `true` | — |
+| `Authenticated users can manage tags` | ALL | authenticated | PERMISSIVE | `true` | `true` |
+| `tags_select` | SELECT | authenticated | PERMISSIVE | `((project_id IN ( SELECT p.id    FROM projects p   WHERE ((p.owner_id = auth.uid()) OR (p.id IN ( SELECT pm.project_id            FROM project_members pm           WHERE (pm.user_id = auth.uid())))))) OR ((shared = true) AND (created_by = auth.uid())))` | — |
+| `tags_write` | ALL | authenticated | PERMISSIVE | `((created_by = auth.uid()) AND (project_id IN ( SELECT p.id    FROM projects p   WHERE (p.owner_id = auth.uid()))))` | `((created_by = auth.uid()) AND (project_id IN ( SELECT p.id    FROM projects p   WHERE (p.owner_id = auth.uid()))))` |
 
 ### `tag_subscriptions`
 
@@ -735,67 +808,89 @@
 |--------|---------|-------|--------|-------|------------|
 | `Anyone can view issue_tags` | SELECT | public | PERMISSIVE | `true` | — |
 | `Authenticated users can manage issue_tags` | ALL | authenticated | PERMISSIVE | `true` | `true` |
+| `issue_tags_select` | SELECT | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM issues i   WHERE ((i.id = issue_tags.issue_id) AND ((i.project_id IN ( SELECT pm.project_id            FROM project_members pm           WHERE (pm.user_id = auth.uid()))) OR (EXISTS ( SELECT 1            FROM projects p           WHERE ((p.id = i.project_id) AND (p.owner_id = auth.uid()))))))))` | — |
+| `issue_tags_write` | ALL | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM issues i   WHERE ((i.id = issue_tags.issue_id) AND ((i.project_id IN ( SELECT pm.project_id            FROM project_members pm           WHERE (pm.user_id = auth.uid()))) OR (EXISTS ( SELECT 1            FROM projects p           WHERE ((p.id = i.project_id) AND (p.owner_id = auth.uid()))))))))` | — |
 
-### `vcs_integrations`
-
-| Policy | Command | Roles | Action | USING | WITH CHECK |
-|--------|---------|-------|--------|-------|------------|
-| `vcs_integrations_select` | SELECT | public | PERMISSIVE | `(project_id IN ( SELECT project_members.project_id    FROM project_members   WHERE (project_members.user_id = auth.uid())))` | — |
-| `vcs_integrations_insert` | INSERT | public | PERMISSIVE | — | `(project_id IN ( SELECT project_members.project_id    FROM project_members   WHERE ((project_members.user_id = auth.uid()) AND (project_members.role = ANY (ARRAY['owner'::text, 'admin'::text])))))` |
-| `vcs_integrations_update` | UPDATE | public | PERMISSIVE | `(project_id IN ( SELECT project_members.project_id    FROM project_members   WHERE ((project_members.user_id = auth.uid()) AND (project_members.role = ANY (ARRAY['owner'::text, 'admin'::text])))))` | — |
-| `vcs_integrations_delete` | DELETE | public | PERMISSIVE | `(project_id IN ( SELECT project_members.project_id    FROM project_members   WHERE ((project_members.user_id = auth.uid()) AND (project_members.role = ANY (ARRAY['owner'::text, 'admin'::text])))))` | — |
-
-### `attribute_values`
+### `comments`
 
 | Policy | Command | Roles | Action | USING | WITH CHECK |
 |--------|---------|-------|--------|-------|------------|
-| `custom_work_item_attributes_update` | UPDATE | public | PERMISSIVE | `true` | `true` |
-| `custom_work_item_attributes_delete` | DELETE | public | PERMISSIVE | `true` | — |
-| `custom_work_item_attributes_select` | SELECT | public | PERMISSIVE | `true` | — |
-| `custom_work_item_attributes_insert` | INSERT | public | PERMISSIVE | — | `true` |
+| `Anyone can view comments` | SELECT | public | PERMISSIVE | `true` | — |
+| `Authenticated users can insert comments` | INSERT | authenticated | PERMISSIVE | — | `(auth.uid() = user_id)` |
+| `Users can update their own comments` | UPDATE | authenticated | PERMISSIVE | `(auth.uid() = user_id)` | `(auth.uid() = user_id)` |
+| `comments_select` | SELECT | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM issues i   WHERE ((i.id = comments.issue_id) AND ((i.project_id IN ( SELECT pm.project_id            FROM project_members pm           WHERE (pm.user_id = auth.uid()))) OR (EXISTS ( SELECT 1            FROM projects p           WHERE ((p.id = i.project_id) AND (p.owner_id = auth.uid()))))))))` | — |
+| `comments_write` | ALL | authenticated | PERMISSIVE | `((user_id = auth.uid()) AND (EXISTS ( SELECT 1    FROM issues i   WHERE ((i.id = comments.issue_id) AND ((i.project_id IN ( SELECT pm.project_id            FROM project_members pm           WHERE (pm.user_id = auth.uid()))) OR (EXISTS ( SELECT 1            FROM projects p           WHERE ((p.id = i.project_id) AND (p.owner_id = auth.uid())))))))))` | `((user_id = auth.uid()) AND (EXISTS ( SELECT 1    FROM issues i   WHERE ((i.id = comments.issue_id) AND ((i.project_id IN ( SELECT pm.project_id            FROM project_members pm           WHERE (pm.user_id = auth.uid()))) OR (EXISTS ( SELECT 1            FROM projects p           WHERE ((p.id = i.project_id) AND (p.owner_id = auth.uid())))))))))` |
 
-### `vcs_user_mappings`
-
-| Policy | Command | Roles | Action | USING | WITH CHECK |
-|--------|---------|-------|--------|-------|------------|
-| `vcs_user_mappings_select` | SELECT | public | PERMISSIVE | `(integration_id IN ( SELECT vcs_integrations.id    FROM vcs_integrations   WHERE true))` | — |
-| `vcs_user_mappings_insert` | INSERT | public | PERMISSIVE | — | `(integration_id IN ( SELECT vcs_integrations.id    FROM vcs_integrations   WHERE true))` |
-| `vcs_user_mappings_delete` | DELETE | public | PERMISSIVE | `(integration_id IN ( SELECT vcs_integrations.id    FROM vcs_integrations   WHERE true))` | — |
-
-### `vcs_commits`
+### `project_members`
 
 | Policy | Command | Roles | Action | USING | WITH CHECK |
 |--------|---------|-------|--------|-------|------------|
-| `vcs_commits_select` | SELECT | public | PERMISSIVE | `(task_id IN ( SELECT issues.id    FROM issues   WHERE true))` | — |
-| `vcs_commits_insert` | INSERT | public | PERMISSIVE | — | `true` |
+| `project_members_insert` | INSERT | authenticated | PERMISSIVE | — | `(is_project_member(project_id) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = project_members.project_id) AND (p.owner_id = auth.uid())))))` |
+| `project_members_select` | SELECT | authenticated | PERMISSIVE | `is_project_member(project_id)` | — |
+| `project_members_update` | UPDATE | authenticated | PERMISSIVE | `(is_project_member(project_id) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = project_members.project_id) AND (p.owner_id = auth.uid())))))` | `(is_project_member(project_id) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = project_members.project_id) AND (p.owner_id = auth.uid())))))` |
+
+### `issue_sprints`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `issue_sprints_select` | SELECT | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM (issues i      JOIN sprints s ON ((s.id = issue_sprints.sprint_id)))   WHERE ((i.id = issue_sprints.issue_id) AND (s.project_id = i.project_id) AND ((i.project_id IN ( SELECT pm.project_id            FROM project_members pm           WHERE (pm.user_id = auth.uid()))) OR (( SELECT p.owner_id            FROM projects p           WHERE (p.id = i.project_id)) = auth.uid())))))` | — |
+| `issue_sprints_write` | ALL | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM (issues i      JOIN sprints s ON ((s.id = issue_sprints.sprint_id)))   WHERE ((i.id = issue_sprints.issue_id) AND (s.project_id = i.project_id) AND (( SELECT p.owner_id            FROM projects p           WHERE (p.id = i.project_id)) = auth.uid()))))` | `(EXISTS ( SELECT 1    FROM (issues i      JOIN sprints s ON ((s.id = issue_sprints.sprint_id)))   WHERE ((i.id = issue_sprints.issue_id) AND (s.project_id = i.project_id) AND (( SELECT p.owner_id            FROM projects p           WHERE (p.id = i.project_id)) = auth.uid()))))` |
+
+### `builds`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `builds_select` | SELECT | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = builds.project_id) AND ((p.owner_id = auth.uid()) OR (EXISTS ( SELECT 1            FROM project_members pm           WHERE ((pm.project_id = p.id) AND (pm.user_id = auth.uid()))))))))` | — |
+| `builds_write` | ALL | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = builds.project_id) AND (p.owner_id = auth.uid()))))` | `(EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = builds.project_id) AND (p.owner_id = auth.uid()))))` |
+
+### `projects`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `Anyone can view projects` | SELECT | public | PERMISSIVE | `true` | — |
+| `Authenticated users can create projects` | INSERT | authenticated | PERMISSIVE | — | `true` |
+| `projects owner full access` | ALL | authenticated | PERMISSIVE | `(owner_id = ( SELECT auth.uid() AS uid))` | `(owner_id = ( SELECT auth.uid() AS uid))` |
+| `projects_select` | SELECT | authenticated | PERMISSIVE | `((owner_id = auth.uid()) OR is_project_member(id))` | — |
+| `projects_update` | UPDATE | authenticated | PERMISSIVE | `(owner_id = auth.uid())` | `(owner_id = auth.uid())` |
+| `projects_write` | INSERT | authenticated | PERMISSIVE | — | `(owner_id = auth.uid())` |
 
 ### `vcs_pull_requests`
 
 | Policy | Command | Roles | Action | USING | WITH CHECK |
 |--------|---------|-------|--------|-------|------------|
-| `vcs_pull_requests_select` | SELECT | public | PERMISSIVE | `(task_id IN ( SELECT issues.id    FROM issues   WHERE true))` | — |
 | `vcs_pull_requests_insert` | INSERT | public | PERMISSIVE | — | `true` |
+| `vcs_pull_requests_select` | SELECT | public | PERMISSIVE | `(task_id IN ( SELECT issues.id    FROM issues   WHERE true))` | — |
 | `vcs_pull_requests_update` | UPDATE | public | PERMISSIVE | `true` | — |
 
-### `time_tracking_configs`
+### `vcs_integrations`
 
 | Policy | Command | Roles | Action | USING | WITH CHECK |
 |--------|---------|-------|--------|-------|------------|
-| `project member read` | SELECT | authenticated | PERMISSIVE | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = time_tracking_configs.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = time_tracking_configs.project_id) AND (p.owner_id = auth.uid())))))` | — |
-| `project member write` | INSERT | authenticated | PERMISSIVE | — | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = time_tracking_configs.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = time_tracking_configs.project_id) AND (p.owner_id = auth.uid())))))` |
-| `project member update` | UPDATE | authenticated | PERMISSIVE | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = time_tracking_configs.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = time_tracking_configs.project_id) AND (p.owner_id = auth.uid())))))` | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = time_tracking_configs.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = time_tracking_configs.project_id) AND (p.owner_id = auth.uid())))))` |
-| `project member delete` | DELETE | authenticated | PERMISSIVE | `((EXISTS ( SELECT 1    FROM project_members pm   WHERE ((pm.project_id = time_tracking_configs.project_id) AND (pm.user_id = auth.uid())))) OR (EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = time_tracking_configs.project_id) AND (p.owner_id = auth.uid())))))` | — |
-| `time_tracking_configs_select` | SELECT | public | PERMISSIVE | `true` | — |
-| `time_tracking_configs_insert` | INSERT | public | PERMISSIVE | — | `true` |
-| `time_tracking_configs_update` | UPDATE | public | PERMISSIVE | `true` | `true` |
-| `time_tracking_configs_delete` | DELETE | public | PERMISSIVE | `true` | — |
+| `vcs_integrations_delete` | DELETE | public | PERMISSIVE | `(project_id IN ( SELECT project_members.project_id    FROM project_members   WHERE ((project_members.user_id = auth.uid()) AND (project_members.role = ANY (ARRAY['owner'::text, 'admin'::text])))))` | — |
+| `vcs_integrations_insert` | INSERT | public | PERMISSIVE | — | `(project_id IN ( SELECT project_members.project_id    FROM project_members   WHERE ((project_members.user_id = auth.uid()) AND (project_members.role = ANY (ARRAY['owner'::text, 'admin'::text])))))` |
+| `vcs_integrations_select` | SELECT | public | PERMISSIVE | `(project_id IN ( SELECT project_members.project_id    FROM project_members   WHERE (project_members.user_id = auth.uid())))` | — |
+| `vcs_integrations_update` | UPDATE | public | PERMISSIVE | `(project_id IN ( SELECT project_members.project_id    FROM project_members   WHERE ((project_members.user_id = auth.uid()) AND (project_members.role = ANY (ARRAY['owner'::text, 'admin'::text])))))` | — |
 
-### `work_item_attributes`
+### `vcs_user_mappings`
 
 | Policy | Command | Roles | Action | USING | WITH CHECK |
 |--------|---------|-------|--------|-------|------------|
-| `work_types_select` | SELECT | public | PERMISSIVE | `true` | — |
-| `work_types_insert` | INSERT | public | PERMISSIVE | — | `true` |
-| `work_types_update` | UPDATE | public | PERMISSIVE | `true` | `true` |
-| `work_types_delete` | DELETE | public | PERMISSIVE | `true` | — |
+| `vcs_user_mappings_delete` | DELETE | public | PERMISSIVE | `(integration_id IN ( SELECT vcs_integrations.id    FROM vcs_integrations   WHERE true))` | — |
+| `vcs_user_mappings_insert` | INSERT | public | PERMISSIVE | — | `(integration_id IN ( SELECT vcs_integrations.id    FROM vcs_integrations   WHERE true))` |
+| `vcs_user_mappings_select` | SELECT | public | PERMISSIVE | `(integration_id IN ( SELECT vcs_integrations.id    FROM vcs_integrations   WHERE true))` | — |
+
+### `article_notifications`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `article_notifications_insert` | INSERT | public | PERMISSIVE | — | `true` |
+| `article_notifications_select` | SELECT | public | PERMISSIVE | `(recipient_id = auth.uid())` | — |
+| `article_notifications_update` | UPDATE | public | PERMISSIVE | `(recipient_id = auth.uid())` | — |
+
+### `sprints`
+
+| Policy | Command | Roles | Action | USING | WITH CHECK |
+|--------|---------|-------|--------|-------|------------|
+| `sprints_select` | SELECT | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = sprints.project_id) AND ((p.owner_id = auth.uid()) OR (EXISTS ( SELECT 1            FROM project_members pm           WHERE ((pm.project_id = p.id) AND (pm.user_id = auth.uid()))))))))` | — |
+| `sprints_write` | ALL | authenticated | PERMISSIVE | `(EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = sprints.project_id) AND (p.owner_id = auth.uid()))))` | `(EXISTS ( SELECT 1    FROM projects p   WHERE ((p.id = sprints.project_id) AND (p.owner_id = auth.uid()))))` |
 

@@ -14,7 +14,8 @@ class GetGroupRolesParams extends Params {
   List<Object?> get props => [groupId];
 }
 
-class GetGroupRoles extends UseCasePermission<List<GroupRoleAssignmentEntity>, GetGroupRolesParams> {
+class GetGroupRoles
+    extends UseCase<List<GroupRoleAssignmentEntity>, GetGroupRolesParams> {
   @override
   Permission get requiredPermission => Permission.systemLowLevelAdminRead;
 
@@ -23,7 +24,9 @@ class GetGroupRoles extends UseCasePermission<List<GroupRoleAssignmentEntity>, G
   GetGroupRoles(this.repository);
 
   @override
-  Future<Either<Failure, List<GroupRoleAssignmentEntity>>> execute({required GetGroupRolesParams params}) {
+  Future<Either<Failure, List<GroupRoleAssignmentEntity>>> call({
+    required GetGroupRolesParams params,
+  }) {
     return repository.getGroupRoles(params.groupId);
   }
 }

@@ -5,7 +5,7 @@ import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_repository.dart';
 
-class ReorderArticles extends UseCasePermission<void, ReorderArticlesParams> {
+class ReorderArticles extends UseCase<void, ReorderArticlesParams> {
   @override
   Permission get requiredPermission => Permission.articleUpdateArticle;
 
@@ -13,7 +13,7 @@ class ReorderArticles extends UseCasePermission<void, ReorderArticlesParams> {
   const ReorderArticles(this.repository);
 
   @override
-  Future<Either<Failure, void>> execute({required ReorderArticlesParams params}) {
+  Future<Either<Failure, void>> call({required ReorderArticlesParams params}) {
     return repository.reorderArticles(params.articles);
   }
 }

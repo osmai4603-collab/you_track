@@ -15,7 +15,7 @@ class GetGroupMembersParams extends Params {
 }
 
 class GetGroupMembers
-    extends UseCasePermission<List<GroupMemberEntity>, GetGroupMembersParams> {
+    extends UseCase<List<GroupMemberEntity>, GetGroupMembersParams> {
   @override
   Permission get requiredPermission => Permission.systemLowLevelAdminRead;
 
@@ -24,7 +24,9 @@ class GetGroupMembers
   GetGroupMembers(this.repository);
 
   @override
-  Future<Either<Failure, List<GroupMemberEntity>>> execute({required GetGroupMembersParams params}) {
+  Future<Either<Failure, List<GroupMemberEntity>>> call({
+    required GetGroupMembersParams params,
+  }) {
     return repository.getGroupMembers(params.groupId);
   }
 }

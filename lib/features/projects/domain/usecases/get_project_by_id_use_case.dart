@@ -13,13 +13,16 @@ class GetProjectByIdParams extends Params {
   List<Object?> get props => [id];
 }
 
-class GetProjectByIdUseCase extends UseCasePermission<ProjectEntity, GetProjectByIdParams> {
+class GetProjectByIdUseCase
+    extends UseCase<ProjectEntity, GetProjectByIdParams> {
   final ProjectsRepository repository;
 
   GetProjectByIdUseCase(this.repository);
 
   @override
-  Future<Either<Failure, ProjectEntity>> execute({required GetProjectByIdParams params}) {
+  Future<Either<Failure, ProjectEntity>> call({
+    required GetProjectByIdParams params,
+  }) {
     return repository.getProjectById(params.id);
   }
 

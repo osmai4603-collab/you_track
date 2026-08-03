@@ -8,6 +8,7 @@ import 'package:issues_tracking/core/widgets/text_hover_widget.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
+import 'package:issues_tracking/features/app/presentation/cubit/youtrack_shell_cubit.dart';
 
 class IssueTableRow extends StatefulWidget {
   final Issue issue;
@@ -82,7 +83,13 @@ class _IssueTableRowState extends State<IssueTableRow> {
                     ),
                     const SizedBox(width: 10),
                     GestureDetector(
-                      onTap: () => context.go('/issues/${issue.id}/edit'),
+                      onTap: () {
+                        // track this issue in the shell cubit and open editor
+                        try {
+                          context.read<YouTrackShellCubit>().addIssue(issue);
+                        } catch (_) {}
+                        context.go('/issues/${issue.id}/edit');
+                      },
                       child: TextHoverWidget(
                         text: issue.issueKey,
                         style: textTheme.labelMedium!.copyWith(

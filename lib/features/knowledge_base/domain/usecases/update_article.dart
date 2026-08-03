@@ -5,15 +5,18 @@ import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_repository.dart';
 
-class UpdateArticle extends UseCasePermission<Article, UpdateArticleParams> {
+class UpdateArticle extends UseCase<Article, UpdateArticleParams> {
   @override
   Permission get requiredPermission => Permission.articleUpdateArticle;
+
+  @override
+  String? getProjectId(UpdateArticleParams params) => params.article.projectId;
 
   final ArticleRepository repository;
   const UpdateArticle(this.repository);
 
   @override
-  Future<Either<Failure, Article>> execute({
+  Future<Either<Failure, Article>> call({
     required UpdateArticleParams params,
   }) async {
     return await repository.updateArticle(params.article);

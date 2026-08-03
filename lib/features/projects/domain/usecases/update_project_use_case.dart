@@ -13,8 +13,7 @@ class UpdateProjectParams extends Params {
   List<Object?> get props => [project];
 }
 
-class UpdateProjectUseCase
-    extends UseCasePermission<ProjectEntity, UpdateProjectParams> {
+class UpdateProjectUseCase extends UseCase<ProjectEntity, UpdateProjectParams> {
   final ProjectsRepository repository;
 
   UpdateProjectUseCase(this.repository);
@@ -23,7 +22,9 @@ class UpdateProjectUseCase
   Permission get requiredPermission => Permission.projectUpdateProject;
 
   @override
-  Future<Either<Failure, ProjectEntity>> execute({required UpdateProjectParams params}) {
+  Future<Either<Failure, ProjectEntity>> call({
+    required UpdateProjectParams params,
+  }) {
     return repository.updateProject(params.project);
   }
 }

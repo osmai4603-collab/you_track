@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import '../../../../core/errors/failure.dart';
 import '../../../../core/enums/custom_field_type_enum.dart';
 import '../../../../core/usecase/usecase.dart';
@@ -7,6 +8,7 @@ import '../repositories/custom_fields_repository.dart';
 
 class UpdateCustomFieldParams extends Params {
   final String fieldId;
+  final String? projectId;
   final String? name;
   final CustomFieldEnumType? fieldType;
   final String? defaultValue;
@@ -17,6 +19,7 @@ class UpdateCustomFieldParams extends Params {
 
   const UpdateCustomFieldParams({
     required this.fieldId,
+    this.projectId,
     this.name,
     this.fieldType,
     this.defaultValue,
@@ -27,15 +30,30 @@ class UpdateCustomFieldParams extends Params {
   });
 
   @override
-  List<Object?> get props =>
-      [fieldId, name, fieldType, defaultValue, emptyValue, canBeEmpty, valueMode, aliases];
+  List<Object?> get props => [
+    fieldId,
+    projectId,
+    name,
+    fieldType,
+    defaultValue,
+    emptyValue,
+    canBeEmpty,
+    valueMode,
+    aliases,
+  ];
 }
 
 class UpdateCustomFieldUseCase
-    implements UseCase<CustomFieldEntity, UpdateCustomFieldParams> {
+    extends UseCase<CustomFieldEntity, UpdateCustomFieldParams> {
   final CustomFieldsRepository repository;
 
   UpdateCustomFieldUseCase(this.repository);
+
+  @override
+  Permission get requiredPermission => Permission.projectUpdateProject;
+
+  @override
+  String? getProjectId(UpdateCustomFieldParams params) => params.projectId;
 
   @override
   Future<Either<Failure, CustomFieldEntity>> call({

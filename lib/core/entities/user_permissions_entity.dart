@@ -6,28 +6,43 @@ class UserPermissionsEntity extends Entity {
   final List<UserRoleAssignment> roleAssignments;
   final List<String> ownedProjectIds;
 
-  const UserPermissionsEntity({
+  // Cache for effective permissions
+  late final Set<Permission> _globalEffectivePermissions;
+  late final Map<String, Set<Permission>> _projectEffectivePermissions;
+
+  UserPermissionsEntity({
     required this.roleAssignments,
     required this.ownedProjectIds,
-  });
+  }) {
+    _projectEffectivePermissions = {};
+    final allDirectPermissions = roleAssignments.expand((r) => r.permissions).toSet();
+    _globalEffectivePermissions = Permission.resolveEffective(allDirectPermissions);
 
-  bool hasGlobalPermission(Permission permission) {
-    return roleAssignments
-        .any((role) => role.permissions.contains(permission));
+    for (final role in roleAssignments) {
+      final effective = Permission.resolveEffective(role.permissions);
+      _projectEffectivePermissions
+          .putIfAbsent(role.projectId, () => <Permission>{})
+          .addAll(effective);
+    }
+
+    
   }
 
+  bool hasGlobalPermission(Permission permission) {
+    return _globalEffectivePermissions.contains(permission) &&
+        permission.arePrerequisitesMet(_globalEffectivePermissions);
+  }
 
   bool hasGlobalAnyPermission(List<Permission> permissions) {
-    return roleAssignments
-        .any((role) => role.permissions.any((p) => permissions.contains(p)));
+    return permissions.any((p) => hasGlobalPermission(p));
   }
 
   bool hasProjectPermission(String projectId, Permission permission) {
     if (isProjectOwner(projectId)) return true;
-    
-    return roleAssignments
-        .where((role) => role.projectId == projectId)
-        .any((role) => role.permissions.contains(permission));
+
+    final projectPermissions = _projectEffectivePermissions[projectId] ?? {};
+    return projectPermissions.contains(permission) &&
+        permission.arePrerequisitesMet(projectPermissions);
   }
 
   bool isProjectOwner(String projectId) {
@@ -38,24 +53,23 @@ class UserPermissionsEntity extends Entity {
     if (isProjectOwner(projectId)) {
       return Permission.values.toSet();
     }
-    
-    final permissions = <Permission>{};
-    for (final role in roleAssignments) {
-      if (role.projectId == projectId) {
-        permissions.addAll(role.permissions);
-      }
-    }
-    return permissions;
+
+    final permissions = _projectEffectivePermissions[projectId] ?? {};
+    // Filter by prerequisites for consistency
+    return permissions
+        .where((p) => p.arePrerequisitesMet(permissions))
+        .toSet();
   }
-  
+
   List<String> getProjectsWithPermission(Permission permission) {
     final projectIds = <String>{...ownedProjectIds};
-    
-    for (final role in roleAssignments) {
-      if (role.permissions.contains(permission)) {
-        projectIds.add(role.projectId);
+
+    _projectEffectivePermissions.forEach((projectId, permissions) {
+      if (permissions.contains(permission) &&
+          permission.arePrerequisitesMet(permissions)) {
+        projectIds.add(projectId);
       }
-    }
+    });
     return projectIds.toList();
   }
 

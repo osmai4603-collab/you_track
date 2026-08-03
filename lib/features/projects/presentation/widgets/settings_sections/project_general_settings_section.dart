@@ -4,6 +4,8 @@ import 'package:issues_tracking/core/constants/app_icons.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_entity.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_event.dart';
@@ -78,43 +80,53 @@ class _ProjectGeneralSettingsSectionState
         }
       },
       builder: (context, state) {
+        Widget content;
         if (state.status == ProjectDetailsStatus.loading) {
-          return const Center(child: CircularProgressIndicator());
+          content = Center(
+            key: const ValueKey('project-general-loading'),
+            child: SizedBox(
+              width: 480,
+              child: ShimmerLoading.list(itemCount: 6),
+            ),
+          );
+        } else {
+          content = Stack(
+            key: const ValueKey('project-general-loaded'),
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.large),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildInfoBanner(colors, textTheme),
+                    const SizedBox(height: AppSpacing.extraLarge),
+                    _buildProjectNameField(colors, textTheme, state),
+                    const SizedBox(height: AppSpacing.large),
+                    _buildProjectIdField(colors, textTheme),
+                    const SizedBox(height: AppSpacing.large),
+                    _buildDescriptionField(colors, textTheme),
+                    const SizedBox(height: AppSpacing.extraLarge),
+                    _buildVisibilitySection(colors, textTheme),
+                    const SizedBox(height: AppSpacing.extraLarge),
+                    _buildActionButtons(colors, textTheme),
+                    const SizedBox(height: 100),
+                  ],
+                ),
+              ),
+              Positioned(
+                bottom: 24,
+                right: 24,
+                child: FloatingActionButton(
+                  onPressed: _onSave,
+                  backgroundColor: colors.primary,
+                  child: const Icon(AppIcons.check, color: Colors.white),
+                ),
+              ),
+            ],
+          );
         }
 
-        return Stack(
-          children: [
-            SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.large),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildInfoBanner(colors, textTheme),
-                  const SizedBox(height: AppSpacing.extraLarge),
-                  _buildProjectNameField(colors, textTheme, state),
-                  const SizedBox(height: AppSpacing.large),
-                  _buildProjectIdField(colors, textTheme),
-                  const SizedBox(height: AppSpacing.large),
-                  _buildDescriptionField(colors, textTheme),
-                  const SizedBox(height: AppSpacing.extraLarge),
-                  _buildVisibilitySection(colors, textTheme),
-                  const SizedBox(height: AppSpacing.extraLarge),
-                  _buildActionButtons(colors, textTheme),
-                  const SizedBox(height: 100),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: 24,
-              right: 24,
-              child: FloatingActionButton(
-                onPressed: _onSave,
-                backgroundColor: colors.primary,
-                child: const Icon(AppIcons.check, color: Colors.white),
-              ),
-            ),
-          ],
-        );
+        return AnimatedContentSwitcher(child: content);
       },
     );
   }

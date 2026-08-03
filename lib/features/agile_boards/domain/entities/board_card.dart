@@ -1,8 +1,9 @@
 import 'package:issues_tracking/core/entities/entity.dart';
 import 'package:issues_tracking/core/enums/issue_priority_type_enum.dart';
 import 'package:issues_tracking/core/enums/issue_state_enum.dart';
-import 'package:issues_tracking/core/enums/issue_subsystem_enum.dart';
+
 import 'package:issues_tracking/core/enums/issue_type_enum.dart';
+import 'package:issues_tracking/features/projects/domain/entities/subsystem_entity.dart';
 
 class BoardCard extends Entity {
   final String id;
@@ -11,7 +12,7 @@ class BoardCard extends Entity {
   final IssueStateEnum state;
   final IssuePriorityTypeEnum priority;
   final IssueTypeEnum issueType;
-  final IssueSubsystemEnum subsystem;
+  final SubsystemEntity subsystem;
   final String? assigneeAvatarUrl;
   final String? assigneeName;
   final Duration? estimation;
@@ -25,7 +26,7 @@ class BoardCard extends Entity {
     required this.state,
     this.priority = IssuePriorityTypeEnum.normal,
     this.issueType = IssueTypeEnum.task,
-    this.subsystem = IssueSubsystemEnum.noValue,
+    required this.subsystem,
     this.assigneeAvatarUrl,
     this.assigneeName,
     this.estimation,
@@ -41,7 +42,7 @@ class BoardCard extends Entity {
     IssueStateEnum? state,
     IssuePriorityTypeEnum? priority,
     IssueTypeEnum? issueType,
-    IssueSubsystemEnum? subsystemId,
+    SubsystemEntity? subsystem,
     String? assigneeAvatarUrl,
     bool clearAssigneeAvatarUrl = false,
     String? assigneeName,
@@ -58,7 +59,7 @@ class BoardCard extends Entity {
       state: state ?? this.state,
       priority: priority ?? this.priority,
       issueType: issueType ?? this.issueType,
-      subsystem: subsystemId ?? this.subsystem,
+      subsystem: subsystem ?? this.subsystem,
       assigneeAvatarUrl: clearAssigneeAvatarUrl
           ? null
           : (assigneeAvatarUrl ?? this.assigneeAvatarUrl),

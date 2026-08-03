@@ -17,7 +17,7 @@ class RemoveGroupMembersParams extends Params {
   List<Object?> get props => [groupId, userIds];
 }
 
-class RemoveGroupMembers extends UseCasePermission<void, RemoveGroupMembersParams> {
+class RemoveGroupMembers extends UseCase<void, RemoveGroupMembersParams> {
   @override
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
@@ -26,7 +26,7 @@ class RemoveGroupMembers extends UseCasePermission<void, RemoveGroupMembersParam
   RemoveGroupMembers(this.repository);
 
   @override
-  Future<Either<Failure, void>> execute({
+  Future<Either<Failure, void>> call({
     required RemoveGroupMembersParams params,
   }) {
     return repository.removeGroupMembers(params.groupId, params.userIds);

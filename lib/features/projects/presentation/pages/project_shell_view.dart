@@ -8,8 +8,10 @@ import 'package:issues_tracking/core/constants/app_radius.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
 import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
 import 'package:issues_tracking/core/widgets/project_chip.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import 'package:issues_tracking/core/widgets/text_hover_widget.dart';
 import 'package:issues_tracking/core/widgets/youtrack_state.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
@@ -100,15 +102,20 @@ class _ProjectShellViewState extends State<ProjectShellView> {
                                   ProjectMembersState
                                 >(
                                   builder: (context, state) {
+                                    Widget content;
                                     if (state.status ==
                                         ProjectMembersStatus.loading) {
-                                      return const Center(
-                                        child: CircularProgressIndicator(),
+                                      content = Center(
+                                        key: const ValueKey('project-shell-members-loading'),
+                                        child: SizedBox(
+                                          width: 240,
+                                          child: ShimmerLoading.list(itemCount: 4),
+                                        ),
                                       );
-                                    }
-                                    if (state.status ==
+                                    } else if (state.status ==
                                         ProjectMembersStatus.failure) {
-                                      return Center(
+                                      content = Center(
+                                        key: const ValueKey('project-shell-members-error'),
                                         child: SelectableText(
                                           state.errorMessage ??
                                               'Failed to load members',
@@ -117,9 +124,9 @@ class _ProjectShellViewState extends State<ProjectShellView> {
                                           ),
                                         ),
                                       );
-                                    }
-                                    if (state.members.isEmpty) {
-                                      return Center(
+                                    } else if (state.members.isEmpty) {
+                                      content = Center(
+                                        key: const ValueKey('project-shell-members-empty'),
                                         child: Text(
                                           'No members yet',
                                           style: textTheme.bodySmall?.copyWith(
@@ -127,12 +134,14 @@ class _ProjectShellViewState extends State<ProjectShellView> {
                                           ),
                                         ),
                                       );
+                                    } else {
+                                      content = _buildMembersList(
+                                        state.members,
+                                        colors,
+                                        textTheme,
+                                      );
                                     }
-                                    return _buildMembersList(
-                                      state.members,
-                                      colors,
-                                      textTheme,
-                                    );
+                                    return AnimatedContentSwitcher(child: content);
                                   },
                                 ),
                           ),
@@ -142,13 +151,18 @@ class _ProjectShellViewState extends State<ProjectShellView> {
                             title: 'Issues',
                             child: BlocBuilder<IssuesBloc, IssuesState>(
                               builder: (context, state) {
+                                Widget content;
                                 if (state is IssuesLoading) {
-                                  return const Center(
-                                    child: CircularProgressIndicator(),
+                                  content = Center(
+                                    key: const ValueKey('project-shell-issues-loading'),
+                                    child: SizedBox(
+                                      width: 240,
+                                      child: ShimmerLoading.list(itemCount: 4),
+                                    ),
                                   );
-                                }
-                                if (state is IssuesError) {
-                                  return Center(
+                                } else if (state is IssuesError) {
+                                  content = Center(
+                                    key: const ValueKey('project-shell-issues-error'),
                                     child: SelectableText(
                                       state.message,
                                       style: textTheme.bodySmall?.copyWith(
@@ -156,10 +170,10 @@ class _ProjectShellViewState extends State<ProjectShellView> {
                                       ),
                                     ),
                                   );
-                                }
-                                if (state is IssuesLoaded) {
+                                } else if (state is IssuesLoaded) {
                                   if (state.filteredIssues.isEmpty) {
-                                    return Center(
+                                    content = Center(
+                                      key: const ValueKey('project-shell-issues-empty'),
                                       child: Text(
                                         'No issues found',
                                         style: textTheme.bodySmall?.copyWith(
@@ -167,15 +181,20 @@ class _ProjectShellViewState extends State<ProjectShellView> {
                                         ),
                                       ),
                                     );
+                                  } else {
+                                    content = _buildIssuesList(
+                                      state.filteredIssues,
+                                      colors,
+                                      textTheme,
+                                      localization,
+                                    );
                                   }
-                                  return _buildIssuesList(
-                                    state.filteredIssues,
-                                    colors,
-                                    textTheme,
-                                    localization,
+                                } else {
+                                  content = const SizedBox.shrink(
+                                    key: ValueKey('project-shell-issues-empty-state'),
                                   );
                                 }
-                                return const SizedBox.shrink();
+                                return AnimatedContentSwitcher(child: content);
                               },
                             ),
                           ),
@@ -319,23 +338,28 @@ class _ProjectShellViewState extends State<ProjectShellView> {
                   spacing: AppSpacing.extraSmall,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      issue.issueKey,
-                      style: textTheme.labelSmall?.copyWith(
+                    TextHoverWidget(
+                      text: issue.issueKey,
+                      style: textTheme.labelSmall!.copyWith(
                         color: colors.onSurfaceVariant,
-                        fontFamily: 'JetBrains Mono',
                         fontWeight: FontWeight.w500,
-                        fontSize: 11,
+                      ), 
+                      styleHover: textTheme.labelSmall!.copyWith(
+                        color: colors.secondary,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 2),
+                    const SizedBox(width: 2),
                     Expanded(
-                      child: Text(
-                        issue.summary,
-                        style: textTheme.bodySmall?.copyWith(
+                      child: TextHoverWidget(
+                        text: issue.summary,
+                        style: textTheme.bodySmall!.copyWith(
                           fontWeight: FontWeight.w500,
                         ),
-                        maxLines: 1,
+                        styleHover: textTheme.bodySmall!.copyWith(
+                          color: colors.secondary,
+                          fontWeight: FontWeight.w500,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),

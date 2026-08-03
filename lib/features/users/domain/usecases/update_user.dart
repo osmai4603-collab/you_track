@@ -13,15 +13,15 @@ class UpdateUserParams extends Params {
   List<Object?> get props => [user];
 }
 
-class UpdateUser extends UseCasePermission<UserEntity, UpdateUserParams> {
+class UpdateUser extends UseCase<UserEntity, UpdateUserParams> {
   final UsersRepository repository;
   UpdateUser(this.repository);
 
   @override
   Permission get requiredPermission => Permission.userUpdateUser;
-  
+
   @override
-  Future<Either<Failure, UserEntity>> execute({required UpdateUserParams params}) {
+  Future<Either<Failure, UserEntity>> call({required UpdateUserParams params}) {
     return repository.updateUser(params.user);
   }
 }

@@ -5,7 +5,7 @@ import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 
-import 'package:issues_tracking/features/auth/domain/entities/user_entity.dart';
+import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 import 'package:issues_tracking/core/entities/user_permissions_entity.dart';
 import 'package:issues_tracking/core/entities/user_role_assignment.dart';
@@ -28,50 +28,50 @@ class TestIntParams extends Params {
 }
 
 // Test UseCase implementations
-class TestStringUseCase extends UseCasePermission<String, TestParams> {
+class TestStringUseCase extends UseCase<String, TestParams> {
   const TestStringUseCase();
 
   @override
   Permission get requiredPermission => Permission.projectCreateProject;
 
   @override
-  Future<Either<Failure, String>> execute({required TestParams params}) {
+  Future<Either<Failure, String>> call({required TestParams params}) {
     return Future.value(Right(params.value));
   }
 }
 
-class TestIntUseCase extends UseCasePermission<int, TestIntParams> {
+class TestIntUseCase extends UseCase<int, TestIntParams> {
   const TestIntUseCase();
 
   @override
   Permission get requiredPermission => Permission.projectCreateProject;
 
   @override
-  Future<Either<Failure, int>> execute({required TestIntParams params}) {
+  Future<Either<Failure, int>> call({required TestIntParams params}) {
     return Future.value(Right(params.number * 2));
   }
 }
 
-class TestNoPermissionUseCase extends UseCasePermission<String, TestParams> {
+class TestNoPermissionUseCase extends UseCase<String, TestParams> {
   const TestNoPermissionUseCase();
 
   @override
   Permission get requiredPermission => Permission.projectCreateProject;
 
   @override
-  Future<Either<Failure, String>> execute({required TestParams params}) {
+  Future<Either<Failure, String>> call({required TestParams params}) {
     return Future.value(Right(params.value));
   }
 }
 
-class TestErrorUseCase extends UseCasePermission<String, TestParams> {
+class TestErrorUseCase extends UseCase<String, TestParams> {
   const TestErrorUseCase();
 
   @override
   Permission get requiredPermission => Permission.projectCreateProject;
 
   @override
-  Future<Either<Failure, String>> execute({required TestParams params}) {
+  Future<Either<Failure, String>> call({required TestParams params}) {
     return Future.value(Left(const PermissionDeniedFailure('Test error')));
   }
 }
@@ -105,16 +105,20 @@ void main() {
         sl<UserSession>().setUser(
           const UserEntity(
             id: 'u1',
+            fullName: 'User One',
+            username: 'user1',
             email: 'user@example.com',
             groups: [],
             projects: [],
           ),
         );
         sl<UserSession>().setPermissions(
-          const UserPermissionsEntity(roleAssignments: [], ownedProjectIds: []),
+          UserPermissionsEntity(roleAssignments: [], ownedProjectIds: []),
         );
 
-        final result = await const TestStringUseCase().call(params: const TestParams(value: 'test'));
+        final result = await const TestStringUseCase().call(
+          params: const TestParams(value: 'test'),
+        );
 
         expect(result.isLeft(), true);
         result.fold(
@@ -128,18 +132,20 @@ void main() {
         sl<UserSession>().setUser(
           const UserEntity(
             id: 'u1',
+            fullName: 'User One',
+            username: 'user1',
             email: 'user@example.com',
             groups: [],
             projects: [],
           ),
         );
         sl<UserSession>().setPermissions(
-          const UserPermissionsEntity(
+          UserPermissionsEntity(
             roleAssignments: [
-              UserRoleAssignment(
+              const UserRoleAssignment(
                 roleName: 'admin',
                 permissions: [Permission.projectCreateProject],
-                projectId: null,
+                projectId: 'global',
                 groupId: 'g1',
               ),
             ],
@@ -147,7 +153,9 @@ void main() {
           ),
         );
 
-        final result = await const TestStringUseCase().call(params: const TestParams(value: 'hello'));
+        final result = await const TestStringUseCase().call(
+          params: const TestParams(value: 'hello'),
+        );
 
         expect(result.isRight(), true);
         result.fold(
@@ -157,7 +165,10 @@ void main() {
       });
 
       test('UseCasePermission contains requiredPermission', () {
-        expect(const TestStringUseCase().requiredPermission, Permission.projectCreateProject);
+        expect(
+          const TestStringUseCase().requiredPermission,
+          Permission.projectCreateProject,
+        );
       });
 
       test('TestIntUseCase handles integer return types', () async {
@@ -165,18 +176,20 @@ void main() {
         sl<UserSession>().setUser(
           const UserEntity(
             id: 'u1',
+            fullName: 'User One',
+            username: 'user1',
             email: 'user@example.com',
             groups: [],
             projects: [],
           ),
         );
         sl<UserSession>().setPermissions(
-          const UserPermissionsEntity(
+          UserPermissionsEntity(
             roleAssignments: [
-              UserRoleAssignment(
+              const UserRoleAssignment(
                 roleName: 'admin',
                 permissions: [Permission.projectCreateProject],
-                projectId: null,
+                projectId: 'global',
                 groupId: 'g1',
               ),
             ],
@@ -184,7 +197,9 @@ void main() {
           ),
         );
 
-        final result = await const TestIntUseCase().call(params: const TestIntParams(number: 5));
+        final result = await const TestIntUseCase().call(
+          params: const TestIntParams(number: 5),
+        );
 
         expect(result.isRight(), true);
         result.fold(
@@ -201,18 +216,20 @@ void main() {
         sl<UserSession>().setUser(
           const UserEntity(
             id: 'u1',
+            fullName: 'User One',
+            username: 'user1',
             email: 'user@example.com',
             groups: [],
             projects: [],
           ),
         );
         sl<UserSession>().setPermissions(
-          const UserPermissionsEntity(
+          UserPermissionsEntity(
             roleAssignments: [
-              UserRoleAssignment(
+              const UserRoleAssignment(
                 roleName: 'admin',
                 permissions: [Permission.projectCreateProject],
-                projectId: null,
+                projectId: 'global',
                 groupId: 'g1',
               ),
             ],
@@ -220,7 +237,9 @@ void main() {
           ),
         );
 
-        final result = await const TestErrorUseCase().call(params: const TestParams(value: 'error-test'));
+        final result = await const TestErrorUseCase().call(
+          params: const TestParams(value: 'error-test'),
+        );
 
         expect(result.isLeft(), true);
         result.fold(
@@ -233,7 +252,9 @@ void main() {
     // Tests for UseCase (without permission)
     group('UseCase (no permission) tests', () {
       test('TestSimpleUseCase works without permission checks', () async {
-        final result = await const TestSimpleUseCase().call(params: const TestParams(value: 'lowercase'));
+        final result = await const TestSimpleUseCase().call(
+          params: const TestParams(value: 'lowercase'),
+        );
 
         expect(result.isRight(), true);
         result.fold(
@@ -246,10 +267,22 @@ void main() {
     // Tests for instantiation and behavior
     group('Instantiation and behavior tests', () {
       test('All test use cases can be instantiated', () {
-        expect(const TestStringUseCase(), isA<UseCasePermission<String, TestParams>>());
-        expect(const TestIntUseCase(), isA<UseCasePermission<int, TestIntParams>>());
-        expect(const TestNoPermissionUseCase(), isA<UseCasePermission<String, TestParams>>());
-        expect(const TestErrorUseCase(), isA<UseCasePermission<String, TestParams>>());
+        expect(
+          const TestStringUseCase(),
+          isA<UseCasePermission<String, TestParams>>(),
+        );
+        expect(
+          const TestIntUseCase(),
+          isA<UseCasePermission<int, TestIntParams>>(),
+        );
+        expect(
+          const TestNoPermissionUseCase(),
+          isA<UseCasePermission<String, TestParams>>(),
+        );
+        expect(
+          const TestErrorUseCase(),
+          isA<UseCasePermission<String, TestParams>>(),
+        );
         expect(const TestSimpleUseCase(), isA<UseCase<String, TestParams>>());
       });
 
@@ -273,8 +306,14 @@ void main() {
       });
 
       test('UseCasePermission has requiredPermission override', () {
-        expect(const TestStringUseCase().requiredPermission, Permission.projectCreateProject);
-        expect(const TestIntUseCase().requiredPermission, Permission.projectCreateProject);
+        expect(
+          const TestStringUseCase().requiredPermission,
+          Permission.projectCreateProject,
+        );
+        expect(
+          const TestIntUseCase().requiredPermission,
+          Permission.projectCreateProject,
+        );
       });
     });
 
@@ -285,18 +324,20 @@ void main() {
         sl<UserSession>().setUser(
           const UserEntity(
             id: 'u1',
+            fullName: 'User One',
+            username: 'user1',
             email: 'user@example.com',
             groups: [],
             projects: [],
           ),
         );
         sl<UserSession>().setPermissions(
-          const UserPermissionsEntity(
+          UserPermissionsEntity(
             roleAssignments: [
-              UserRoleAssignment(
+              const UserRoleAssignment(
                 roleName: 'admin',
                 permissions: [Permission.projectCreateProject],
-                projectId: null,
+                projectId: 'global',
                 groupId: 'g1',
               ),
             ],
@@ -305,7 +346,9 @@ void main() {
         );
 
         // Test String use case
-        final stringResult = await const TestStringUseCase().call(params: const TestParams(value: 'test-string'));
+        final stringResult = await const TestStringUseCase().call(
+          params: const TestParams(value: 'test-string'),
+        );
         expect(stringResult.isRight(), true);
         stringResult.fold(
           (_) => fail('Expected success'),
@@ -313,7 +356,9 @@ void main() {
         );
 
         // Test Int use case
-        final intResult = await const TestIntUseCase().call(params: const TestIntParams(number: 25));
+        final intResult = await const TestIntUseCase().call(
+          params: const TestIntParams(number: 25),
+        );
         expect(intResult.isRight(), true);
         intResult.fold(
           (_) => fail('Expected success'),
@@ -322,7 +367,9 @@ void main() {
       });
 
       test('Simple use case (no permission) works independently', () async {
-        final result = await const TestSimpleUseCase().call(params: const TestParams(value: 'hello-world'));
+        final result = await const TestSimpleUseCase().call(
+          params: const TestParams(value: 'hello-world'),
+        );
 
         expect(result.isRight(), true);
         result.fold(
@@ -336,12 +383,18 @@ void main() {
     group('Tests for actual codebase use cases', () {
       test('CreateArticle use case pattern works', () {
         final createArticleUseCase = TestStringUseCase();
-        expect(createArticleUseCase.requiredPermission, Permission.projectCreateProject);
+        expect(
+          createArticleUseCase.requiredPermission,
+          Permission.projectCreateProject,
+        );
       });
 
       test('GetGroups use case pattern works', () {
         final getGroupsUseCase = TestIntUseCase();
-        expect(getGroupsUseCase.requiredPermission, Permission.projectCreateProject);
+        expect(
+          getGroupsUseCase.requiredPermission,
+          Permission.projectCreateProject,
+        );
       });
     });
   });

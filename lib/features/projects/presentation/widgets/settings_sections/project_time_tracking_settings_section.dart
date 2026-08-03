@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/update_project_use_case.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
@@ -140,16 +142,23 @@ class _ProjectTimeTrackingSettingsSectionState
             }
           },
           builder: (context, state) {
+            Widget content;
             if (state is TimeTrackingConfigLoading) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            if (state is TimeTrackingConfigError) {
-              return Center(child: SelectableText(state.message));
-            }
-
-            if (state is TimeTrackingConfigStale) {
-              return Center(
+              content = Center(
+                key: const ValueKey('project-time-tracking-loading'),
+                child: SizedBox(
+                  width: 480,
+                  child: ShimmerLoading.list(itemCount: 6),
+                ),
+              );
+            } else if (state is TimeTrackingConfigError) {
+              content = Center(
+                key: const ValueKey('project-time-tracking-error'),
+                child: SelectableText(state.message),
+              );
+            } else if (state is TimeTrackingConfigStale) {
+              content = Center(
+                key: const ValueKey('project-time-tracking-stale'),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -166,13 +175,13 @@ class _ProjectTimeTrackingSettingsSectionState
                   ],
                 ),
               );
+            } else if (state is TimeTrackingConfigLoaded) {
+              content = buildTimeTracking(state, context, projectState.project);
+            } else {
+              content = const SizedBox.shrink(key: ValueKey('project-time-tracking-empty'));
             }
 
-            if (state is TimeTrackingConfigLoaded) {
-              return buildTimeTracking(state, context, projectState.project);
-            }
-
-            return const SizedBox.shrink();
+            return AnimatedContentSwitcher(child: content);
           },
         );
       },
@@ -239,7 +248,9 @@ class _ProjectTimeTrackingSettingsSectionState
                     .colorScheme
                     .surface
                     .withValues(alpha: 0.7),
-                child: const Center(child: CircularProgressIndicator()),
+                child: Center(
+                  child: ShimmerLoading.center(width: 48, height: 48),
+                ),
               ),
             ),
         ],
@@ -321,7 +332,7 @@ class _ProjectTimeTrackingSettingsSectionState
             children: [
               Positioned.fill(
                 child: _loadingAttributes
-                    ? const Center(child: CircularProgressIndicator())
+                    ? Center(child: ShimmerLoading.center(width: 48, height: 48))
                     : _attributeError != null
                     ? Center(child: Text(_attributeError!))
                     : _workItemAttributes.isEmpty

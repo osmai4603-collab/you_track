@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/groups/domain/usecases/get_group_members.dart';
 import 'package:issues_tracking/features/users/presentation/bloc/users_bloc.dart';
 import 'package:issues_tracking/features/users/presentation/bloc/users_event.dart';
@@ -10,6 +9,10 @@ import 'package:issues_tracking/features/users/presentation/widgets/confirm_acti
 import 'package:issues_tracking/features/users/presentation/widgets/group_selection_dialog.dart';
 import 'package:issues_tracking/features/users/presentation/widgets/merge_users_dialog.dart';
 import 'package:issues_tracking/features/users/presentation/widgets/users_table_view.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
+
+import '../../../groups/domain/usecases/get_groups.dart';
 
 class UsersPage extends StatefulWidget {
   const UsersPage({super.key});
@@ -40,101 +43,111 @@ class _UsersPageState extends State<UsersPage> {
 
     return BlocBuilder<UsersBloc, UsersState>(
       builder: (context, state) {
+        Widget content;
+
         if (state is UsersLoading) {
-          return const Center(child: CircularProgressIndicator());
+          content = ShimmerLoading.table(
+            key: const ValueKey('users-loading'),
+          );
         } else if (state is UsersError) {
-          return Center(child: SelectableText(state.message));
-        }
-
-        final loaded = state is UsersLoaded ? state : null;
-
-        return Scaffold(
-          body: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: _buildSearchField(colors),
-              ),
-              const SizedBox(height: 12),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
-                  children: [
-                    _buildDropdownButton(
-                      'Add to group',
-                      colors,
-                      enabled: loaded != null && loaded.hasSelection,
-                      onTap: loaded != null ? () => _onAddToGroup(context, loaded) : null,
-                    ),
-                    const SizedBox(width: 8),
-                    _buildDropdownButton(
-                      'Remove from group',
-                      colors,
-                      enabled: loaded != null && loaded.hasSelection,
-                      onTap: loaded != null ? () => _onRemoveFromGroup(context, loaded) : null,
-                    ),
-                    const SizedBox(width: 8),
-                    _buildActionButton(
-                      'Ban',
-                      colors,
-                      enabled: loaded != null && loaded.hasSelection,
-                      onTap: loaded != null ? () => _onBan(context, loaded) : null,
-                    ),
-                    const SizedBox(width: 8),
-                    _buildActionButton(
-                      'Merge',
-                      colors,
-                      enabled: loaded != null && loaded.selectedUserIds.length == 2,
-                      onTap: loaded != null ? () => _onMerge(context, loaded) : null,
-                    ),
-                    const SizedBox(width: 8),
-                    _buildActionButton(
-                      'Delete',
-                      colors,
-                      enabled: loaded != null && loaded.hasSelection,
-                      onTap: loaded != null ? () => _onDelete(context, loaded) : null,
-                    ),
-                    const Spacer(),
-                    TextButton(
-                      onPressed: () {},
-                      child: Text(
-                        'Manage custom attributes',
-                        style: textTheme.bodySmall?.copyWith(
-                          color: colors.primary,
+          content = Center(
+            key: const ValueKey('users-error'),
+            child: SelectableText(state.message),
+          );
+        } else if (state is UsersLoaded) {
+          content = Scaffold(
+            key: const ValueKey('users-loaded'),
+            body: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: _buildSearchField(colors),
+                ),
+                const SizedBox(height: 12),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    children: [
+                      _buildDropdownButton(
+                        'Add to group',
+                        colors,
+                        enabled: state.hasSelection,
+                        onTap: state.hasSelection ? () => _onAddToGroup(context, state) : null,
+                      ),
+                      const SizedBox(width: 8),
+                      _buildDropdownButton(
+                        'Remove from group',
+                        colors,
+                        enabled: state.hasSelection,
+                        onTap: state.hasSelection ? () => _onRemoveFromGroup(context, state) : null,
+                      ),
+                      const SizedBox(width: 8),
+                      _buildActionButton(
+                        'Ban',
+                        colors,
+                        enabled: state.hasSelection,
+                        onTap: state.hasSelection ? () => _onBan(context, state) : null,
+                      ),
+                      const SizedBox(width: 8),
+                      _buildActionButton(
+                        'Merge',
+                        colors,
+                        enabled: state.selectedUserIds.length == 2,
+                        onTap: state.selectedUserIds.length == 2 ? () => _onMerge(context, state) : null,
+                      ),
+                      const SizedBox(width: 8),
+                      _buildActionButton(
+                        'Delete',
+                        colors,
+                        enabled: state.hasSelection,
+                        onTap: state.hasSelection ? () => _onDelete(context, state) : null,
+                      ),
+                      const Spacer(),
+                      TextButton(
+                        onPressed: () {},
+                        child: Text(
+                          'Manage custom attributes',
+                          style: textTheme.bodySmall?.copyWith(
+                            color: colors.primary,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              const Divider(height: 1),
-              const SizedBox(height: 8),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
-                  children: [
-                    const Spacer(),
-                    FilledButton.icon(
-                      onPressed: () => _showNewUserDialog(context),
-                      icon: const Icon(Icons.add, size: 18),
-                      label: const Text('New User'),
-                    ),
-                  ],
+                const SizedBox(height: 8),
+                const Divider(height: 1),
+                const SizedBox(height: 8),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Row(
+                    children: [
+                      const Spacer(),
+                      FilledButton.icon(
+                        onPressed: () => _showNewUserDialog(context),
+                        icon: const Icon(Icons.add, size: 18),
+                        label: const Text('New User'),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              const Expanded(child: UsersTableView()),
-            ],
-          ),
-          floatingActionButton: FloatingActionButton.small(
-            onPressed: () {},
-            backgroundColor: colors.primary,
-            child: const Icon(Icons.help_outline, color: Colors.white),
-          ),
-        );
+                const SizedBox(height: 8),
+                const Expanded(child: UsersTableView()),
+              ],
+            ),
+            floatingActionButton: FloatingActionButton.small(
+              onPressed: () {},
+              backgroundColor: colors.primary,
+              child: const Icon(Icons.help_outline, color: Colors.white),
+            ),
+          );
+        } else {
+          content = const SizedBox.shrink(key: ValueKey('users-empty'));
+        }
+
+        return AnimatedContentSwitcher(child: content);
       },
     );
   }
@@ -177,7 +190,7 @@ class _UsersPageState extends State<UsersPage> {
 
   void _onAddToGroup(BuildContext context, UsersLoaded state) async {
     final bloc = context.read<UsersBloc>();
-    final result = await bloc.getGroups(params: const NoParams());
+    final result = await bloc.getGroups(params: const GetGroupsParams());
     result.fold(
       (failure) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -238,7 +251,7 @@ class _UsersPageState extends State<UsersPage> {
 
   void _onRemoveFromGroup(BuildContext context, UsersLoaded state) async {
     final getGroupsUseCase = context.read<UsersBloc>().getGroups;
-    final result = await getGroupsUseCase(params: const NoParams());
+    final result = await getGroupsUseCase(params: const GetGroupsParams());
     result.fold(
       (failure) {
         ScaffoldMessenger.of(context).showSnackBar(

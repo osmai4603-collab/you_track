@@ -56,4 +56,25 @@ class YouTrackShellCubit extends Cubit<YouTrackShellState> {
   void clearCurrentIssue() {
     emit(state.copyWith(clearCurrentIssue: true));
   }
+
+  /// Add [issue] to the tracked issues list if it's not already present.
+  void addIssue(Issue issue) {
+    final exists = state.issues.any((i) => i.id == issue.id);
+    if (!exists) {
+      final updated = List<Issue>.from(state.issues)..add(issue);
+      emit(state.copyWith(issues: updated, currentIssue: issue));
+    } else {
+      // still set as current issue if already present
+      emit(state.copyWith(currentIssue: issue));
+    }
+  }
+
+  void removeIssue(Issue issue) {
+    final updated = List<Issue>.from(state.issues)
+      ..removeWhere((i) => i.id == issue.id);
+    final currentIssue = state.currentIssue?.id == issue.id
+        ? null
+        : state.currentIssue;
+    emit(state.copyWith(issues: updated, currentIssue: currentIssue));
+  }
 }

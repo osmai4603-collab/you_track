@@ -4,7 +4,7 @@ import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_comment_repository.dart';
 
-class DeleteComment extends UseCasePermission<void, DeleteCommentParams> {
+class DeleteComment extends UseCase<void, DeleteCommentParams> {
   @override
   Permission get requiredPermission => Permission.commentDeleteArticleComment;
 
@@ -17,12 +17,11 @@ class DeleteComment extends UseCasePermission<void, DeleteCommentParams> {
   }) async {
     return await repository.deleteComment(params.commentId);
   }
-  
-  @override
-  Future<Either<Failure, void>> execute({required DeleteCommentParams params}) {
-    return repository.deleteComment(params.commentId);
-  }
-  
+
+  // @override
+  // Future<Either<Failure, void>> call({required DeleteCommentParams params}) {
+  //   return repository.deleteComment(params.commentId);
+  // }
 }
 
 class DeleteCommentParams extends Params {

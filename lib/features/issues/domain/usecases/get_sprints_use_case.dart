@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import '../../../../core/errors/failure.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../entities/sprint.dart';
@@ -12,13 +13,21 @@ class GetSprintsParams extends Params {
   List<Object?> get props => [projectId];
 }
 
-class GetSprintsUseCase implements UseCase<List<Sprint>, GetSprintsParams> {
+class GetSprintsUseCase extends UseCase<List<Sprint>, GetSprintsParams> {
   final IssuesRepository repository;
 
   GetSprintsUseCase(this.repository);
 
   @override
-  Future<Either<Failure, List<Sprint>>> call({required GetSprintsParams params}) {
+  Permission get requiredPermission => Permission.projectReadProjectBasic;
+
+  @override
+  String? getProjectId(GetSprintsParams params) => params.projectId;
+
+  @override
+  Future<Either<Failure, List<Sprint>>> call({
+    required GetSprintsParams params,
+  }) {
     return repository.getSprints(params.projectId);
   }
 }

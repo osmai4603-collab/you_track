@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import 'package:issues_tracking/features/roles/presentation/bloc/roles_bloc.dart';
 import 'package:issues_tracking/features/roles/presentation/bloc/roles_event.dart';
 import 'package:issues_tracking/features/roles/presentation/bloc/roles_state.dart';
@@ -22,52 +24,89 @@ class RolesTableView extends StatelessWidget {
 
     return BlocBuilder<RolesBloc, RolesState>(
       builder: (context, state) {
+        Widget content;
         if (state is RolesLoaded) {
-          // If no userId provided, show all roles as before
           if (userId == null) {
-            if (state.roles.isEmpty) return _emptyState(colors, textTheme);
-            return _buildRolesList(state.roles, state.selectedRoleId, colors, textTheme, context);
+            if (state.roles.isEmpty) {
+              content = _emptyState(colors, textTheme, context);
+            } else {
+              content = _buildRolesList(
+                state.roles,
+                state.selectedRoleId,
+                colors,
+                textTheme,
+                context,
+              );
+            }
+          } else {
+            content = BlocBuilder<GroupsBloc, GroupsState>(
+              builder: (context, gState) {
+                if (gState is! GroupsLoaded) {
+                  return Center(
+                    key: const ValueKey('roles-groups-loading'),
+                    child: SizedBox(
+                      width: 480,
+                      child: ShimmerLoading.list(itemCount: 6),
+                    ),
+                  );
+                }
+
+                final userSession = context.watch<UserSession>();
+                final currentUserId = userSession.currentUser?.id;
+                final canReadAllGroups = userSession.hasPermission(
+                  Permission.systemLowLevelAdminRead,
+                );
+
+                final visibleGroups = gState.groups.where((g) {
+                  if (userId != null && !g.members.any((m) => m.userId == userId)) {
+                    return false;
+                  }
+                  if (canReadAllGroups) return true;
+                  if (currentUserId == null) return false;
+                  return g.members.any((m) => m.userId == currentUserId);
+                }).toList();
+
+                final assignedRoleNames = <String>{};
+                for (final g in visibleGroups) {
+                  for (final r in g.roles) {
+                    assignedRoleNames.add(r.roleName);
+                  }
+                }
+
+                final displayedRoles = state.roles.where((r) => assignedRoleNames.contains(r.name)).toList();
+                if (displayedRoles.isEmpty) {
+                  return _emptyState(colors, textTheme, context);
+                }
+
+                return _buildRolesList(
+                  displayedRoles,
+                  state.selectedRoleId,
+                  colors,
+                  textTheme,
+                  context,
+                );
+              },
+            );
           }
-
-          // When userId is provided, derive assigned roles from groups
-          return BlocBuilder<GroupsBloc, GroupsState>(builder: (context, gState) {
-            if (gState is! GroupsLoaded) {
-              return const Center(child: CircularProgressIndicator());
-            }
-
-            final userSession = context.watch<UserSession>();
-            final currentUserId = userSession.currentUser?.id;
-            final canReadAllGroups = userSession.hasPermission(Permission.systemLowLevelAdminRead);
-
-            final visibleGroups = gState.groups.where((g) {
-              if (userId != null && !g.members.any((m) => m.userId == userId)) {
-                return false;
-              }
-              if (canReadAllGroups) return true;
-              if (currentUserId == null) return false;
-              return g.members.any((m) => m.userId == currentUserId);
-            }).toList();
-
-            final assignedRoleNames = <String>{};
-            for (final g in visibleGroups) {
-              for (final r in g.roles) {
-                assignedRoleNames.add(r.roleName);
-              }
-            }
-
-            final displayedRoles = state.roles.where((r) => assignedRoleNames.contains(r.name)).toList();
-            if (displayedRoles.isEmpty) return _emptyState(colors, textTheme);
-
-            return _buildRolesList(displayedRoles, state.selectedRoleId, colors, textTheme, context);
-          });
+        } else {
+          content = Center(
+            key: const ValueKey('roles-loading'),
+            child: SizedBox(
+              width: 480,
+              child: ShimmerLoading.list(itemCount: 6),
+            ),
+          );
         }
 
-        return const Center(child: CircularProgressIndicator());
+        return AnimatedContentSwitcher(child: content);
       },
     );
   }
 
-  Widget _emptyState(ColorScheme colors, TextTheme textTheme) {
+  Widget _emptyState(ColorScheme colors, TextTheme textTheme, BuildContext context) {
+    final userSession = context.read<UserSession>();
+    final canCreateRole = userSession.hasPermission(Permission.systemLowLevelAdminWrite);
+
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -84,13 +123,15 @@ class RolesTableView extends StatelessWidget {
               color: colors.onSurfaceVariant,
             ),
           ),
-          const SizedBox(height: AppSpacing.extraSmall),
-          Text(
-            'Create a new role to get started',
-            style: textTheme.bodySmall?.copyWith(
-              color: colors.onSurfaceVariant,
+          if (canCreateRole) ...[
+            const SizedBox(height: AppSpacing.extraSmall),
+            Text(
+              'Create a new role to get started',
+              style: textTheme.bodySmall?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
             ),
-          ),
+          ],
         ],
       ),
     );

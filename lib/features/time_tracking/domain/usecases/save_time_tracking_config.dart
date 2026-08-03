@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import '../../../../core/errors/failure.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../entities/time_tracking_config_entity.dart';
@@ -13,10 +14,17 @@ class SaveTimeTrackingConfigParams extends Params {
 }
 
 class SaveTimeTrackingConfig
-    implements UseCase<TimeTrackingConfigEntity, SaveTimeTrackingConfigParams> {
+    extends UseCase<TimeTrackingConfigEntity, SaveTimeTrackingConfigParams> {
   final TimeTrackingRepository repository;
 
   const SaveTimeTrackingConfig(this.repository);
+
+  @override
+  Permission get requiredPermission => Permission.projectUpdateProject;
+
+  @override
+  String? getProjectId(SaveTimeTrackingConfigParams params) =>
+      params.config.projectId;
 
   @override
   Future<Either<Failure, TimeTrackingConfigEntity>> call({

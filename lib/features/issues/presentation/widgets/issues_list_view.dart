@@ -5,6 +5,7 @@ import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/issue_state_chip.dart';
 import 'package:issues_tracking/core/widgets/issue_priority_chip.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/youtrack_shell_cubit.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
@@ -76,7 +77,7 @@ class IssuesListView extends StatelessWidget {
           );
         }
 
-        return const Center(child: CircularProgressIndicator());
+        return ShimmerLoading.list(itemCount: 6);
       },
     );
   }
@@ -155,9 +156,10 @@ class _IssueListCard extends StatelessWidget {
                     const SizedBox(width: AppSpacing.small),
                     GestureDetector(
                       onTap: () {
-                        context.read<YouTrackShellCubit>().setCurrentIssue(
-                          issue,
-                        );
+                        // add issue to shell tracked list and open editor
+                        try {
+                          context.read<YouTrackShellCubit>().addIssue(issue);
+                        } catch (_) {}
                         context.go('/issues/${issue.id}/edit');
                       },
                       child: Text(

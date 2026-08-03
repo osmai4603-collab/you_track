@@ -2,7 +2,7 @@ import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_repository.dart';
 
-class DeleteArticle extends UseCasePermission<void, DeleteArticleParams> {
+class DeleteArticle extends UseCase<void, DeleteArticleParams> {
   @override
   Permission get requiredPermission => Permission.articleDeleteArticle;
 
@@ -10,7 +10,7 @@ class DeleteArticle extends UseCasePermission<void, DeleteArticleParams> {
   const DeleteArticle(this.repository);
 
   @override
-  execute({required DeleteArticleParams params}) {
+  call({required DeleteArticleParams params}) {
     return repository.deleteArticle(params.articleId);
   }
 }

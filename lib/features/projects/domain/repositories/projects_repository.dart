@@ -16,4 +16,8 @@ abstract class ProjectsRepository {
   Future<Either<Failure, List<ProjectMemberEntity>>> getProjectMembers(String projectId);
   Future<Either<Failure, ProjectMemberEntity>> addProjectMember(ProjectMemberEntity member);
   Future<Either<Failure, List<SubsystemEntity>>> getSubsystems(String projectId);
+  Future<Either<Failure, SubsystemEntity>> getSubsystemById(String id);
+  Future<Either<Failure, SubsystemEntity>> createSubsystem(SubsystemEntity subsystem);
+
+  Future<Either<Failure, SubsystemEntity>> addSubsystem(SubsystemEntity subsystem);
 }

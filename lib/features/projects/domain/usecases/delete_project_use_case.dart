@@ -13,8 +13,7 @@ class DeleteProjectParams extends Params {
   List<Object?> get props => [id];
 }
 
-class DeleteProjectUseCase
-    extends UseCasePermission<Unit, DeleteProjectParams> {
+class DeleteProjectUseCase extends UseCase<Unit, DeleteProjectParams> {
   final ProjectsRepository repository;
 
   DeleteProjectUseCase(this.repository);
@@ -23,7 +22,7 @@ class DeleteProjectUseCase
   Permission get requiredPermission => Permission.projectDeleteProject;
 
   @override
-  Future<Either<Failure, Unit>> execute({required DeleteProjectParams params}) {
+  Future<Either<Failure, Unit>> call({required DeleteProjectParams params}) {
     return repository.deleteProject(params.id);
   }
 }

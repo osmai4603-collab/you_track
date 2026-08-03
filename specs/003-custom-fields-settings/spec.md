@@ -6,7 +6,7 @@
 
 **Status**: Draft
 
-**Input**: User description: "Build custom fields page inside project settings. UI: table with checkbox, drag handle, field name, type dropdown, default value. Drag & drop reordering. Field types from existing enums (IssueTypeEnum, IssuePriorityTypeEnum, IssueStateEnum, IssueSubsystemEnum)."
+**Input**: User description: "Build custom fields page inside project settings. UI: table with checkbox, drag handle, field name, type dropdown, default value. Drag & drop reordering. Field types from existing enums (IssueTypeEnum, IssuePriorityTypeEnum, IssueStateEnum, SubsystemEntity)."
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -123,7 +123,7 @@ As a project administrator, I want to delete custom fields that are no longer ne
 
 - The existing project settings page has a sidebar or tab navigation where "Custom Fields" can be added as a new section
 - Custom fields are scoped per project (not global), following the existing project-based data model
-- The existing enums (IssueTypeEnum, IssuePriorityTypeEnum, IssueStateEnum, IssueSubsystemEnum) define the available field types
+- The existing enums (IssueTypeEnum, IssuePriorityTypeEnum, IssueStateEnum, SubsystemEntity) define the available field types
 - Default value options depend on the selected field type (e.g., enum types show available enum values as defaults)
 - Data persistence follows the same pattern as the existing project feature (currently Supabase-based)
 - The user is already authenticated and has project administrator permissions to access settings

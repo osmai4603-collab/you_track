@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import '../../../../core/errors/failure.dart';
 import '../../../../core/usecase/usecase.dart';
 import '../entities/build.dart';
@@ -12,10 +13,16 @@ class GetBuildsParams extends Params {
   List<Object?> get props => [projectId];
 }
 
-class GetBuildsUseCase implements UseCase<List<Build>, GetBuildsParams> {
+class GetBuildsUseCase extends UseCase<List<Build>, GetBuildsParams> {
   final IssuesRepository repository;
 
   GetBuildsUseCase(this.repository);
+
+  @override
+  Permission get requiredPermission => Permission.projectReadProjectBasic;
+
+  @override
+  String? getProjectId(GetBuildsParams params) => params.projectId;
 
   @override
   Future<Either<Failure, List<Build>>> call({required GetBuildsParams params}) {

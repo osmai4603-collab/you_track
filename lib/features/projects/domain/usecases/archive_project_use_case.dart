@@ -13,8 +13,7 @@ class ArchiveProjectParams extends Params {
   List<Object?> get props => [id];
 }
 
-class ArchiveProjectUseCase
-    extends UseCasePermission<Unit, ArchiveProjectParams> {
+class ArchiveProjectUseCase extends UseCase<Unit, ArchiveProjectParams> {
   final ProjectsRepository repository;
 
   ArchiveProjectUseCase(this.repository);
@@ -23,7 +22,7 @@ class ArchiveProjectUseCase
   Permission get requiredPermission => Permission.projectUpdateProject;
 
   @override
-  Future<Either<Failure, Unit>> execute({required ArchiveProjectParams params}) {
+  Future<Either<Failure, Unit>> call({required ArchiveProjectParams params}) {
     return repository.archiveProject(params.id);
   }
 }

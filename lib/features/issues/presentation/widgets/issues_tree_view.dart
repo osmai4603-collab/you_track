@@ -5,6 +5,7 @@ import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/issue_state_chip.dart';
 import 'package:issues_tracking/core/widgets/issue_priority_chip.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/youtrack_shell_cubit.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.dart';
@@ -98,7 +99,7 @@ class _IssuesTreeViewState extends State<IssuesTreeView> {
           );
         }
 
-        return const Center(child: CircularProgressIndicator());
+        return ShimmerLoading.tree(itemCount: 5);
       },
     );
   }

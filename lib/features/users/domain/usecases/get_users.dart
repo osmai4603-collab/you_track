@@ -5,16 +5,18 @@ import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 import 'package:issues_tracking/features/users/domain/repositories/users_repository.dart';
 
-class GetUsers extends UseCasePermission<List<UserEntity>, NoParams> {
+class GetUsers extends UseCase<List<UserEntity>, NoParams> {
   final UsersRepository repository;
 
   GetUsers(this.repository);
 
   @override
-  Permission get requiredPermission => .userReadUserDetails;
+  Permission get requiredPermission => .userReadUserBasic;
 
   @override
-  Future<Either<Failure, List<UserEntity>>> execute({ NoParams params = const NoParams() }) {
+  Future<Either<Failure, List<UserEntity>>> call({
+    NoParams params = const NoParams(),
+  }) {
     return repository.getUsers();
   }
 }

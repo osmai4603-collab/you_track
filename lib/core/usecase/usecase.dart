@@ -24,7 +24,11 @@ abstract class UseCasePermission<ReturnType, ParamsType extends Params>
 
   Permission get requiredPermission;
 
-  Future<Either<Failure, ReturnType>> execute({required ParamsType params});
+  /// Returns the project ID associated with the operation, if any.
+  /// Override this in project-scoped UseCases.
+  String? getProjectId(ParamsType params) => null;
+
+  Future<Either<Failure, ReturnType>> call({required ParamsType params});
 
   @protected
   Future<Either<Failure, bool>> hasPermission({
@@ -38,10 +42,12 @@ abstract class UseCasePermission<ReturnType, ParamsType extends Params>
       );
     }
 
-    if (!userSession.hasPermission(requiredPermission)) {
+    final projectId = getProjectId(params);
+    if (!userSession.hasPermission(requiredPermission, projectId: projectId)) {
+      final scope = projectId != null ? ' in project $projectId' : '';
       return Left(
         PermissionDeniedFailure(
-          'The current user does not have permission to execute this operation: ${requiredPermission.name}',
+          'The current user does not have permission to execute this operation: ${requiredPermission.name}$scope',
         ),
       );
     }
@@ -49,7 +55,9 @@ abstract class UseCasePermission<ReturnType, ParamsType extends Params>
   }
 
   @override
-  Future<Either<Failure, ReturnType>> call({required ParamsType params}) async {
+  Future<Either<Failure, ReturnType>> execute({
+    required ParamsType params,
+  }) async {
     final permissionCheck = await hasPermission(params: params);
     return permissionCheck.fold(
       (failure) => Left(failure),

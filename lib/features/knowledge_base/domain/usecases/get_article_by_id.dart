@@ -5,7 +5,7 @@ import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_repository.dart';
 
-class GetArticleById extends UseCasePermission<Article, GetArticleByIdParams> {
+class GetArticleById extends UseCase<Article, GetArticleByIdParams> {
   @override
   Permission get requiredPermission => Permission.articleReadArticle;
 
@@ -19,10 +19,12 @@ class GetArticleById extends UseCasePermission<Article, GetArticleByIdParams> {
     return await repository.getArticleById(params.articleId);
   }
 
-  @override
-  Future<Either<Failure, Article>> execute({required GetArticleByIdParams params}) {
-    return repository.getArticleById(params.articleId);
-  }
+  // @override
+  // Future<Either<Failure, Article>> call({
+  //   required GetArticleByIdParams params,
+  // }) {
+  //   return repository.getArticleById(params.articleId);
+  // }
 }
 
 class GetArticleByIdParams extends Params {

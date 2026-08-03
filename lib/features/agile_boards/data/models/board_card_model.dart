@@ -1,9 +1,9 @@
 import 'package:issues_tracking/core/enums/issue_priority_type_enum.dart';
 import 'package:issues_tracking/core/enums/issue_state_enum.dart';
-import 'package:issues_tracking/core/enums/issue_subsystem_enum.dart';
 import 'package:issues_tracking/core/enums/issue_type_enum.dart';
 import 'package:issues_tracking/features/agile_boards/domain/entities/board_card.dart';
 import 'package:issues_tracking/core/utils/printing.dart';
+import 'package:issues_tracking/features/projects/data/models/subsystem_model.dart';
 
 class BoardCardModel extends BoardCard {
   const BoardCardModel({
@@ -13,7 +13,7 @@ class BoardCardModel extends BoardCard {
     required super.state,
     super.priority,
     super.issueType,
-    super.subsystem,
+    required super.subsystem,
     super.assigneeAvatarUrl,
     super.assigneeName,
     super.estimation,
@@ -32,9 +32,9 @@ class BoardCardModel extends BoardCard {
       issueType: json['issue_type'] != null
           ? IssueTypeEnum.of(json['issue_type'])
           : IssueTypeEnum.task,
-      subsystem: json['subsystem'] != null
-          ? IssueSubsystemEnum.of(json['subsystem'])
-          : IssueSubsystemEnum.noValue,
+      subsystem: SubsystemModel.fromJson(
+        (json['subsystem'] as Map<String, dynamic>?) ?? <String, dynamic>{},
+      ),
       assigneeAvatarUrl: json['assignee_avatar_url']?.toString(),
       assigneeName: json['assignee_name']?.toString(),
       estimation: json['estimation'] != null

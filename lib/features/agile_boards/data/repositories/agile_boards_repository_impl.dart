@@ -1,12 +1,13 @@
 import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/enums/issue_state_enum.dart';
-import 'package:issues_tracking/core/enums/issue_subsystem_enum.dart';
+
 import 'package:issues_tracking/features/agile_boards/data/datasources/agile_boards_supabase_data_source.dart';
 import 'package:issues_tracking/features/agile_boards/domain/entities/agile_board.dart';
 import 'package:issues_tracking/features/agile_boards/domain/entities/board_column.dart';
 import 'package:issues_tracking/features/agile_boards/domain/entities/board_swimlane.dart';
 import 'package:issues_tracking/features/agile_boards/domain/repositories/agile_boards_repository.dart';
+import 'package:issues_tracking/features/projects/domain/entities/subsystem_entity.dart';
 
 class AgileBoardsRepositoryImpl implements AgileBoardsRepository {
   final AgileBoardsRemoteDataSource remoteDataSource;
@@ -41,14 +42,14 @@ class AgileBoardsRepositoryImpl implements AgileBoardsRepository {
       }
 
       // Group cards by subsystem
-      final Map<IssueSubsystemEnum, List<BoardColumn>> swimlaneMap = {};
+      final Map<SubsystemEntity, List<BoardColumn>> swimlaneMap = {};
 
       // Initialize swimlane map with empty columns for all unique subsystems
       final uniqueSubsystems = cards.map((c) => c.subsystem).toSet().toList();
-      if (uniqueSubsystems.isEmpty) {
-        // Add at least one default swimlane if board is empty
-        uniqueSubsystems.add(IssueSubsystemEnum.noValue);
-      }
+      // if (uniqueSubsystems.isEmpty) {
+      //   // Add at least one default swimlane if board is empty
+      //   uniqueSubsystems.add(SubsystemEntity.noValue);
+      // }
 
       for (final subsystem in uniqueSubsystems) {
         final columns = headers.map((state) {

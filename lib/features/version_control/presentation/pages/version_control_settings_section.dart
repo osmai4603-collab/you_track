@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
 import 'package:issues_tracking/features/version_control/domain/entities/vcs_integration_entity.dart';
 import 'package:issues_tracking/features/version_control/presentation/cubits/vcs_integrations_cubit.dart';
@@ -125,7 +126,10 @@ class _VersionControlSettingsSectionState
     TextTheme textTheme,
   ) {
     if (state is VcsIntegrationsInitial || state is VcsIntegrationsLoading) {
-      return const Center(child: CircularProgressIndicator());
+      return Center(
+        key: const ValueKey('vcs-loading'),
+        child: SizedBox(width: 480, child: ShimmerLoading.list(itemCount: 6)),
+      );
     }
 
     if (state is VcsIntegrationsError && state is! VcsIntegrationsLoaded) {

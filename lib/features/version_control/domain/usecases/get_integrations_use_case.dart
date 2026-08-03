@@ -6,17 +6,21 @@ import 'package:issues_tracking/features/version_control/domain/entities/vcs_int
 import 'package:issues_tracking/features/version_control/domain/repositories/version_control_repository.dart';
 
 class GetIntegrationsUseCase
-    extends UseCasePermission<List<VcsIntegrationEntity>, GetIntegrationsParams> {
+    extends UseCase<List<VcsIntegrationEntity>, GetIntegrationsParams> {
   @override
   Permission get requiredPermission => Permission.projectReadProjectBasic;
+
+  @override
+  String? getProjectId(GetIntegrationsParams params) => params.projectId;
 
   final VersionControlRepository repository;
 
   GetIntegrationsUseCase(this.repository);
 
   @override
-  Future<Either<Failure, List<VcsIntegrationEntity>>> execute(
-      {required GetIntegrationsParams params}) {
+  Future<Either<Failure, List<VcsIntegrationEntity>>> call({
+    required GetIntegrationsParams params,
+  }) {
     return repository.getIntegrations(params.projectId);
   }
 }

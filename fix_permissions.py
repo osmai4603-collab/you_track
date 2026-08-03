@@ -41,8 +41,8 @@ for file_path, perm in files_to_fix:
     if "Permission get requiredPermission" in content:
         continue
         
-    # Find the class declaration that extends UseCasePermission
-    match = re.search(r'class \w+\s*extends UseCasePermission<[^>]+>\s*{', content)
+    # Find the class declaration that extends UseCase
+    match = re.search(r'class \w+\s*extends UseCase<[^>]+>\s*{', content)
     if not match:
         print(f"Failed to find UseCasePermission in {file_path}")
         continue

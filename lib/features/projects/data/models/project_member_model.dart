@@ -26,21 +26,46 @@ class ProjectMemberModel extends ProjectMemberEntity {
 
   static List<ProjectMemberModel> fromListJson(List<dynamic>? allData) {
     if (allData == null) return [];
-    return allData
-        .map((data) => ProjectMemberModel.fromJson(data['groups']))
-        .toList();
+    return allData.whereType<Map<String, dynamic>>().map((data) {
+      final payload = data['groups'];
+      if (payload is Map<String, dynamic>) {
+        return ProjectMemberModel.fromJson(payload);
+      }
+      if (payload is Map) {
+        return ProjectMemberModel.fromJson(Map<String, dynamic>.from(payload));
+      }
+      return const ProjectMemberModel(
+        id: '',
+        projectId: '',
+        roles: [],
+        userId: '',
+        isOwner: false,
+      );
+    }).toList();
   }
 
-  factory ProjectMemberModel.fromJson(Map<String, dynamic> json) {
-    printMap(title: 'ProjectMember', data: json);
+  factory ProjectMemberModel.fromJson(Map<String, dynamic>? json) {
+    printMap(title: 'ProjectMember', data: json ?? {});
+
+    if (json == null) {
+      return const ProjectMemberModel(
+        id: '',
+        projectId: '',
+        roles: [],
+        userId: '',
+        isOwner: false,
+      );
+    }
 
     return ProjectMemberModel(
       id: (json['id'] ?? json['user_id'] ?? '').toString(),
-      projectId: json['project_id'],
-      roles: [], // [json['role']],
-      userId: json['user_id'],
-      isOwner: json['is_owner'],
-      userData: UserModel.tryParseFromJson(json['users']),
+      projectId: json['project_id']?.toString() ?? '',
+      roles: [],
+      userId: json['user_id']?.toString() ?? '',
+      isOwner: json['is_owner'] == true,
+      userData: UserModel.tryParseFromJson(
+        json['users'] is Map ? Map<String, dynamic>.from(json['users']) : null,
+      ),
     );
   }
 

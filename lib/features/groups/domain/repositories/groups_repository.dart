@@ -6,7 +6,7 @@ import 'package:issues_tracking/features/groups/domain/entities/group_project_en
 import 'package:issues_tracking/features/groups/domain/entities/group_role_assignment_entity.dart';
 
 abstract class GroupsRepository {
-  Future<Either<Failure, List<GroupEntity>>> getGroups();
+  Future<Either<Failure, List<GroupEntity>>> getGroups({String? userId});
   Future<Either<Failure, GroupEntity>> getGroupById(String id);
   Future<Either<Failure, GroupEntity>> createGroup(GroupEntity group);
   Future<Either<Failure, GroupEntity>> updateGroup(GroupEntity group);

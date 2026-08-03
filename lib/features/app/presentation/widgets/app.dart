@@ -7,6 +7,7 @@ import 'package:issues_tracking/core/services/navigation/navigation_service.dart
 import 'package:issues_tracking/core/theme/app_theme.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/app_cubit.dart';
 import 'package:issues_tracking/features/app/presentation/cubit/app_state.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 
 class Application extends StatelessWidget {
   const Application({super.key});
@@ -41,8 +42,8 @@ class Application extends StatelessWidget {
         }
 
         // Initial / Loading state
-        return const MaterialApp(
-          home: Scaffold(body: Center(child: CircularProgressIndicator())),
+        return MaterialApp(
+          home: Scaffold(body: ShimmerLoading.center()),
         );
       },
     );

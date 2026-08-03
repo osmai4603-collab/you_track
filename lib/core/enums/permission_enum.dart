@@ -10,6 +10,8 @@ sealed class Permission extends AppEnum {
   Module get module;
   Entity get entity;
   Operation get operation;
+  List<Permission> get dependents => [];
+  List<Permission> get implies => [];
 
   // ── Project ──
   static const projectReadProjectBasic = ProjectReadProjectBasic._();
@@ -44,9 +46,9 @@ sealed class Permission extends AppEnum {
   // ── Issue ──
   static const issueReadIssue = IssueReadIssue._();
   static const issueReadIssuePrivateFields = IssueReadIssuePrivateFields._();
-  static const issueUpdateIssue = IssueUpdateIssue._();
-  static const issueCreateIssue = IssueCreateIssue._();
-  static const issueDeleteIssue = IssueDeleteIssue._();
+  static const updateIssue = IssueUpdateIssue._();
+  static const createIssue = IssueCreateIssue._();
+  static const deleteIssue = IssueDeleteIssue._();
   static const issueLinkIssues = IssueLinkIssues._();
   static const issueUpdateIssuePrivateFields =
       IssueUpdateIssuePrivateFields._();
@@ -56,7 +58,7 @@ sealed class Permission extends AppEnum {
   static const issueViewVoters = IssueViewVoters._();
 
   // ── Attachment ──
-  static const attachmentAddAttachment = AttachmentAddAttachment._();
+  static const addAttachment = AttachmentAddAttachment._();
   static const attachmentUpdateAttachment = AttachmentUpdateAttachment._();
   static const attachmentDeleteAttachment = AttachmentDeleteAttachment._();
 
@@ -98,66 +100,102 @@ sealed class Permission extends AppEnum {
   static const appUpdateAppContent = AppUpdateAppContent._();
 
   static List<Permission> get values => [
-        projectReadProjectBasic,
-        projectCreateProject,
-        projectReadProjectFull,
-        projectUpdateProject,
-        projectDeleteProject,
-        organizationReadOrganization,
-        organizationUpdateOrganization,
-        organizationCreateOrganization,
-        organizationDeleteOrganization,
-        userProfileUpdateSelf,
-        userReadUserBasic,
-        userReadUserDetails,
-        userUpdateUser,
-        userCreateUser,
-        userDeleteUser,
-        systemLowLevelAdminRead,
-        systemLowLevelAdminWrite,
-        issueReadIssue,
-        issueReadIssuePrivateFields,
-        issueUpdateIssue,
-        issueCreateIssue,
-        issueDeleteIssue,
-        issueLinkIssues,
-        issueUpdateIssuePrivateFields,
-        issueApplyCommandsSilently,
-        issueViewWatchers,
-        issueUpdateWatchers,
-        issueViewVoters,
-        attachmentAddAttachment,
-        attachmentUpdateAttachment,
-        attachmentDeleteAttachment,
-        commentCreateIssueComment,
-        commentReadIssueComment,
-        commentUpdateIssueComment,
-        commentDeleteIssueComment,
-        commentUpdateNotOwnIssueComment,
-        commentDeleteNotOwnCommentAndPermanentCommentDelete,
-        commentReadArticleComment,
-        commentCreateArticleComment,
-        commentUpdateArticleComment,
-        commentDeleteArticleComment,
-        visibilityOverrideVisibilityRestrictions,
-        issueWorkItemReadWorkItem,
-        issueWorkItemUpdateWorkItem,
-        issueWorkItemUpdateNotOwnWorkItem,
-        issueWorkItemCreateWorkItem,
-        issueWorkItemCreateNotOwnWorkItem,
-        articleReadArticle,
-        articleCreateArticle,
-        articleUpdateArticle,
-        articleDeleteArticle,
-        appReadAppContent,
-        appUpdateAppContent,
-      ];
+    projectReadProjectBasic,
+    projectCreateProject,
+    projectReadProjectFull,
+    projectUpdateProject,
+    projectDeleteProject,
+    organizationReadOrganization,
+    organizationUpdateOrganization,
+    organizationCreateOrganization,
+    organizationDeleteOrganization,
+    userProfileUpdateSelf,
+    userReadUserBasic,
+    userReadUserDetails,
+    userUpdateUser,
+    userCreateUser,
+    userDeleteUser,
+    systemLowLevelAdminRead,
+    systemLowLevelAdminWrite,
+    issueReadIssue,
+    issueReadIssuePrivateFields,
+    updateIssue,
+    createIssue,
+    deleteIssue,
+    issueLinkIssues,
+    issueUpdateIssuePrivateFields,
+    issueApplyCommandsSilently,
+    issueViewWatchers,
+    issueUpdateWatchers,
+    issueViewVoters,
+    addAttachment,
+    attachmentUpdateAttachment,
+    attachmentDeleteAttachment,
+    commentCreateIssueComment,
+    commentReadIssueComment,
+    commentUpdateIssueComment,
+    commentDeleteIssueComment,
+    commentUpdateNotOwnIssueComment,
+    commentDeleteNotOwnCommentAndPermanentCommentDelete,
+    commentReadArticleComment,
+    commentCreateArticleComment,
+    commentUpdateArticleComment,
+    commentDeleteArticleComment,
+    visibilityOverrideVisibilityRestrictions,
+    issueWorkItemReadWorkItem,
+    issueWorkItemUpdateWorkItem,
+    issueWorkItemUpdateNotOwnWorkItem,
+    issueWorkItemCreateWorkItem,
+    issueWorkItemCreateNotOwnWorkItem,
+    articleReadArticle,
+    articleCreateArticle,
+    articleUpdateArticle,
+    articleDeleteArticle,
+    appReadAppContent,
+    appUpdateAppContent,
+  ];
 
   static Permission of(String name) {
     return values.firstWhere(
       (e) => e.name == name,
       orElse: () => throw ArgumentError('Unknown Permission: $name'),
     );
+  }
+
+  /// Resolves a set of permissions to their effective set, including all implied permissions.
+  static Set<Permission> resolveEffective(Iterable<Permission> permissions) {
+    final effective = <Permission>{};
+    final queue = List<Permission>.from(permissions);
+
+    while (queue.isNotEmpty) {
+      final p = queue.removeLast();
+      if (effective.add(p)) {
+        queue.addAll(p.implies);
+      }
+    }
+    return effective;
+  }
+
+  /// Checks if all prerequisites (dependents) are met for the given permission
+  /// within the context of the effective permissions set.
+  bool arePrerequisitesMet(Set<Permission> effectivePermissions) {
+    // If this permission is in the effective set, we check if its ancestors are also there.
+    // In this model, 'dependents' are those that depend on THIS.
+    // So we need to find what THIS depends ON.
+    // Wait, the current model has 'dependents' listing permissions that depend on the current one.
+    // So if I am 'projectReadProjectFull', I depend on 'projectReadProjectBasic'.
+    // In projectReadProjectBasic.dependents, we see projectReadProjectFull.
+    // This means projectReadProjectFull's prerequisite is projectReadProjectBasic.
+
+    // To check if 'projectReadProjectFull' is valid, we must ensure its prerequisites are met.
+    // We can find prerequisites by searching which permissions have THIS in their 'dependents' list.
+    final prerequisites = values.where((p) => p.dependents.contains(this));
+    for (final prereq in prerequisites) {
+      if (!effectivePermissions.contains(prereq)) {
+        return false;
+      }
+    }
+    return true;
   }
 }
 
@@ -168,7 +206,7 @@ sealed class Permission extends AppEnum {
 final class ProjectReadProjectBasic extends Permission {
   const ProjectReadProjectBasic._();
   @override
-  String get name => 'Read Project Basic';
+  String get name => 'read-project-basic';
   @override
   int get index => 0;
   @override
@@ -180,12 +218,34 @@ final class ProjectReadProjectBasic extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionProjectReadProjectBasic;
+
+  @override
+  List<Permission> get dependents => [
+    Permission.projectReadProjectFull,
+    Permission.issueReadIssue,
+    Permission.issueReadIssuePrivateFields,
+    Permission.createIssue,
+    Permission.issueViewWatchers,
+    Permission.issueViewVoters,
+    Permission.articleReadArticle,
+    Permission.articleCreateArticle,
+    Permission.articleUpdateArticle,
+    Permission.articleDeleteArticle,
+    Permission.commentReadArticleComment,
+    Permission.commentCreateArticleComment,
+    Permission.commentUpdateArticleComment,
+    Permission.commentDeleteArticleComment,
+    Permission.issueUpdateIssuePrivateFields,
+    Permission.visibilityOverrideVisibilityRestrictions,
+    Permission.projectUpdateProject,
+    Permission.projectDeleteProject,
+  ];
 }
 
 final class ProjectCreateProject extends Permission {
   const ProjectCreateProject._();
   @override
-  String get name => 'Create Project';
+  String get name => 'create-project';
   @override
   int get index => 1;
   @override
@@ -202,7 +262,7 @@ final class ProjectCreateProject extends Permission {
 final class ProjectReadProjectFull extends Permission {
   const ProjectReadProjectFull._();
   @override
-  String get name => 'Read Project Full';
+  String get name => 'read-project-full';
   @override
   int get index => 2;
   @override
@@ -214,12 +274,21 @@ final class ProjectReadProjectFull extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionProjectReadProjectFull;
+
+  @override
+  List<Permission> get implies => [Permission.projectReadProjectBasic];
+
+  @override
+  List<Permission> get dependents => [
+    Permission.projectUpdateProject,
+    Permission.projectDeleteProject,
+  ];
 }
 
 final class ProjectUpdateProject extends Permission {
   const ProjectUpdateProject._();
   @override
-  String get name => 'Update Project';
+  String get name => 'update-project';
   @override
   int get index => 3;
   @override
@@ -231,12 +300,18 @@ final class ProjectUpdateProject extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionProjectUpdateProject;
+
+  @override
+  List<Permission> get implies => [
+    Permission.projectReadProjectFull,
+    Permission.projectReadProjectBasic,
+  ];
 }
 
 final class ProjectDeleteProject extends Permission {
   const ProjectDeleteProject._();
   @override
-  String get name => 'Delete Project';
+  String get name => 'delete-project';
   @override
   int get index => 4;
   @override
@@ -248,6 +323,12 @@ final class ProjectDeleteProject extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionProjectDeleteProject;
+
+  @override
+  List<Permission> get implies => [
+    Permission.projectReadProjectFull,
+    Permission.projectReadProjectBasic,
+  ];
 }
 
 // ═══════════════════════════════════════════════
@@ -257,7 +338,7 @@ final class ProjectDeleteProject extends Permission {
 final class OrganizationReadOrganization extends Permission {
   const OrganizationReadOrganization._();
   @override
-  String get name => 'Read Organization';
+  String get name => 'read-organization';
   @override
   int get index => 5;
   @override
@@ -269,12 +350,18 @@ final class OrganizationReadOrganization extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionOrganizationReadOrganization;
+
+  @override
+  List<Permission> get dependents => [
+    Permission.organizationUpdateOrganization,
+    Permission.organizationDeleteOrganization,
+  ];
 }
 
 final class OrganizationUpdateOrganization extends Permission {
   const OrganizationUpdateOrganization._();
   @override
-  String get name => 'Update Organization';
+  String get name => 'update-organization';
   @override
   int get index => 6;
   @override
@@ -286,12 +373,15 @@ final class OrganizationUpdateOrganization extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionOrganizationUpdateOrganization;
+
+  @override
+  List<Permission> get implies => [Permission.organizationReadOrganization];
 }
 
 final class OrganizationCreateOrganization extends Permission {
   const OrganizationCreateOrganization._();
   @override
-  String get name => 'Create Organization';
+  String get name => 'create-organization';
   @override
   int get index => 7;
   @override
@@ -308,7 +398,7 @@ final class OrganizationCreateOrganization extends Permission {
 final class OrganizationDeleteOrganization extends Permission {
   const OrganizationDeleteOrganization._();
   @override
-  String get name => 'Delete Organization';
+  String get name => 'delete-organization';
   @override
   int get index => 8;
   @override
@@ -320,6 +410,9 @@ final class OrganizationDeleteOrganization extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionOrganizationDeleteOrganization;
+
+  @override
+  List<Permission> get implies => [Permission.organizationReadOrganization];
 }
 
 // ═══════════════════════════════════════════════
@@ -329,7 +422,7 @@ final class OrganizationDeleteOrganization extends Permission {
 final class UserProfileUpdateSelf extends Permission {
   const UserProfileUpdateSelf._();
   @override
-  String get name => 'Profile Update Self';
+  String get name => 'update-self';
   @override
   int get index => 9;
   @override
@@ -341,6 +434,9 @@ final class UserProfileUpdateSelf extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionUserProfileUpdateSelf;
+
+  @override
+  List<Permission> get dependents => [Permission.userUpdateUser];
 }
 
 // ═══════════════════════════════════════════════
@@ -350,7 +446,7 @@ final class UserProfileUpdateSelf extends Permission {
 final class UserReadUserBasic extends Permission {
   const UserReadUserBasic._();
   @override
-  String get name => 'Read User Basic';
+  String get name => 'read-user-basic';
   @override
   int get index => 10;
   @override
@@ -362,12 +458,19 @@ final class UserReadUserBasic extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionUserReadUserBasic;
+
+  @override
+  List<Permission> get dependents => [
+    Permission.userReadUserDetails,
+    Permission.userUpdateUser,
+    Permission.userDeleteUser,
+  ];
 }
 
 final class UserReadUserDetails extends Permission {
   const UserReadUserDetails._();
   @override
-  String get name => 'Read User Details';
+  String get name => 'read-user-details';
   @override
   int get index => 11;
   @override
@@ -379,12 +482,21 @@ final class UserReadUserDetails extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionUserReadUserDetails;
+
+  @override
+  List<Permission> get implies => [Permission.userReadUserBasic];
+
+  @override
+  List<Permission> get dependents => [
+    Permission.userUpdateUser,
+    Permission.userDeleteUser,
+  ];
 }
 
 final class UserUpdateUser extends Permission {
   const UserUpdateUser._();
   @override
-  String get name => 'Update User';
+  String get name => 'update-user';
   @override
   int get index => 12;
   @override
@@ -396,12 +508,19 @@ final class UserUpdateUser extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionUserUpdateUser;
+
+  @override
+  List<Permission> get implies => [
+    Permission.userReadUserDetails,
+    Permission.userProfileUpdateSelf,
+    Permission.userReadUserBasic,
+  ];
 }
 
 final class UserCreateUser extends Permission {
   const UserCreateUser._();
   @override
-  String get name => 'Create User';
+  String get name => 'create-user';
   @override
   int get index => 13;
   @override
@@ -418,7 +537,7 @@ final class UserCreateUser extends Permission {
 final class UserDeleteUser extends Permission {
   const UserDeleteUser._();
   @override
-  String get name => 'Delete User';
+  String get name => 'delete-user';
   @override
   int get index => 14;
   @override
@@ -430,6 +549,12 @@ final class UserDeleteUser extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionUserDeleteUser;
+
+  @override
+  List<Permission> get implies => [
+    Permission.userReadUserDetails,
+    Permission.userReadUserBasic,
+  ];
 }
 
 // ═══════════════════════════════════════════════
@@ -439,7 +564,7 @@ final class UserDeleteUser extends Permission {
 final class SystemLowLevelAdminRead extends Permission {
   const SystemLowLevelAdminRead._();
   @override
-  String get name => 'Low Level Admin Read';
+  String get name => 'low-level-admin-read';
   @override
   int get index => 15;
   @override
@@ -451,12 +576,15 @@ final class SystemLowLevelAdminRead extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionSystemLowLevelAdminRead;
+
+  @override
+  List<Permission> get dependents => [Permission.systemLowLevelAdminWrite];
 }
 
 final class SystemLowLevelAdminWrite extends Permission {
   const SystemLowLevelAdminWrite._();
   @override
-  String get name => 'Low Level Admin Write';
+  String get name => 'low-level-admin-write';
   @override
   int get index => 16;
   @override
@@ -468,6 +596,9 @@ final class SystemLowLevelAdminWrite extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionSystemLowLevelAdminWrite;
+
+  @override
+  List<Permission> get implies => [Permission.systemLowLevelAdminRead];
 }
 
 // ═══════════════════════════════════════════════
@@ -477,7 +608,7 @@ final class SystemLowLevelAdminWrite extends Permission {
 final class IssueReadIssue extends Permission {
   const IssueReadIssue._();
   @override
-  String get name => 'Read Issue';
+  String get name => 'read-issue';
   @override
   int get index => 17;
   @override
@@ -489,12 +620,15 @@ final class IssueReadIssue extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionIssueReadIssue;
+
+  @override
+  List<Permission> get implies => [Permission.projectReadProjectBasic];
 }
 
 final class IssueReadIssuePrivateFields extends Permission {
   const IssueReadIssuePrivateFields._();
   @override
-  String get name => 'Read Issue Private Fields';
+  String get name => 'read-issue-private-fields';
   @override
   int get index => 18;
   @override
@@ -506,12 +640,21 @@ final class IssueReadIssuePrivateFields extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionIssueReadIssuePrivateFields;
+
+  @override
+  List<Permission> get implies => [Permission.projectReadProjectBasic];
+
+  @override
+  List<Permission> get dependents => [
+    Permission.issueUpdateIssuePrivateFields,
+    Permission.visibilityOverrideVisibilityRestrictions,
+  ];
 }
 
 final class IssueUpdateIssue extends Permission {
   const IssueUpdateIssue._();
   @override
-  String get name => 'Update Issue';
+  String get name => 'update-issue';
   @override
   int get index => 19;
   @override
@@ -523,12 +666,15 @@ final class IssueUpdateIssue extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionIssueUpdateIssue;
+
+  @override
+  List<Permission> get dependents => [Permission.issueUpdateIssuePrivateFields];
 }
 
 final class IssueCreateIssue extends Permission {
   const IssueCreateIssue._();
   @override
-  String get name => 'Create Issue';
+  String get name => 'create-issue';
   @override
   int get index => 20;
   @override
@@ -540,12 +686,15 @@ final class IssueCreateIssue extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionIssueCreateIssue;
+
+  @override
+  List<Permission> get implies => [Permission.projectReadProjectBasic];
 }
 
 final class IssueDeleteIssue extends Permission {
   const IssueDeleteIssue._();
   @override
-  String get name => 'Delete Issue';
+  String get name => 'delete-issue';
   @override
   int get index => 21;
   @override
@@ -562,7 +711,7 @@ final class IssueDeleteIssue extends Permission {
 final class IssueLinkIssues extends Permission {
   const IssueLinkIssues._();
   @override
-  String get name => 'Link Issues';
+  String get name => 'link-issues';
   @override
   int get index => 22;
   @override
@@ -579,7 +728,7 @@ final class IssueLinkIssues extends Permission {
 final class IssueUpdateIssuePrivateFields extends Permission {
   const IssueUpdateIssuePrivateFields._();
   @override
-  String get name => 'Update Issue Private Fields';
+  String get name => 'update-issue-private-fields';
   @override
   int get index => 23;
   @override
@@ -591,12 +740,19 @@ final class IssueUpdateIssuePrivateFields extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionIssueUpdateIssuePrivateFields;
+
+  @override
+  List<Permission> get implies => [
+    Permission.issueReadIssuePrivateFields,
+    Permission.updateIssue,
+    Permission.projectReadProjectBasic,
+  ];
 }
 
 final class IssueApplyCommandsSilently extends Permission {
   const IssueApplyCommandsSilently._();
   @override
-  String get name => 'Apply Commands Silently';
+  String get name => 'apply-commands-silently';
   @override
   int get index => 24;
   @override
@@ -613,7 +769,7 @@ final class IssueApplyCommandsSilently extends Permission {
 final class IssueViewWatchers extends Permission {
   const IssueViewWatchers._();
   @override
-  String get name => 'View Watchers';
+  String get name => 'view-watchers';
   @override
   int get index => 25;
   @override
@@ -625,12 +781,15 @@ final class IssueViewWatchers extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionIssueViewWatchers;
+
+  @override
+  List<Permission> get implies => [Permission.projectReadProjectBasic];
 }
 
 final class IssueUpdateWatchers extends Permission {
   const IssueUpdateWatchers._();
   @override
-  String get name => 'Update Watchers';
+  String get name => 'update-watchers';
   @override
   int get index => 26;
   @override
@@ -647,7 +806,7 @@ final class IssueUpdateWatchers extends Permission {
 final class IssueViewVoters extends Permission {
   const IssueViewVoters._();
   @override
-  String get name => 'View Voters';
+  String get name => 'view-voters';
   @override
   int get index => 27;
   @override
@@ -659,6 +818,9 @@ final class IssueViewVoters extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionIssueViewVoters;
+
+  @override
+  List<Permission> get implies => [Permission.projectReadProjectBasic];
 }
 
 // ═══════════════════════════════════════════════
@@ -668,7 +830,7 @@ final class IssueViewVoters extends Permission {
 final class AttachmentAddAttachment extends Permission {
   const AttachmentAddAttachment._();
   @override
-  String get name => 'Add Attachment';
+  String get name => 'add-attachment';
   @override
   int get index => 28;
   @override
@@ -685,7 +847,7 @@ final class AttachmentAddAttachment extends Permission {
 final class AttachmentUpdateAttachment extends Permission {
   const AttachmentUpdateAttachment._();
   @override
-  String get name => 'Update Attachment';
+  String get name => 'update-attachment';
   @override
   int get index => 29;
   @override
@@ -702,7 +864,7 @@ final class AttachmentUpdateAttachment extends Permission {
 final class AttachmentDeleteAttachment extends Permission {
   const AttachmentDeleteAttachment._();
   @override
-  String get name => 'Delete Attachment';
+  String get name => 'delete-attachment';
   @override
   int get index => 30;
   @override
@@ -723,7 +885,7 @@ final class AttachmentDeleteAttachment extends Permission {
 final class CommentCreateIssueComment extends Permission {
   const CommentCreateIssueComment._();
   @override
-  String get name => 'Create Issue Comment';
+  String get name => 'create-issue-comment';
   @override
   int get index => 31;
   @override
@@ -740,7 +902,7 @@ final class CommentCreateIssueComment extends Permission {
 final class CommentReadIssueComment extends Permission {
   const CommentReadIssueComment._();
   @override
-  String get name => 'Read Issue Comment';
+  String get name => 'read-issue-comment';
   @override
   int get index => 32;
   @override
@@ -752,12 +914,18 @@ final class CommentReadIssueComment extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionCommentReadIssueComment;
+
+  @override
+  List<Permission> get dependents => [
+    Permission.commentUpdateNotOwnIssueComment,
+    Permission.commentDeleteNotOwnCommentAndPermanentCommentDelete,
+  ];
 }
 
 final class CommentUpdateIssueComment extends Permission {
   const CommentUpdateIssueComment._();
   @override
-  String get name => 'Update Issue Comment';
+  String get name => 'update-issue-comment';
   @override
   int get index => 33;
   @override
@@ -774,7 +942,7 @@ final class CommentUpdateIssueComment extends Permission {
 final class CommentDeleteIssueComment extends Permission {
   const CommentDeleteIssueComment._();
   @override
-  String get name => 'Delete Issue Comment';
+  String get name => 'delete-issue-comment';
   @override
   int get index => 34;
   @override
@@ -791,7 +959,7 @@ final class CommentDeleteIssueComment extends Permission {
 final class CommentUpdateNotOwnIssueComment extends Permission {
   const CommentUpdateNotOwnIssueComment._();
   @override
-  String get name => 'Update Not Own Issue Comment';
+  String get name => 'update-not-own-issue-comment';
   @override
   int get index => 35;
   @override
@@ -803,13 +971,16 @@ final class CommentUpdateNotOwnIssueComment extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionCommentUpdateNotOwnIssueComment;
+
+  @override
+  List<Permission> get implies => [Permission.commentReadIssueComment];
 }
 
 final class CommentDeleteNotOwnCommentAndPermanentCommentDelete
     extends Permission {
   const CommentDeleteNotOwnCommentAndPermanentCommentDelete._();
   @override
-  String get name => 'Delete Not Own Comment And Permanent Comment Delete';
+  String get name => 'delete-not-own-comment-and-permanent-comment-delete';
   @override
   int get index => 36;
   @override
@@ -819,14 +990,17 @@ final class CommentDeleteNotOwnCommentAndPermanentCommentDelete
   @override
   Operation get operation => Operation.delete;
   @override
-  String displayName(AppLocalizations localization) =>
-      localization.permissionCommentDeleteNotOwnCommentAndPermanentCommentDelete;
+  String displayName(AppLocalizations localization) => localization
+      .permissionCommentDeleteNotOwnCommentAndPermanentCommentDelete;
+
+  @override
+  List<Permission> get implies => [Permission.commentReadIssueComment];
 }
 
 final class CommentReadArticleComment extends Permission {
   const CommentReadArticleComment._();
   @override
-  String get name => 'Read Article Comment';
+  String get name => 'read-article-comment';
   @override
   int get index => 37;
   @override
@@ -838,12 +1012,25 @@ final class CommentReadArticleComment extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionCommentReadArticleComment;
+
+  @override
+  List<Permission> get implies => [
+    Permission.articleReadArticle,
+    Permission.projectReadProjectBasic,
+  ];
+
+  @override
+  List<Permission> get dependents => [
+    Permission.commentCreateArticleComment,
+    Permission.commentUpdateArticleComment,
+    Permission.commentDeleteArticleComment,
+  ];
 }
 
 final class CommentCreateArticleComment extends Permission {
   const CommentCreateArticleComment._();
   @override
-  String get name => 'Create Article Comment';
+  String get name => 'create-article-comment';
   @override
   int get index => 38;
   @override
@@ -855,12 +1042,19 @@ final class CommentCreateArticleComment extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionCommentCreateArticleComment;
+
+  @override
+  List<Permission> get implies => [
+    Permission.commentReadArticleComment,
+    Permission.articleReadArticle,
+    Permission.projectReadProjectBasic,
+  ];
 }
 
 final class CommentUpdateArticleComment extends Permission {
   const CommentUpdateArticleComment._();
   @override
-  String get name => 'Update Article Comment';
+  String get name => 'update-article-comment';
   @override
   int get index => 39;
   @override
@@ -872,12 +1066,19 @@ final class CommentUpdateArticleComment extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionCommentUpdateArticleComment;
+
+  @override
+  List<Permission> get implies => [
+    Permission.commentReadArticleComment,
+    Permission.articleReadArticle,
+    Permission.projectReadProjectBasic,
+  ];
 }
 
 final class CommentDeleteArticleComment extends Permission {
   const CommentDeleteArticleComment._();
   @override
-  String get name => 'Delete Article Comment';
+  String get name => 'delete-article-comment';
   @override
   int get index => 40;
   @override
@@ -889,6 +1090,13 @@ final class CommentDeleteArticleComment extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionCommentDeleteArticleComment;
+
+  @override
+  List<Permission> get implies => [
+    Permission.commentReadArticleComment,
+    Permission.articleReadArticle,
+    Permission.projectReadProjectBasic,
+  ];
 }
 
 // ═══════════════════════════════════════════════
@@ -898,7 +1106,7 @@ final class CommentDeleteArticleComment extends Permission {
 final class VisibilityOverrideVisibilityRestrictions extends Permission {
   const VisibilityOverrideVisibilityRestrictions._();
   @override
-  String get name => 'Override Visibility Restrictions';
+  String get name => 'override-visibility-restrictions';
   @override
   int get index => 41;
   @override
@@ -910,6 +1118,12 @@ final class VisibilityOverrideVisibilityRestrictions extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionVisibilityOverrideVisibilityRestrictions;
+
+  @override
+  List<Permission> get implies => [
+    Permission.issueReadIssuePrivateFields,
+    Permission.projectReadProjectBasic,
+  ];
 }
 
 // ═══════════════════════════════════════════════
@@ -919,7 +1133,7 @@ final class VisibilityOverrideVisibilityRestrictions extends Permission {
 final class IssueWorkItemReadWorkItem extends Permission {
   const IssueWorkItemReadWorkItem._();
   @override
-  String get name => 'Work Item Read Work Item';
+  String get name => 'read-work-item';
   @override
   int get index => 42;
   @override
@@ -931,12 +1145,17 @@ final class IssueWorkItemReadWorkItem extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionIssueWorkItemReadWorkItem;
+
+  @override
+  List<Permission> get dependents => [
+    Permission.issueWorkItemUpdateNotOwnWorkItem,
+  ];
 }
 
 final class IssueWorkItemUpdateWorkItem extends Permission {
   const IssueWorkItemUpdateWorkItem._();
   @override
-  String get name => 'Work Item Update Work Item';
+  String get name => 'update-work-item';
   @override
   int get index => 43;
   @override
@@ -948,12 +1167,17 @@ final class IssueWorkItemUpdateWorkItem extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionIssueWorkItemUpdateWorkItem;
+
+  @override
+  List<Permission> get dependents => [
+    Permission.issueWorkItemUpdateNotOwnWorkItem,
+  ];
 }
 
 final class IssueWorkItemUpdateNotOwnWorkItem extends Permission {
   const IssueWorkItemUpdateNotOwnWorkItem._();
   @override
-  String get name => 'Work Item Update Not Own Work Item';
+  String get name => 'update-not-own-work-item';
   @override
   int get index => 44;
   @override
@@ -965,12 +1189,18 @@ final class IssueWorkItemUpdateNotOwnWorkItem extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionIssueWorkItemUpdateNotOwnWorkItem;
+
+  @override
+  List<Permission> get implies => [
+    Permission.issueWorkItemReadWorkItem,
+    Permission.issueWorkItemUpdateWorkItem,
+  ];
 }
 
 final class IssueWorkItemCreateWorkItem extends Permission {
   const IssueWorkItemCreateWorkItem._();
   @override
-  String get name => 'Work Item Create Work Item';
+  String get name => 'create-work-item';
   @override
   int get index => 45;
   @override
@@ -982,12 +1212,17 @@ final class IssueWorkItemCreateWorkItem extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionIssueWorkItemCreateWorkItem;
+
+  @override
+  List<Permission> get dependents => [
+    Permission.issueWorkItemCreateNotOwnWorkItem,
+  ];
 }
 
 final class IssueWorkItemCreateNotOwnWorkItem extends Permission {
   const IssueWorkItemCreateNotOwnWorkItem._();
   @override
-  String get name => 'Work Item Create Not Own Work Item';
+  String get name => 'create-not-own-work-item';
   @override
   int get index => 46;
   @override
@@ -999,6 +1234,9 @@ final class IssueWorkItemCreateNotOwnWorkItem extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionIssueWorkItemCreateNotOwnWorkItem;
+
+  @override
+  List<Permission> get implies => [Permission.issueWorkItemCreateWorkItem];
 }
 
 // ═══════════════════════════════════════════════
@@ -1008,7 +1246,7 @@ final class IssueWorkItemCreateNotOwnWorkItem extends Permission {
 final class ArticleReadArticle extends Permission {
   const ArticleReadArticle._();
   @override
-  String get name => 'Read Article';
+  String get name => 'read-article';
   @override
   int get index => 47;
   @override
@@ -1020,12 +1258,26 @@ final class ArticleReadArticle extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionArticleReadArticle;
+
+  @override
+  List<Permission> get implies => [Permission.projectReadProjectBasic];
+
+  @override
+  List<Permission> get dependents => [
+    Permission.articleCreateArticle,
+    Permission.articleUpdateArticle,
+    Permission.articleDeleteArticle,
+    Permission.commentReadArticleComment,
+    Permission.commentCreateArticleComment,
+    Permission.commentUpdateArticleComment,
+    Permission.commentDeleteArticleComment,
+  ];
 }
 
 final class ArticleCreateArticle extends Permission {
   const ArticleCreateArticle._();
   @override
-  String get name => 'Create Article';
+  String get name => 'create-article';
   @override
   int get index => 48;
   @override
@@ -1037,12 +1289,18 @@ final class ArticleCreateArticle extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionArticleCreateArticle;
+
+  @override
+  List<Permission> get implies => [
+    Permission.articleReadArticle,
+    Permission.projectReadProjectBasic,
+  ];
 }
 
 final class ArticleUpdateArticle extends Permission {
   const ArticleUpdateArticle._();
   @override
-  String get name => 'Update Article';
+  String get name => 'update-article';
   @override
   int get index => 49;
   @override
@@ -1054,12 +1312,18 @@ final class ArticleUpdateArticle extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionArticleUpdateArticle;
+
+  @override
+  List<Permission> get implies => [
+    Permission.articleReadArticle,
+    Permission.projectReadProjectBasic,
+  ];
 }
 
 final class ArticleDeleteArticle extends Permission {
   const ArticleDeleteArticle._();
   @override
-  String get name => 'Delete Article';
+  String get name => 'delete-article';
   @override
   int get index => 50;
   @override
@@ -1071,6 +1335,12 @@ final class ArticleDeleteArticle extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionArticleDeleteArticle;
+
+  @override
+  List<Permission> get implies => [
+    Permission.articleReadArticle,
+    Permission.projectReadProjectBasic,
+  ];
 }
 
 // ═══════════════════════════════════════════════
@@ -1080,7 +1350,7 @@ final class ArticleDeleteArticle extends Permission {
 final class AppReadAppContent extends Permission {
   const AppReadAppContent._();
   @override
-  String get name => 'Read App Content';
+  String get name => 'read-app-content';
   @override
   int get index => 51;
   @override
@@ -1092,12 +1362,15 @@ final class AppReadAppContent extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionAppReadAppContent;
+
+  @override
+  List<Permission> get dependents => [Permission.appUpdateAppContent];
 }
 
 final class AppUpdateAppContent extends Permission {
   const AppUpdateAppContent._();
   @override
-  String get name => 'Update App Content';
+  String get name => 'update-app-content';
   @override
   int get index => 52;
   @override
@@ -1109,4 +1382,7 @@ final class AppUpdateAppContent extends Permission {
   @override
   String displayName(AppLocalizations localization) =>
       localization.permissionAppUpdateAppContent;
+
+  @override
+  List<Permission> get implies => [Permission.appReadAppContent];
 }

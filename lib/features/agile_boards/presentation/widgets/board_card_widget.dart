@@ -133,7 +133,7 @@ class BoardCardWidget extends StatelessWidget {
                       ),
 
                       TextHoverWidget(
-                        text: card.subsystem.displayName(localization),
+                        text: card.subsystem.name,
                         style: textTheme.labelSmall!,
                         styleHover: textTheme.labelSmall!.copyWith(
                           color: colors.secondary,

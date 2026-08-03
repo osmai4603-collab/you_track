@@ -379,7 +379,7 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
       alignmentOffset: Offset(_isCollapsed ? 80 : 200, -40),
       menuChildren: [
         PermissionGuard(
-          permission: Permission.issueCreateIssue,
+          permission: Permission.createIssue,
           child: _menuItem(
             currentRoute: currentRoute,
             selectedTextColor: selectedTextColor,
@@ -548,8 +548,9 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
     return [
       MenuItemButton(
         style: itemStyle,
-        onPressed: () {
-          context.go('users/profile');
+        onPressed: () async {
+          final session = get_it<UserSession>();
+          context.go('users/${session.currentUser?.id}');
           _adminWidgetController.close();
         },
         leadingIcon: Icon(Icons.person_outline, color: textColor, size: 18),

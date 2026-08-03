@@ -1,24 +1,26 @@
-# Fix invalid override in `GroupsSqliteDataSourceImpl`
+# Fix errors in `all_usecases_test.dart` and `permission_guard_mixin_test.dart`
 
-The `GroupsSqliteDataSourceImpl.getGroups` method does not match the signature defined in the `GroupsRemoteDataSource` interface. Specifically, it is missing the optional named parameter `userId`.
+The test files `all_usecases_test.dart` and `permission_guard_mixin_test.dart` have several compilation errors due to changes in `UserEntity`, `UserPermissionsEntity`, and `UserRoleAssignment`.
 
 ## Proposed Changes
 
-### [groups_sqlite_data_source_impl.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/lib/features/groups/data/datasources/groups_sqlite_data_source_impl.dart)
+### [all_usecases_test.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/test/core/usecase/all_usecases_test.dart)
 
-#### [MODIFY] [GroupsSqliteDataSourceImpl](file:///home/osmsoftwareengineering/flutter_projects/you_track/lib/features/groups/data/datasources/groups_sqlite_data_source_impl.dart)
+#### [MODIFY] [all_usecases_test.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/test/core/usecase/all_usecases_test.dart)
+- Remove invalid import: `import 'package:issues_tracking/features/auth/domain/entities/user_entity.dart';`.
+- Update `UserEntity` instantiation: add required `fullName` and `username` parameters.
+- Update `UserPermissionsEntity` instantiation: remove `const` keyword as the constructor is no longer `const`.
+- Update `UserRoleAssignment` instantiation: change `projectId: null` to `projectId: 'global'` (or another string) as `projectId` is now a required non-nullable `String`.
 
-- Update `getGroups` signature to `Future<List<GroupModel>> getGroups({String? userId})`.
-- Implement filtering by `userId` if it's provided. This will involve:
-    1. Querying `group_members` table for the given `userId` to get the list of `group_id`s.
-    2. Querying `groups` table for those `group_id`s.
-    3. If `userId` is null, continue fetching all groups as before.
+### [permission_guard_mixin_test.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/test/core/usecase/permission_guard_mixin_test.dart)
+
+#### [MODIFY] [permission_guard_mixin_test.dart](file:///home/osmsoftwareengineering/flutter_projects/you_track/test/core/usecase/permission_guard_mixin_test.dart)
+- Remove invalid import: `import 'package:issues_tracking/features/auth/domain/entities/user_entity.dart';`.
+- Update `UserEntity` instantiation: add required `fullName` and `username` parameters.
+- Update `UserPermissionsEntity` instantiation: remove `const` keyword.
+- Update `UserRoleAssignment` instantiation: change `projectId: null` to `projectId: 'global'`.
 
 ## Verification Plan
 
 ### Automated Tests
-- I will check if the file compiles (no static analysis errors) after the change.
-- Since I don't have a test runner easily available in this environment, I'll rely on the fact that the signature will match the interface.
-
-### Manual Verification
-- Verify that the error message reported by the user is resolved.
+- Run `analyze_file` on both test files to ensure all compilation errors are resolved.

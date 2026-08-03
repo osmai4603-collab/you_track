@@ -1,7 +1,6 @@
 import 'package:issues_tracking/core/enums/issue_priority_type_enum.dart';
 import 'package:issues_tracking/core/enums/issue_state_enum.dart';
 import 'package:issues_tracking/core/enums/issue_type_enum.dart';
-import 'package:issues_tracking/core/enums/issue_subsystem_enum.dart';
 import 'package:issues_tracking/features/issues/data/models/build_model.dart';
 import 'package:issues_tracking/features/issues/data/models/sprint_model.dart';
 import 'package:issues_tracking/features/issues/data/models/tag_model.dart';
@@ -16,6 +15,7 @@ class IssueModel extends Issue {
     required super.issueKey,
     required super.issueNumber,
     required super.summary,
+    required super.projectId,
     super.description,
     super.state,
     super.priority,
@@ -49,6 +49,7 @@ class IssueModel extends Issue {
     printMap(title: 'Issue', data: json);
     return IssueModel(
       id: (json['id'] ?? '').toString(),
+      projectId: json['project_id'],
       issueKey: (json['issue_key'] ?? '').toString(),
       issueNumber: (json['issue_sequence'] ?? 0) as int,
       summary: (json['summary'] ?? '').toString(),
@@ -99,6 +100,7 @@ class IssueModel extends Issue {
   Map<String, dynamic> toJson() {
     return {
       if (id.isNotEmpty) 'id': id,
+      'project_id': projectId,
       'issue_key': issueKey,
       'issue_sequence': issueNumber,
       'summary': summary,
@@ -107,10 +109,10 @@ class IssueModel extends Issue {
       'priority': priority.name,
       'issue_type': issueType.name,
       'assignee_id': assigneeId,
-      'assignee_name': assigneeName,
-      'assignee_avatar_url': assigneeAvatarUrl,
+      // 'assignee_name': assigneeName,
+      // 'assignee_avatar_url': assigneeAvatarUrl,
       'reporter_id': reporterId,
-      'reporter_name': reporterName,
+      // 'reporter_name': reporterName,
       'subsystem_id': subsystemId,
       'fix_versions': fixVersions,
       'build_id': build?.id,
@@ -153,6 +155,7 @@ class IssueModel extends Issue {
   static IssueModel fromEntity(Issue issue) {
     return IssueModel(
       id: issue.id,
+      projectId: issue.projectId,
       issueKey: issue.issueKey,
       issueNumber: issue.issueNumber,
       summary: issue.summary,

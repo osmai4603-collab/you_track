@@ -19,7 +19,7 @@ class AddGroupProjectsParams extends Params {
 }
 
 class AddGroupProjects
-    extends UseCasePermission<List<GroupProjectEntity>, AddGroupProjectsParams> {
+    extends UseCase<List<GroupProjectEntity>, AddGroupProjectsParams> {
   @override
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
@@ -28,7 +28,9 @@ class AddGroupProjects
   AddGroupProjects(this.repository);
 
   @override
-  Future<Either<Failure, List<GroupProjectEntity>>> execute({required AddGroupProjectsParams params}) {
+  Future<Either<Failure, List<GroupProjectEntity>>> call({
+    required AddGroupProjectsParams params,
+  }) {
     return repository.addGroupProjects(params.groupId, params.projectIds);
   }
 }

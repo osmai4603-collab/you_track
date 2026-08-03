@@ -5,8 +5,7 @@ import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article_comment.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_comment_repository.dart';
 
-class AddComment
-    extends UseCasePermission<ArticleComment, AddCommentParams> {
+class AddComment extends UseCase<ArticleComment, AddCommentParams> {
   final ArticleCommentRepository repository;
   const AddComment(this.repository);
 
@@ -19,11 +18,13 @@ class AddComment
 
   @override
   Permission get requiredPermission => Permission.commentCreateArticleComment;
-  
-  @override
-  Future<Either<Failure, ArticleComment>> execute({required AddCommentParams params}) {
-    return repository.addComment(params.comment);
-  }
+
+  // @override
+  // Future<Either<Failure, ArticleComment>> call({
+  //   required AddCommentParams params,
+  // }) {
+  //   return repository.addComment(params.comment);
+  // }
 }
 
 class AddCommentParams extends Params {

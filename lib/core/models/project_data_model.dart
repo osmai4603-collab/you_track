@@ -1,5 +1,6 @@
 import 'package:issues_tracking/core/entities/project_data.dart';
 import 'package:issues_tracking/core/utils/printing.dart';
+import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
 
 final class ProjectDataModel extends ProjectData {
   const ProjectDataModel({
@@ -19,5 +20,13 @@ final class ProjectDataModel extends ProjectData {
 
   Map<String, dynamic> toJson() {
     return {'id': id, 'name': projectName, 'project_id': projectId};
+  }
+
+  static ProjectData? fromProjectEntity(ProjectEntity project) {
+    return ProjectDataModel(
+      id: project.id,
+      projectName: project.name,
+      projectId: project.projectId,
+    );
   }
 }

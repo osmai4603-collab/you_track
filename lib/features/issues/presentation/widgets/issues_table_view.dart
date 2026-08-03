@@ -7,6 +7,7 @@ import 'package:issues_tracking/features/issues/presentation/bloc/issues_bloc.da
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_event.dart';
 import 'package:issues_tracking/features/issues/presentation/bloc/issues_state.dart';
 import 'package:issues_tracking/features/issues/presentation/widgets/issue_table_row.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 
 class IssuesTableView extends StatelessWidget {
   const IssuesTableView({super.key});
@@ -77,7 +78,7 @@ class IssuesTableView extends StatelessWidget {
           );
         }
 
-        return const Center(child: CircularProgressIndicator());
+        return ShimmerLoading.table();
       },
     );
   }

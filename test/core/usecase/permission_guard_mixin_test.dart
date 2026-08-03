@@ -5,7 +5,7 @@ import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 
 import 'package:issues_tracking/core/usecase/usecase.dart';
-import 'package:issues_tracking/features/auth/domain/entities/user_entity.dart';
+import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 import 'package:issues_tracking/core/entities/user_permissions_entity.dart';
 import 'package:issues_tracking/core/entities/user_role_assignment.dart';
@@ -14,14 +14,14 @@ class TestParams extends Params {
   const TestParams();
 }
 
-class TestUseCase extends UseCasePermission<String, TestParams> {
+class TestUseCase extends UseCase<String, TestParams> {
   const TestUseCase();
 
   @override
   Permission get requiredPermission => Permission.projectCreateProject;
 
   @override
-  Future<Either<Failure, String>> execute({required TestParams params}) {
+  Future<Either<Failure, String>> call({required TestParams params}) {
     return Future.value(const Right('ok'));
   }
 }
@@ -43,13 +43,15 @@ void main() {
     sl<UserSession>().setUser(
       const UserEntity(
         id: 'u1',
+        fullName: 'User One',
+        username: 'user1',
         email: 'user@example.com',
         groups: [],
         projects: [],
       ),
     );
     sl<UserSession>().setPermissions(
-      const UserPermissionsEntity(roleAssignments: [], ownedProjectIds: []),
+      UserPermissionsEntity(roleAssignments: [], ownedProjectIds: []),
     );
 
     final result = await const TestUseCase().call(params: const TestParams());
@@ -66,18 +68,20 @@ void main() {
     sl<UserSession>().setUser(
       const UserEntity(
         id: 'u1',
+        fullName: 'User One',
+        username: 'user1',
         email: 'user@example.com',
         groups: [],
         projects: [],
       ),
     );
     sl<UserSession>().setPermissions(
-      const UserPermissionsEntity(
+      UserPermissionsEntity(
         roleAssignments: [
-          UserRoleAssignment(
+          const UserRoleAssignment(
             roleName: 'admin',
             permissions: [Permission.projectCreateProject],
-            projectId: null,
+            projectId: 'global',
             groupId: 'g1',
           ),
         ],

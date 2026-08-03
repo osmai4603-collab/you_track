@@ -1,2 +1,3 @@
-- [ ] Register `AddSubsystemUseCase` in `lib/core/init_dependencies.dart`
-- [ ] Verify registration
+- [x] Fix unsafe cast in `_onUpdateFilter` in `lib/features/issues/presentation/bloc/issues_bloc.dart`
+- [x] Fix typos in method names in `lib/features/issues/presentation/bloc/issues_bloc.dart`
+- [x] Verify changes

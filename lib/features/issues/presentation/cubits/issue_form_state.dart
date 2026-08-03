@@ -1,16 +1,13 @@
 import 'package:equatable/equatable.dart';
+import 'package:issues_tracking/core/entities/project_data.dart';
 import 'package:issues_tracking/core/enums/issue_priority_type_enum.dart';
 import 'package:issues_tracking/core/enums/issue_state_enum.dart';
 import 'package:issues_tracking/core/enums/issue_type_enum.dart';
-import 'package:issues_tracking/core/enums/issue_subsystem_enum.dart';
 import 'package:issues_tracking/features/issues/domain/entities/build.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_attachment.dart';
-import 'package:issues_tracking/features/issues/domain/entities/sprint.dart';
-import 'package:issues_tracking/features/issues/domain/entities/tag.dart';
-import 'package:issues_tracking/features/issues/domain/entities/issue_link.dart';
-
 import 'package:issues_tracking/features/projects/domain/entities/project_entity.dart';
 import 'package:issues_tracking/features/projects/domain/entities/project_member_entity.dart';
+
 import 'package:issues_tracking/features/projects/domain/entities/subsystem_entity.dart';
 
 class IssueFormState extends Equatable {
@@ -20,32 +17,21 @@ class IssueFormState extends Equatable {
   final IssuePriorityTypeEnum priority;
   final IssueStateEnum state;
   final IssueTypeEnum issueType;
-  final String? assigneeId;
-  final String? assigneeName;
+  final ProjectMemberEntity? assignee;
   final SubsystemEntity? subsystem;
   final String fixVersions;
   final Build? build;
   final Duration? estimation;
   final Duration? spentTime;
-  final List<String> visibility;
-  final List<Tag> tags;
-  final List<Sprint> sprints;
-  final List<IssueLink> links;
-  final List<IssueAttachment> attachments;
-  final List<ProjectEntity> availableProjects;
-  final List<ProjectMemberEntity> projectMembers;
-  final List<Sprint> availableSprints;
-  final List<Build> availableBuilds;
   final Map<String, String> validationErrors;
   final bool isSubmitting;
   final bool isLoading;
-  final bool isEditing;
   final String? issueId;
-  final String? projectKey;
+  final ProjectEntity? project;
   final String? errorMessage;
 
-  final List<SubsystemEntity> availableSubsystems;
 
+ bool get isEditing => issueId != null;
   const IssueFormState({
     this.summary = '',
     this.description = '',
@@ -53,30 +39,18 @@ class IssueFormState extends Equatable {
     this.priority = IssuePriorityTypeEnum.normal,
     this.state = IssueStateEnum.toDo,
     this.issueType = IssueTypeEnum.task,
-    this.assigneeId,
-    this.assigneeName,
+    this.assignee,
     this.subsystem,
     this.fixVersions = '',
     this.build,
     this.estimation,
     this.spentTime,
-    this.visibility = const ['team'],
-    this.tags = const [],
-    this.sprints = const [],
-    this.links = const [],
-    this.attachments = const [],
-    this.availableProjects = const [],
-    this.projectMembers = const [],
-    this.availableSprints = const [],
-    this.availableBuilds = const [],
     this.validationErrors = const {},
     this.isSubmitting = false,
     this.isLoading = false,
-    this.isEditing = false,
     this.issueId,
-    this.projectKey,
+    this.project,
     this.errorMessage,
-    this.availableSubsystems = const [],
   });
 
   bool get isDirty =>
@@ -85,17 +59,12 @@ class IssueFormState extends Equatable {
       priority != IssuePriorityTypeEnum.normal ||
       state != IssueStateEnum.toDo ||
       issueType != IssueTypeEnum.task ||
-      assigneeId != null ||
-      subsystem != IssueSubsystemEnum.noValue ||
+      assignee != null ||
+      subsystem != null ||
       fixVersions.isNotEmpty ||
       build != null ||
       estimation != null ||
-      spentTime != null ||
-      visibility != const ['team'] ||
-      tags.isNotEmpty ||
-      sprints.isNotEmpty ||
-      links.isNotEmpty ||
-      attachments.isNotEmpty;
+      spentTime != null;
 
   bool get canSubmit => summary.trim().isNotEmpty && !isSubmitting;
 
@@ -106,8 +75,7 @@ class IssueFormState extends Equatable {
     IssuePriorityTypeEnum? priority,
     IssueStateEnum? state,
     IssueTypeEnum? issueType,
-    String? assigneeId,
-    String? assigneeName,
+    ProjectMemberEntity? assignee,
     bool clearAssignee = false,
     SubsystemEntity? subsystem,
     String? fixVersions,
@@ -117,24 +85,13 @@ class IssueFormState extends Equatable {
     bool clearEstimation = false,
     Duration? spentTime,
     bool clearSpentTime = false,
-    List<String>? visibility,
-    List<Tag>? tags,
-    List<Sprint>? sprints,
-    List<IssueLink>? links,
-    List<IssueAttachment>? attachments,
-    List<ProjectEntity>? availableProjects,
-    List<ProjectMemberEntity>? projectMembers,
-    List<Sprint>? availableSprints,
-    List<Build>? availableBuilds,
     Map<String, String>? validationErrors,
     bool? isSubmitting,
     bool? isLoading,
-    bool? isEditing,
     String? issueId,
-    String? projectKey,
+    ProjectEntity? project,
     String? errorMessage,
     bool clearErrorMessage = false,
-    List<SubsystemEntity>? availableSubsystems,
   }) {
     return IssueFormState(
       summary: summary ?? this.summary,
@@ -143,32 +100,20 @@ class IssueFormState extends Equatable {
       priority: priority ?? this.priority,
       state: state ?? this.state,
       issueType: issueType ?? this.issueType,
-      assigneeId: clearAssignee ? null : (assigneeId ?? this.assigneeId),
-      assigneeName: clearAssignee ? null : (assigneeName ?? this.assigneeName),
+      assignee: clearAssignee ? null : (assignee ?? this.assignee),
       subsystem: subsystem ?? this.subsystem,
       fixVersions: fixVersions ?? this.fixVersions,
       build: clearBuild ? null : (build ?? this.build),
       estimation: clearEstimation ? null : (estimation ?? this.estimation),
       spentTime: clearSpentTime ? null : (spentTime ?? this.spentTime),
-      visibility: visibility ?? this.visibility,
-      tags: tags ?? this.tags,
-      sprints: sprints ?? this.sprints,
-      links: links ?? this.links,
-      attachments: attachments ?? this.attachments,
-      availableProjects: availableProjects ?? this.availableProjects,
-      projectMembers: projectMembers ?? this.projectMembers,
-      availableSprints: availableSprints ?? this.availableSprints,
-      availableBuilds: availableBuilds ?? this.availableBuilds,
       validationErrors: validationErrors ?? this.validationErrors,
       isSubmitting: isSubmitting ?? this.isSubmitting,
       isLoading: isLoading ?? this.isLoading,
-      isEditing: isEditing ?? this.isEditing,
       issueId: issueId ?? this.issueId,
-      projectKey: projectKey ?? this.projectKey,
+      project: project ?? this.project,
       errorMessage: clearErrorMessage
           ? null
           : (errorMessage ?? this.errorMessage),
-      availableSubsystems: availableSubsystems ?? this.availableSubsystems,
     );
   }
 
@@ -180,29 +125,18 @@ class IssueFormState extends Equatable {
     priority,
     state,
     issueType,
-    assigneeId,
-    assigneeName,
+    assignee,
     subsystem,
     fixVersions,
     build,
     estimation,
     spentTime,
-    visibility,
-    tags,
-    sprints,
-    links,
-    attachments,
-    availableProjects,
-    projectMembers,
-    availableSprints,
-    availableBuilds,
     validationErrors,
     isSubmitting,
     isLoading,
     isEditing,
     issueId,
-    projectKey,
+    project,
     errorMessage,
-    availableSubsystems,
   ];
 }

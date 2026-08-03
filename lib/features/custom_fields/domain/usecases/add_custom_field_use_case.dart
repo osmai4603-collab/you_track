@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import '../../../../core/errors/failure.dart';
 import '../../../../core/enums/custom_field_type_enum.dart';
 import '../../../../core/usecase/usecase.dart';
@@ -27,15 +28,29 @@ class AddCustomFieldParams extends Params {
   });
 
   @override
-  List<Object?> get props =>
-      [projectId, name, fieldType, defaultValue, emptyValue, canBeEmpty, valueMode, aliases];
+  List<Object?> get props => [
+    projectId,
+    name,
+    fieldType,
+    defaultValue,
+    emptyValue,
+    canBeEmpty,
+    valueMode,
+    aliases,
+  ];
 }
 
 class AddCustomFieldUseCase
-    implements UseCase<CustomFieldEntity, AddCustomFieldParams> {
+    extends UseCase<CustomFieldEntity, AddCustomFieldParams> {
   final CustomFieldsRepository repository;
 
   AddCustomFieldUseCase(this.repository);
+
+  @override
+  Permission get requiredPermission => Permission.projectUpdateProject;
+
+  @override
+  String? getProjectId(AddCustomFieldParams params) => params.projectId;
 
   @override
   Future<Either<Failure, CustomFieldEntity>> call({

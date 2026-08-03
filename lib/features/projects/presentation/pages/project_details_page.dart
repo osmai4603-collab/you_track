@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_icons.dart';
-import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/constants/app_radius.dart';
+import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import '../cubits/project_details_cubit.dart';
 
 /// صفحة 6: عرض تفاصيل المشروع مع التبويبات الداخلية والشريط الجانبي
@@ -28,154 +30,137 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
     final localization = AppLocalizations.of(context)!;
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final tabs = [
+      'Issues',
+      'Agile Boards',
+      'Gantt Charts',
+      'Knowledge Base',
+      'Settings',
+    ];
+    final tabIcons = [
+      AppIcons.issues,
+      AppIcons.board,
+      AppIcons.ganttChart,
+      AppIcons.knowledgeBase,
+      AppIcons.settings,
+    ];
 
     return BlocBuilder<ProjectDetailsCubit, ProjectDetailsState>(
       builder: (context, state) {
+        Widget content;
+
         if (state.status == ProjectDetailsStatus.loading) {
-          return const Center(child: CircularProgressIndicator());
-        }
-        if (state.status == ProjectDetailsStatus.failure) {
-          return Center(
+          content = Center(
+            key: const ValueKey('project-details-loading'),
+            child: SizedBox(
+              width: 480,
+              child: ShimmerLoading.list(itemCount: 6),
+            ),
+          );
+        } else if (state.status == ProjectDetailsStatus.failure) {
+          content = Center(
+            key: const ValueKey('project-details-error'),
             child: SelectableText(
               state.errorMessage ?? 'Error',
               style: textTheme.bodyMedium?.copyWith(color: colors.error),
             ),
           );
-        }
-
-        final project = state.project;
-        if (project == null) {
-          return const Center(child: CircularProgressIndicator());
-        }
-
-        final tabs = [
-          'Issues',
-          'Agile Boards',
-          'Gantt Charts',
-          'Knowledge Base',
-          'Settings',
-        ];
-        final tabIcons = [
-          AppIcons.issues,
-          AppIcons.board,
-          AppIcons.ganttChart,
-          AppIcons.knowledgeBase,
-          AppIcons.settings,
-        ];
-
-        return Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ProjectsHeader(
-            //   breadcrumbs: [
-            //     BreadcrumbItem(
-            //       title: localization.projectsTitle,
-            //       onTap: (ctx) => ctx.go(AppRouteKeys.projects),
-            //     ),
-            //     BreadcrumbItem(title: project.name),
-            //   ],
-            // ),
-            // ── التبويبات الداخلية ──────────────────────────
-            Container(
-              decoration: BoxDecoration(
-                border: Border(
-                  bottom: BorderSide(color: colors.outlineVariant, width: 0.5),
-                ),
+        } else {
+          final project = state.project;
+          if (project == null) {
+            content = Center(
+              key: const ValueKey('project-details-loading'),
+              child: SizedBox(
+                width: 480,
+                child: ShimmerLoading.list(itemCount: 6),
               ),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.small,
-                ),
-                child: Row(
-                  children: List.generate(tabs.length, (index) {
-                    final isSelected = state.activeTabIndex == index;
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: AppSpacing.extraSmall,
-                      ),
-
-                      child: InkWell(
-                        onTap: () {
-                          context.read<ProjectDetailsCubit>().changeTab(index);
-                        },
-                        child: Container(
+            );
+          } else {
+            content = Column(
+              key: const ValueKey('project-details-loaded'),
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(color: colors.outlineVariant, width: 0.5),
+                    ),
+                  ),
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.small),
+                    child: Row(
+                      children: List.generate(tabs.length, (index) {
+                        final isSelected = state.activeTabIndex == index;
+                        return Padding(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.small,
-                            vertical: AppSpacing.small,
+                            horizontal: AppSpacing.extraSmall,
                           ),
-                          decoration: BoxDecoration(
-                            border: Border(
-                              bottom: BorderSide(
-                                color: isSelected
-                                    ? colors.primary
-                                    : Colors.transparent,
-                                width: 2,
+                          child: InkWell(
+                            onTap: () {
+                              context.read<ProjectDetailsCubit>().changeTab(index);
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: AppSpacing.small,
+                                vertical: AppSpacing.small,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: isSelected
+                                        ? colors.primary
+                                        : Colors.transparent,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    tabIcons[index],
+                                    size: 14,
+                                    color: isSelected
+                                        ? colors.primary
+                                        : colors.onSurfaceVariant,
+                                  ),
+                                  const SizedBox(width: AppSpacing.extraSmall),
+                                  Text(
+                                    tabs[index],
+                                    style: textTheme.labelSmall?.copyWith(
+                                      color: isSelected
+                                          ? colors.primary
+                                          : colors.onSurfaceVariant,
+                                      fontWeight: isSelected
+                                          ? FontWeight.w600
+                                          : FontWeight.normal,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                tabIcons[index],
-                                size: 14,
-                                color: isSelected
-                                    ? colors.primary
-                                    : colors.onSurfaceVariant,
-                              ),
-                              const SizedBox(width: AppSpacing.extraSmall),
-                              Text(
-                                tabs[index],
-                                style: textTheme.labelSmall?.copyWith(
-                                  color: isSelected
-                                      ? colors.primary
-                                      : colors.onSurfaceVariant,
-                                  fontWeight: isSelected
-                                      ? FontWeight.w600
-                                      : FontWeight.normal,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }),
+                        );
+                      }),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-            // ── المحتوى الرئيسي ──────────────────────────
-            Expanded(
-              child: Row(
-                children: [
-                  // المحتوى الأساسي
-                  Expanded(
-                    child: _buildTabContent(
-                      context,
-                      state,
-                      colors,
-                      textTheme,
-                      localization,
-                    ),
+                const SizedBox(height: AppSpacing.medium),
+                Expanded(
+                  child: _buildTabContent(
+                    context,
+                    state,
+                    colors,
+                    textTheme,
+                    localization,
                   ),
-                  // الشريط الجانبي
-                  Container(
-                    width: 220,
-                    decoration: BoxDecoration(
-                      border: Border(
-                        left: BorderSide(
-                          color: colors.outlineVariant,
-                          width: 0.5,
-                        ),
-                      ),
-                    ),
-                    child: _buildSidebar(context, colors, textTheme),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        );
+                ),
+              ],
+            );
+          }
+        }
+
+        return AnimatedContentSwitcher(child: content);
       },
     );
   }
@@ -188,9 +173,9 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
     AppLocalizations localization,
   ) {
     switch (state.activeTabIndex) {
-      case 0: // Issues
+      case 0:
         return _buildIssuesTab(context, state, colors, textTheme, localization);
-      case 1: // Agile Boards
+      case 1:
         return _buildAgileBoardsTab(context, colors, textTheme, localization);
       default:
         return Center(
@@ -213,7 +198,6 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
   ) {
     return Column(
       children: [
-        // شريط البحث
         Padding(
           padding: const EdgeInsets.all(AppSpacing.small),
           child: TextField(
@@ -230,7 +214,6 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
             ),
           ),
         ),
-        // رسالة عدم وجود مشكلات
         Expanded(
           child: Center(
             child: Column(
@@ -312,59 +295,6 @@ class _ProjectDetailsPageState extends State<ProjectDetailsPage> {
           }),
         ],
       ),
-    );
-  }
-
-  Widget _buildSidebar(
-    BuildContext context,
-    ColorScheme colors,
-    TextTheme textTheme,
-  ) {
-    final sidebarItems = [('Drafts', AppIcons.drafts), ('Tags', AppIcons.tag)];
-    final savedSearches = [
-      'Assigned to me',
-      'Commented by me',
-      'Reported by me',
-      'Unassigned',
-    ];
-
-    return ListView(
-      padding: const EdgeInsets.symmetric(vertical: AppSpacing.small),
-      children: [
-        ...sidebarItems.map((item) {
-          return ListTile(
-            dense: true,
-            leading: Icon(item.$2, size: 16),
-            title: Text(item.$1, style: textTheme.bodySmall),
-            onTap: () {},
-          );
-        }),
-        Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: AppSpacing.medium,
-            vertical: AppSpacing.small,
-          ),
-          child: Text(
-            'Saved Searches',
-            style: textTheme.labelSmall?.copyWith(
-              color: colors.onSurfaceVariant,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-        ),
-        ...savedSearches.map((search) {
-          return ListTile(
-            dense: true,
-            leading: Icon(
-              AppIcons.savedSearch,
-              size: 14,
-              color: colors.onSurfaceVariant,
-            ),
-            title: Text(search, style: textTheme.bodySmall),
-            onTap: () {},
-          );
-        }),
-      ],
     );
   }
 }

@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_event.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_state.dart';
 import 'package:issues_tracking/features/groups/presentation/pages/group_form_page.dart';
 import 'package:issues_tracking/features/groups/presentation/widgets/groups_table_view.dart';
+import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
 
 class GroupsPage extends StatefulWidget {
   final String? userId;
@@ -23,7 +27,7 @@ class _GroupsPageState extends State<GroupsPage> {
   @override
   void initState() {
     super.initState();
-    context.read<GroupsBloc>().add(const LoadGroups());
+    context.read<GroupsBloc>().add(LoadGroups(userId: widget.userId));
   }
 
   @override
@@ -37,12 +41,20 @@ class _GroupsPageState extends State<GroupsPage> {
     return BlocBuilder<GroupsBloc, GroupsState>(
       builder: (context, state) {
         final showPanel = state is GroupsLoaded && state.selectedGroupId != null;
+        Widget content;
+
         if (state is GroupsLoading) {
-          return const Center(child: CircularProgressIndicator());
+          content = ShimmerLoading.table(
+            key: const ValueKey('groups-loading'),
+          );
         } else if (state is GroupsError) {
-          return Center(child: SelectableText(state.message));
+          content = Center(
+            key: const ValueKey('groups-error'),
+            child: SelectableText(state.message),
+          );
         } else if (state is GroupsLoaded) {
-          return Stack(
+          content = Stack(
+            key: const ValueKey('groups-loaded'),
             children: [
               Column(
                 children: [
@@ -53,11 +65,12 @@ class _GroupsPageState extends State<GroupsPage> {
                       children: [
                         Expanded(child: _buildSearchField()),
                         const SizedBox(width: 8),
-                        FilledButton.icon(
-                          onPressed: () => context.push(AppRouteKeys.createGroup),
-                          icon: const Icon(Icons.add, size: 18),
-                          label: const Text('Add group'),
-                        ),
+                        if (context.watch<UserSession>().hasPermission(Permission.systemLowLevelAdminWrite))
+                          FilledButton.icon(
+                            onPressed: () => context.push(AppRouteKeys.createGroup),
+                            icon: const Icon(Icons.add, size: 18),
+                            label: const Text('Add group'),
+                          ),
                       ],
                     ),
                   ),
@@ -81,8 +94,11 @@ class _GroupsPageState extends State<GroupsPage> {
               ),
             ],
           );
+        } else {
+          content = const SizedBox.shrink(key: ValueKey('groups-empty'));
         }
-        return const SizedBox.shrink();
+
+        return AnimatedContentSwitcher(child: content);
       },
     );
   }

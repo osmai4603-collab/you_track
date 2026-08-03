@@ -1,4 +1,5 @@
 import 'package:fpdart/fpdart.dart';
+import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/usecase/usecase.dart';
 import 'package:issues_tracking/core/enums/tag_permission_scope_enum.dart';
@@ -6,10 +7,16 @@ import 'package:issues_tracking/core/enums/tag_subscription_event_enum.dart';
 import '../entities/tag.dart';
 import '../repositories/tags_repository.dart';
 
-class CreateTag implements UseCase<Tag, CreateTagParams> {
+class CreateTag extends UseCase<Tag, CreateTagParams> {
   final TagsRepository repository;
 
   CreateTag(this.repository);
+
+  @override
+  Permission get requiredPermission => Permission.projectReadProjectBasic;
+
+  @override
+  String? getProjectId(CreateTagParams params) => params.projectId;
 
   @override
   Future<Either<Failure, Tag>> call({required CreateTagParams params}) {
@@ -52,14 +59,14 @@ class CreateTagParams extends Params {
 
   @override
   List<Object?> get props => [
-        name,
-        projectId,
-        ownerId,
-        shared,
-        removeOnResolution,
-        favorite,
-        permissions,
-        specificUserIds,
-        subscriptions,
-      ];
+    name,
+    projectId,
+    ownerId,
+    shared,
+    removeOnResolution,
+    favorite,
+    permissions,
+    specificUserIds,
+    subscriptions,
+  ];
 }

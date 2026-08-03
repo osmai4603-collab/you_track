@@ -6,6 +6,8 @@ import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.dart';
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_state.dart';
 import 'package:issues_tracking/features/groups/domain/entities/group_entity.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import '../cubits/project_members_cubit.dart';
 
 /// صفحة 7: إدارة أعضاء الفريق والأدوار للمشروع
@@ -49,76 +51,84 @@ class _ProjectMembersPageState extends State<ProjectMembersPage> {
         Expanded(
           child: BlocBuilder<ProjectMembersCubit, ProjectMembersState>(
             builder: (context, state) {
+              Widget content;
+
               if (state.status == ProjectMembersStatus.loading) {
-                return const Center(child: CircularProgressIndicator());
+                content = Center(
+                  key: const ValueKey('project-members-loading'),
+                  child: SizedBox(width: 480, child: ShimmerLoading.list(itemCount: 6)),
+                );
+              } else {
+                // قراءة المجموعات المرتبطة بالمشروع
+                final groupsState = context.read<GroupsBloc>().state;
+                List<GroupEntity> projectGroups = [];
+                if (groupsState is GroupsLoaded) {
+                  projectGroups = groupsState.groups.where((g) => g.projects.any((p) => p.projectId == widget.projectId)).toList();
+                }
+
+                final teamMembers = state.members
+                    .where((m) => m.isOwner || m.roles.contains('Project Admin'))
+                    .toList();
+                final otherMembers = state.members
+                    .where(
+                      (m) => !m.isOwner && !m.roles.contains('Project Admin'),
+                    )
+                    .toList();
+
+                content = ListView(
+                  key: const ValueKey('project-members-loaded'),
+                  padding: AppSpacing.paddingAllMedium,
+                  children: [
+                    // فريق المشروع
+                    if (teamMembers.isNotEmpty || projectGroups.isNotEmpty) ...[
+                      Text(
+                        localization.projectTeamTitle,
+                        style: textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.small),
+                      // عرض المجموعات ككيانات
+                      ...projectGroups.map(
+                        (group) => _buildGroupTile(group, widget.projectId, colors, textTheme),
+                      ),
+                      ...teamMembers.map(
+                        (member) => _buildMemberTile(
+                          member.name,
+                          member.email,
+                          member.roles,
+                          member.isOwner,
+                          colors,
+                          textTheme,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.large),
+                    ],
+                    // أشخاص آخرون
+                    if (otherMembers.isNotEmpty) ...[
+                      Text(
+                        localization.otherPeopleAccessTitle,
+                        style: textTheme.titleSmall?.copyWith(
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: AppSpacing.small),
+                      ...otherMembers.map(
+                        (member) => _buildMemberTile(
+                          member.name,
+                          member.email,
+                          member.roles,
+                          member.isOwner,
+                          colors,
+                          textTheme,
+                        ),
+                      ),
+                    ],
+                  ],
+                );
               }
 
-              // قراءة المجموعات المرتبطة بالمشروع
-              final groupsState = context.read<GroupsBloc>().state;
-              List<GroupEntity> projectGroups = [];
-              if (groupsState is GroupsLoaded) {
-                projectGroups = groupsState.groups.where((g) => g.projects.any((p) => p.projectId == widget.projectId)).toList();
-              }
-
-              final teamMembers = state.members
-                  .where((m) => m.isOwner || m.roles.contains('Project Admin'))
-                  .toList();
-              final otherMembers = state.members
-                  .where(
-                    (m) => !m.isOwner && !m.roles.contains('Project Admin'),
-                  )
-                  .toList();
-
-              return ListView(
-                padding: AppSpacing.paddingAllMedium,
-                children: [
-                  // فريق المشروع
-                  if (teamMembers.isNotEmpty || projectGroups.isNotEmpty) ...[
-                    Text(
-                      localization.projectTeamTitle,
-                      style: textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.small),
-                    // عرض المجموعات ككيانات
-                    ...projectGroups.map(
-                      (group) => _buildGroupTile(group, widget.projectId, colors, textTheme),
-                    ),
-                    ...teamMembers.map(
-                      (member) => _buildMemberTile(
-                        member.name,
-                        member.email,
-                        member.roles,
-                        member.isOwner,
-                        colors,
-                        textTheme,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.large),
-                  ],
-                  // أشخاص آخرون
-                  if (otherMembers.isNotEmpty) ...[
-                    Text(
-                      localization.otherPeopleAccessTitle,
-                      style: textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.small),
-                    ...otherMembers.map(
-                      (member) => _buildMemberTile(
-                        member.name,
-                        member.email,
-                        member.roles,
-                        member.isOwner,
-                        colors,
-                        textTheme,
-                      ),
-                    ),
-                  ],
-                ],
-              );
+              return AnimatedContentSwitcher(child: content);
             },
           ),
         ),

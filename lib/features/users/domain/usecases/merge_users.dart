@@ -17,7 +17,7 @@ class MergeUsersParams extends Params {
   List<Object?> get props => [primaryUserId, secondaryUserId];
 }
 
-class MergeUsers extends UseCasePermission<UserEntity, MergeUsersParams> {
+class MergeUsers extends UseCase<UserEntity, MergeUsersParams> {
   final UsersRepository repository;
   MergeUsers(this.repository);
 
@@ -25,7 +25,7 @@ class MergeUsers extends UseCasePermission<UserEntity, MergeUsersParams> {
   Permission get requiredPermission => .systemLowLevelAdminWrite;
 
   @override
-  Future<Either<Failure, UserEntity>> execute({
+  Future<Either<Failure, UserEntity>> call({
     required MergeUsersParams params,
   }) async {
     final primaryResult = await repository.getUserById(params.primaryUserId);

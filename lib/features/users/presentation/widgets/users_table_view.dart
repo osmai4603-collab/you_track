@@ -5,6 +5,7 @@ import 'package:issues_tracking/features/users/presentation/bloc/users_bloc.dart
 import 'package:issues_tracking/features/users/presentation/bloc/users_event.dart';
 import 'package:issues_tracking/features/users/presentation/bloc/users_state.dart';
 import 'package:issues_tracking/features/users/presentation/widgets/user_table_row.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 
 class UsersTableView extends StatelessWidget {
   const UsersTableView({super.key});
@@ -77,7 +78,7 @@ class UsersTableView extends StatelessWidget {
           );
         }
 
-        return const Center(child: CircularProgressIndicator());
+        return ShimmerLoading.table();
       },
     );
   }

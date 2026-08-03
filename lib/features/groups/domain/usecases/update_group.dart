@@ -40,7 +40,7 @@ class UpdateGroupParams extends Params {
   ];
 }
 
-class UpdateGroup extends UseCasePermission<GroupEntity, UpdateGroupParams> {
+class UpdateGroup extends UseCase<GroupEntity, UpdateGroupParams> {
   final GroupsRepository repository;
 
   UpdateGroup(this.repository);
@@ -49,7 +49,9 @@ class UpdateGroup extends UseCasePermission<GroupEntity, UpdateGroupParams> {
   Permission get requiredPermission => Permission.systemLowLevelAdminWrite;
 
   @override
-  Future<Either<Failure, GroupEntity>> execute({required UpdateGroupParams params}) {
+  Future<Either<Failure, GroupEntity>> call({
+    required UpdateGroupParams params,
+  }) {
     return repository.updateGroup(
       GroupEntity(
         id: params.id,
@@ -63,6 +65,4 @@ class UpdateGroup extends UseCasePermission<GroupEntity, UpdateGroupParams> {
       ),
     );
   }
-
-  
 }

@@ -4,8 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/enums/issue_state_enum.dart';
-import 'package:issues_tracking/core/enums/issue_subsystem_enum.dart';
+
 import 'package:issues_tracking/core/init_dependencies.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import 'package:issues_tracking/core/theme/app_text_theme.dart';
 import 'package:issues_tracking/core/widgets/youtrack_state.dart';
 import 'package:issues_tracking/features/agile_boards/domain/entities/agile_board.dart';
@@ -13,6 +15,7 @@ import 'package:issues_tracking/features/agile_boards/presentation/bloc/agile_bo
 import 'package:issues_tracking/features/agile_boards/presentation/bloc/agile_boards_event.dart';
 import 'package:issues_tracking/features/agile_boards/presentation/bloc/agile_boards_state.dart';
 import 'package:issues_tracking/features/agile_boards/presentation/widgets/board_column_widget.dart';
+import 'package:issues_tracking/features/projects/domain/entities/subsystem_entity.dart';
 
 class AgileBoardViewPage extends StatefulWidget {
   final String projectId;
@@ -79,10 +82,18 @@ class _AgileBoardViewPageState extends YouTrackState<AgileBoardViewPage> {
         // ),
         body: BlocBuilder<AgileBoardsBloc, AgileBoardsState>(
           builder: (context, state) {
+            Widget content;
             if (state is AgileBoardsLoading) {
-              return const Center(child: CircularProgressIndicator());
+              content = Center(
+                key: const ValueKey('agile-board-loading'),
+                child: SizedBox(
+                  width: 480,
+                  child: ShimmerLoading.list(itemCount: 6),
+                ),
+              );
             } else if (state is AgileBoardsError) {
-              return Center(
+              content = Center(
+                key: const ValueKey('agile-board-error'),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -97,7 +108,8 @@ class _AgileBoardViewPageState extends YouTrackState<AgileBoardViewPage> {
             } else if (state is AgileBoardsLoaded) {
               final board = state.board;
 
-              return Column(
+              content = Column(
+                key: const ValueKey('agile-board-loaded'),
                 children: [
                   // Kanban Grid
                   _bildHeaders(colors, board),
@@ -185,9 +197,13 @@ class _AgileBoardViewPageState extends YouTrackState<AgileBoardViewPage> {
                   ),
                 ],
               );
+            } else {
+              content = const SizedBox.shrink(
+                key: ValueKey('agile-board-empty'),
+              );
             }
 
-            return const SizedBox.shrink();
+            return AnimatedContentSwitcher(child: content);
           },
         ),
       ),
@@ -222,7 +238,7 @@ class _AgileBoardViewPageState extends YouTrackState<AgileBoardViewPage> {
     );
   }
 
-  void _navigateToAddIssue(IssueSubsystemEnum subsystem, IssueStateEnum state) {
+  void _navigateToAddIssue(SubsystemEntity subsystem, IssueStateEnum state) {
     // In the future this should navigate to IssueFormPage with initial subsystem and state.
     // For now we just show a snackbar or navigate to the form.
     context.push(AppRouteKeys.createIssue);

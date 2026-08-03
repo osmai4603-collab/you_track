@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/entities/issue_data.dart';
+import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
+import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
 import 'package:issues_tracking/core/widgets/text_hover_widget.dart';
 import 'package:issues_tracking/features/issues/data/datasources/issues_remote_data_source.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_details_cubit.dart';
@@ -181,41 +183,51 @@ class _ProjectNotificationsSettingsSectionState
           _loadIssuesForProject(projectId);
         }
 
+        Widget content;
         if (state.status == ProjectDetailsStatus.loading) {
-          return const Center(child: CircularProgressIndicator());
+          content = Center(
+            key: const ValueKey('project-notifications-loading'),
+            child: SizedBox(
+              width: 480,
+              child: ShimmerLoading.list(itemCount: 6),
+            ),
+          );
+        } else {
+          content = Stack(
+            key: const ValueKey('project-notifications-loaded'),
+            children: [
+              SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _buildSenderSettingsSection(colors, textTheme),
+                    const SizedBox(height: 24),
+                    _buildTemplatesToolbar(colors, textTheme),
+                    const SizedBox(height: 24),
+                    _buildTemplatesTreeTable(colors, textTheme),
+                    const SizedBox(height: 100),
+                  ],
+                ),
+              ),
+              Positioned(
+                bottom: 24,
+                right: 24,
+                child: FloatingActionButton(
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Help action triggered')),
+                    );
+                  },
+                  backgroundColor: colors.primary,
+                  child: const Icon(Icons.lightbulb, color: Colors.white),
+                ),
+              ),
+            ],
+          );
         }
 
-        return Stack(
-          children: [
-            SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildSenderSettingsSection(colors, textTheme),
-                  const SizedBox(height: 24),
-                  _buildTemplatesToolbar(colors, textTheme),
-                  const SizedBox(height: 24),
-                  _buildTemplatesTreeTable(colors, textTheme),
-                  const SizedBox(height: 100),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: 24,
-              right: 24,
-              child: FloatingActionButton(
-                onPressed: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Help action triggered')),
-                  );
-                },
-                backgroundColor: colors.primary,
-                child: const Icon(Icons.lightbulb, color: Colors.white),
-              ),
-            ),
-          ],
-        );
+        return AnimatedContentSwitcher(child: content);
       },
     );
   }

@@ -14,8 +14,7 @@ class CreateProjectParams extends Params {
   List<Object?> get props => [project];
 }
 
-class CreateProjectUseCase
-    extends UseCasePermission<ProjectEntity, CreateProjectParams> {
+class CreateProjectUseCase extends UseCase<ProjectEntity, CreateProjectParams> {
   final ProjectsRepository repository;
 
   CreateProjectUseCase(this.repository);
@@ -24,7 +23,9 @@ class CreateProjectUseCase
   Permission get requiredPermission => Permission.projectCreateProject;
 
   @override
-  Future<Either<Failure, ProjectEntity>> execute({required CreateProjectParams params}) {
+  Future<Either<Failure, ProjectEntity>> call({
+    required CreateProjectParams params,
+  }) {
     return repository.createProject(params.project);
   }
 }

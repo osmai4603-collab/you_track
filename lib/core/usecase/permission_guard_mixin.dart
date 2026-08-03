@@ -10,6 +10,7 @@ mixin PermissionGuardMixin<ReturnType, ParamsType> {
   Future<Either<Failure, ReturnType>> runWithPermissionCheck({
     required Future<Either<Failure, ReturnType>> Function() action,
     Permission? permission,
+    String? projectId,
   }) async {
     final userSession = GetIt.instance<UserSession>();
 
@@ -20,7 +21,7 @@ mixin PermissionGuardMixin<ReturnType, ParamsType> {
     }
 
     final effectivePermission = permission ?? requiredPermission;
-    if (!userSession.hasPermission(effectivePermission)) {
+    if (!userSession.hasPermission(effectivePermission, projectId: projectId)) {
       return Left(
         PermissionDeniedFailure(
           'The current user does not have permission to execute this operation',
