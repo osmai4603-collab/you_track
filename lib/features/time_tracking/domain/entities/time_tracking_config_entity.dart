@@ -21,7 +21,7 @@ class TimeTrackingConfigEntity extends Entity {
 
   @override
   TimeTrackingConfigEntity copyWith({
-    String? projectKey,
+    String? projectId,
     bool? enabled,
     String? estimationFieldId,
     String? spentTimeFieldId,
@@ -30,7 +30,7 @@ class TimeTrackingConfigEntity extends Entity {
     DateTime? updatedAt,
   }) {
     return TimeTrackingConfigEntity(
-      projectId: projectKey ?? this.projectId,
+      projectId: projectId ?? this.projectId,
       enabled: enabled ?? this.enabled,
       estimationFieldId: estimationFieldId ?? this.estimationFieldId,
       spentTimeFieldId: spentTimeFieldId ?? this.spentTimeFieldId,

@@ -424,7 +424,7 @@ class IssueFormCubit extends Cubit<IssueFormState> {
       issueType: state.issueType,
       assigneeId: state.assignee?.userId,
       reporterId: userSession.currentUser!.id,
-      reporterName: userSession.currentUser?.fullName ?? 'Anonymous',
+      buildId: state.build?.id,
       subsystemId: state.subsystem?.id,
       fixVersions: state.fixVersions,
       build: state.build,

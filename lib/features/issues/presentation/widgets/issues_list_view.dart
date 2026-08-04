@@ -248,12 +248,12 @@ class _IssueListCard extends StatelessWidget {
                           ),
                         ),
                     const Spacer(),
-                    if (issue.assigneeName != null) ...[
+                    if (issue.assigneeId != null) ...[
                       CircleAvatar(
                         radius: 10,
                         backgroundColor: colors.primaryContainer,
                         child: Text(
-                          issue.assigneeName![0].toUpperCase(),
+                          issue.assigneeId![0].toUpperCase(),
                           style: textTheme.labelSmall?.copyWith(
                             color: colors.onPrimaryContainer,
                             fontSize: 10,
@@ -262,7 +262,7 @@ class _IssueListCard extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        issue.assigneeName!,
+                        issue.assigneeId ?? '',
                         style: textTheme.labelSmall?.copyWith(
                           color: colors.onSurfaceVariant,
                         ),

@@ -28,7 +28,7 @@ class ProjectMemberEntity extends Entity {
   @override
   ProjectMemberEntity copyWith({
     String? id,
-    String? projectKey,
+    String? projectId,
     List<String>? roles,
     bool? isOwner,
     String? userId,
@@ -36,7 +36,7 @@ class ProjectMemberEntity extends Entity {
   }) {
     return ProjectMemberEntity(
       id: id ?? this.id,
-      projectId: projectKey ?? this.projectId,
+      projectId: projectId ?? this.projectId,
       roles: roles ?? this.roles,
       isOwner: isOwner ?? this.isOwner,
       userId: userId ?? this.userId,

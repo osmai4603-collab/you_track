@@ -47,7 +47,7 @@ class CustomFieldEntity extends Entity {
   @override
   CustomFieldEntity copyWith({
     String? id,
-    String? projectKey,
+    String? projectId,
     String? name,
     CustomFieldEnumType? fieldType,
     String? fieldMode,
@@ -68,7 +68,7 @@ class CustomFieldEntity extends Entity {
   }) {
     return CustomFieldEntity(
       id: id ?? this.id,
-      projectId: projectKey ?? this.projectId,
+      projectId: projectId ?? this.projectId,
       name: name ?? this.name,
       fieldType: fieldType ?? this.fieldType,
       fieldMode: fieldMode ?? this.fieldMode,

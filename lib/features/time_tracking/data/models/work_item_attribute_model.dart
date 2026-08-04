@@ -45,13 +45,13 @@ class WorkItemAttributeModel extends WorkItemAttributeEntity {
   WorkItemAttributeModel copyWith({
     String? id,
     String? name,
-    String? projectKey,
+    String? projectId,
     List<WorkItemAttributeValueEntity>? values,
   }) {
     return WorkItemAttributeModel(
       id: id ?? this.id,
       name: name ?? this.name,
-      projectId: projectKey ?? this.projectId,
+      projectId: projectId ?? this.projectId,
       values: values ?? this.values,
     );
   }

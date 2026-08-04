@@ -177,14 +177,14 @@ class _IssueTableRowState extends State<IssueTableRow> {
               ),
               SizedBox(
                 width: 120,
-                child: issue.assigneeName != null
+                child: issue.assigneeId != null
                     ? Row(
                         children: [
                           CircleAvatar(
                             radius: 10,
                             backgroundColor: colors.primaryContainer,
                             child: Text(
-                              issue.assigneeName![0].toUpperCase(),
+                              issue.assigneeId![0].toUpperCase(),
                               style: textTheme.labelSmall?.copyWith(
                                 color: colors.onPrimaryContainer,
                                 fontSize: 10,
@@ -194,7 +194,7 @@ class _IssueTableRowState extends State<IssueTableRow> {
                           const SizedBox(width: 6),
                           Flexible(
                             child: TextHoverWidget(
-                              text: issue.assigneeName ?? 'Unassigned',
+                              text: issue.assigneeId ?? 'Unassigned',
                               style: textTheme.bodyMedium!.copyWith(
                                 fontWeight: .w600,
                                 color: colors.primary,
@@ -211,7 +211,7 @@ class _IssueTableRowState extends State<IssueTableRow> {
                         ],
                       )
                     : TextHoverWidget(
-                        text: issue.assigneeName ?? 'Unassigned',
+                        text: issue.assigneeId ?? 'Unassigned',
                         style: textTheme.bodyMedium!.copyWith(
                           fontWeight: .w600,
                           color: colors.primary,

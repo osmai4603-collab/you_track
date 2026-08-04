@@ -24,7 +24,7 @@ class WorkTypeEntity extends Entity {
   @override
   WorkTypeEntity copyWith({
     String? id,
-    String? projectKey,
+    String? projectId,
     String? name,
     String? description,
     bool? isActive,
@@ -34,7 +34,7 @@ class WorkTypeEntity extends Entity {
   }) {
     return WorkTypeEntity(
       id: id ?? this.id,
-      projectId: projectKey ?? this.projectId,
+      projectId: projectId ?? this.projectId,
       name: name ?? this.name,
       description: description ?? this.description,
       isActive: isActive ?? this.isActive,

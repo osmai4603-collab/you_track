@@ -229,14 +229,14 @@ class _FieldsSection extends StatelessWidget {
             label: 'Assignee',
             colors: colors,
             textTheme: textTheme,
-            child: issue.assigneeName != null
+            child: issue.assigneeId != null
                 ? Row(
                     children: [
                       CircleAvatar(
                         radius: 10,
                         backgroundColor: colors.primaryContainer,
                         child: Text(
-                          issue.assigneeName!.isNotEmpty ? issue.assigneeName![0].toUpperCase() : '?',
+                          issue.assigneeId ?? '?',
                           style: textTheme.labelSmall?.copyWith(
                             color: colors.onPrimaryContainer,
                             fontSize: 10,
@@ -245,7 +245,7 @@ class _FieldsSection extends StatelessWidget {
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        issue.assigneeName!,
+                        issue.assigneeId ?? '',
                         style: textTheme.bodySmall?.copyWith(
                           color: colors.onSurface,
                         ),
@@ -270,7 +270,7 @@ class _FieldsSection extends StatelessWidget {
                   radius: 10,
                   backgroundColor: colors.tertiaryContainer,
                   child: Text(
-                    issue.reporterName.isNotEmpty ? issue.reporterName[0].toUpperCase() : '?',
+                    issue.reporterId?.isNotEmpty == true ? issue.reporterId![0].toUpperCase() : '?',
                     style: textTheme.labelSmall?.copyWith(
                       color: colors.onTertiaryContainer,
                       fontSize: 10,
@@ -279,7 +279,7 @@ class _FieldsSection extends StatelessWidget {
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  issue.reporterName,
+                  issue.reporterId ?? '',
                   style: textTheme.bodySmall?.copyWith(color: colors.onSurface),
                 ),
               ],

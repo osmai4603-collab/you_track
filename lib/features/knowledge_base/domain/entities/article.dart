@@ -30,7 +30,7 @@ class Article extends Entity {
   @override
   Article copyWith({
     String? id,
-    String? projectKey,
+    String? projectId,
     String? parentId,
     bool clearParentId = false,
     String? title,
@@ -44,7 +44,7 @@ class Article extends Entity {
   }) {
     return Article(
       id: id ?? this.id,
-      projectId: projectKey ?? this.projectId,
+      projectId: projectId ?? this.projectId,
       parentId: clearParentId ? null : (parentId ?? this.parentId),
       title: title ?? this.title,
       contentMarkdown: contentMarkdown ?? this.contentMarkdown,

@@ -21,7 +21,7 @@ class SubsystemEntity extends Entity {
   SubsystemEntity copyWith({
     String? id,
     String? name,
-    String? projectKey,
+    String? projectId,
     String? ownerId,
     SubsystemEntity? subsystemType,
     int? color,
@@ -30,7 +30,7 @@ class SubsystemEntity extends Entity {
     return SubsystemEntity(
       id: id ?? this.id,
       name: name ?? this.name,
-      projectId: projectKey ?? this.projectId,
+      projectId: projectId ?? this.projectId,
       ownerId: ownerId ?? this.ownerId,
       color: color ?? this.color,
       firstLetter: firstLetter ?? this.firstLetter,

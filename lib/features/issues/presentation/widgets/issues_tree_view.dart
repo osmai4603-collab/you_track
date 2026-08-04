@@ -244,12 +244,12 @@ class _TreeNodeWidget extends StatelessWidget {
                     localization: localization,
                   ),
                   const SizedBox(width: AppSpacing.small),
-                  if (issue.assigneeName != null)
+                  if (issue.assigneeId != null)
                     CircleAvatar(
                       radius: 9,
                       backgroundColor: colors.primaryContainer,
                       child: Text(
-                        issue.assigneeName![0].toUpperCase(),
+                        issue.assigneeId![0].toUpperCase(),
                         style: textTheme.labelSmall?.copyWith(
                           color: colors.onPrimaryContainer,
                           fontSize: 9,

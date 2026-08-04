@@ -17,12 +17,11 @@ class Issue extends Entity {
   final IssuePriorityTypeEnum priority;
   final IssueTypeEnum issueType;
   final String? assigneeId;
-  final String? assigneeName;
   final String? assigneeAvatarUrl;
   final String reporterId;
-  final String reporterName;
   final String? subsystemId;
   final String fixVersions;
+  final String? buildId;
   final Build? build;
   final List<Tag> tags;
   final DateTime createdAt;
@@ -52,11 +51,10 @@ class Issue extends Entity {
     this.priority = IssuePriorityTypeEnum.normal,
     this.issueType = IssueTypeEnum.task,
     this.assigneeId,
-    this.assigneeName,
     this.assigneeAvatarUrl,
     required this.reporterId,
-    required this.reporterName,
     this.subsystemId,
+    this.buildId,
     this.fixVersions = '',
     this.build,
     this.tags = const [],
@@ -79,7 +77,7 @@ class Issue extends Entity {
   @override
   Issue copyWith({
     String? id,
-    String? projectKey,
+    String? projectId,
     int? issueNumber,
     String? summary,
     String? description,
@@ -87,7 +85,7 @@ class Issue extends Entity {
     IssuePriorityTypeEnum? priority,
     IssueTypeEnum? issueType,
     String? assigneeId,
-    String? assigneeName,
+    String? buildId,
     String? assigneeAvatarUrl,
     bool clearAssignee = false,
     String? reporterId,
@@ -118,7 +116,7 @@ class Issue extends Entity {
     return Issue(
       id: id ?? this.id,
       issueKey: issueKey,
-      projectId: projectKey ?? this.projectId,
+      projectId: projectId ?? this.projectId,
       issueNumber: issueNumber ?? this.issueNumber,
       summary: summary ?? this.summary,
       description: description ?? this.description,
@@ -126,12 +124,11 @@ class Issue extends Entity {
       priority: priority ?? this.priority,
       issueType: issueType ?? this.issueType,
       assigneeId: clearAssignee ? null : (assigneeId ?? this.assigneeId),
-      assigneeName: clearAssignee ? null : (assigneeName ?? this.assigneeName),
+      buildId: buildId ?? this.buildId,
       assigneeAvatarUrl: clearAssignee
           ? null
           : (assigneeAvatarUrl ?? this.assigneeAvatarUrl),
       reporterId: reporterId ?? this.reporterId,
-      reporterName: reporterName ?? this.reporterName,
       subsystemId: subsystemId ?? this.subsystemId,
       fixVersions: fixVersions ?? this.fixVersions,
       build: clearBuild ? null : (build ?? this.build),
@@ -164,10 +161,9 @@ class Issue extends Entity {
     priority,
     issueType,
     assigneeId,
-    assigneeName,
+    buildId,
     assigneeAvatarUrl,
     reporterId,
-    reporterName,
     subsystemId,
     fixVersions,
     build,

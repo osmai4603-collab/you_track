@@ -43,7 +43,7 @@ class ProjectEntity extends Entity {
   ProjectEntity copyWith({
     String? id,
     String? name,
-    String? projectKey,
+    String? projectId,
     String? description,
     bool? isArchived,
     ProjectTemplateType? templateType,
@@ -62,7 +62,7 @@ class ProjectEntity extends Entity {
     return ProjectEntity(
       id: id ?? this.id,
       name: name ?? this.name,
-      projectKey: projectKey ?? this.projectKey,
+      projectKey: projectId ?? this.projectKey,
       description: description ?? this.description,
       isArchived: isArchived ?? this.isArchived,
       templateType: templateType ?? this.templateType,

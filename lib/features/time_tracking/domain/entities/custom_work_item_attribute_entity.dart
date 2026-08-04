@@ -27,7 +27,7 @@ class CustomWorkItemAttributeEntity extends Entity {
   @override
   CustomWorkItemAttributeEntity copyWith({
     String? id,
-    String? projectKey,
+    String? projectId,
     String? name,
     TimeTrackingFieldType? fieldType,
     bool? isRequired,
@@ -38,7 +38,7 @@ class CustomWorkItemAttributeEntity extends Entity {
   }) {
     return CustomWorkItemAttributeEntity(
       id: id ?? this.id,
-      projectId: projectKey ?? this.projectId,
+      projectId: projectId ?? this.projectId,
       name: name ?? this.name,
       fieldType: fieldType ?? this.fieldType,
       isRequired: isRequired ?? this.isRequired,

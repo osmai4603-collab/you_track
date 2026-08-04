@@ -198,7 +198,7 @@ class AgileBoardsBloc extends Bloc<AgileBoardsEvent, AgileBoardsState> {
             issueType: issue.issueType,
             subsystem: subsystem,
             assigneeAvatarUrl: issue.assigneeAvatarUrl,
-            assigneeName: issue.assigneeName,
+            assigneeName: issue.assigneeId,
             estimation: issue.estimation,
           );
 

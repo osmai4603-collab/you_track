@@ -18,13 +18,13 @@ class UserRoleAssignment extends Entity {
   UserRoleAssignment copyWith({
     String? roleName,
     List<Permission>? permissions,
-    String? projectKey,
+    String? projectId,
     String? groupId,
   }) {
     return UserRoleAssignment(
       roleName: roleName ?? this.roleName,
       permissions: permissions ?? this.permissions,
-      projectId: projectKey ?? this.projectId,
+      projectId: projectId ?? this.projectId,
       groupId: groupId ?? this.groupId,
     );
   }

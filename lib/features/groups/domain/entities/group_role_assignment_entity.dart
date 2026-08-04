@@ -21,14 +21,14 @@ class GroupRoleAssignmentEntity extends Entity {
     String? id,
     String? groupId,
     String? roleName,
-    String? projectKey,
+    String? projectId,
     ProjectData? project,
   }) {
     return GroupRoleAssignmentEntity(
       id: id ?? this.id,
       groupId: groupId ?? this.groupId,
       roleName: roleName ?? this.roleName,
-      projectId: projectKey ?? this.projectId,
+      projectId: projectId ?? this.projectId,
       project: project ?? this.project,
     );
   }

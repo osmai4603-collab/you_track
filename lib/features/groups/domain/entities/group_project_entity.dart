@@ -17,14 +17,14 @@ class GroupProjectEntity extends Entity {
   @override
   GroupProjectEntity copyWith({
     String? id,
-    String? projectKey,
+    String? projectId,
     String? groupId,
     ProjectData? project,
   }) {
     return GroupProjectEntity(
       id: id ?? this.id,
       groupId: groupId ?? this.groupId,
-      projectId: projectKey ?? this.projectId,
+      projectId: projectId ?? this.projectId,
       project: project ?? this.project,
     );
   }

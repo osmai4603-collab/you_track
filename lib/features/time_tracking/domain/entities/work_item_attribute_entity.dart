@@ -18,13 +18,13 @@ class WorkItemAttributeEntity extends Entity {
   WorkItemAttributeEntity copyWith({
     String? id,
     String? name,
-    String? projectKey,
+    String? projectId,
     List<WorkItemAttributeValueEntity>? values,
   }) {
     return WorkItemAttributeEntity(
       id: id ?? this.id,
       name: name ?? this.name,
-      projectId: projectKey ?? this.projectId,
+      projectId: projectId ?? this.projectId,
       values: values ?? this.values,
     );
   }
