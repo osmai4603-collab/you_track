@@ -73,7 +73,7 @@ class _ProjectGeneralSettingsSectionState
         if (state.status == ProjectDetailsStatus.success &&
             state.project != null) {
           _nameController.text = state.project!.name;
-          _idController.text = state.project!.projectId;
+          _idController.text = state.project!.projectKey;
           _descriptionController.text = state.project!.description ?? '';
           _defaultVisibility = state.project!.visibility;
           _recommendedVisibility = [...state.project!.recommendedVisibility];
@@ -84,17 +84,16 @@ class _ProjectGeneralSettingsSectionState
         if (state.status == ProjectDetailsStatus.loading) {
           content = Center(
             key: const ValueKey('project-general-loading'),
-            child: SizedBox(
-              width: 480,
-              child: ShimmerLoading.list(itemCount: 6),
-            ),
+            child: ShimmerLoading.list(itemCount: 10),
           );
         } else {
           content = Stack(
             key: const ValueKey('project-general-loaded'),
             children: [
               SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.large),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.large,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -223,7 +222,7 @@ class _ProjectGeneralSettingsSectionState
   ) {
     return Row(
       children: [
-        ProjectIcon(projectCode: state.project?.projectId ?? ''),
+        ProjectIcon(projectCode: state.project?.projectKey ?? ''),
         const SizedBox(width: AppSpacing.medium),
         Expanded(
           child: Column(

@@ -27,7 +27,7 @@ class CustomWorkItemAttributeEntity extends Entity {
   @override
   CustomWorkItemAttributeEntity copyWith({
     String? id,
-    String? projectId,
+    String? projectKey,
     String? name,
     TimeTrackingFieldType? fieldType,
     bool? isRequired,
@@ -38,7 +38,7 @@ class CustomWorkItemAttributeEntity extends Entity {
   }) {
     return CustomWorkItemAttributeEntity(
       id: id ?? this.id,
-      projectId: projectId ?? this.projectId,
+      projectId: projectKey ?? this.projectId,
       name: name ?? this.name,
       fieldType: fieldType ?? this.fieldType,
       isRequired: isRequired ?? this.isRequired,
@@ -51,6 +51,14 @@ class CustomWorkItemAttributeEntity extends Entity {
 
   @override
   List<Object?> get props => [
-        id, projectId, name, fieldType, isRequired, options, sortOrder, createdAt, updatedAt,
-      ];
+    id,
+    projectId,
+    name,
+    fieldType,
+    isRequired,
+    options,
+    sortOrder,
+    createdAt,
+    updatedAt,
+  ];
 }

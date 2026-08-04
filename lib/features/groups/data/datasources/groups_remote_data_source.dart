@@ -55,7 +55,9 @@ class GroupsRemoteDataSourceImpl implements GroupsRemoteDataSource {
   Future<GroupModel> getGroupById(String id) async {
     final response = await supabase
         .from('groups')
-        .select('*, group_members(*, users(id, user_name, email, avatar_url)), group_roles(*, projects(*)), group_projects(*, projects(*))')
+        .select(
+          '*, group_members(*, users(id, user_name, email, avatar_url)), group_roles(*, projects(*)), group_projects(*, projects(*))',
+        )
         .eq('id', id)
         .single();
     return GroupModel.fromJson(response);
@@ -68,7 +70,10 @@ class GroupsRemoteDataSourceImpl implements GroupsRemoteDataSource {
         .from('groups')
         .insert(json)
         .select()
-        .single();
+        .maybeSingle();
+    if (response == null) {
+      throw DatabaseException('Failed insert group');
+    }
     return GroupModel.fromJson(response);
   }
 
@@ -153,10 +158,7 @@ class GroupsRemoteDataSourceImpl implements GroupsRemoteDataSource {
   }
 
   @override
-  Future<void> removeGroupMembers(
-    String groupId,
-    List<String> userIds,
-  ) async {
+  Future<void> removeGroupMembers(String groupId, List<String> userIds) async {
     for (final uid in userIds) {
       await supabase
           .from('group_members')
@@ -174,7 +176,10 @@ class GroupsRemoteDataSourceImpl implements GroupsRemoteDataSource {
     final data = projectIds
         .map((pid) => {'project_id': pid, 'group_id': groupId})
         .toList();
-    final response = await supabase.from('group_projects').insert(data).select();
+    final response = await supabase
+        .from('group_projects')
+        .insert(data)
+        .select();
     return response.map((e) => GroupProjectModel.fromJson(e)).toList();
   }
 }

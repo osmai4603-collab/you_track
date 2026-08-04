@@ -5,8 +5,8 @@ import 'package:issues_tracking/features/groups/presentation/bloc/groups_bloc.da
 import 'package:issues_tracking/features/groups/presentation/bloc/groups_state.dart';
 
 class IssueVisibilityPicker extends StatefulWidget {
-  final List<String> currentVisibility;
-  final Function(List<String>) onVisibilityChanged;
+  final Map<String, List<String>> currentVisibility;
+  final Function(Map<String, List<String>>) onVisibilityChanged;
 
   const IssueVisibilityPicker({
     super.key,
@@ -19,20 +19,23 @@ class IssueVisibilityPicker extends StatefulWidget {
 }
 
 class _IssueVisibilityPickerState extends State<IssueVisibilityPicker> {
-  late List<String> _selectedVisibility;
+  late Map<String, List<String>> _selectedVisibility;
 
   @override
   void initState() {
     super.initState();
-    _selectedVisibility = List.from(widget.currentVisibility);
+    _selectedVisibility = {
+      'users': List.from(widget.currentVisibility['users']!),
+      'groups': List.from(widget.currentVisibility['groups']!),
+    };
   }
 
-  void _toggleValue(String value, bool? selected) {
+  void _toggleValue(String value, String key, bool? selected) {
     setState(() {
-      if (selected == true && !_selectedVisibility.contains(value)) {
-        _selectedVisibility.add(value);
+      if (selected == true && !_selectedVisibility[key]!.contains(value)) {
+        _selectedVisibility[key]!.add(value);
       } else {
-        _selectedVisibility.remove(value);
+        _selectedVisibility[key]!.remove(value);
       }
     });
   }
@@ -51,7 +54,9 @@ class _IssueVisibilityPickerState extends State<IssueVisibilityPicker> {
               continue;
             }
 
-            final displayName = user.userName.isNotEmpty ? user.userName : user.email;
+            final displayName = user.userName.isNotEmpty
+                ? user.userName
+                : user.email;
             users.add(
               _GroupUserEntry(
                 value: 'user:${user.id}',
@@ -76,35 +81,6 @@ class _IssueVisibilityPickerState extends State<IssueVisibilityPicker> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    'Project team',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  CheckboxListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('All team members'),
-                    value: _selectedVisibility.contains('team'),
-                    onChanged: (value) => _toggleValue('team', value),
-                  ),
-                  const Divider(),
-                  const Text(
-                    'Registered users',
-                    style: TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  CheckboxListTile(
-                    contentPadding: EdgeInsets.zero,
-                    title: const Text('All registered users'),
-                    value: _selectedVisibility.contains('registered'),
-                    onChanged: (value) => _toggleValue('registered', value),
-                  ),
                   const Divider(),
                   const Text(
                     'Groups linked to this workspace',
@@ -128,13 +104,15 @@ class _IssueVisibilityPickerState extends State<IssueVisibilityPicker> {
                     ...groups.map((group) {
                       final value = 'group:${group.id}';
                       return CheckboxListTile(
+                        controlAffinity: .leading,
                         contentPadding: EdgeInsets.zero,
                         title: Text(group.name),
                         subtitle: Text(
                           '${group.members.length} members • ${group.projects.length} projects',
                         ),
-                        value: _selectedVisibility.contains(value),
-                        onChanged: (selected) => _toggleValue(value, selected),
+                        value: _selectedVisibility['groups']!.contains(value),
+                        onChanged: (selected) =>
+                            _toggleValue(value, 'groups', selected),
                       );
                     }),
                   const Divider(),
@@ -159,11 +137,15 @@ class _IssueVisibilityPickerState extends State<IssueVisibilityPicker> {
                   else
                     ...uniqueUsers.values.map((user) {
                       return CheckboxListTile(
+                        controlAffinity: .leading,
                         contentPadding: EdgeInsets.zero,
                         title: Text(user.title),
                         subtitle: Text(user.subtitle),
-                        value: _selectedVisibility.contains(user.value),
-                        onChanged: (selected) => _toggleValue(user.value, selected),
+                        value: _selectedVisibility['users']!.contains(
+                          user.value,
+                        ),
+                        onChanged: (selected) =>
+                            _toggleValue(user.value, 'users', selected),
                       );
                     }),
                 ],
@@ -177,7 +159,6 @@ class _IssueVisibilityPickerState extends State<IssueVisibilityPicker> {
             ),
             FilledButton(
               onPressed: () {
-                widget.onVisibilityChanged(_selectedVisibility);
                 Navigator.pop(context, _selectedVisibility);
               },
               child: const Text('Save'),

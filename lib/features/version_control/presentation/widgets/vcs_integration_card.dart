@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/enums/server_type_enum.dart';
 import 'package:issues_tracking/core/enums/vcs_connection_status_enum.dart';
+import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
 import 'package:issues_tracking/features/version_control/domain/entities/vcs_integration_entity.dart';
 import 'package:issues_tracking/features/version_control/presentation/cubits/vcs_integrations_cubit.dart';
 import 'package:issues_tracking/features/version_control/presentation/widgets/vcs_user_mapping_section.dart';
@@ -96,10 +97,13 @@ class _VcsIntegrationCardState extends State<VcsIntegrationCard> {
           padding: AppSpacing.paddingAllSmall,
           borderRadius: BorderRadius.circular(4),
           itemBuilder: (context) => [
-            const PopupMenuItem(value: 'edit', child: Text('Edit')),
-            const PopupMenuItem(value: 'test', child: Text('Test connection')),
+            const AppPopupMenuItem(value: 'edit', child: Text('Edit')),
+            const AppPopupMenuItem(
+              value: 'test',
+              child: Text('Test connection'),
+            ),
             const PopupMenuDivider(),
-            PopupMenuItem(
+            AppPopupMenuItem(
               value: 'delete',
               child: Text('Delete', style: TextStyle(color: colors.error)),
             ),

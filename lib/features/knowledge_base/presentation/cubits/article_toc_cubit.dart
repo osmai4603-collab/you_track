@@ -51,7 +51,7 @@ class ArticleTocCubit extends Cubit<ArticleTocState> {
     if (index < _headingOffsets.length && _scrollController.hasClients) {
       _scrollController.animateTo(
         _headingOffsets[index],
-        duration: const Duration(milliseconds: 300),
+        duration: const Duration(milliseconds: 500),
         curve: Curves.easeInOut,
       );
     }

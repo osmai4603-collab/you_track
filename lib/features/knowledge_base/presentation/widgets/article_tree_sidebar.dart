@@ -49,12 +49,12 @@ class ArticleTreeSidebar extends StatelessWidget {
                 final item = reordered.removeAt(oldIndex);
                 reordered.insert(newIndex, item);
                 context.read<ArticleTreeBloc>().add(
-                      ReorderArticlesInTree(
-                        projectId: state.projectId,
-                        parentParentId: 'root',
-                        articleIds: reordered.map((a) => a.id).toList(),
-                      ),
-                    );
+                  ReorderArticlesInTree(
+                    projectId: state.projectId,
+                    parentParentId: 'root',
+                    articleIds: reordered.map((a) => a.id).toList(),
+                  ),
+                );
               },
               children: rootArticles.map((article) {
                 return _buildNode(context, article, state, 0);
@@ -62,7 +62,9 @@ class ArticleTreeSidebar extends StatelessWidget {
             );
           }
         } else {
-          content = const SizedBox.shrink(key: ValueKey('article-tree-empty-state'));
+          content = const SizedBox.shrink(
+            key: ValueKey('article-tree-empty-state'),
+          );
         }
 
         return AnimatedContentSwitcher(child: content);
@@ -83,7 +85,9 @@ class ArticleTreeSidebar extends StatelessWidget {
 
     return Dismissible(
       key: ValueKey(article.id),
-      direction: hasChildren ? DismissDirection.none : DismissDirection.horizontal,
+      direction: hasChildren
+          ? DismissDirection.none
+          : DismissDirection.horizontal,
       confirmDismiss: (_) async {
         return false;
       },
@@ -104,7 +108,9 @@ class ArticleTreeSidebar extends StatelessWidget {
                 bottom: 6.0,
               ),
               color: isSelected
-                  ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 0.3)
+                  ? Theme.of(
+                      context,
+                    ).colorScheme.primaryContainer.withValues(alpha: 0.3)
                   : null,
               child: Row(
                 children: [
@@ -112,13 +118,13 @@ class ArticleTreeSidebar extends StatelessWidget {
                     GestureDetector(
                       onTap: () {
                         if (isExpanded) {
-                          context
-                              .read<ArticleTreeBloc>()
-                              .add(CollapseNode(article.id));
+                          context.read<ArticleTreeBloc>().add(
+                            CollapseNode(article.id),
+                          );
                         } else {
-                          context
-                              .read<ArticleTreeBloc>()
-                              .add(ExpandNode(article.id));
+                          context.read<ArticleTreeBloc>().add(
+                            ExpandNode(article.id),
+                          );
                         }
                       },
                       child: Icon(
@@ -132,7 +138,9 @@ class ArticleTreeSidebar extends StatelessWidget {
                     const SizedBox(width: 20),
                   const SizedBox(width: 4),
                   Icon(
-                    hasChildren ? Icons.folder_outlined : Icons.article_outlined,
+                    hasChildren
+                        ? Icons.folder_outlined
+                        : Icons.article_outlined,
                     size: 18,
                     color: Theme.of(context).colorScheme.onSurfaceVariant,
                   ),
@@ -142,8 +150,9 @@ class ArticleTreeSidebar extends StatelessWidget {
                       article.title.isEmpty ? 'Untitled' : article.title,
                       style: TextStyle(
                         fontSize: 13,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.normal,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.normal,
                         color: isSelected
                             ? Theme.of(context).colorScheme.primary
                             : null,
@@ -164,7 +173,9 @@ class ArticleTreeSidebar extends StatelessWidget {
                           child: Icon(
                             Icons.add,
                             size: 16,
-                            color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            color: Theme.of(
+                              context,
+                            ).colorScheme.onSurfaceVariant,
                           ),
                         ),
                       ),
@@ -175,7 +186,9 @@ class ArticleTreeSidebar extends StatelessWidget {
             ),
           ),
           if (hasChildren && isExpanded)
-            ...children.map((child) => _buildNode(context, child, state, depth + 1)),
+            ...children.map(
+              (child) => _buildNode(context, child, state, depth + 1),
+            ),
         ],
       ),
     );
@@ -207,7 +220,10 @@ class ArticleTreeSidebar extends StatelessWidget {
                 permission: Permission.articleDeleteArticle,
                 child: ListTile(
                   leading: const Icon(Icons.delete_outline, color: Colors.red),
-                  title: const Text('Delete', style: TextStyle(color: Colors.red)),
+                  title: const Text(
+                    'Delete',
+                    style: TextStyle(color: Colors.red),
+                  ),
                   onTap: () {
                     Navigator.pop(sheetContext);
                     _confirmDelete(context, article);
@@ -238,9 +254,9 @@ class ArticleTreeSidebar extends StatelessWidget {
             TextButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
-                context
-                    .read<ArticleTreeBloc>()
-                    .add(DeleteArticleFromTree(article.id));
+                context.read<ArticleTreeBloc>().add(
+                  DeleteArticleFromTree(article.id),
+                );
               },
               child: const Text('Delete', style: TextStyle(color: Colors.red)),
             ),
@@ -256,11 +272,10 @@ class ArticleTreeSidebar extends StatelessWidget {
     ArticleTreeLoaded state,
   ) {
     context.push(
-      '${AppRouteKeys.projectKnowledgeBasePath(state.projectId)}/new',
-      extra: {
-        'projectId': state.projectId,
-        'parentId': parentArticle.id,
-      },
+      state.projectId == null
+          ? '${AppRouteKeys.knowldgeBase}/new'
+          : '${AppRouteKeys.projectKnowledgeBasePath(state.projectId!)}/new',
+      extra: {'projectId': state.projectId, 'parentId': parentArticle.id},
     );
   }
 }

@@ -45,7 +45,9 @@ class TagPermissionsSection extends StatelessWidget {
               state.permissions['edit'] ?? TagPermissionScope.owner,
               localization,
             ),
-            if (state.permissions.values.any((s) => s == TagPermissionScope.specificUsers))
+            if (state.permissions.values.any(
+              (s) => s == TagPermissionScope.specificUsers,
+            ))
               _buildSpecificUsersSummary(context, state),
           ],
         );
@@ -60,13 +62,15 @@ class TagPermissionsSection extends StatelessWidget {
     TagPermissionScope currentScope,
     AppLocalizations localization,
   ) {
+    final textTheme = TextTheme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        Text(label, style: textTheme.bodySmall?.copyWith(fontWeight: .bold)),
         DropdownButton<TagPermissionScope>(
           value: currentScope,
           isExpanded: true,
+          style: textTheme.labelSmall?.copyWith(fontWeight: .bold),
           underline: Container(height: 1, color: Colors.grey[400]),
           items: TagPermissionScope.values.map((scope) {
             return DropdownMenuItem(
@@ -97,7 +101,7 @@ class TagPermissionsSection extends StatelessWidget {
             const Icon(Icons.people_outline, size: 20, color: Colors.blue),
             const SizedBox(width: 8),
             Text(
-              '${state.specificUserIds.length} users selected',
+              '${state.specificUserIds.length} users, ${state.specificGroupIds.length} groups selected',
               style: const TextStyle(color: Colors.blue),
             ),
             const Spacer(),
@@ -113,8 +117,13 @@ class TagPermissionsSection extends StatelessWidget {
     SpecificUsersPicker.show(
       context,
       members: cubit.state.members,
+      groups: cubit.state.projectGroups,
       initialSelectedIds: cubit.state.specificUserIds,
-      onSelectionChanged: (userIds) => cubit.updateSpecificUsers(userIds),
+      initialSelectedGroupIds: cubit.state.specificGroupIds,
+      onSelectionChanged: (userIds, groupIds) {
+        cubit.updateSpecificUsers(userIds);
+        cubit.updateSpecificGroups(groupIds);
+      },
     );
   }
 }

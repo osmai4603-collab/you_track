@@ -20,6 +20,7 @@ import 'package:issues_tracking/core/services/sqlite/tables/issue_sprints_table.
 import 'package:issues_tracking/core/services/sqlite/tables/tag_permissions_table.dart';
 import 'package:issues_tracking/core/services/sqlite/tables/tag_subscriptions_table.dart';
 import 'package:issues_tracking/core/services/sqlite/tables/tag_permission_users_table.dart';
+import 'package:issues_tracking/core/services/sqlite/tables/tag_permission_groups_table.dart';
 import 'package:issues_tracking/core/services/sqlite/tables/dashboards_table.dart';
 import 'package:issues_tracking/core/services/sqlite/tables/dashboard_widgets_table.dart';
 import 'package:sqlite3/sqlite3.dart';
@@ -27,7 +28,7 @@ import 'package:sqlite3/sqlite3.dart';
 final class SqliteSchemaManager {
   const SqliteSchemaManager._();
 
-  static const int currentVersion = 14;
+  static const int currentVersion = 15;
 
   /// Create the full schema for a new database.
   static void createAll(Database db) {
@@ -88,6 +89,7 @@ final class SqliteSchemaManager {
       const TagPermissionsTable(),
       const TagSubscriptionsTable(),
       const TagPermissionUsersTable(),
+      const TagPermissionGroupsTable(),
       const DashboardsTable(),
       const DashboardWidgetsTable(),
     ];

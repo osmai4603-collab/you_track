@@ -3,6 +3,7 @@ import 'package:issues_tracking/core/enums/tag_permission_scope_enum.dart';
 import 'package:issues_tracking/core/enums/tag_subscription_event_enum.dart';
 import '../../domain/usecases/create_tag.dart';
 import '../../domain/usecases/get_project_members.dart';
+import '../../domain/usecases/get_project_groups.dart';
 import '../../domain/usecases/is_tag_name_unique.dart';
 import '../../domain/usecases/associate_tag_with_issue.dart';
 import 'new_tag_state.dart';
@@ -10,12 +11,14 @@ import 'new_tag_state.dart';
 class NewTagCubit extends Cubit<NewTagState> {
   final CreateTag createTagUseCase;
   final GetProjectMembers getProjectMembersUseCase;
+  final GetProjectGroups getProjectGroupsUseCase;
   final IsTagNameUnique isTagNameUniqueUseCase;
   final AssociateTagWithIssue associateTagUseCase;
 
   NewTagCubit({
     required this.createTagUseCase,
     required this.getProjectMembersUseCase,
+    required this.getProjectGroupsUseCase,
     required this.isTagNameUniqueUseCase,
     required this.associateTagUseCase,
   }) : super(const NewTagState());
@@ -40,6 +43,22 @@ class NewTagCubit extends Cubit<NewTagState> {
           ownerId: ownerId,
         ));
       },
+    );
+
+    await _loadGroups(projectId);
+  }
+
+  Future<void> _loadGroups(String projectId) async {
+    final result = await getProjectGroupsUseCase(
+      params: GetProjectGroupsParams(projectId: projectId),
+    );
+
+    result.fold(
+      (failure) => emit(state.copyWith(
+        status: NewTagStatus.failure,
+        errorMessage: failure.message,
+      )),
+      (groups) => emit(state.copyWith(projectGroups: groups)),
     );
   }
 
@@ -71,6 +90,10 @@ class NewTagCubit extends Cubit<NewTagState> {
 
   void updateSpecificUsers(List<String> userIds) {
     emit(state.copyWith(specificUserIds: userIds));
+  }
+
+  void updateSpecificGroups(List<String> groupIds) {
+    emit(state.copyWith(specificGroupIds: groupIds));
   }
 
   void toggleSubscription(TagSubscriptionEvent event) {
@@ -126,6 +149,7 @@ class NewTagCubit extends Cubit<NewTagState> {
         favorite: state.favorite,
         permissions: state.permissions,
         specificUserIds: state.specificUserIds,
+        specificGroupIds: state.specificGroupIds,
         subscriptions: state.subscriptions,
       ),
     );

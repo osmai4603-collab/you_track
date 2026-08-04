@@ -412,6 +412,14 @@ class IssuesSqliteDataSourceImpl implements IssuesRemoteDataSource {
   }
 
   @override
+  Future<void> updateIssueStarred(String issueId, bool isStarred) async {
+    _sqlite.execute(
+      'UPDATE ${_issuesTable.tableName} SET is_starred = ? WHERE ${_issuesTable.id} = ?',
+      [isStarred ? 1 : 0, issueId],
+    );
+  }
+
+  @override
   Future<String> uploadAttachment({
     required String issueId,
     required String filePath,

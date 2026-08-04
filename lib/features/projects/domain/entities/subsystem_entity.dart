@@ -1,6 +1,5 @@
 import 'package:issues_tracking/core/entities/entity.dart';
 
-
 class SubsystemEntity extends Entity {
   final String id;
   final String name;
@@ -22,7 +21,7 @@ class SubsystemEntity extends Entity {
   SubsystemEntity copyWith({
     String? id,
     String? name,
-    String? projectId,
+    String? projectKey,
     String? ownerId,
     SubsystemEntity? subsystemType,
     int? color,
@@ -31,7 +30,7 @@ class SubsystemEntity extends Entity {
     return SubsystemEntity(
       id: id ?? this.id,
       name: name ?? this.name,
-      projectId: projectId ?? this.projectId,
+      projectId: projectKey ?? this.projectId,
       ownerId: ownerId ?? this.ownerId,
       color: color ?? this.color,
       firstLetter: firstLetter ?? this.firstLetter,
@@ -39,16 +38,15 @@ class SubsystemEntity extends Entity {
   }
 
   @override
-  List<Object?> get props => [
-    id,
-    name,
-    projectId,
-    ownerId,
-    color,
-    firstLetter,
-  ];
+  List<Object?> get props => [id, name, projectId, ownerId, color, firstLetter];
 
-  factory SubsystemEntity.create({required String id, required String name, required String projectId, required String ownerId, required int color}) {
+  factory SubsystemEntity.create({
+    required String id,
+    required String name,
+    required String projectId,
+    required String ownerId,
+    required int color,
+  }) {
     return SubsystemEntity(
       id: id,
       name: name,

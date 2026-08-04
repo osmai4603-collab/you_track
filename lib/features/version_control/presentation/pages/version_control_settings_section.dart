@@ -128,7 +128,7 @@ class _VersionControlSettingsSectionState
     if (state is VcsIntegrationsInitial || state is VcsIntegrationsLoading) {
       return Center(
         key: const ValueKey('vcs-loading'),
-        child: SizedBox(width: 480, child: ShimmerLoading.list(itemCount: 6)),
+        child: ShimmerLoading.list(itemCount: 8),
       );
     }
 

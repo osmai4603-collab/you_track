@@ -124,7 +124,7 @@ class ProjectCreationCubit extends Cubit<ProjectCreationState> {
     final newProject = ProjectEntity(
       id: 'proj_${DateTime.now().millisecondsSinceEpoch}',
       name: state.projectName.trim(),
-      projectId: state.projectKey.trim().toUpperCase(),
+      projectKey: state.projectKey.trim().toUpperCase(),
       description: state.projectDescription.isNotEmpty
           ? state.projectDescription.trim()
           : state.selectedTemplate.description,
@@ -133,6 +133,7 @@ class ProjectCreationCubit extends Cubit<ProjectCreationState> {
       templateType: state.selectedTemplate,
       ownerId: userSession.currentUser?.id ?? 'unknown',
       createdAt: DateTime.now(),
+      startingNumber: state.startingNumber,
     );
 
     final result = await _createProjectUseCase(

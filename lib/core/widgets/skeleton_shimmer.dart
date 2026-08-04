@@ -10,7 +10,7 @@ class SkeletonShimmer extends StatelessWidget {
   const SkeletonShimmer({
     super.key,
     this.width = double.infinity,
-    this.height = 20,
+    this.height = 40,
     this.borderRadius = 4,
     this.duration = const Duration(milliseconds: 2500),
   });

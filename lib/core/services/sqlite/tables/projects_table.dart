@@ -18,6 +18,7 @@ class ProjectsTable extends TableById implements SqliteTable {
   String get ownerId => 'owner_id';
   String get createdAt => 'created_at';
   String get isFavorite => 'is_favorite';
+  String get startingNumber => 'starting_number';
 
   @override
   List<String> get columns => [
@@ -30,6 +31,7 @@ class ProjectsTable extends TableById implements SqliteTable {
         ownerId,
         createdAt,
         isFavorite,
+        startingNumber,
       ];
 
   @override
@@ -43,7 +45,8 @@ class ProjectsTable extends TableById implements SqliteTable {
       $templateType TEXT,
       $ownerId TEXT,
       $createdAt TEXT,
-      $isFavorite INTEGER DEFAULT 0
+      $isFavorite INTEGER DEFAULT 0,
+      $startingNumber INTEGER DEFAULT 1
     )
   ''';
 }

@@ -5,7 +5,7 @@ import '../../domain/entities/project_entity.dart';
 import '../../domain/usecases/archive_project_use_case.dart';
 import '../../domain/usecases/delete_project_use_case.dart';
 import '../../domain/usecases/get_projects_use_case.dart';
-import '../../domain/usecases/update_project_use_case.dart';
+import '../../domain/usecases/update_project_favorite_use_case.dart';
 
 enum ProjectsListStatus { initial, loading, success, failure }
 
@@ -37,7 +37,7 @@ class ProjectsListState extends Equatable {
         ? newProjects
         : newProjects.where((p) {
             return p.name.toLowerCase().contains(query.toLowerCase()) ||
-                p.projectId.toLowerCase().contains(query.toLowerCase());
+                p.projectKey.toLowerCase().contains(query.toLowerCase());
           }).toList();
 
     return ProjectsListState(
@@ -73,13 +73,13 @@ class ProjectsListCubit extends Cubit<ProjectsListState> {
   final GetProjectsUseCase _getProjectsUseCase;
   final ArchiveProjectUseCase _archiveProjectUseCase;
   final DeleteProjectUseCase _deleteProjectUseCase;
-  final UpdateProjectUseCase _updateProjectUseCase;
+  final UpdateProjectFavoriteUseCase _updateProjectFavoriteUseCase;
 
   ProjectsListCubit({
     required this._getProjectsUseCase,
     required this._archiveProjectUseCase,
     required this._deleteProjectUseCase,
-    required this._updateProjectUseCase,
+    required this._updateProjectFavoriteUseCase,
   }) : super(const ProjectsListState());
 
   Future<void> loadProjects() async {
@@ -147,8 +147,11 @@ class ProjectsListCubit extends Cubit<ProjectsListState> {
     emit(state.copyWith(projects: updatedProjects));
 
     // Save to repository
-    final result = await _updateProjectUseCase(
-      params: UpdateProjectParams(project: updatedProject),
+    final result = await _updateProjectFavoriteUseCase(
+      params: UpdateProjectFavoriteParams(
+        projectId: project.id,
+        isFavorite: updatedProject.isFavorite,
+      ),
     );
     result.fold((failure) {
       // Revert on failure

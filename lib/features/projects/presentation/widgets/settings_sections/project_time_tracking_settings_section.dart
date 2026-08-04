@@ -146,10 +146,7 @@ class _ProjectTimeTrackingSettingsSectionState
             if (state is TimeTrackingConfigLoading) {
               content = Center(
                 key: const ValueKey('project-time-tracking-loading'),
-                child: SizedBox(
-                  width: 480,
-                  child: ShimmerLoading.list(itemCount: 6),
-                ),
+                child: ShimmerLoading.list(itemCount: 8),
               );
             } else if (state is TimeTrackingConfigError) {
               content = Center(
@@ -178,7 +175,9 @@ class _ProjectTimeTrackingSettingsSectionState
             } else if (state is TimeTrackingConfigLoaded) {
               content = buildTimeTracking(state, context, projectState.project);
             } else {
-              content = const SizedBox.shrink(key: ValueKey('project-time-tracking-empty'));
+              content = const SizedBox.shrink(
+                key: ValueKey('project-time-tracking-empty'),
+              );
             }
 
             return AnimatedContentSwitcher(child: content);
@@ -210,7 +209,7 @@ class _ProjectTimeTrackingSettingsSectionState
               if (hasTimeTracking)
                 Expanded(
                   child: AnimatedSize(
-                    duration: const Duration(milliseconds: 300),
+                    duration: const Duration(milliseconds: 500),
                     curve: Curves.easeInOut,
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
@@ -244,10 +243,9 @@ class _ProjectTimeTrackingSettingsSectionState
           if (_isProjectSaving)
             Positioned.fill(
               child: Container(
-                color: Theme.of(context)
-                    .colorScheme
-                    .surface
-                    .withValues(alpha: 0.7),
+                color: Theme.of(
+                  context,
+                ).colorScheme.surface.withValues(alpha: 0.7),
                 child: Center(
                   child: ShimmerLoading.center(width: 48, height: 48),
                 ),
@@ -283,7 +281,9 @@ class _ProjectTimeTrackingSettingsSectionState
       hasTimeTracking: !project.hasTimeTracking,
     );
 
-    debugPrint('Updating project id: ${project.id}, toggle to ${updatedProject.hasTimeTracking}');
+    debugPrint(
+      'Updating project id: ${project.id}, toggle to ${updatedProject.hasTimeTracking}',
+    );
 
     final result = await get_it<UpdateProjectUseCase>()(
       params: UpdateProjectParams(project: updatedProject),
@@ -299,7 +299,9 @@ class _ProjectTimeTrackingSettingsSectionState
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: SelectableText('Failed to save project: ${failure.message}'),
+            content: SelectableText(
+              'Failed to save project: ${failure.message}',
+            ),
           ),
         );
       },
@@ -309,7 +311,7 @@ class _ProjectTimeTrackingSettingsSectionState
         });
         context.read<ProjectDetailsCubit>().loadProject(savedProject.id);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: SelectableText('Project settings saved')), 
+          const SnackBar(content: SelectableText('Project settings saved')),
         );
       },
     );
@@ -332,7 +334,9 @@ class _ProjectTimeTrackingSettingsSectionState
             children: [
               Positioned.fill(
                 child: _loadingAttributes
-                    ? Center(child: ShimmerLoading.center(width: 48, height: 48))
+                    ? Center(
+                        child: ShimmerLoading.center(width: 48, height: 48),
+                      )
                     : _attributeError != null
                     ? Center(child: Text(_attributeError!))
                     : _workItemAttributes.isEmpty
@@ -343,10 +347,16 @@ class _ProjectTimeTrackingSettingsSectionState
                         ),
                       )
                     : DataTable(
-                      showCheckboxColumn: false,
+                        showCheckboxColumn: false,
                         columns: const [
-                          DataColumn(label: Text('Attribute Name'), columnWidth: FixedColumnWidth(150)),
-                          DataColumn(label: Text('Values'), columnWidth: FixedColumnWidth(250)),
+                          DataColumn(
+                            label: Text('Attribute Name'),
+                            columnWidth: FixedColumnWidth(150),
+                          ),
+                          DataColumn(
+                            label: Text('Values'),
+                            columnWidth: FixedColumnWidth(250),
+                          ),
                         ],
                         rows: _workItemAttributes.map((attribute) {
                           return DataRow(
@@ -368,7 +378,7 @@ class _ProjectTimeTrackingSettingsSectionState
                       ),
               ),
               AnimatedPositioned(
-                duration: const Duration(milliseconds: 250),
+                duration: const Duration(milliseconds: 500),
                 curve: Curves.easeInOut,
                 top: 0,
                 right: _selectedAttribute == null ? -panelWidth : 0,

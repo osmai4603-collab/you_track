@@ -47,7 +47,7 @@ class CustomFieldEntity extends Entity {
   @override
   CustomFieldEntity copyWith({
     String? id,
-    String? projectId,
+    String? projectKey,
     String? name,
     CustomFieldEnumType? fieldType,
     String? fieldMode,
@@ -68,7 +68,7 @@ class CustomFieldEntity extends Entity {
   }) {
     return CustomFieldEntity(
       id: id ?? this.id,
-      projectId: projectId ?? this.projectId,
+      projectId: projectKey ?? this.projectId,
       name: name ?? this.name,
       fieldType: fieldType ?? this.fieldType,
       fieldMode: fieldMode ?? this.fieldMode,
@@ -91,24 +91,24 @@ class CustomFieldEntity extends Entity {
 
   @override
   List<Object?> get props => [
-        id,
-        projectId,
-        name,
-        fieldType,
-        fieldMode,
-        valueMode,
-        defaultValue,
-        emptyValue,
-        canBeEmpty,
-        aliases,
-        visibleTo,
-        updatableBy,
-        showOnlyWhen,
-        filterValuesBasedOn,
-        orderIndex,
-        visibility,
-        accessControl,
-        createdAt,
-        updatedAt,
-      ];
+    id,
+    projectId,
+    name,
+    fieldType,
+    fieldMode,
+    valueMode,
+    defaultValue,
+    emptyValue,
+    canBeEmpty,
+    aliases,
+    visibleTo,
+    updatableBy,
+    showOnlyWhen,
+    filterValuesBasedOn,
+    orderIndex,
+    visibility,
+    accessControl,
+    createdAt,
+    updatedAt,
+  ];
 }

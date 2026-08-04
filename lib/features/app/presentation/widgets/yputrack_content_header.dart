@@ -54,16 +54,19 @@ class _SectionOne extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Row(
-              spacing: 8,
-              children: [
-                ...shellState.issues.map((issue) {
-                  return _TrackedIssueTile(
-                    issue: issue,
-                    currentIssue: currentIssue,
-                  );
-                }),
-              ],
+            child: SingleChildScrollView(
+              scrollDirection: .horizontal,
+              child: Row(
+                spacing: 8,
+                children: [
+                  ...shellState.issues.map((issue) {
+                    return _TrackedIssueTile(
+                      issue: issue,
+                      currentIssue: currentIssue,
+                    );
+                  }),
+                ],
+              ),
             ),
           ),
           if (remainingIssues.isNotEmpty)
@@ -74,7 +77,7 @@ class _SectionOne extends StatelessWidget {
                 // Navigate to issue details if needed
               },
               itemBuilder: (context) => remainingIssues.map((issue) {
-                return PopupMenuItem(
+                return AppPopupMenuItem(
                   value: issue.id,
                   child: Text(
                     issue.issueKey,
@@ -580,7 +583,7 @@ class _SearchFieldState extends State<_SearchField>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 2500),
       vsync: this,
     );
     _widthAnimation = Tween<double>(

@@ -12,6 +12,7 @@ abstract class TagRemoteDatasource {
     required bool favorite,
     required Map<String, String> permissions,
     List<String>? specificUserIds,
+    List<String>? specificGroupIds,
     required List<String> subscriptionEvents,
   });
 
@@ -21,6 +22,10 @@ abstract class TagRemoteDatasource {
   });
 
   Future<List<Map<String, dynamic>>> getProjectMembers({
+    required String projectId,
+  });
+
+  Future<List<Map<String, dynamic>>> getProjectGroups({
     required String projectId,
   });
 
@@ -49,6 +54,7 @@ class TagRemoteDatasourceImpl implements TagRemoteDatasource {
     required bool favorite,
     required Map<String, String> permissions,
     List<String>? specificUserIds,
+    List<String>? specificGroupIds,
     required List<String> subscriptionEvents,
   }) async {
     // 1. Create Tag
@@ -92,6 +98,18 @@ class TagRemoteDatasourceImpl implements TagRemoteDatasource {
             )
             .toList();
         await supabase.from('tag_permission_users').insert(userPermissionData);
+      }
+
+      if (entry.value == 'specific_users' && specificGroupIds != null) {
+        final groupPermissionData = specificGroupIds
+            .map(
+              (groupId) => {
+                'tag_permission_id': permissionId,
+                'group_id': groupId,
+              },
+            )
+            .toList();
+        await supabase.from('tag_permission_groups').insert(groupPermissionData);
       }
     }
 
@@ -141,6 +159,17 @@ class TagRemoteDatasourceImpl implements TagRemoteDatasource {
   }
 
   @override
+  Future<List<Map<String, dynamic>>> getProjectGroups({
+    required String projectId,
+  }) async {
+    final response = await supabase
+        .from('group_projects')
+        .select('*, groups(*)')
+        .eq('project_id', projectId);
+    return List<Map<String, dynamic>>.from(response);
+  }
+
+  @override
   Future<bool> isTagNameUnique({
     required String name,
     required String projectId,
@@ -171,7 +200,7 @@ class TagRemoteDatasourceImpl implements TagRemoteDatasource {
     final response = await supabase
         .from('issue_links')
         .select()
-        .eq('issue_id', issueId);
+        .eq('source_issue_id', issueId);
 
     return response.map((e) => IssueLinkModel.fromJson(e)).toList();
   }

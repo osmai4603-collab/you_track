@@ -8,7 +8,7 @@ abstract class ArticleTreeEvent extends Equatable {
 }
 
 class LoadArticleTree extends ArticleTreeEvent {
-  final String projectId;
+  final String? projectId;
   const LoadArticleTree(this.projectId);
 
   @override
@@ -48,7 +48,7 @@ class DeleteArticleFromTree extends ArticleTreeEvent {
 }
 
 class ReorderArticlesInTree extends ArticleTreeEvent {
-  final String projectId;
+  final String? projectId;
   final String parentParentId;
   final List<String> articleIds;
   const ReorderArticlesInTree({

@@ -3,6 +3,7 @@ import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/enums/tag_permission_scope_enum.dart';
 import 'package:issues_tracking/core/enums/tag_subscription_event_enum.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_link.dart';
+import 'package:issues_tracking/features/groups/domain/entities/group_entity.dart';
 import '../entities/tag.dart';
 import '../entities/project_member.dart';
 
@@ -16,6 +17,7 @@ abstract class TagsRepository {
     required bool favorite,
     required Map<String, TagPermissionScope> permissions,
     List<String>? specificUserIds,
+    List<String>? specificGroupIds,
     required List<TagSubscriptionEvent> subscriptions,
   });
 
@@ -25,6 +27,10 @@ abstract class TagsRepository {
   });
 
   Future<Either<Failure, List<ProjectMember>>> getProjectMembers({
+    required String projectId,
+  });
+
+  Future<Either<Failure, List<GroupEntity>>> getProjectGroups({
     required String projectId,
   });
 

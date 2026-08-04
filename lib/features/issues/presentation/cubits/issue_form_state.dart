@@ -29,9 +29,11 @@ class IssueFormState extends Equatable {
   final String? issueId;
   final ProjectEntity? project;
   final String? errorMessage;
+  final bool isFavorite;
 
+  final Map<String, List<String>> visibility;
 
- bool get isEditing => issueId != null;
+  bool get isEditing => issueId != null;
   const IssueFormState({
     this.summary = '',
     this.description = '',
@@ -51,6 +53,8 @@ class IssueFormState extends Equatable {
     this.issueId,
     this.project,
     this.errorMessage,
+    this.isFavorite = false,
+    this.visibility = const {'users': [], 'groups': []},
   });
 
   bool get isDirty =>
@@ -92,6 +96,8 @@ class IssueFormState extends Equatable {
     ProjectEntity? project,
     String? errorMessage,
     bool clearErrorMessage = false,
+    bool? isFavorite,
+    Map<String, List<String>>? visibility,
   }) {
     return IssueFormState(
       summary: summary ?? this.summary,
@@ -114,6 +120,8 @@ class IssueFormState extends Equatable {
       errorMessage: clearErrorMessage
           ? null
           : (errorMessage ?? this.errorMessage),
+      isFavorite: isFavorite ?? this.isFavorite,
+      visibility: visibility ?? this.visibility,
     );
   }
 
@@ -138,5 +146,7 @@ class IssueFormState extends Equatable {
     issueId,
     project,
     errorMessage,
+    isFavorite,
+    visibility,
   ];
 }

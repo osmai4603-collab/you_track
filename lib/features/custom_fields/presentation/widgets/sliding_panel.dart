@@ -11,7 +11,7 @@ class SlidingPanel extends StatelessWidget {
     required this.isOpen,
     required this.child,
     this.panelWidth = 400.0,
-    this.animationDuration = const Duration(milliseconds: 300),
+    this.animationDuration = const Duration(milliseconds: 1000),
   });
 
   @override

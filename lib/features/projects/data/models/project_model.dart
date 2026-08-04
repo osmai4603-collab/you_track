@@ -8,7 +8,7 @@ class ProjectModel extends ProjectEntity {
   const ProjectModel({
     required super.id,
     required super.name,
-    required super.projectId,
+    required super.projectKey,
     super.description,
     super.isArchived,
     required super.templateType,
@@ -21,13 +21,14 @@ class ProjectModel extends ProjectEntity {
     super.hasTimeTracking,
     super.estimation,
     super.spentTime,
+    super.startingNumber,
   });
 
   factory ProjectModel.fromEntity(ProjectEntity entity) {
     return ProjectModel(
       id: entity.id,
       name: entity.name,
-      projectId: entity.projectId,
+      projectKey: entity.projectKey,
       description: entity.description,
       isArchived: entity.isArchived,
       templateType: entity.templateType,
@@ -40,6 +41,7 @@ class ProjectModel extends ProjectEntity {
       hasTimeTracking: entity.hasTimeTracking,
       estimation: entity.estimation,
       spentTime: entity.spentTime,
+      startingNumber: entity.startingNumber,
     );
   }
 
@@ -50,15 +52,19 @@ class ProjectModel extends ProjectEntity {
     return ProjectModel(
       id: safeJson['id']?.toString() ?? '',
       name: safeJson['name']?.toString() ?? '',
-      projectId: safeJson['project_id']?.toString() ?? '',
+      projectKey: safeJson['project_id']?.toString() ?? '',
       description: safeJson['description']?.toString(),
       isArchived: safeJson['is_archived'] == true,
       templateType: ProjectTemplateType.of(safeJson['template_type']),
       ownerId: safeJson['owner_id']?.toString() ?? '',
-      createdAt: DateTime.tryParse(safeJson['created_at']?.toString() ?? '') ?? DateTime.now(),
+      createdAt:
+          DateTime.tryParse(safeJson['created_at']?.toString() ?? '') ??
+          DateTime.now(),
       isFavorite: safeJson['is_favorite'] == true,
       members: ProjectMemberModel.fromListJson(
-        safeJson['group_members'] is List ? safeJson['group_members'] as List : null,
+        safeJson['group_members'] is List
+            ? safeJson['group_members'] as List
+            : null,
       ),
       visibility: safeJson['visibility'] is String
           ? safeJson['visibility'] as String
@@ -72,13 +78,18 @@ class ProjectModel extends ProjectEntity {
       estimation: safeJson['estimation'] is int
           ? safeJson['estimation'] as int
           : (safeJson['estimation'] is num
-              ? (safeJson['estimation'] as num).toInt()
-              : null),
+                ? (safeJson['estimation'] as num).toInt()
+                : null),
       spentTime: safeJson['spent_time'] is int
           ? safeJson['spent_time'] as int
           : (safeJson['spent_time'] is num
-              ? (safeJson['spent_time'] as num).toInt()
-              : null),
+                ? (safeJson['spent_time'] as num).toInt()
+                : null),
+      startingNumber: safeJson['starting_number'] is int
+          ? safeJson['starting_number'] as int
+          : (safeJson['starting_number'] is num
+                ? (safeJson['starting_number'] as num).toInt()
+                : null),
     );
   }
 
@@ -86,7 +97,7 @@ class ProjectModel extends ProjectEntity {
     return {
       if (id.isNotEmpty) 'id': id,
       'name': name,
-      'project_id': projectId,
+      'project_id': projectKey,
       'description': description,
       'is_archived': isArchived,
       'template_type': templateType.name,
@@ -98,6 +109,7 @@ class ProjectModel extends ProjectEntity {
       'has_time_tracking': hasTimeTracking,
       'estimation': estimation,
       'spent_time': spentTime,
+      'starting_number': startingNumber,
     };
   }
 

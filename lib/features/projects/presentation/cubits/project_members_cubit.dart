@@ -71,7 +71,7 @@ class ProjectMembersCubit extends Cubit<ProjectMembersState> {
     );
   }
 
-  Future<void> addMember({
+  Future<bool> addMember({
     required String projectId,
     required String name,
     required String email,
@@ -89,9 +89,15 @@ class ProjectMembersCubit extends Cubit<ProjectMembersState> {
     final result = await _addProjectMemberUseCase(
       params: AddProjectMemberParams(member: newMember),
     );
-    result.fold(
-      (failure) => emit(state.copyWith(errorMessage: failure.message)),
-      (added) => emit(state.addMemberLocal(added)),
+    return result.fold(
+      (failure) {
+        emit(state.copyWith(errorMessage: failure.message));
+        return false;
+      },
+      (added) {
+        emit(state.addMemberLocal(added));
+        return true;
+      },
     );
   }
 

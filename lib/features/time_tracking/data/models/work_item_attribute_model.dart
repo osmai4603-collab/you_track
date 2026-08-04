@@ -5,7 +5,7 @@ import 'attribute_value_model.dart';
 import 'package:issues_tracking/core/utils/printing.dart';
 
 class WorkItemAttributeModel extends WorkItemAttributeEntity {
-   const WorkItemAttributeModel({
+  const WorkItemAttributeModel({
     required super.id,
     required super.name,
     required super.projectId,
@@ -17,7 +17,9 @@ class WorkItemAttributeModel extends WorkItemAttributeEntity {
       id: entity.id,
       name: entity.name,
       projectId: entity.projectId,
-      values: entity.values.map((v) => AttributeValueModel.fromEntity(v)).toList(),
+      values: entity.values
+          .map((v) => AttributeValueModel.fromEntity(v))
+          .toList(),
     );
   }
 
@@ -32,33 +34,25 @@ class WorkItemAttributeModel extends WorkItemAttributeEntity {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      if (id.isNotEmpty) 'id': id,
-      'project_id': projectId,
-      'name': name,
-    };
+    return {if (id.isNotEmpty) 'id': id, 'project_id': projectId, 'name': name};
   }
 
   Map<String, dynamic> toInsertJson() {
-    return {
-      'project_id': projectId,
-      'name': name,
-    };
+    return {'project_id': projectId, 'name': name};
   }
 
   @override
   WorkItemAttributeModel copyWith({
     String? id,
     String? name,
-    String? projectId,
+    String? projectKey,
     List<WorkItemAttributeValueEntity>? values,
   }) {
     return WorkItemAttributeModel(
       id: id ?? this.id,
       name: name ?? this.name,
-      projectId: projectId ?? this.projectId,
+      projectId: projectKey ?? this.projectId,
       values: values ?? this.values,
     );
   }
-
 }

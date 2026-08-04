@@ -550,5 +550,325 @@
   "permissionDeniedTooltip": "You don't have permission to perform this action",
   "@permissionDeniedTooltip": {
     "description": "Tooltip shown when an action is disabled due to missing permission"
+  },
+  "userProfileGeneral": "General",
+  "@userProfileGeneral": {
+    "description": "General tab in user profile page"
+  },
+  "userProfileWorkspace": "Workspace",
+  "@userProfileWorkspace": {
+    "description": "Workspace tab in user profile page"
+  },
+  "userProfileTagsAndSearches": "Tags and Saved Searches",
+  "@userProfileTagsAndSearches": {
+    "description": "Tags and Saved Searches tab in user profile page"
+  },
+  "userProfileNotifications": "Notifications",
+  "@userProfileNotifications": {
+    "description": "Notifications tab in user profile page"
+  },
+  "userProfileAccountSecurity": "Account Security",
+  "@userProfileAccountSecurity": {
+    "description": "Account Security tab in user profile page"
+  },
+  "fullName": "Full name",
+  "@fullName": {
+    "description": "Full name field"
+  },
+  "username": "Username",
+  "@username": {
+    "description": "Username field"
+  },
+  "avatar": "Avatar",
+  "@avatar": {
+    "description": "Avatar field"
+  },
+  "vcsUsernames": "VCS usernames",
+  "@vcsUsernames": {
+    "description": "VCS usernames field"
+  },
+  "registrationDate": "Registration date",
+  "@registrationDate": {
+    "description": "Registration date field"
+  },
+  "personalData": "Personal data",
+  "@personalData": {
+    "description": "Personal data section title"
+  },
+  "downloadCsv": "Download in CSV format",
+  "@downloadCsv": {
+    "description": "Download personal data as CSV button"
+  },
+  "localTimezone": "Local time zone",
+  "@localTimezone": {
+    "description": "Local time zone section title"
+  },
+  "guessTimezone": "Guess time zone",
+  "@guessTimezone": {
+    "description": "Guess time zone button"
+  },
+  "sendTestMessage": "Send test message",
+  "@sendTestMessage": {
+    "description": "Send test message button"
+  },
+  "theme": "Theme",
+  "@theme": {
+    "description": "Theme section title"
+  },
+  "themeLight": "Light",
+  "@themeLight": {
+    "description": "Light theme option"
+  },
+  "themeDark": "Dark",
+  "@themeDark": {
+    "description": "Dark theme option"
+  },
+  "themeSyncOs": "Sync with OS",
+  "@themeSyncOs": {
+    "description": "Sync theme with OS option"
+  },
+  "linksPanelPosition": "Links panel position",
+  "@linksPanelPosition": {
+    "description": "Links panel position section title"
+  },
+  "belowSummary": "Below the summary",
+  "@belowSummary": {
+    "description": "Links panel below summary option"
+  },
+  "belowDescription": "Below the description",
+  "@belowDescription": {
+    "description": "Links panel below description option"
+  },
+  "showRecentIssues": "Show recent issues and articles",
+  "@showRecentIssues": {
+    "description": "Show recent items switch"
+  },
+  "newTagOrSearch": "New tag or saved search",
+  "@newTagOrSearch": {
+    "description": "New tag or saved search button"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Delete button"
+  },
+  "searchTagsAndSearches": "Search tags and searches",
+  "@searchTagsAndSearches": {
+    "description": "Search tags and searches field"
+  },
+  "all": "All",
+  "@all": {
+    "description": "Show all option"
+  },
+  "createdByMe": "Created by me",
+  "@createdByMe": {
+    "description": "Show items created by me option"
+  },
+  "removeOnResolution": "Remove on resolution",
+  "@removeOnResolution": {
+    "description": "Remove tag on issue resolution checkbox"
+  },
+  "markAsFavorite": "Mark as favorite for all viewers",
+  "@markAsFavorite": {
+    "description": "Mark as favorite checkbox"
+  },
+  "notificationEvents": "Notification events:",
+  "@notificationEvents": {
+    "description": "Notification events section title"
+  },
+  "sendNotificationsTo": "Send notifications to:",
+  "@sendNotificationsTo": {
+    "description": "Send notifications to section title"
+  },
+  "starAutomaticallyWhen": "Star automatically when:",
+  "@starAutomaticallyWhen": {
+    "description": "Star automatically when section title"
+  },
+  "twoFactorAuth": "Two-factor Authentication",
+  "@twoFactorAuth": {
+    "description": "Two-factor authentication section title"
+  },
+  "credentials": "Credentials",
+  "@credentials": {
+    "description": "Credentials section title"
+  },
+  "tokens": "Tokens",
+  "@tokens": {
+    "description": "Tokens section title"
+  },
+  "changePassword": "Change password",
+  "@changePassword": {
+    "description": "Change password button"
+  },
+  "revokeRefreshToken": "Revoke refresh token",
+  "@revokeRefreshToken": {
+    "description": "Revoke refresh token button"
+  },
+  "deleteCredentials": "Delete credentials",
+  "@deleteCredentials": {
+    "description": "Delete credentials button"
+  },
+  "pairWithApp": "Pair with app ...",
+  "@pairWithApp": {
+    "description": "Pair with authenticator app button"
+  },
+  "pairWithHardwareToken": "Pair with hardware token ...",
+  "@pairWithHardwareToken": {
+    "description": "Pair with hardware token button"
+  },
+  "addCredentials": "Add credentials ...",
+  "@addCredentials": {
+    "description": "Add credentials button"
+  },
+  "newToken": "New token ...",
+  "@newToken": {
+    "description": "New token button"
+  },
+  "newPasswordButton": "New password ...",
+  "@newPasswordButton": {
+    "description": "New password button"
+  },
+  "saveChanges": "Save changes",
+  "@saveChanges": {
+    "description": "Save changes button"
+  },
+  "currentPassword": "Current password",
+  "@currentPassword": {
+    "description": "Current password field"
+  },
+  "newPassword": "New password",
+  "@newPassword": {
+    "description": "New password field"
+  },
+  "confirmPassword": "Confirm password",
+  "@confirmPassword": {
+    "description": "Confirm password field"
+  },
+  "passwordMismatch": "Passwords do not match",
+  "@passwordMismatch": {
+    "description": "Password mismatch error message"
+  },
+  "passwordChangedSuccess": "Password changed successfully",
+  "@passwordChangedSuccess": {
+    "description": "Password change success message"
+  },
+  "passwordChangeFailed": "Failed to change password: {error}",
+  "@passwordChangeFailed": {
+    "description": "Password change failure message",
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "sessionsRevokedSuccess": "Other active sessions have been revoked",
+  "@sessionsRevokedSuccess": {
+    "description": "Refresh token revocation success message"
+  },
+  "sessionsRevokeFailed": "Failed to revoke sessions: {error}",
+  "@sessionsRevokeFailed": {
+    "description": "Refresh token revocation failure message",
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "changesSavedSuccess": "Changes saved successfully",
+  "@changesSavedSuccess": {
+    "description": "Changes saved success message"
+  },
+  "noTagSelected": "No item selected to delete",
+  "@noTagSelected": {
+    "description": "No item selected message"
+  },
+  "enterTagName": "Enter tag name...",
+  "@enterTagName": {
+    "description": "Tag name field hint"
+  },
+  "enterSearchQuery": "Enter search query...",
+  "@enterSearchQuery": {
+    "description": "Search query field hint"
+  },
+  "searchSavedSearchType": "Saved search",
+  "@searchSavedSearchType": {
+    "description": "Saved search type label"
+  },
+  "vcsUsernamesHint": "Adding personal identifiers from integrated version control systems (VCS) lets YouTrack add links to issues referenced in your code commits.",
+  "@vcsUsernamesHint": {
+    "description": "VCS usernames helper text"
+  },
+  "profileLoadError": "Failed to load profile: {error}",
+  "@profileLoadError": {
+    "description": "Profile load error message",
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "changesByMe": "Changes applied by me",
+  "@changesByMe": {
+    "description": "Changes by me notification checkbox"
+  },
+  "mentionsMyUsername": "@mentions that reference my username",
+  "@mentionsMyUsername": {
+    "description": "Mentions notification checkbox"
+  },
+  "changesInDuplicateCluster": "Changes in a duplicate cluster",
+  "@changesInDuplicateCluster": {
+    "description": "Duplicate cluster changes notification checkbox"
+  },
+  "issuesFromEmails": "Issues and comments created from my emails",
+  "@issuesFromEmails": {
+    "description": "Issues from emails notification checkbox"
+  },
+  "vcsBuildUpdates": "Updates applied by VCS and build server integrations",
+  "@vcsBuildUpdates": {
+    "description": "VCS updates notification checkbox"
+  },
+  "failedVcsCommands": "Failed commands in commits processed by VCS and build server integrations",
+  "@failedVcsCommands": {
+    "description": "Failed VCS commands notification checkbox"
+  },
+  "starOnComment": "I post a comment to an issue or article",
+  "@starOnComment": {
+    "description": "Auto star on comment checkbox"
+  },
+  "starOnCreate": "I create an issue or article",
+  "@starOnCreate": {
+    "description": "Auto star on create checkbox"
+  },
+  "starOnUpdate": "I update an issue or article",
+  "@starOnUpdate": {
+    "description": "Auto star on update checkbox"
+  },
+  "starOnAssigned": "I am made responsible for an issue",
+  "@starOnAssigned": {
+    "description": "Auto star on assigned checkbox"
+  },
+  "starOnVote": "I vote for an issue",
+  "@starOnVote": {
+    "description": "Auto star on vote checkbox"
+  },
+  "emailChannel": "Email",
+  "@emailChannel": {
+    "description": "Email channel checkbox"
+  },
+  "telegramChannel": "YouTrack bot for Telegram",
+  "@telegramChannel": {
+    "description": "Telegram channel checkbox"
+  },
+  "connectTelegramAccount": "Connect my account",
+  "@connectTelegramAccount": {
+    "description": "Connect Telegram account button"
+  },
+  "testMessageSent": "Test message sent to email",
+  "@testMessageSent": {
+    "description": "Test message success notification"
+  },
+  "downloadCsvStarted": "Downloading personal data as CSV...",
+  "@downloadCsvStarted": {
+    "description": "CSV download started notification"
+  },
+  "timezoneGuessed": "Time zone guessed: {zone} (based on IP address)",
+  "@timezoneGuessed": {
+    "description": "Timezone guess notification",
+    "placeholders": {
+      "zone": {}
+    }
   }
 }

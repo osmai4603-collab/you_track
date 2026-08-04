@@ -24,6 +24,7 @@ class AddSprintDialog extends StatefulWidget {
 }
 
 class _AddSprintDialogState extends State<AddSprintDialog> {
+  final ScrollController _scrollController = ScrollController();
   late TextEditingController _nameController;
   late TextEditingController _descriptionController;
   DateTime? _startDate;
@@ -62,6 +63,7 @@ class _AddSprintDialogState extends State<AddSprintDialog> {
 
   @override
   void dispose() {
+    _scrollController.dispose();
     _nameController.dispose();
     _descriptionController.dispose();
     super.dispose();
@@ -104,8 +106,10 @@ class _AddSprintDialogState extends State<AddSprintDialog> {
             const SizedBox(height: 20),
             Flexible(
               child: Scrollbar(
+                controller: _scrollController,
                 thumbVisibility: true,
                 child: SingleChildScrollView(
+                  controller: _scrollController,
                   padding: const EdgeInsets.only(right: 12),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,

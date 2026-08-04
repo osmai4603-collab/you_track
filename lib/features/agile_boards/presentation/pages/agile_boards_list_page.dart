@@ -36,7 +36,10 @@ class _AgileBoardsListPageState extends State<AgileBoardsListPage> {
             if (state.status == .loading) {
               content = Center(
                 key: const ValueKey('agile-boards-loading'),
-                child: SizedBox(width: 480, child: ShimmerLoading.list(itemCount: 6)),
+                child: SizedBox(
+                  width: 480,
+                  child: ShimmerLoading.list(itemCount: 6),
+                ),
               );
             } else if (state.status == .failure) {
               content = Center(
@@ -58,7 +61,7 @@ class _AgileBoardsListPageState extends State<AgileBoardsListPage> {
                     final project = projects[index];
                     return ListTile(
                       title: Text(project.name),
-                      subtitle: Text(project.projectId),
+                      subtitle: Text(project.projectKey),
                       trailing: const Icon(Icons.arrow_forward_ios),
                       onTap: () {
                         context.push(
@@ -71,7 +74,9 @@ class _AgileBoardsListPageState extends State<AgileBoardsListPage> {
                 );
               }
             } else {
-              content = const SizedBox.shrink(key: ValueKey('agile-boards-empty'));
+              content = const SizedBox.shrink(
+                key: ValueKey('agile-boards-empty'),
+              );
             }
 
             return AnimatedContentSwitcher(child: content);

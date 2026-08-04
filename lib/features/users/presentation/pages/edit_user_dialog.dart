@@ -1,5 +1,10 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:issues_tracking/core/init_dependencies.dart';
+import 'package:issues_tracking/core/services/supabase_storage_service.dart';
 import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 import 'package:issues_tracking/features/users/presentation/bloc/users_bloc.dart';
 import 'package:issues_tracking/features/users/presentation/bloc/users_event.dart';
@@ -18,7 +23,9 @@ class _EditUserDialogState extends State<EditUserDialog> {
   late final TextEditingController _fullNameController;
   late final TextEditingController _usernameController;
   late final TextEditingController _emailController;
-  late final TextEditingController _avatarUrlController;
+
+  String? _avatarUrl;
+  bool _isUploading = false;
 
   @override
   void initState() {
@@ -26,7 +33,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
     _fullNameController = TextEditingController(text: widget.user.fullName);
     _usernameController = TextEditingController(text: widget.user.username);
     _emailController = TextEditingController(text: widget.user.email);
-    _avatarUrlController = TextEditingController(text: widget.user.avatarUrl ?? '');
+    _avatarUrl = widget.user.avatarUrl;
   }
 
   @override
@@ -34,8 +41,50 @@ class _EditUserDialogState extends State<EditUserDialog> {
     _fullNameController.dispose();
     _usernameController.dispose();
     _emailController.dispose();
-    _avatarUrlController.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickAndUploadAvatar() async {
+    try {
+      final result = await FilePicker.pickFiles(type: FileType.image);
+      if (result == null || result.files.single.path == null) return;
+
+      final file = File(result.files.single.path!);
+      setState(() => _isUploading = true);
+
+      final fileName =
+          'avatars/${widget.user.id}_${DateTime.now().millisecondsSinceEpoch}';
+      final storageService = get_it<SupabaseStorageService>();
+
+      await for (final state in storageService.uploadFile(
+        path: fileName,
+        file: file,
+      )) {
+        if (state.status == UploadStatus.success) {
+          if (!mounted) return;
+          setState(() {
+            _avatarUrl = state.downloadUrl;
+            _isUploading = false;
+          });
+          break;
+        } else if (state.status == UploadStatus.failure) {
+          setState(() => _isUploading = false);
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text(state.errorMessage ?? 'Upload failed')),
+            );
+          }
+          break;
+        }
+      }
+    } catch (e) {
+      setState(() => _isUploading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to pick image: $e')),
+        );
+      }
+    }
   }
 
   void _save() {
@@ -45,9 +94,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
       displayName: _fullNameController.text.trim(),
       username: _usernameController.text.trim(),
       email: _emailController.text.trim(),
-      avatarUrl: _avatarUrlController.text.trim().isEmpty
-          ? null
-          : _avatarUrlController.text.trim(),
+      avatarUrl: _avatarUrl,
     );
 
     context.read<UsersBloc>().add(EditUserEvent(updated));
@@ -58,6 +105,9 @@ class _EditUserDialogState extends State<EditUserDialog> {
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final initials = widget.user.initials.isNotEmpty
+        ? widget.user.initials
+        : widget.user.userKey;
 
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -90,7 +140,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
                     validator: (v) =>
                         v == null || v.trim().isEmpty ? 'Required' : null),
                 const SizedBox(height: 14),
-                _buildField('Avatar URL', _avatarUrlController, colors, textTheme),
+                _buildAvatarSection(colors, textTheme, initials),
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -101,7 +151,7 @@ class _EditUserDialogState extends State<EditUserDialog> {
                     ),
                     const SizedBox(width: 12),
                     FilledButton(
-                      onPressed: _save,
+                      onPressed: _isUploading ? null : _save,
                       child: const Text('Save'),
                     ),
                   ],
@@ -111,6 +161,65 @@ class _EditUserDialogState extends State<EditUserDialog> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildAvatarSection(
+    ColorScheme colors,
+    TextTheme textTheme,
+    String initials,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Avatar',
+          style: textTheme.bodySmall?.copyWith(
+            color: colors.onSurfaceVariant,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            CircleAvatar(
+              radius: 28,
+              backgroundColor: colors.primaryContainer,
+              foregroundImage: _avatarUrl != null && _avatarUrl!.isNotEmpty
+                  ? NetworkImage(_avatarUrl!)
+                  : null,
+              child: Text(
+                initials,
+                style: TextStyle(
+                  color: colors.onPrimaryContainer,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            if (_isUploading)
+              const SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(strokeWidth: 2),
+              )
+            else
+              OutlinedButton.icon(
+                onPressed: _pickAndUploadAvatar,
+                icon: const Icon(Icons.upload_file, size: 16),
+                label: const Text('Upload avatar'),
+              ),
+            if (_avatarUrl != null && !_isUploading) ...[
+              const SizedBox(width: 8),
+              IconButton(
+                tooltip: 'Remove avatar',
+                onPressed: () => setState(() => _avatarUrl = null),
+                icon: const Icon(Icons.delete_outline, size: 18),
+              ),
+            ],
+          ],
+        ),
+      ],
     );
   }
 

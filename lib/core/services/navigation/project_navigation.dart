@@ -7,6 +7,8 @@ import 'package:issues_tracking/features/agile_boards/presentation/pages/agile_b
 import 'package:issues_tracking/features/custom_fields/presentation/cubits/custom_fields_cubit.dart';
 import 'package:issues_tracking/features/custom_fields/presentation/pages/custom_fields_settings_section.dart';
 import 'package:issues_tracking/features/issues/presentation/pages/issues_page.dart';
+import 'package:issues_tracking/features/knowledge_base/presentation/bloc/article_tree_bloc.dart';
+import 'package:issues_tracking/features/knowledge_base/presentation/bloc/article_tree_event.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/pages/article_editor_page.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/pages/knowledge_base_page.dart';
 import 'package:issues_tracking/features/projects/presentation/cubits/project_creation_cubit.dart';
@@ -169,7 +171,11 @@ final class ProjectNavigation extends StatefulShellBranch {
               final projectId = state.pathParameters['projectId']!;
               return CustomTransitionPage(
                 key: state.pageKey,
-                child: ArticleEditorPage(projectId: projectId),
+                child: BlocProvider(
+                  create: (context) => get_it<ArticleTreeBloc>()
+                    ..add(LoadArticleTree(projectId)),
+                  child: ArticleEditorPage(projectId: projectId),
+                ),
                 transitionsBuilder: _fadeTransition,
               );
             },
@@ -190,9 +196,13 @@ final class ProjectNavigation extends StatefulShellBranch {
               final articleId = state.pathParameters['articleId']!;
               return CustomTransitionPage(
                 key: state.pageKey,
-                child: ArticleEditorPage(
-                  projectId: projectId,
-                  articleId: articleId,
+                child: BlocProvider(
+                  create: (context) => get_it<ArticleTreeBloc>()
+                    ..add(LoadArticleTree(projectId)),
+                  child: ArticleEditorPage(
+                    projectId: projectId,
+                    articleId: articleId,
+                  ),
                 ),
                 transitionsBuilder: _fadeTransition,
               );

@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:hive/hive.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/create_issue.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/update_issue_starred.dart';
 import 'package:issues_tracking/features/users/domain/usecases/get_user_permissions_use_case.dart';
 import 'package:issues_tracking/features/users/domain/usecases/login_use_case.dart';
 import 'package:issues_tracking/features/users/presentation/bloc/cubits/login_cubit.dart';
@@ -48,6 +49,8 @@ import 'package:issues_tracking/features/issues/domain/usecases/get_sprints_use_
 import 'package:issues_tracking/features/projects/domain/usecases/get_project_by_id_use_case.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/create_project_use_case.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/update_project_use_case.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/update_project_starting_number_use_case.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/update_project_favorite_use_case.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/archive_project_use_case.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/delete_project_use_case.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/get_project_members_use_case.dart';
@@ -149,6 +152,7 @@ import 'package:issues_tracking/features/issues/domain/repositories/tags_reposit
 import 'package:issues_tracking/features/issues/domain/usecases/create_tag.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/stream_issues.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_project_members.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/get_project_groups.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/is_tag_name_unique.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/associate_tag_with_issue.dart';
 import 'package:issues_tracking/features/issues/presentation/cubits/new_tag_cubit.dart';
@@ -198,6 +202,24 @@ import 'package:issues_tracking/features/users/domain/usecases/ban_user.dart';
 import 'package:issues_tracking/features/users/domain/usecases/update_user.dart';
 import 'package:issues_tracking/features/users/domain/usecases/merge_users.dart';
 import 'package:issues_tracking/features/users/presentation/bloc/users_bloc.dart';
+import 'package:issues_tracking/features/users/data/datasources/user_profile_remote_data_source.dart';
+import 'package:issues_tracking/features/users/data/repositories/user_profile_repository_impl.dart';
+import 'package:issues_tracking/features/users/domain/repositories/user_profile_repository.dart';
+import 'package:issues_tracking/features/users/domain/usecases/get_user_preferences.dart';
+import 'package:issues_tracking/features/users/domain/usecases/save_user_preferences.dart';
+import 'package:issues_tracking/features/users/domain/usecases/get_notification_settings.dart';
+import 'package:issues_tracking/features/users/domain/usecases/save_notification_settings.dart';
+import 'package:issues_tracking/features/users/domain/usecases/get_user_tags.dart';
+import 'package:issues_tracking/features/users/domain/usecases/get_saved_searches.dart';
+import 'package:issues_tracking/features/users/domain/usecases/create_saved_search.dart';
+import 'package:issues_tracking/features/users/domain/usecases/delete_saved_search.dart';
+import 'package:issues_tracking/features/users/domain/usecases/change_password.dart';
+import 'package:issues_tracking/features/users/domain/usecases/revoke_refresh_token.dart';
+import 'package:issues_tracking/features/users/presentation/bloc/cubits/user_profile_cubit.dart';
+import 'package:issues_tracking/features/users/presentation/bloc/cubits/user_preferences_cubit.dart';
+import 'package:issues_tracking/features/users/presentation/bloc/cubits/notification_settings_cubit.dart';
+import 'package:issues_tracking/features/users/presentation/bloc/cubits/user_tags_cubit.dart';
+import 'package:issues_tracking/features/users/presentation/bloc/cubits/account_security_cubit.dart';
 
 // ignore: non_constant_identifier_names
 final get_it = GetIt.instance;
@@ -236,6 +258,7 @@ Future<void> initDependencies({bool isOffline = false}) async {
   _initGroupsFeature(isOffline: isOffline);
   _initRolesFeature(isOffline: isOffline);
   _initUsersFeature(isOffline: isOffline);
+  _initUserProfileFeature(isOffline: isOffline);
 }
 
 void _initAppFeature({required bool isOffline}) {
@@ -314,10 +337,12 @@ void _initIssuesFeature({required bool isOffline}) {
   get_it.registerLazySingleton(() => UploadAttachment(get_it()));
   get_it.registerLazySingleton(() => CreateTag(get_it()));
   get_it.registerLazySingleton(() => GetProjectMembers(get_it()));
+  get_it.registerLazySingleton(() => GetProjectGroups(get_it()));
   get_it.registerLazySingleton(() => IsTagNameUnique(get_it()));
   get_it.registerLazySingleton(() => AssociateTagWithIssue(get_it()));
   get_it.registerLazySingleton(() => GetTagsByIssueId(get_it()));
   get_it.registerLazySingleton(() => GetLinksByIssueId(get_it()));
+  get_it.registerLazySingleton(() => UpdateIssueStarredUseCase(get_it()));
 
   // Blocs
   get_it.registerFactory(
@@ -325,6 +350,7 @@ void _initIssuesFeature({required bool isOffline}) {
       getIssues: get_it(),
       streamIssues: get_it(),
       repository: get_it(),
+      updateIssueStarredUseCase: get_it(),
     ),
   );
   get_it.registerFactory(
@@ -341,12 +367,14 @@ void _initIssuesFeature({required bool isOffline}) {
       getProjectMembersUseCase: get_it(),
       getIssueLinksByIssueId: get_it(),
       getTagsByIssueId: get_it(),
+      updateProjectStartingNumberUseCase: get_it(),
     ),
   );
   get_it.registerFactory(
     () => NewTagCubit(
       createTagUseCase: get_it(),
       getProjectMembersUseCase: get_it(),
+      getProjectGroupsUseCase: get_it(),
       isTagNameUniqueUseCase: get_it(),
       associateTagUseCase: get_it(),
     ),
@@ -387,6 +415,12 @@ void _initProjectsFeature({required bool isOffline}) {
   get_it.registerLazySingleton(() => DeleteProjectUseCase(get_it()));
   get_it.registerLazySingleton(() => AddProjectMemberUseCase(get_it()));
   get_it.registerLazySingleton(() => GetProjectTemplatesUseCase(get_it()));
+  get_it.registerLazySingleton(
+    () => UpdateProjectStartingNumberUseCase(get_it()),
+  );
+  get_it.registerLazySingleton(
+    () => UpdateProjectFavoriteUseCase(get_it()),
+  );
 
   // Cubits
   get_it.registerFactory(
@@ -394,7 +428,7 @@ void _initProjectsFeature({required bool isOffline}) {
       getProjectsUseCase: get_it(),
       archiveProjectUseCase: get_it(),
       deleteProjectUseCase: get_it(),
-      updateProjectUseCase: get_it(),
+      updateProjectFavoriteUseCase: get_it(),
     ),
   );
   get_it.registerFactory(
@@ -736,6 +770,64 @@ void _initAgileBoardsFeature({required bool isOffline}) {
       removeGroupMembers: get_it(),
       getGroups: get_it(),
       getGroupMembers: get_it(),
+    ),
+  );
+}
+
+void _initUserProfileFeature({required bool isOffline}) {
+  // DataSource
+  get_it.registerLazySingleton<UserProfileRemoteDataSource>(
+    () => UserProfileRemoteDataSourceImpl(get_it()),
+  );
+
+  // Repository
+  get_it.registerLazySingleton<UserProfileRepository>(
+    () => UserProfileRepositoryImpl(get_it()),
+  );
+
+  // Use Cases
+  get_it.registerLazySingleton(() => GetUserPreferencesUseCase(get_it()));
+  get_it.registerLazySingleton(() => SaveUserPreferencesUseCase(get_it()));
+  get_it.registerLazySingleton(() => GetNotificationSettingsUseCase(get_it()));
+  get_it.registerLazySingleton(() => SaveNotificationSettingsUseCase(get_it()));
+  get_it.registerLazySingleton(() => GetUserTagsUseCase(get_it()));
+  get_it.registerLazySingleton(() => GetSavedSearchesUseCase(get_it()));
+  get_it.registerLazySingleton(() => CreateSavedSearchUseCase(get_it()));
+  get_it.registerLazySingleton(() => DeleteSavedSearchUseCase(get_it()));
+  get_it.registerLazySingleton(() => ChangePasswordUseCase(get_it()));
+  get_it.registerLazySingleton(() => RevokeRefreshTokenUseCase(get_it()));
+
+  // Cubits
+  get_it.registerFactory(
+    () => UserProfileCubit(
+      usersRepository: get_it(),
+      updateUser: get_it(),
+    ),
+  );
+  get_it.registerFactory(
+    () => UserPreferencesCubit(
+      getPreferences: get_it(),
+      savePreferences: get_it(),
+    ),
+  );
+  get_it.registerFactory(
+    () => NotificationSettingsCubit(
+      getSettings: get_it(),
+      saveSettings: get_it(),
+    ),
+  );
+  get_it.registerFactory(
+    () => UserTagsCubit(
+      getUserTags: get_it(),
+      getSavedSearches: get_it(),
+      createSavedSearch: get_it(),
+      deleteSavedSearch: get_it(),
+    ),
+  );
+  get_it.registerFactory(
+    () => AccountSecurityCubit(
+      changePassword: get_it(),
+      revokeRefreshToken: get_it(),
     ),
   );
 }

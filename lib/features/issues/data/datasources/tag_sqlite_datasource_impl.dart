@@ -1,5 +1,8 @@
 import 'package:issues_tracking/core/services/sqlite/sqlite_database_sync.dart';
+import 'package:issues_tracking/core/services/sqlite/tables/group_projects_table.dart';
+import 'package:issues_tracking/core/services/sqlite/tables/groups_table.dart';
 import 'package:issues_tracking/core/services/sqlite/tables/issue_tags_table.dart';
+import 'package:issues_tracking/core/services/sqlite/tables/tag_permission_groups_table.dart';
 import 'package:issues_tracking/core/services/sqlite/tables/tag_permission_users_table.dart';
 import 'package:issues_tracking/core/services/sqlite/tables/tag_permissions_table.dart';
 import 'package:issues_tracking/core/services/sqlite/tables/tag_subscriptions_table.dart';
@@ -16,9 +19,13 @@ class TagSqliteDatasourceImpl implements TagRemoteDatasource {
   final TagPermissionsTable _permissionsTable = const TagPermissionsTable();
   final TagPermissionUsersTable _permissionUsersTable =
       const TagPermissionUsersTable();
+  final TagPermissionGroupsTable _permissionGroupsTable =
+      const TagPermissionGroupsTable();
   final TagSubscriptionsTable _subscriptionsTable =
       const TagSubscriptionsTable();
   final IssueTagsTable _issueTagsTable = const IssueTagsTable();
+  final GroupProjectsTable _groupProjectsTable = const GroupProjectsTable();
+  final GroupsTable _groupsTable = const GroupsTable();
 
   TagSqliteDatasourceImpl(this._sqlite);
 
@@ -43,6 +50,7 @@ class TagSqliteDatasourceImpl implements TagRemoteDatasource {
     required bool favorite,
     required Map<String, String> permissions,
     List<String>? specificUserIds,
+    List<String>? specificGroupIds,
     required List<String> subscriptionEvents,
   }) async {
     final tagId = DateTime.now().millisecondsSinceEpoch.toString();
@@ -87,6 +95,15 @@ class TagSqliteDatasourceImpl implements TagRemoteDatasource {
             data: {'tag_permission_id': permId, 'user_id': uid},
           );
           permUsers.add({'user_id': uid});
+        }
+      }
+
+      if (entry.value == 'specific_users' && specificGroupIds != null) {
+        for (final gid in specificGroupIds) {
+          _sqlite.insert(
+            table: _permissionGroupsTable.tableName,
+            data: {'tag_permission_id': permId, 'group_id': gid},
+          );
         }
       }
 
@@ -135,7 +152,71 @@ class TagSqliteDatasourceImpl implements TagRemoteDatasource {
       where: 'project_id = ?',
       whereArgs: [projectId],
     );
-    return rows;
+
+    final userIds = rows
+        .map((row) => row['user_id']?.toString())
+        .whereType<String>()
+        .toList();
+    if (userIds.isEmpty) return rows;
+
+    final userRows = _sqlite.query(
+      table: 'users',
+      where: 'id IN (${List.filled(userIds.length, '?').join(', ')})',
+      whereArgs: userIds,
+    );
+    final usersById = {
+      for (final user in userRows) user['id']?.toString(): user,
+    };
+
+    return rows.map((row) {
+      final userRow = usersById[row['user_id']?.toString()];
+      return {
+        ...row,
+        'users': userRow == null
+            ? null
+            : {
+                'id': userRow['id'],
+                'full_name': userRow['display_name'],
+                'username': userRow['username'],
+                'email': userRow['email'],
+                'avatar_url': userRow['avatar_url'],
+              },
+      };
+    }).toList();
+  }
+
+  @override
+  Future<List<Map<String, dynamic>>> getProjectGroups({
+    required String projectId,
+  }) async {
+    final rows = _sqlite.query(
+      table: _groupProjectsTable.tableName,
+      where: '${_groupProjectsTable.projectId} = ?',
+      whereArgs: [projectId],
+    );
+
+    final groupIds = rows
+        .map((row) => row[_groupProjectsTable.groupId]?.toString())
+        .whereType<String>()
+        .toList();
+    if (groupIds.isEmpty) return rows;
+
+    final groupRows = _sqlite.query(
+      table: _groupsTable.tableName,
+      where: '${_groupsTable.id} IN (${List.filled(groupIds.length, '?').join(', ')})',
+      whereArgs: groupIds,
+    );
+    final groupsById = {
+      for (final group in groupRows) group[_groupsTable.id]?.toString(): group,
+    };
+
+    return rows.map((row) {
+      final groupRow = groupsById[row[_groupProjectsTable.groupId]?.toString()];
+      return {
+        ...row,
+        'groups': groupRow,
+      };
+    }).toList();
   }
 
   @override

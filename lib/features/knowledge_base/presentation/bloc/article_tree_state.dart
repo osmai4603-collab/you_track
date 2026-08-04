@@ -17,7 +17,7 @@ class ArticleTreeLoaded extends ArticleTreeState {
   final Map<String, List<Article>> tree;
   final String? selectedArticleId;
   final Set<String> expandedNodeIds;
-  final String projectId;
+  final String? projectId;
 
   const ArticleTreeLoaded({
     required this.articles,
@@ -48,12 +48,12 @@ class ArticleTreeLoaded extends ArticleTreeState {
 
   @override
   List<Object?> get props => [
-        articles,
-        tree,
-        selectedArticleId,
-        expandedNodeIds,
-        projectId,
-      ];
+    articles,
+    tree,
+    selectedArticleId,
+    expandedNodeIds,
+    projectId,
+  ];
 }
 
 class ArticleTreeError extends ArticleTreeState {

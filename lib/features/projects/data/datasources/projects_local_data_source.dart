@@ -9,6 +9,8 @@ abstract class ProjectsLocalDataSource {
   Future<ProjectModel> getProjectById(String id);
   Future<ProjectModel> createProject(ProjectModel project);
   Future<ProjectModel> updateProject(ProjectModel project);
+  Future<void> updateStartingNumber(String projectId, int startingNumber);
+  Future<void> updateFavorite(String projectId, bool isFavorite);
   Future<void> archiveProject(String id);
   Future<void> deleteProject(String id);
   Future<List<ProjectMemberModel>> getProjectMembers(String projectId);
@@ -32,7 +34,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
     ProjectModel(
       id: 'proj_demo',
       name: 'Demo Project',
-      projectId: 'DEMO',
+      projectKey: 'DEMO',
       description: 'Demonstration project showcasing YouTrack capabilities.',
       isArchived: false,
 
@@ -44,7 +46,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
     ProjectModel(
       id: 'proj_fingerprint',
       name: 'fingerprint',
-      projectId: 'FIN',
+      projectKey: 'FIN',
       description: 'Biometric fingerprint authentication subsystem.',
       isArchived: false,
 
@@ -56,7 +58,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
     ProjectModel(
       id: 'proj_test',
       name: 'Test project',
-      projectId: 'TP',
+      projectKey: 'TP',
       description: 'Primary testing environment for new workflow features.',
       isArchived: false,
 
@@ -99,7 +101,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
   @override
   Future<ProjectModel> getProjectById(String id) async {
     final project = _projects.firstWhere(
-      (p) => p.id == id || p.projectId == id,
+      (p) => p.id == id || p.projectKey == id,
       orElse: () => throw Exception('Project not found with ID: $id'),
     );
     return project;
@@ -122,6 +124,26 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
   }
 
   @override
+  Future<void> updateStartingNumber(String projectId, int startingNumber) async {
+    final index = _projects.indexWhere((p) => p.id == projectId);
+    if (index != -1) {
+      final p = _projects[index];
+      _projects[index] =
+          ProjectModel.fromEntity(p.copyWith(startingNumber: startingNumber));
+    }
+  }
+
+  @override
+  Future<void> updateFavorite(String projectId, bool isFavorite) async {
+    final index = _projects.indexWhere((p) => p.id == projectId);
+    if (index != -1) {
+      final p = _projects[index];
+      _projects[index] =
+          ProjectModel.fromEntity(p.copyWith(isFavorite: isFavorite));
+    }
+  }
+
+  @override
   Future<void> archiveProject(String id) async {
     final index = _projects.indexWhere((p) => p.id == id);
     if (index != -1) {
@@ -129,7 +151,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
       _projects[index] = ProjectModel(
         id: p.id,
         name: p.name,
-        projectId: p.projectId,
+        projectKey: p.projectKey,
         description: p.description,
         isArchived: true,
         templateType: p.templateType,

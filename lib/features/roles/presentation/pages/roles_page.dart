@@ -48,9 +48,7 @@ class _RolesPageState extends State<RolesPage> {
         Widget content;
 
         if (state is RolesLoading) {
-          content = ShimmerLoading.table(
-            key: const ValueKey('roles-loading'),
-          );
+          content = ShimmerLoading.table(key: const ValueKey('roles-loading'));
         } else if (state is RolesError) {
           content = Center(
             key: const ValueKey('roles-error'),
@@ -68,7 +66,9 @@ class _RolesPageState extends State<RolesPage> {
                       children: [
                         Expanded(child: _buildSearchField()),
                         const SizedBox(width: 8),
-                        if (context.watch<UserSession>().hasPermission(Permission.systemLowLevelAdminWrite))
+                        if (context.watch<UserSession>().hasPermission(
+                          Permission.systemLowLevelAdminWrite,
+                        ))
                           FilledButton.icon(
                             onPressed: () =>
                                 context.push(AppRouteKeys.createRole),
@@ -83,7 +83,7 @@ class _RolesPageState extends State<RolesPage> {
                 ],
               ),
               AnimatedPositioned(
-                duration: const Duration(milliseconds: 250),
+                duration: const Duration(milliseconds: 500),
                 curve: Curves.easeInOut,
                 right: showPanel ? 0 : -500,
                 top: 0,

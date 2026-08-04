@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article_comment.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/bloc/article_comment_bloc.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/bloc/article_comment_event.dart';
@@ -51,11 +52,11 @@ class _ArticleCommentThreadState extends State<ArticleCommentThread> {
 
   void _resolveComment(ArticleComment comment) {
     context.read<ArticleCommentBloc>().add(
-          ResolveCommentEvent(
-            commentId: comment.id,
-            resolvedBy: widget.currentUserId,
-          ),
-        );
+      ResolveCommentEvent(
+        commentId: comment.id,
+        resolvedBy: widget.currentUserId,
+      ),
+    );
   }
 
   void _deleteComment(ArticleComment comment) async {
@@ -78,9 +79,7 @@ class _ArticleCommentThreadState extends State<ArticleCommentThread> {
     );
     if (!mounted) return;
     if (confirmed == true) {
-      context
-          .read<ArticleCommentBloc>()
-          .add(DeleteCommentEvent(comment.id));
+      context.read<ArticleCommentBloc>().add(DeleteCommentEvent(comment.id));
     }
   }
 
@@ -99,8 +98,8 @@ class _ArticleCommentThreadState extends State<ArticleCommentThread> {
             child: Text(
               'No comments yet.',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: colorScheme.onSurfaceVariant,
-                  ),
+                color: colorScheme.onSurfaceVariant,
+              ),
             ),
           ),
         ...sorted.map((comment) => _buildCommentCard(comment, colorScheme)),
@@ -140,8 +139,10 @@ class _ArticleCommentThreadState extends State<ArticleCommentThread> {
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(8),
-                    borderSide:
-                        BorderSide(color: colorScheme.primary, width: 2),
+                    borderSide: BorderSide(
+                      color: colorScheme.primary,
+                      width: 2,
+                    ),
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 12,
@@ -210,16 +211,13 @@ class _ArticleCommentThreadState extends State<ArticleCommentThread> {
                           comment.authorId.length > 12
                               ? '${comment.authorId.substring(0, 12)}...'
                               : comment.authorId,
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelMedium
+                          style: Theme.of(context).textTheme.labelMedium
                               ?.copyWith(fontWeight: FontWeight.w600),
                         ),
                         Text(
                           _formatTimestamp(comment.createdAt),
-                          style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                                color: colorScheme.onSurfaceVariant,
-                              ),
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(color: colorScheme.onSurfaceVariant),
                         ),
                       ],
                     ),
@@ -232,11 +230,11 @@ class _ArticleCommentThreadState extends State<ArticleCommentThread> {
                       },
                       itemBuilder: (context) => [
                         if (!isResolved)
-                          const PopupMenuItem(
+                          const AppPopupMenuItem(
                             value: 'resolve',
                             child: Text('Resolve'),
                           ),
-                        const PopupMenuItem(
+                        const AppPopupMenuItem(
                           value: 'delete',
                           child: Text('Delete'),
                         ),
@@ -255,8 +253,7 @@ class _ArticleCommentThreadState extends State<ArticleCommentThread> {
               Text(
                 comment.commentText,
                 style: TextStyle(
-                  decoration:
-                      isResolved ? TextDecoration.lineThrough : null,
+                  decoration: isResolved ? TextDecoration.lineThrough : null,
                   color: colorScheme.onSurface,
                 ),
               ),
@@ -265,18 +262,14 @@ class _ArticleCommentThreadState extends State<ArticleCommentThread> {
                   padding: const EdgeInsets.only(top: 6),
                   child: Row(
                     children: [
-                      Icon(
-                        Icons.check_circle,
-                        size: 14,
-                        color: Colors.green,
-                      ),
+                      Icon(Icons.check_circle, size: 14, color: Colors.green),
                       const SizedBox(width: 4),
                       Text(
                         'Resolved',
                         style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                              color: Colors.green,
-                              fontWeight: FontWeight.w500,
-                            ),
+                          color: Colors.green,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ],
                   ),

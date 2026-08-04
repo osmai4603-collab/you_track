@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
+import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
 import 'package:issues_tracking/core/widgets/avatar_url_chip.dart';
 import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 import 'package:issues_tracking/features/users/presentation/bloc/users_bloc.dart';
@@ -176,9 +177,12 @@ class _UserTableRowState extends State<UserTableRow> {
                 icon: const Icon(Icons.more_horiz, size: 18),
                 onSelected: (value) => _onPopupAction(context, value, user),
                 itemBuilder: (context) => [
-                  const PopupMenuItem(value: 'edit', child: Text('Edit')),
-                  const PopupMenuItem(value: 'delete', child: Text('Delete')),
-                  PopupMenuItem(
+                  const AppPopupMenuItem(value: 'edit', child: Text('Edit')),
+                  const AppPopupMenuItem(
+                    value: 'delete',
+                    child: Text('Delete'),
+                  ),
+                  AppPopupMenuItem(
                     value: 'ban',
                     child: Text(user.isBanned ? 'Unban' : 'Ban'),
                   ),

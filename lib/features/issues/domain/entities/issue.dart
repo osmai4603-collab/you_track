@@ -36,7 +36,7 @@ class Issue extends Entity {
   final int commentsCount;
   final bool isStarred;
   final String? parentId;
-  final List<String> visibility;
+  final Map<String, List<String>> visibility;
   final List<Sprint> sprints;
   final List<IssueLink> links;
   final String projectId;
@@ -71,7 +71,7 @@ class Issue extends Entity {
     this.commentsCount = 0,
     this.isStarred = false,
     this.parentId,
-    this.visibility = const ['team'],
+    this.visibility = const {'users': [], 'groups': []},
     this.sprints = const [],
     this.links = const [],
   });
@@ -79,7 +79,7 @@ class Issue extends Entity {
   @override
   Issue copyWith({
     String? id,
-    String? projectId,
+    String? projectKey,
     int? issueNumber,
     String? summary,
     String? description,
@@ -111,14 +111,14 @@ class Issue extends Entity {
     bool? isStarred,
     String? parentId,
     bool clearParentId = false,
-    List<String>? visibility,
+    Map<String, List<String>>? visibility,
     List<Sprint>? sprints,
     List<IssueLink>? links,
   }) {
     return Issue(
       id: id ?? this.id,
       issueKey: issueKey,
-      projectId: projectId ?? this.projectId,
+      projectId: projectKey ?? this.projectId,
       issueNumber: issueNumber ?? this.issueNumber,
       summary: summary ?? this.summary,
       description: description ?? this.description,
@@ -187,5 +187,4 @@ class Issue extends Entity {
     sprints,
     links,
   ];
-
 }

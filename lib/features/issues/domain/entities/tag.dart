@@ -34,7 +34,7 @@ class Tag extends Entity {
     String? id,
     String? name,
     String? ownerId,
-    String? projectId,
+    String? projectKey,
     bool? shared,
     bool? removeOnResolution,
     bool? favorite,
@@ -47,7 +47,7 @@ class Tag extends Entity {
       id: id ?? this.id,
       name: name ?? this.name,
       ownerId: ownerId ?? this.ownerId,
-      projectId: projectId ?? this.projectId,
+      projectId: projectKey ?? this.projectId,
       shared: shared ?? this.shared,
       removeOnResolution: removeOnResolution ?? this.removeOnResolution,
       favorite: favorite ?? this.favorite,
@@ -60,16 +60,16 @@ class Tag extends Entity {
 
   @override
   List<Object?> get props => [
-        id,
-        name,
-        ownerId,
-        projectId,
-        shared,
-        removeOnResolution,
-        favorite,
-        createdAt,
-        createdBy,
-        permissions,
-        subscriptions,
-      ];
+    id,
+    name,
+    ownerId,
+    projectId,
+    shared,
+    removeOnResolution,
+    favorite,
+    createdAt,
+    createdBy,
+    permissions,
+    subscriptions,
+  ];
 }

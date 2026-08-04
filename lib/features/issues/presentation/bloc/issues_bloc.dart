@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/features/issues/domain/entities/tag.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_issues.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/stream_issues.dart';
+import 'package:issues_tracking/features/issues/domain/usecases/update_issue_starred.dart';
 import 'package:issues_tracking/features/issues/domain/repositories/issues_repository.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_filter.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
@@ -16,11 +17,13 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
   final GetIssues getIssues;
   final StreamIssues streamIssues;
   final IssuesRepository repository;
+  final UpdateIssueStarredUseCase updateIssueStarredUseCase;
 
   IssuesBloc({
     required this.getIssues,
     required this.streamIssues,
     required this.repository,
+    required this.updateIssueStarredUseCase,
   }) : super(IssuesInitial()) {
     on<LoadIssues>(_onLoadIssues);
     on<SelectIssue>(_onSelectIssue);
@@ -198,14 +201,54 @@ class IssuesBloc extends Bloc<IssuesEvent, IssuesState> {
   ) async {
     if (state is IssuesLoaded) {
       final current = state as IssuesLoaded;
-      final updatedIssues = current.filteredIssues.map((issue) {
+      Issue? toggledIssue;
+      final updatedIssues = current.issues.map((issue) {
         if (issue.id == event.issueId) {
-          return issue.copyWith(isStarred: !issue.isStarred);
+          toggledIssue = issue.copyWith(isStarred: !issue.isStarred);
+          return toggledIssue!;
+        }
+        return issue;
+      }).toList();
+      final updatedFilteredIssues = current.filteredIssues.map((issue) {
+        if (issue.id == event.issueId) {
+          return toggledIssue!;
         }
         return issue;
       }).toList();
 
-      emit(current.copyWith(filteredIssues: updatedIssues));
+      emit(current.copyWith(
+        issues: updatedIssues,
+        filteredIssues: updatedFilteredIssues,
+      ));
+
+      if (toggledIssue == null) return;
+      final result = await updateIssueStarredUseCase(
+        params: UpdateIssueStarredParams(
+          issueId: toggledIssue!.id,
+          isStarred: toggledIssue!.isStarred,
+        ),
+      );
+      result.fold(
+        (failure) {
+          final revertedIssues = updatedIssues.map((issue) {
+            if (issue.id == event.issueId) {
+              return issue.copyWith(isStarred: !issue.isStarred);
+            }
+            return issue;
+          }).toList();
+          final revertedFiltered = updatedFilteredIssues.map((issue) {
+            if (issue.id == event.issueId) {
+              return issue.copyWith(isStarred: !issue.isStarred);
+            }
+            return issue;
+          }).toList();
+          emit(current.copyWith(
+            issues: revertedIssues,
+            filteredIssues: revertedFiltered,
+          ));
+        },
+        (_) => null,
+      );
     }
   }
 

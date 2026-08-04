@@ -12,11 +12,11 @@ class ProjectData extends Entity {
   });
 
   @override
-  Entity copyWith({String? id, String? projectName, String? projectId}) {
+  Entity copyWith({String? id, String? projectName, String? projectKey}) {
     return ProjectData(
       id: id ?? this.id,
       projectName: projectName ?? this.projectName,
-      projectId: projectId ?? this.projectId,
+      projectId: projectKey ?? this.projectId,
     );
   }
 

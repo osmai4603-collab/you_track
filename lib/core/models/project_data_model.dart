@@ -26,7 +26,7 @@ final class ProjectDataModel extends ProjectData {
     return ProjectDataModel(
       id: project.id,
       projectName: project.name,
-      projectId: project.projectId,
+      projectId: project.projectKey,
     );
   }
 }

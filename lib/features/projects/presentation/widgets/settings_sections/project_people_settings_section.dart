@@ -6,6 +6,7 @@ import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/constants/app_spacing.dart';
 import 'package:issues_tracking/core/localization/app_localizations.dart';
 import 'package:issues_tracking/core/widgets/animated_content_switcher.dart';
+import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
 import 'package:issues_tracking/core/widgets/avatar_url_chip.dart';
 import 'package:issues_tracking/core/widgets/hover_widget.dart';
 import 'package:issues_tracking/core/widgets/shimmer_loading.dart';
@@ -123,10 +124,7 @@ class _ProjectPeopleSettingsSectionState
             if (state.status == ProjectMembersStatus.loading) {
               content = Center(
                 key: const ValueKey('project-people-loading'),
-                child: SizedBox(
-                  width: 480,
-                  child: ShimmerLoading.list(itemCount: 6),
-                ),
+                child: ShimmerLoading.list(itemCount: 9),
               );
             } else if (state.status == ProjectMembersStatus.failure) {
               content = Padding(
@@ -146,71 +144,82 @@ class _ProjectPeopleSettingsSectionState
                 filteredGroups.isEmpty) {
               content = _buildEmptyState(l10n, textTheme, colors);
             } else {
-              content = SingleChildScrollView(
-                key: const ValueKey('project-people-loaded'),
-                padding: const EdgeInsets.symmetric(horizontal: AppSpacing.large),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildSearchFilterBar(
-                      l10n,
-                      textTheme,
-                      colors,
-                      filteredGroups,
-                      projectId,
-                    ),
-                    const SizedBox(height: AppSpacing.large),
-                    _buildProjectTeamHeader(
-                      teamMembers.length + filteredGroups.length,
-                      project?.ownerId ?? '',
-                      l10n,
-                      textTheme,
-                      colors,
-                    ),
-                    const SizedBox(height: AppSpacing.medium),
-                    Builder(
-                      builder: (context) {
-                        final mainTableIds = [
-                          ...filteredGroups.map((g) => g.id),
-                          ...teamMembers.map((m) => m.id),
-                        ];
-                        final allSelected =
-                            mainTableIds.isNotEmpty &&
-                            mainTableIds.every(
-                              (id) => _selectedItemIds.contains(id),
-                            );
-                        return _buildMembersTableHeader(
+              content = Align(
+                alignment: .topStart,
+                child: SingleChildScrollView(
+                  key: const ValueKey('project-people-loaded'),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.large,
+                  ),
+                  child: Column(
+                    mainAxisAlignment: .start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _buildSearchFilterBar(
+                        l10n,
+                        textTheme,
+                        colors,
+                        filteredGroups,
+                        projectId,
+                      ),
+                      const SizedBox(height: AppSpacing.large),
+                      _buildProjectTeamHeader(
+                        teamMembers.length + filteredGroups.length,
+                        project?.ownerId ?? '',
+                        l10n,
+                        textTheme,
+                        colors,
+                      ),
+                      const SizedBox(height: AppSpacing.medium),
+                      Builder(
+                        builder: (context) {
+                          final mainTableIds = [
+                            ...filteredGroups.map((g) => g.id),
+                            ...teamMembers.map((m) => m.id),
+                          ];
+                          final allSelected =
+                              mainTableIds.isNotEmpty &&
+                              mainTableIds.every(
+                                (id) => _selectedItemIds.contains(id),
+                              );
+                          return _buildMembersTableHeader(
+                            textTheme,
+                            colors,
+                            allSelected: allSelected,
+                            onSelectAll: (value) {
+                              setState(() {
+                                if (value == true) {
+                                  _selectedItemIds.addAll(mainTableIds);
+                                } else {
+                                  _selectedItemIds.removeAll(mainTableIds);
+                                }
+                              });
+                            },
+                          );
+                        },
+                      ),
+                      ...filteredGroups.map(
+                        (g) => _buildGroupRow(
+                          g,
+                          projectId,
+                          l10n,
                           textTheme,
                           colors,
-                          allSelected: allSelected,
-                          onSelectAll: (value) {
-                            setState(() {
-                              if (value == true) {
-                                _selectedItemIds.addAll(mainTableIds);
-                              } else {
-                                _selectedItemIds.removeAll(mainTableIds);
-                              }
-                            });
-                          },
-                        );
-                      },
-                    ),
-                    ...filteredGroups.map(
-                      (g) =>
-                          _buildGroupRow(g, projectId, l10n, textTheme, colors),
-                    ),
-                    ...teamMembers.map(
-                      (m) => _buildMemberRow(m, l10n, textTheme, colors),
-                    ),
-                    const SizedBox(height: AppSpacing.extraLarge),
-                    _buildOtherPeopleSection(
-                      otherPeople,
-                      l10n,
-                      textTheme,
-                      colors,
-                    ),
-                    const SizedBox(height: AppSpacing.extraLarge),
-                  ],
+                        ),
+                      ),
+                      ...teamMembers.map(
+                        (m) => _buildMemberRow(m, l10n, textTheme, colors),
+                      ),
+                      const SizedBox(height: AppSpacing.extraLarge),
+                      _buildOtherPeopleSection(
+                        otherPeople,
+                        l10n,
+                        textTheme,
+                        colors,
+                      ),
+                      const SizedBox(height: AppSpacing.extraLarge),
+                    ],
+                  ),
                 ),
               );
             }
@@ -344,61 +353,61 @@ class _ProjectPeopleSettingsSectionState
           ),
         ),
         const Spacer(),
-        PopupMenuButton<String>(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              CircleAvatar(
-                radius: 10,
-                backgroundColor: Colors.green,
-                child: Text(
-                  owner.isNotEmpty ? owner[0].toUpperCase() : '?',
-                  style: textTheme.textTheme.labelSmall?.copyWith(
-                    color: Colors.white,
-                    fontSize: 10,
-                  ),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.extraSmall),
-              Text(owner, style: textTheme.textTheme.bodySmall),
-              const Icon(Icons.arrow_drop_down, size: 18),
-            ],
-          ),
-          onSelected: (_) {},
-          itemBuilder: (context) => [
-            PopupMenuItem(value: owner, child: Text(owner)),
-          ],
-        ),
-        const SizedBox(width: AppSpacing.medium),
-        PopupMenuButton<String>(
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(l10n.teamRolesLabel, style: textTheme.textTheme.bodySmall),
-              const Icon(Icons.arrow_drop_down, size: 18),
-            ],
-          ),
-          onSelected: (value) {
-            setState(() {
-              _selectedRoleFilter = value == 'all' ? null : value;
-            });
-          },
-          itemBuilder: (context) => [
-            const PopupMenuItem(value: 'all', child: Text('All')),
-            const PopupMenuItem(
-              value: 'System Admin',
-              child: Text('System Admin'),
-            ),
-            const PopupMenuItem(
-              value: 'Contributor',
-              child: Text('Contributor'),
-            ),
-            const PopupMenuItem(
-              value: 'Project Admin',
-              child: Text('Project Admin'),
-            ),
-          ],
-        ),
+        // PopupMenuButton<String>(
+        //   child: Row(
+        //     mainAxisSize: MainAxisSize.min,
+        //     children: [
+        //       CircleAvatar(
+        //         radius: 10,
+        //         backgroundColor: Colors.green,
+        //         child: Text(
+        //           owner.isNotEmpty ? owner[0].toUpperCase() : '?',
+        //           style: textTheme.textTheme.labelSmall?.copyWith(
+        //             color: Colors.white,
+        //             fontSize: 10,
+        //           ),
+        //         ),
+        //       ),
+        //       const SizedBox(width: AppSpacing.extraSmall),
+        //       Text(owner, style: textTheme.textTheme.bodySmall),
+        //       const Icon(Icons.arrow_drop_down, size: 18),
+        //     ],
+        //   ),
+        //   onSelected: (_) {},
+        //   itemBuilder: (context) => [
+        //     AppPopupMenuItem(value: owner, child: Text(owner)),
+        //   ],
+        // ),
+        // const SizedBox(width: AppSpacing.medium),
+        // PopupMenuButton<String>(
+        //   child: Row(
+        //     mainAxisSize: MainAxisSize.min,
+        //     children: [
+        //       Text(l10n.teamRolesLabel, style: textTheme.textTheme.bodySmall),
+        //       const Icon(Icons.arrow_drop_down, size: 18),
+        //     ],
+        //   ),
+        //   onSelected: (value) {
+        //     setState(() {
+        //       _selectedRoleFilter = value == 'all' ? null : value;
+        //     });
+        //   },
+        //   itemBuilder: (context) => [
+        //     const AppPopupMenuItem(value: 'all', child: Text('All')),
+        //     const AppPopupMenuItem(
+        //       value: 'System Admin',
+        //       child: Text('System Admin'),
+        //     ),
+        //     const AppPopupMenuItem(
+        //       value: 'Contributor',
+        //       child: Text('Contributor'),
+        //     ),
+        //     const AppPopupMenuItem(
+        //       value: 'Project Admin',
+        //       child: Text('Project Admin'),
+        //     ),
+        //   ],
+        // ),
       ],
     );
   }
@@ -683,7 +692,7 @@ class _ProjectPeopleSettingsSectionState
         }
       },
       itemBuilder: (context) => [
-        PopupMenuItem(
+        AppPopupMenuItem(
           value: 'remove',
           child: Text(
             l10n.removeMemberAction,

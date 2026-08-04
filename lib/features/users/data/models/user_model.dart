@@ -31,6 +31,7 @@ class UserModel extends UserEntity {
   }
 
   static UserModel? tryParseFromJson(Map<String, dynamic>? data) {
+    print('model: $data');
     if (data == null) return null;
     return UserModel.fromJson(data);
   }

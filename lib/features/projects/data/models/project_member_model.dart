@@ -44,28 +44,17 @@ class ProjectMemberModel extends ProjectMemberEntity {
     }).toList();
   }
 
-  factory ProjectMemberModel.fromJson(Map<String, dynamic>? json) {
-    printMap(title: 'ProjectMember', data: json ?? {});
+  factory ProjectMemberModel.fromJson(Map<String, dynamic> json) {
+    printMap(title: 'ProjectMember', data: json);
 
-    if (json == null) {
-      return const ProjectMemberModel(
-        id: '',
-        projectId: '',
-        roles: [],
-        userId: '',
-        isOwner: false,
-      );
-    }
-
+    final role = json['role']?.toString();
     return ProjectMemberModel(
-      id: (json['id'] ?? json['user_id'] ?? '').toString(),
-      projectId: json['project_id']?.toString() ?? '',
-      roles: [],
-      userId: json['user_id']?.toString() ?? '',
-      isOwner: json['is_owner'] == true,
-      userData: UserModel.tryParseFromJson(
-        json['users'] is Map ? Map<String, dynamic>.from(json['users']) : null,
-      ),
+      id: json['id'] ?? '',
+      projectId: json['project_id']!,
+      roles: role != null && role.isNotEmpty ? [role] : [],
+      userId: json['user_id']!,
+      isOwner: json['is_owner'] ?? false,
+      userData: UserModel.tryParseFromJson(json['users']),
     );
   }
 
@@ -74,8 +63,8 @@ class ProjectMemberModel extends ProjectMemberEntity {
       if (id.isNotEmpty) 'id': id,
       'project_id': projectId,
       'user_id': userId,
-      //'roles': roles,
       'is_owner': isOwner,
+      if (roles.isNotEmpty) 'role': roles.first,
     };
   }
 }

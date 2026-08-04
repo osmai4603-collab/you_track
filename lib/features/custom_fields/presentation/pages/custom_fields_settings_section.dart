@@ -227,17 +227,13 @@ class _ProjectSettingCustomFieldsSectionState
         ),
         const Spacer(),
         TextButton.icon(
-          onPressed: canEdit
+          onPressed: _isPanelOpen
               ? () {
                   setState(() {
-                    _isDetailsPanelOpen = !_isDetailsPanelOpen;
+                    _isPanelOpen = false;
                   });
                 }
-              : () {
-                  setState(() {
-                    _showDetails = !_showDetails;
-                  });
-                },
+              : null,
           icon: Icon(
             canEdit
                 ? (_isDetailsPanelOpen
@@ -246,11 +242,7 @@ class _ProjectSettingCustomFieldsSectionState
                 : (_showDetails ? Icons.visibility_off : Icons.visibility),
             size: 18,
           ),
-          label: Text(
-            canEdit
-                ? (_isDetailsPanelOpen ? 'Hide details' : 'Show details')
-                : (_showDetails ? 'Hide columns' : 'Show columns'),
-          ),
+          label: Text((_isPanelOpen ? 'Hide details' : 'Show details')),
         ),
       ],
     );
@@ -300,7 +292,7 @@ class _ProjectSettingCustomFieldsSectionState
     if (state is CustomFieldsInitial || state is CustomFieldsLoading) {
       return Center(
         key: const ValueKey('custom-fields-loading'),
-        child: SizedBox(width: 480, child: ShimmerLoading.list(itemCount: 6)),
+        child: ShimmerLoading.list(itemCount: 8),
       );
     }
 

@@ -22,7 +22,7 @@ class AgileBoard extends Entity {
 
   @override
   AgileBoard copyWith({
-    String? projectId,
+    String? projectKey,
     List<IssueStateEnum>? headers,
     Map<IssueStateEnum, int>? columnCounts,
     List<BoardSwimlane>? swimlanes,
@@ -31,7 +31,7 @@ class AgileBoard extends Entity {
     bool clearActiveSprint = false,
   }) {
     return AgileBoard(
-      projectId: projectId ?? this.projectId,
+      projectId: projectKey ?? this.projectId,
       headers: headers ?? this.headers,
       columnCounts: columnCounts ?? this.columnCounts,
       swimlanes: swimlanes ?? this.swimlanes,

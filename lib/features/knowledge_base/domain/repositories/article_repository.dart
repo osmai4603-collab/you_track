@@ -3,7 +3,7 @@ import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article.dart';
 
 abstract class ArticleRepository {
-  Future<Either<Failure, List<Article>>> getArticleTree(String projectId);
+  Future<Either<Failure, List<Article>>> getArticleTree({String? projectId});
   Future<Either<Failure, Article>> getArticleById(String articleId);
   Future<Either<Failure, Article>> createArticle(Article article);
   Future<Either<Failure, Article>> updateArticle(Article article);

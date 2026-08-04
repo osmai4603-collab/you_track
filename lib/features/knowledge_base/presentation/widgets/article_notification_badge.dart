@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:issues_tracking/core/widgets/app_popup_menu_item.dart';
 import 'package:issues_tracking/features/knowledge_base/domain/entities/article_notification.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/cubits/article_notification_cubit.dart';
 import 'package:intl/intl.dart';
@@ -7,10 +8,7 @@ import 'package:intl/intl.dart';
 class ArticleNotificationBadge extends StatelessWidget {
   final Function(String articleId, String? commentId) onNotificationTap;
 
-  const ArticleNotificationBadge({
-    super.key,
-    required this.onNotificationTap,
-  });
+  const ArticleNotificationBadge({super.key, required this.onNotificationTap});
 
   @override
   Widget build(BuildContext context) {
@@ -44,17 +42,14 @@ class ArticleNotificationBadge extends StatelessWidget {
         ? state.notifications
         : <ArticleNotification>[];
 
-    final RenderBox button =
-        context.findRenderObject() as RenderBox;
+    final RenderBox button = context.findRenderObject() as RenderBox;
     final RenderBox overlay =
         Navigator.of(context).overlay!.context.findRenderObject() as RenderBox;
 
     final RelativeRect position = RelativeRect.fromRect(
       Rect.fromCenter(
-        center: button.localToGlobal(
-          Offset.zero,
-          ancestor: overlay,
-        ) +
+        center:
+            button.localToGlobal(Offset.zero, ancestor: overlay) +
             Offset(button.size.width / 2, button.size.height),
         width: 320,
         height: 0,
@@ -67,16 +62,16 @@ class ArticleNotificationBadge extends StatelessWidget {
       position: position,
       constraints: const BoxConstraints(maxWidth: 360, maxHeight: 400),
       items: [
-        PopupMenuItem(
+        AppPopupMenuItem(
           enabled: false,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
                 'Notifications',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold),
               ),
               if (notifications.isNotEmpty)
                 TextButton(
@@ -89,7 +84,7 @@ class ArticleNotificationBadge extends StatelessWidget {
           ),
         ),
         if (notifications.isEmpty)
-          const PopupMenuItem(
+          const AppPopupMenuItem(
             enabled: false,
             child: Center(
               child: Padding(
@@ -102,12 +97,9 @@ class ArticleNotificationBadge extends StatelessWidget {
             ),
           ),
         ...notifications.map(
-          (notification) => PopupMenuItem(
+          (notification) => AppPopupMenuItem(
             onTap: () {
-              onNotificationTap(
-                notification.articleId,
-                notification.commentId,
-              );
+              onNotificationTap(notification.articleId, notification.commentId);
             },
             child: _NotificationTile(notification: notification),
           ),
@@ -171,9 +163,9 @@ class _NotificationTile extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   _timeAgo(notification.createdAt),
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey,
-                      ),
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodySmall?.copyWith(color: Colors.grey),
                 ),
               ],
             ),

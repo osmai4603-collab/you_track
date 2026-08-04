@@ -51,8 +51,9 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
   @override
   void initState() {
     super.initState();
-    _existingProjectIds =
-        widget.existingProjects.map((p) => p.projectId).toSet();
+    _existingProjectIds = widget.existingProjects
+        .map((p) => p.projectId)
+        .toSet();
     _loadProjects();
   }
 
@@ -152,66 +153,77 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
                             ),
                           ),
                         ],
-                        rows: _projects?.map((project) {
-                          final isExisting =
-                              _existingProjectIds.contains(project.id);
-                          final isSelected =
-                              _selectedProjectIds.contains(project.id);
-                          return DataRow(
-                            selected: isSelected,
-                            onSelectChanged: isExisting
-                                ? null
-                                : (selected) {
-                                    if (selected == true) {
-                                      setState(() =>
-                                          _selectedProjectIds.add(project.id));
-                                    } else {
-                                      setState(() =>
-                                          _selectedProjectIds.remove(project.id));
-                                    }
-                                  },
-                            cells: [
-                              DataCell(
-                                Checkbox(
-                                  value: isSelected || isExisting,
-                                  onChanged: isExisting
-                                      ? null
-                                      : (value) {
-                                          setState(() {
-                                            if (value == true) {
-                                              _selectedProjectIds
-                                                  .add(project.id);
-                                            } else {
-                                              _selectedProjectIds
-                                                  .remove(project.id);
-                                            }
-                                          });
-                                        },
-                                ),
-                              ),
-                              DataCell(
-                                Text(
-                                  project.name,
-                                  style: textTheme.bodySmall?.copyWith(
-                                    color: isExisting
-                                        ? colors.onSurfaceVariant
-                                        : colors.onSurface,
+                        rows:
+                            _projects?.map((project) {
+                              final isExisting = _existingProjectIds.contains(
+                                project.id,
+                              );
+                              final isSelected = _selectedProjectIds.contains(
+                                project.id,
+                              );
+                              return DataRow(
+                                selected: isSelected,
+                                onSelectChanged: isExisting
+                                    ? null
+                                    : (selected) {
+                                        if (selected == true) {
+                                          setState(
+                                            () => _selectedProjectIds.add(
+                                              project.id,
+                                            ),
+                                          );
+                                        } else {
+                                          setState(
+                                            () => _selectedProjectIds.remove(
+                                              project.id,
+                                            ),
+                                          );
+                                        }
+                                      },
+                                cells: [
+                                  DataCell(
+                                    Checkbox(
+                                      value: isSelected || isExisting,
+                                      onChanged: isExisting
+                                          ? null
+                                          : (value) {
+                                              setState(() {
+                                                if (value == true) {
+                                                  _selectedProjectIds.add(
+                                                    project.id,
+                                                  );
+                                                } else {
+                                                  _selectedProjectIds.remove(
+                                                    project.id,
+                                                  );
+                                                }
+                                              });
+                                            },
+                                    ),
                                   ),
-                                ),
-                              ),
-                              DataCell(
-                                Text(
-                                  project.projectId,
-                                  style: textTheme.bodySmall?.copyWith(
-                                    color: isExisting
-                                        ? colors.onSurfaceVariant
-                                        : colors.onSurface,
+                                  DataCell(
+                                    Text(
+                                      project.name,
+                                      style: textTheme.bodySmall?.copyWith(
+                                        color: isExisting
+                                            ? colors.onSurfaceVariant
+                                            : colors.onSurface,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                            ],
-                          );
-                        }).toList() ??
+                                  DataCell(
+                                    Text(
+                                      project.projectKey,
+                                      style: textTheme.bodySmall?.copyWith(
+                                        color: isExisting
+                                            ? colors.onSurfaceVariant
+                                            : colors.onSurface,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              );
+                            }).toList() ??
                             [],
                       ),
                     ),

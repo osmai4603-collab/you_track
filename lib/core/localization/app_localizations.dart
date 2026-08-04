@@ -1603,6 +1603,468 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'You don\'t have permission to perform this action'**
   String get permissionDeniedTooltip;
+
+  /// General tab in user profile page
+  ///
+  /// In en, this message translates to:
+  /// **'General'**
+  String get userProfileGeneral;
+
+  /// Workspace tab in user profile page
+  ///
+  /// In en, this message translates to:
+  /// **'Workspace'**
+  String get userProfileWorkspace;
+
+  /// Tags and Saved Searches tab in user profile page
+  ///
+  /// In en, this message translates to:
+  /// **'Tags and Saved Searches'**
+  String get userProfileTagsAndSearches;
+
+  /// Notifications tab in user profile page
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get userProfileNotifications;
+
+  /// Account Security tab in user profile page
+  ///
+  /// In en, this message translates to:
+  /// **'Account Security'**
+  String get userProfileAccountSecurity;
+
+  /// Full name field
+  ///
+  /// In en, this message translates to:
+  /// **'Full name'**
+  String get fullName;
+
+  /// Username field
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get username;
+
+  /// Avatar field
+  ///
+  /// In en, this message translates to:
+  /// **'Avatar'**
+  String get avatar;
+
+  /// VCS usernames field
+  ///
+  /// In en, this message translates to:
+  /// **'VCS usernames'**
+  String get vcsUsernames;
+
+  /// Registration date field
+  ///
+  /// In en, this message translates to:
+  /// **'Registration date'**
+  String get registrationDate;
+
+  /// Personal data section title
+  ///
+  /// In en, this message translates to:
+  /// **'Personal data'**
+  String get personalData;
+
+  /// Download personal data as CSV button
+  ///
+  /// In en, this message translates to:
+  /// **'Download in CSV format'**
+  String get downloadCsv;
+
+  /// Local time zone section title
+  ///
+  /// In en, this message translates to:
+  /// **'Local time zone'**
+  String get localTimezone;
+
+  /// Guess time zone button
+  ///
+  /// In en, this message translates to:
+  /// **'Guess time zone'**
+  String get guessTimezone;
+
+  /// Send test message button
+  ///
+  /// In en, this message translates to:
+  /// **'Send test message'**
+  String get sendTestMessage;
+
+  /// Theme section title
+  ///
+  /// In en, this message translates to:
+  /// **'Theme'**
+  String get theme;
+
+  /// Light theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// Dark theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// Sync theme with OS option
+  ///
+  /// In en, this message translates to:
+  /// **'Sync with OS'**
+  String get themeSyncOs;
+
+  /// Links panel position section title
+  ///
+  /// In en, this message translates to:
+  /// **'Links panel position'**
+  String get linksPanelPosition;
+
+  /// Links panel below summary option
+  ///
+  /// In en, this message translates to:
+  /// **'Below the summary'**
+  String get belowSummary;
+
+  /// Links panel below description option
+  ///
+  /// In en, this message translates to:
+  /// **'Below the description'**
+  String get belowDescription;
+
+  /// Show recent items switch
+  ///
+  /// In en, this message translates to:
+  /// **'Show recent issues and articles'**
+  String get showRecentIssues;
+
+  /// New tag or saved search button
+  ///
+  /// In en, this message translates to:
+  /// **'New tag or saved search'**
+  String get newTagOrSearch;
+
+  /// Delete button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// Search tags and searches field
+  ///
+  /// In en, this message translates to:
+  /// **'Search tags and searches'**
+  String get searchTagsAndSearches;
+
+  /// Show all option
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// Show items created by me option
+  ///
+  /// In en, this message translates to:
+  /// **'Created by me'**
+  String get createdByMe;
+
+  /// Remove tag on issue resolution checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'Remove on resolution'**
+  String get removeOnResolution;
+
+  /// Mark as favorite checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as favorite for all viewers'**
+  String get markAsFavorite;
+
+  /// Notification events section title
+  ///
+  /// In en, this message translates to:
+  /// **'Notification events:'**
+  String get notificationEvents;
+
+  /// Send notifications to section title
+  ///
+  /// In en, this message translates to:
+  /// **'Send notifications to:'**
+  String get sendNotificationsTo;
+
+  /// Star automatically when section title
+  ///
+  /// In en, this message translates to:
+  /// **'Star automatically when:'**
+  String get starAutomaticallyWhen;
+
+  /// Two-factor authentication section title
+  ///
+  /// In en, this message translates to:
+  /// **'Two-factor Authentication'**
+  String get twoFactorAuth;
+
+  /// Credentials section title
+  ///
+  /// In en, this message translates to:
+  /// **'Credentials'**
+  String get credentials;
+
+  /// Tokens section title
+  ///
+  /// In en, this message translates to:
+  /// **'Tokens'**
+  String get tokens;
+
+  /// Change password button
+  ///
+  /// In en, this message translates to:
+  /// **'Change password'**
+  String get changePassword;
+
+  /// Revoke refresh token button
+  ///
+  /// In en, this message translates to:
+  /// **'Revoke refresh token'**
+  String get revokeRefreshToken;
+
+  /// Delete credentials button
+  ///
+  /// In en, this message translates to:
+  /// **'Delete credentials'**
+  String get deleteCredentials;
+
+  /// Pair with authenticator app button
+  ///
+  /// In en, this message translates to:
+  /// **'Pair with app ...'**
+  String get pairWithApp;
+
+  /// Pair with hardware token button
+  ///
+  /// In en, this message translates to:
+  /// **'Pair with hardware token ...'**
+  String get pairWithHardwareToken;
+
+  /// Add credentials button
+  ///
+  /// In en, this message translates to:
+  /// **'Add credentials ...'**
+  String get addCredentials;
+
+  /// New token button
+  ///
+  /// In en, this message translates to:
+  /// **'New token ...'**
+  String get newToken;
+
+  /// New password button
+  ///
+  /// In en, this message translates to:
+  /// **'New password ...'**
+  String get newPasswordButton;
+
+  /// Save changes button
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get saveChanges;
+
+  /// Current password field
+  ///
+  /// In en, this message translates to:
+  /// **'Current password'**
+  String get currentPassword;
+
+  /// New password field
+  ///
+  /// In en, this message translates to:
+  /// **'New password'**
+  String get newPassword;
+
+  /// Confirm password field
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get confirmPassword;
+
+  /// Password mismatch error message
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordMismatch;
+
+  /// Password change success message
+  ///
+  /// In en, this message translates to:
+  /// **'Password changed successfully'**
+  String get passwordChangedSuccess;
+
+  /// Password change failure message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to change password: {error}'**
+  String passwordChangeFailed(Object error);
+
+  /// Refresh token revocation success message
+  ///
+  /// In en, this message translates to:
+  /// **'Other active sessions have been revoked'**
+  String get sessionsRevokedSuccess;
+
+  /// Refresh token revocation failure message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to revoke sessions: {error}'**
+  String sessionsRevokeFailed(Object error);
+
+  /// Changes saved success message
+  ///
+  /// In en, this message translates to:
+  /// **'Changes saved successfully'**
+  String get changesSavedSuccess;
+
+  /// No item selected message
+  ///
+  /// In en, this message translates to:
+  /// **'No item selected to delete'**
+  String get noTagSelected;
+
+  /// Tag name field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter tag name...'**
+  String get enterTagName;
+
+  /// Search query field hint
+  ///
+  /// In en, this message translates to:
+  /// **'Enter search query...'**
+  String get enterSearchQuery;
+
+  /// Saved search type label
+  ///
+  /// In en, this message translates to:
+  /// **'Saved search'**
+  String get searchSavedSearchType;
+
+  /// VCS usernames helper text
+  ///
+  /// In en, this message translates to:
+  /// **'Adding personal identifiers from integrated version control systems (VCS) lets YouTrack add links to issues referenced in your code commits.'**
+  String get vcsUsernamesHint;
+
+  /// Profile load error message
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load profile: {error}'**
+  String profileLoadError(Object error);
+
+  /// Changes by me notification checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'Changes applied by me'**
+  String get changesByMe;
+
+  /// Mentions notification checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'@mentions that reference my username'**
+  String get mentionsMyUsername;
+
+  /// Duplicate cluster changes notification checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'Changes in a duplicate cluster'**
+  String get changesInDuplicateCluster;
+
+  /// Issues from emails notification checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'Issues and comments created from my emails'**
+  String get issuesFromEmails;
+
+  /// VCS updates notification checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'Updates applied by VCS and build server integrations'**
+  String get vcsBuildUpdates;
+
+  /// Failed VCS commands notification checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'Failed commands in commits processed by VCS and build server integrations'**
+  String get failedVcsCommands;
+
+  /// Auto star on comment checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'I post a comment to an issue or article'**
+  String get starOnComment;
+
+  /// Auto star on create checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'I create an issue or article'**
+  String get starOnCreate;
+
+  /// Auto star on update checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'I update an issue or article'**
+  String get starOnUpdate;
+
+  /// Auto star on assigned checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'I am made responsible for an issue'**
+  String get starOnAssigned;
+
+  /// Auto star on vote checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'I vote for an issue'**
+  String get starOnVote;
+
+  /// Email channel checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get emailChannel;
+
+  /// Telegram channel checkbox
+  ///
+  /// In en, this message translates to:
+  /// **'YouTrack bot for Telegram'**
+  String get telegramChannel;
+
+  /// Connect Telegram account button
+  ///
+  /// In en, this message translates to:
+  /// **'Connect my account'**
+  String get connectTelegramAccount;
+
+  /// Test message success notification
+  ///
+  /// In en, this message translates to:
+  /// **'Test message sent to email'**
+  String get testMessageSent;
+
+  /// CSV download started notification
+  ///
+  /// In en, this message translates to:
+  /// **'Downloading personal data as CSV...'**
+  String get downloadCsvStarted;
+
+  /// Timezone guess notification
+  ///
+  /// In en, this message translates to:
+  /// **'Time zone guessed: {zone} (based on IP address)'**
+  String timezoneGuessed(Object zone);
 }
 
 class _AppLocalizationsDelegate

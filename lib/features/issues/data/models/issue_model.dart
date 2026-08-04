@@ -48,33 +48,29 @@ class IssueModel extends Issue {
   factory IssueModel.fromJson(Map<String, dynamic> json) {
     printMap(title: 'Issue', data: json);
     return IssueModel(
-      id: (json['id'] ?? '').toString(),
-      projectId: json['project_id'],
-      issueKey: (json['issue_key'] ?? '').toString(),
-      issueNumber: (json['issue_sequence'] ?? 0) as int,
-      summary: (json['summary'] ?? '').toString(),
-      description: (json['description'] ?? '').toString(),
+      id: json['id']!,
+      projectId: json['project_id']!,
+      issueKey: json['issue_key']!,
+      issueNumber: json['issue_sequence']!,
+      summary: json['summary']!,
+      description: json['description'] ?? '',
       state: IssueStateEnum.of(json['state']),
       priority: IssuePriorityTypeEnum.of(json['priority']),
       issueType: IssueTypeEnum.of(json['issue_type']),
-      assigneeId: json['assignee_id']?.toString(),
-      assigneeName: json['assignee_name']?.toString(),
-      assigneeAvatarUrl: json['assignee_avatar_url']?.toString(),
-      reporterId: (json['reporter_id'] ?? '').toString(),
-      reporterName: (json['reporter_name'] ?? '').toString(),
+      assigneeId: json['assignee_id'],
+      assigneeName: json['assignee_name'],
+      assigneeAvatarUrl: json['assignee_avatar_url'],
+      reporterId: json['reporter_id'],
+      reporterName: json['reporter_name'] ?? '',
       subsystemId: json['subsystem_id'],
-      fixVersions: (json['fix_versions'] ?? '').toString(),
-      build: json['build'] != null
-          ? BuildModel.fromJson(json['build'] as Map<String, dynamic>)
-          : null,
+      fixVersions: json['fix_versions'] ?? '',
+      build: json['build'] != null ? BuildModel.fromJson(json['build']!) : null,
       tags: (json['tags'] as List? ?? [])
-          .map((e) => TagModel.fromJson(e as Map<String, dynamic>))
+          .map((e) => TagModel.fromJson(e))
           .toList(),
       createdAt: _parseDate(json['created_at']),
       updatedAt: _parseDate(json['updated_at']),
-      dueDate: json['due_date'] != null
-          ? DateTime.parse(json['due_date'].toString())
-          : null,
+      dueDate: DateTime.tryParse(json['due_date'] ?? ''),
       estimation: json['estimation'] != null
           ? Duration(minutes: json['estimation'] as int)
           : null,
@@ -86,7 +82,7 @@ class IssueModel extends Issue {
       attachmentsCount: (json['attachments_count'] ?? 0) as int,
       commentsCount: (json['comments_count'] ?? 0) as int,
       isStarred: json['is_starred'] == true,
-      parentId: json['parent_id']?.toString(),
+      parentId: json['parent_id'],
       visibility: _parseList(json['visibility']),
       sprints: (json['sprints'] as List? ?? [])
           .map((s) => SprintModel.fromJson(s as Map<String, dynamic>))
@@ -109,16 +105,12 @@ class IssueModel extends Issue {
       'priority': priority.name,
       'issue_type': issueType.name,
       'assignee_id': assigneeId,
-      // 'assignee_name': assigneeName,
-      // 'assignee_avatar_url': assigneeAvatarUrl,
       'reporter_id': reporterId,
-      // 'reporter_name': reporterName,
       'subsystem_id': subsystemId,
       'fix_versions': fixVersions,
       'build_id': build?.id,
-      // 'tags': tags.map((t) => (t as TagModel).toJson()).toList(),
-      'created_at': createdAt.toIso8601String(),
-      'updated_at': updatedAt.toIso8601String(),
+      'created_at': createdAt.toUtc().toIso8601String(),
+      'updated_at': updatedAt.toUtc().toIso8601String(),
       'due_date': dueDate?.toIso8601String(),
       'estimation': estimation?.inMinutes,
       'spent_time': spentTime?.inMinutes,
@@ -129,10 +121,6 @@ class IssueModel extends Issue {
       'is_starred': isStarred,
       'parent_id': parentId,
       'visibility': visibility,
-      // 'sprints': sprints
-      //     .map((s) => (s as SprintModel).toJson())
-      //     .toList(),
-      'issue_links': links.map((l) => (l as IssueLinkModel).toJson()).toList(),
     };
   }
 
@@ -145,11 +133,14 @@ class IssueModel extends Issue {
     }
   }
 
-  static List<String> _parseList(dynamic value) {
-    if (value is List) {
-      return value.map((e) => e.toString()).toList();
+  static Map<String, List<String>> _parseList(dynamic value) {
+    if (value is Map) {
+      return value.map(
+        (key, value) =>
+            MapEntry(key, (value as List).map((e) => e as String).toList()),
+      );
     }
-    return const [];
+    return const {'users': [], 'groups': []};
   }
 
   static IssueModel fromEntity(Issue issue) {

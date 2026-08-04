@@ -6,11 +6,11 @@ import 'package:issues_tracking/features/knowledge_base/domain/entities/article.
 import 'package:issues_tracking/features/knowledge_base/domain/repositories/article_repository.dart';
 
 class GetArticleTree extends UseCase<List<Article>, GetArticleTreeParams> {
-  @override
-  Permission get requiredPermission => Permission.articleReadArticle;
+  // @override
+  // Permission get requiredPermission => Permission.articleReadArticle;
 
-  @override
-  String? getProjectId(GetArticleTreeParams params) => params.projectId;
+  // @override
+  // String? getProjectId(GetArticleTreeParams params) => params.projectId;
 
   final ArticleRepository repository;
   const GetArticleTree(this.repository);
@@ -19,12 +19,12 @@ class GetArticleTree extends UseCase<List<Article>, GetArticleTreeParams> {
   Future<Either<Failure, List<Article>>> call({
     required GetArticleTreeParams params,
   }) {
-    return repository.getArticleTree(params.projectId);
+    return repository.getArticleTree(projectId: params.projectId);
   }
 }
 
 class GetArticleTreeParams extends Params {
-  final String projectId;
+  final String? projectId;
   const GetArticleTreeParams({required this.projectId});
 
   @override

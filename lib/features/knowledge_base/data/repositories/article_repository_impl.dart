@@ -16,11 +16,13 @@ class ArticleRepositoryImpl implements ArticleRepository {
   });
 
   @override
-  Future<Either<Failure, List<Article>>> getArticleTree(
-    String projectId,
-  ) async {
+  Future<Either<Failure, List<Article>>> getArticleTree({
+    String? projectId,
+  }) async {
     try {
-      final articles = await remoteDataSource.getArticleTree(projectId);
+      final articles = await remoteDataSource.getArticleTree(
+        projectId: projectId,
+      );
       return Right(articles);
     } catch (e) {
       return Left(ServerFailure(e.toString()));

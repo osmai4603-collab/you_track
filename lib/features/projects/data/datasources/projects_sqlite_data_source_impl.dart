@@ -38,6 +38,22 @@ class ProjectsSqliteDataSourceImpl implements ProjectsRemoteDataSource {
   }
 
   @override
+  Future<void> updateStartingNumber(String projectId, int startingNumber) async {
+    _sqlite.execute(
+      'UPDATE ${_projectsTable.tableName} SET ${_projectsTable.startingNumber} = ? WHERE ${_projectsTable.id} = ?',
+      [startingNumber, projectId],
+    );
+  }
+
+  @override
+  Future<void> updateFavorite(String projectId, bool isFavorite) async {
+    _sqlite.execute(
+      'UPDATE ${_projectsTable.tableName} SET ${_projectsTable.isFavorite} = ? WHERE ${_projectsTable.id} = ?',
+      [isFavorite ? 1 : 0, projectId],
+    );
+  }
+
+  @override
   Future<void> archiveProject(String id) async {
     _sqlite.execute(
       'UPDATE ${_projectsTable.tableName} SET ${_projectsTable.isArchived} = 1 WHERE ${_projectsTable.id} = ?',

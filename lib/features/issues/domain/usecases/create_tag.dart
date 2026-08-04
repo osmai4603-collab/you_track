@@ -29,6 +29,7 @@ class CreateTag extends UseCase<Tag, CreateTagParams> {
       favorite: params.favorite,
       permissions: params.permissions,
       specificUserIds: params.specificUserIds,
+      specificGroupIds: params.specificGroupIds,
       subscriptions: params.subscriptions,
     );
   }
@@ -43,6 +44,7 @@ class CreateTagParams extends Params {
   final bool favorite;
   final Map<String, TagPermissionScope> permissions;
   final List<String>? specificUserIds;
+  final List<String>? specificGroupIds;
   final List<TagSubscriptionEvent> subscriptions;
 
   const CreateTagParams({
@@ -54,6 +56,7 @@ class CreateTagParams extends Params {
     required this.favorite,
     required this.permissions,
     this.specificUserIds,
+    this.specificGroupIds,
     required this.subscriptions,
   });
 
@@ -67,6 +70,7 @@ class CreateTagParams extends Params {
     favorite,
     permissions,
     specificUserIds,
+    specificGroupIds,
     subscriptions,
   ];
 }

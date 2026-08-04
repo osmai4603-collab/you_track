@@ -80,14 +80,14 @@ ReorderableColumn(
 ```dart
 PopupMenuButton<String>(
   itemBuilder: (context) => [
-    PopupMenuItem<String>(
+    AppPopupMenuItem<String>(
       enabled: false, // Prevents closing when tapping TextField
       child: TextField(
         decoration: InputDecoration(hintText: 'Search values...'),
         onChanged: (value) => _filterValues(value),
       ),
     ),
-    ...filteredValues.map((value) => PopupMenuItem<String>(
+    ...filteredValues.map((value) => AppPopupMenuItem<String>(
       value: value,
       child: Text(value),
     )),

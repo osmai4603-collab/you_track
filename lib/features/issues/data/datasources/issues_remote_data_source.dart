@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:issues_tracking/core/utils/printing.dart';
 import 'package:issues_tracking/features/issues/data/models/build_model.dart';
 import 'package:issues_tracking/features/issues/data/models/sprint_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -19,6 +20,7 @@ abstract class IssuesRemoteDataSource {
 
   Future<IssueModel> createIssue(IssueModel issue);
   Future<IssueModel> updateIssue(IssueModel issue);
+  Future<void> updateIssueStarred(String issueId, bool isStarred);
   Future<void> deleteIssue(String issueId);
 
   Future<String> uploadAttachment({
@@ -202,17 +204,22 @@ class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
     final links = issue.links;
 
     issueData.remove('id');
+    issueData.remove('issue_key');
+    issueData.remove('issue_sequence');
     issueData.remove('sprints');
     issueData.remove('tags');
     issueData.remove('issue_links');
+    issueData['created_at'] = DateTime.now().toIso8601String();
+    issueData['updated_at'] = DateTime.now().toIso8601String();
+    printMap(title: 'Insert Issue', data: issueData);
 
     final response = await supabase
         .from('issues')
         .insert(issueData)
         .select()
         .maybeSingle();
-    
-    if(response == null) {
+
+    if (response == null) {
       throw Exception('Failed to create issue. No response from server.');
     }
 
@@ -264,7 +271,9 @@ class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
     updates.remove('sprints');
     updates.remove('tags');
     updates.remove('issue_links');
+
     updates['updated_at'] = DateTime.now().toIso8601String();
+    printMap(title: 'Update Issue', data: updates);
 
     final response = await supabase
         .from('issues')
@@ -308,6 +317,14 @@ class IssuesRemoteDataSourceImpl implements IssuesRemoteDataSource {
     }
 
     return IssueModel.fromJson(response);
+  }
+
+  @override
+  Future<void> updateIssueStarred(String issueId, bool isStarred) async {
+    await supabase
+        .from('issues')
+        .update({'is_starred': isStarred})
+        .eq('id', issueId);
   }
 
   @override

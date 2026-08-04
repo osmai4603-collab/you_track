@@ -1,12 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:issues_tracking/core/constants/app_route_keys.dart';
 import 'package:issues_tracking/core/enums/permission_enum.dart';
 import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 
 class ArticleEmptyState extends StatelessWidget {
   final String role; // TODO: Can be removed later as role is no longer used for permissions
+  final String? projectId;
 
-  const ArticleEmptyState({super.key, required this.role});
+  const ArticleEmptyState({
+    super.key,
+    required this.role,
+    this.projectId,
+  });
+
+  void _createArticle(BuildContext context) {
+    context.push(
+      projectId == null
+          ? '${AppRouteKeys.knowldgeBase}/new'
+          : '${AppRouteKeys.projectKnowledgeBasePath(projectId!)}/new',
+      extra: {'projectId': projectId},
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,7 +55,7 @@ class ArticleEmptyState extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             FilledButton.icon(
-              onPressed: () {},
+              onPressed: () => _createArticle(context),
               icon: const Icon(Icons.add, size: 18),
               label: const Text('Create Article'),
             ),

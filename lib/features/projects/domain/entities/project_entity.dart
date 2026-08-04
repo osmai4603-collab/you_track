@@ -5,7 +5,7 @@ import '../../../../core/entities/entity.dart';
 class ProjectEntity extends Entity {
   final String id;
   final String name;
-  final String projectId;
+  final String projectKey;
   final String? description;
   final bool isArchived;
   final ProjectTemplateType templateType;
@@ -18,11 +18,12 @@ class ProjectEntity extends Entity {
   final bool hasTimeTracking;
   final int? estimation;
   final int? spentTime;
+  final int? startingNumber;
 
   const ProjectEntity({
     required this.id,
     required this.name,
-    required this.projectId,
+    required this.projectKey,
     this.description,
     this.isArchived = false,
     required this.templateType,
@@ -35,13 +36,14 @@ class ProjectEntity extends Entity {
     this.hasTimeTracking = false,
     this.estimation,
     this.spentTime,
+    this.startingNumber,
   });
 
   @override
   ProjectEntity copyWith({
     String? id,
     String? name,
-    String? projectId,
+    String? projectKey,
     String? description,
     bool? isArchived,
     ProjectTemplateType? templateType,
@@ -55,11 +57,12 @@ class ProjectEntity extends Entity {
     bool? hasTimeTracking,
     int? estimation,
     int? spentTime,
+    int? startingNumber,
   }) {
     return ProjectEntity(
       id: id ?? this.id,
       name: name ?? this.name,
-      projectId: projectId ?? this.projectId,
+      projectKey: projectKey ?? this.projectKey,
       description: description ?? this.description,
       isArchived: isArchived ?? this.isArchived,
       templateType: templateType ?? this.templateType,
@@ -68,10 +71,12 @@ class ProjectEntity extends Entity {
       isFavorite: isFavorite ?? this.isFavorite,
       members: members ?? this.members,
       visibility: visibility ?? this.visibility,
-      recommendedVisibility: recommendedVisibility ?? this.recommendedVisibility,
+      recommendedVisibility:
+          recommendedVisibility ?? this.recommendedVisibility,
       hasTimeTracking: hasTimeTracking ?? this.hasTimeTracking,
       estimation: estimation ?? this.estimation,
       spentTime: spentTime ?? this.spentTime,
+      startingNumber: startingNumber ?? this.startingNumber,
     );
   }
 
@@ -79,7 +84,7 @@ class ProjectEntity extends Entity {
   List<Object?> get props => [
     id,
     name,
-    projectId,
+    projectKey,
     description,
     isArchived,
     templateType,
@@ -92,5 +97,6 @@ class ProjectEntity extends Entity {
     hasTimeTracking,
     estimation,
     spentTime,
+    startingNumber,
   ];
 }

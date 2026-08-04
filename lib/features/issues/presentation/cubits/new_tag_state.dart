@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:issues_tracking/core/enums/tag_permission_scope_enum.dart';
 import 'package:issues_tracking/core/enums/tag_subscription_event_enum.dart';
+import 'package:issues_tracking/features/groups/domain/entities/group_entity.dart';
 import '../../domain/entities/project_member.dart';
 import '../../domain/entities/tag.dart';
 
@@ -11,6 +12,7 @@ class NewTagState extends Equatable {
   final String? nameError;
   final String? ownerId;
   final List<ProjectMember> members;
+  final List<GroupEntity> projectGroups;
   final NewTagStatus status;
   final String? errorMessage;
 
@@ -22,6 +24,7 @@ class NewTagState extends Equatable {
   // Permissions
   final Map<String, TagPermissionScope> permissions;
   final List<String> specificUserIds;
+  final List<String> specificGroupIds;
 
   // Subscriptions
   final List<TagSubscriptionEvent> subscriptions;
@@ -33,6 +36,7 @@ class NewTagState extends Equatable {
     this.nameError,
     this.ownerId,
     this.members = const [],
+    this.projectGroups = const [],
     this.status = NewTagStatus.initial,
     this.errorMessage,
     this.shared = true,
@@ -44,6 +48,7 @@ class NewTagState extends Equatable {
       'edit': TagPermissionScope.owner,
     },
     this.specificUserIds = const [],
+    this.specificGroupIds = const [],
     this.subscriptions = const [],
     this.createdTag,
   });
@@ -54,6 +59,7 @@ class NewTagState extends Equatable {
     bool clearNameError = false,
     String? ownerId,
     List<ProjectMember>? members,
+    List<GroupEntity>? projectGroups,
     NewTagStatus? status,
     String? errorMessage,
     bool? shared,
@@ -61,6 +67,7 @@ class NewTagState extends Equatable {
     bool? favorite,
     Map<String, TagPermissionScope>? permissions,
     List<String>? specificUserIds,
+    List<String>? specificGroupIds,
     List<TagSubscriptionEvent>? subscriptions,
     Tag? createdTag,
   }) {
@@ -69,6 +76,7 @@ class NewTagState extends Equatable {
       nameError: clearNameError ? null : (nameError ?? this.nameError),
       ownerId: ownerId ?? this.ownerId,
       members: members ?? this.members,
+      projectGroups: projectGroups ?? this.projectGroups,
       status: status ?? this.status,
       errorMessage: errorMessage ?? this.errorMessage,
       shared: shared ?? this.shared,
@@ -76,6 +84,7 @@ class NewTagState extends Equatable {
       favorite: favorite ?? this.favorite,
       permissions: permissions ?? this.permissions,
       specificUserIds: specificUserIds ?? this.specificUserIds,
+      specificGroupIds: specificGroupIds ?? this.specificGroupIds,
       subscriptions: subscriptions ?? this.subscriptions,
       createdTag: createdTag ?? this.createdTag,
     );
@@ -87,6 +96,7 @@ class NewTagState extends Equatable {
         nameError,
         ownerId,
         members,
+        projectGroups,
         status,
         errorMessage,
         shared,
@@ -94,6 +104,7 @@ class NewTagState extends Equatable {
         favorite,
         permissions,
         specificUserIds,
+        specificGroupIds,
         subscriptions,
         createdTag,
       ];

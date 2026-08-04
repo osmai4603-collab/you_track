@@ -21,15 +21,15 @@ class ArticleTocPanel extends StatelessWidget {
 
             return Container(
               width: 220,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     'On this page',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 12),
                   Expanded(
@@ -41,9 +41,9 @@ class ArticleTocPanel extends StatelessWidget {
 
                         return InkWell(
                           onTap: () {
-                            context
-                                .read<ArticleTocCubit>()
-                                .scrollToHeading(index);
+                            context.read<ArticleTocCubit>().scrollToHeading(
+                              index,
+                            );
                           },
                           child: Padding(
                             padding: EdgeInsets.only(
@@ -55,9 +55,9 @@ class ArticleTocPanel extends StatelessWidget {
                               _cleanHeading(heading),
                               style: TextStyle(
                                 fontSize: 13 - depth * 0.5,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
+                                color: Theme.of(
+                                  context,
+                                ).colorScheme.onSurfaceVariant,
                               ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,

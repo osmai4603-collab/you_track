@@ -113,6 +113,19 @@ class IssuesRepositoryImpl implements IssuesRepository {
   }
 
   @override
+  Future<Either<Failure, void>> updateIssueStarred(
+    String issueId,
+    bool isStarred,
+  ) async {
+    try {
+      await dataSource.updateIssueStarred(issueId, isStarred);
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, void>> deleteIssue(String issueId) async {
     try {
       await dataSource.deleteIssue(issueId);

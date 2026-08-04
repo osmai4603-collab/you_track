@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:issues_tracking/core/init_dependencies.dart';
 import 'package:issues_tracking/core/widgets/avatar_url_chip.dart';
+import 'package:issues_tracking/core/widgets/youtrack_state.dart';
 import 'package:issues_tracking/features/projects/domain/entities/subsystem_entity.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/get_subsystems_use_case.dart';
 import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
@@ -10,7 +11,11 @@ class AddSubsystemDialog extends StatefulWidget {
   final SubsystemEntity? subsystem;
   final String projectId;
 
-  const AddSubsystemDialog({super.key, this.subsystem, required this.projectId});
+  const AddSubsystemDialog({
+    super.key,
+    this.subsystem,
+    required this.projectId,
+  });
 
   static Future<SubsystemEntity?> show(
     BuildContext context, {
@@ -19,7 +24,8 @@ class AddSubsystemDialog extends StatefulWidget {
   }) {
     return showDialog<SubsystemEntity>(
       context: context,
-      builder: (context) => AddSubsystemDialog(subsystem: subsystem, projectId: projectId),
+      builder: (context) =>
+          AddSubsystemDialog(subsystem: subsystem, projectId: projectId),
     );
   }
 
@@ -27,11 +33,13 @@ class AddSubsystemDialog extends StatefulWidget {
   State<AddSubsystemDialog> createState() => _AddSubsystemDialogState();
 }
 
-class _AddSubsystemDialogState extends State<AddSubsystemDialog> {
+class _AddSubsystemDialogState extends YouTrackState<AddSubsystemDialog> {
   late TextEditingController _nameController;
   int _selectedColorIndex = 0;
   UserEntity? _selectedOwner;
   Color? _selectedColor;
+  String? errorMessage;
+  bool _isSaving = false;
   List<UserEntity> _availableOwners =
       []; // This should be populated with actual owners in a real scenario.
 
@@ -235,6 +243,25 @@ class _AddSubsystemDialogState extends State<AddSubsystemDialog> {
                     );
                   },
                 ),
+                if (errorMessage != null)
+                  Container(
+                    margin: .only(top: 24),
+                    decoration: ShapeDecoration(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: .circular(8),
+                        side: BorderSide(color: colors.error),
+                      ),
+                      color: colors.error.withValues(alpha: 0.20),
+                    ),
+                    padding: .all(16),
+                    child: SelectableText(
+                      errorMessage!,
+                      style: textTheme.labelSmall!.copyWith(
+                        color: colors.error,
+                        fontWeight: .bold,
+                      ),
+                    ),
+                  ),
                 const SizedBox(height: 24),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -250,13 +277,22 @@ class _AddSubsystemDialogState extends State<AddSubsystemDialog> {
                     ),
                     const SizedBox(width: 12),
                     FilledButton(
-                      onPressed: _onSaveButtonPressed,
+                      onPressed: _isSaving ? null : _onSaveButtonPressed,
                       style: FilledButton.styleFrom(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(4),
                         ),
                       ),
-                      child: const Text('Save'),
+                      child: _isSaving
+                          ? SizedBox(
+                              width: 18,
+                              height: 18,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: colorScheme.onPrimary,
+                              ),
+                            )
+                          : const Text('Save'),
                     ),
                   ],
                 ),
@@ -279,25 +315,32 @@ class _AddSubsystemDialogState extends State<AddSubsystemDialog> {
   }
 
   void _onSaveButtonPressed() async {
+    errorMessage = null;
     final context = this.context;
     if (_nameController.text.isEmpty) return;
-    final subsystem = SubsystemEntity.create(
-      id: widget.subsystem?.id.isNotEmpty == true
-          ? widget.subsystem!.id
-          : '',
-      name: _nameController.text,
-      projectId: widget.projectId,
-      ownerId: _selectedOwner!.id,
-      color: _colors[_selectedColorIndex].toARGB32(),
-    );
-    final usecase = get_it<AddSubsystemUseCase>();
-    final result = await usecase(
-      params: AddSubsystemParams(subsystem: subsystem),
-    );
-    
-
-    if(context.mounted) {
-      Navigator.pop(context, result.getOrElse((f) => subsystem));
+    setState(() => _isSaving = true);
+    try {
+      final subsystem = SubsystemEntity.create(
+        id: widget.subsystem?.id.isNotEmpty == true ? widget.subsystem!.id : '',
+        name: _nameController.text,
+        projectId: widget.projectId,
+        ownerId: _selectedOwner!.id,
+        color: _colors[_selectedColorIndex].toARGB32(),
+      );
+      final usecase = get_it<AddSubsystemUseCase>();
+      final result = await usecase(
+        params: AddSubsystemParams(subsystem: subsystem),
+      );
+      if (context.mounted) {
+        Navigator.pop(
+          context,
+          result.fold((failure) => throw failure.message, (result) => result),
+        );
+      }
+    } catch (e) {
+      errorMessage = e.toString();
+    } finally {
+      setState(() => _isSaving = false);
     }
   }
 }

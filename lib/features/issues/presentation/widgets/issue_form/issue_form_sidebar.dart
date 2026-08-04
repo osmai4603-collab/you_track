@@ -52,11 +52,14 @@ class IssueFormSidebar extends StatelessWidget {
                     style: const TextStyle(fontSize: 12, color: Colors.grey),
                   ),
                   IconButton(
-                    onPressed: _onFavoritePressed,
+                    onPressed: () =>
+                        context.read<IssueFormCubit>().toggleFavorite(),
                     icon: Icon(
-                      cubit.state.isEditing ? Icons.star : Icons.star_border,
+                      cubit.state.isFavorite ? Icons.star : Icons.star_border,
                       size: 20,
-                      color: Colors.grey,
+                      color: cubit.state.isFavorite
+                          ? Colors.amber
+                          : Colors.grey,
                     ),
                   ),
                   const SizedBox(width: 20),
@@ -67,15 +70,14 @@ class IssueFormSidebar extends StatelessWidget {
               label: 'Project',
               trailing: cubit.state.project == null
                   ? null
-                  : ProjectIcon(projectCode: cubit.state.project!.projectId),
+                  : ProjectIcon(projectCode: cubit.state.project!.projectKey),
               value: cubit.state.project?.name ?? 'No project selected',
-
               onTap: () => _showProjectPicker(context),
             ),
             CompactFieldWidget(
               label: 'Priority',
               value: cubit.state.priority.displayName(localization),
-              leading: IssuePriorityChip(
+              trailing: IssuePriorityChip(
                 textTheme: textTheme,
                 colors: colors,
                 localization: localization,
@@ -121,7 +123,7 @@ class IssueFormSidebar extends StatelessWidget {
             ),
             CompactFieldWidget(
               label: 'Subsystem',
-              trailing: cubit.state.assignee == null
+              trailing: cubit.state.subsystem == null
                   ? null
                   : IssueSubsystemChip(subsystem: cubit.state.subsystem!),
               value: cubit.state.subsystem?.name ?? 'No Subsystem',
@@ -209,13 +211,7 @@ class IssueFormSidebar extends StatelessWidget {
     List<SubsystemEntity> availableSubsystems,
   ) async {
     final cubit = context.read<IssueFormCubit>();
-    List<SubsystemEntity> subsystems = availableSubsystems;
-    if (cubit.state.project != null) {
-      final result = await get_it<GetSubsystemsUseCase>().call(
-        params: GetSubsystemsParams(projectId: cubit.state.project!.projectId),
-      );
-      result.fold((_) => [], (systems) => subsystems = systems);
-    }
+
     if (context.mounted == false) return;
     final result = await showModalBottomSheet(
       context: context,
@@ -229,7 +225,7 @@ class IssueFormSidebar extends StatelessWidget {
               Navigator.pop(contextModal, 'new system');
             },
           ),
-          ...subsystems.map(
+          ...cubit.subsystems.map(
             (subsystem) => ListTile(
               title: Text(subsystem.name),
               trailing: subsystem.id == current?.id
@@ -245,7 +241,7 @@ class IssueFormSidebar extends StatelessWidget {
     if (result is String && context.mounted) {
       final subsystem = await AddSubsystemDialog.show(
         context,
-        projectId: cubit.state.project!.projectId,
+        projectId: cubit.state.project!.id,
       );
       if (subsystem != null && context.mounted) {
         cubit.updateSubsystem(subsystem);
@@ -268,10 +264,10 @@ class IssueFormSidebar extends StatelessWidget {
         children: cubit.availableProjects
             .map(
               (project) => ListTile(
-                leading: ProjectIcon(projectCode: project.projectId),
+                leading: ProjectIcon(projectCode: project.projectKey),
                 title: Text(project.name),
-                subtitle: Text(project.projectId),
-                trailing: project.projectId == cubit.state.project?.projectId
+                subtitle: Text(project.projectKey),
+                trailing: project.projectKey == cubit.state.project?.projectKey
                     ? const Icon(Icons.check)
                     : null,
                 onTap: () {
@@ -742,8 +738,6 @@ class IssueFormSidebar extends StatelessWidget {
       ),
     );
   }
-
-  void _onFavoritePressed() {}
 }
 
 class _PickerSheet extends StatelessWidget {

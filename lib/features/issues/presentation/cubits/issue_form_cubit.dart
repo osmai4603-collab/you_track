@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:issues_tracking/core/enums/issue_priority_type_enum.dart';
 import 'package:issues_tracking/core/enums/issue_state_enum.dart';
 import 'package:issues_tracking/core/enums/issue_type_enum.dart';
+import 'package:issues_tracking/core/extensions/either_result.dart';
 import 'package:issues_tracking/core/models/project_data_model.dart';
 import 'package:issues_tracking/features/issues/domain/entities/build.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
@@ -23,6 +25,7 @@ import 'package:issues_tracking/features/projects/domain/usecases/get_subsystems
 
 import 'package:issues_tracking/features/projects/domain/usecases/get_projects_use_case.dart';
 import 'package:issues_tracking/features/projects/domain/usecases/get_project_members_use_case.dart';
+import 'package:issues_tracking/features/projects/domain/usecases/update_project_starting_number_use_case.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_builds_use_case.dart';
 import 'package:issues_tracking/features/issues/domain/usecases/get_sprints_use_case.dart';
 import '../../../../core/usecase/usecase.dart';
@@ -32,6 +35,7 @@ import 'issue_form_state.dart';
 class IssueFormCubit extends Cubit<IssueFormState> {
   final GetProjectsUseCase getProjectsUseCase;
   final GetProjectMembersUseCase getProjectMembersUseCase;
+  final UpdateProjectStartingNumberUseCase updateProjectStartingNumberUseCase;
   final GetBuildsUseCase getBuildsUseCase;
   final GetSprintsUseCase getSprintsUseCase;
   final GetSubsystemsUseCase getSubsystemsUseCase;
@@ -83,6 +87,7 @@ class IssueFormCubit extends Cubit<IssueFormState> {
     required this.uploadAttachment,
     required this.getTagsByIssueId,
     required this.getIssueLinksByIssueId,
+    required this.updateProjectStartingNumberUseCase,
   }) : super(const IssueFormState());
 
   void initIssue({String? issueId}) async {
@@ -96,29 +101,48 @@ class IssueFormCubit extends Cubit<IssueFormState> {
     ProjectMemberEntity? projectMember;
     ProjectEntity? project;
     SubsystemEntity? subsystem;
+    Issue? issue;
 
-    _links = await getIssueLinksByIssueId(
+    await getIssueLinksByIssueId(
       params: GetByIssueIdParams(issueId: issueId),
-    ).then((result) => result.getOrElse((_) => []));
-    _tags = await getTagsByIssueId(
-      params: GetByIssueIdParams(issueId: issueId),
-    ).then((result) => result.getOrElse((_) => []));
+    ).then(
+      (result) => result.fold((failure) {
+        debugPrint('Error on get links');
+        emit(state.copyWith(errorMessage: failure.message, isLoading: false));
+      }, (links) => _links = links),
+    );
 
-    final issue = await getIssueById(
-      params: GetIssueByIdParams(id: issueId),
-    ).then((result) => result.toNullable());
+    if (state.errorMessage != null) return;
+    await getTagsByIssueId(params: GetByIssueIdParams(issueId: issueId)).then(
+      (result) => result.fold((failure) {
+        debugPrint('Error on get tags');
+        emit(state.copyWith(errorMessage: failure.message, isLoading: false));
+      }, (tags) => _tags = tags),
+    );
+    if (state.errorMessage != null) return;
+
+    await getIssueById(params: GetIssueByIdParams(id: issueId)).then(
+      (result) => result.fold((failure) {
+        issue = null;
+        debugPrint('Error on get issue');
+        emit(state.copyWith(errorMessage: failure.message, isLoading: false));
+      }, (issueResult) => issue = issueResult),
+    );
+    if (state.errorMessage != null) return;
+
     if (issue != null) {
-      await _initWithProjectChildren(issue.projectId);
+      final result = await _initWithProjectChildren(issue!.projectId);
+      if (result) return;
       projectMember = _projectMembers.cast<ProjectMemberEntity?>().firstWhere(
-        (member) => member?.id == issue.assigneeId,
+        (member) => member?.userId == issue!.assigneeId,
         orElse: () => null,
       );
-      project = _projectMembers.cast<ProjectEntity?>().firstWhere(
-        (member) => member?.id == issue.projectId,
+      project = _availableProjects.cast<ProjectEntity?>().firstWhere(
+        (project) => project?.id == issue!.projectId,
         orElse: () => null,
       );
       subsystem = _subsystems.cast<SubsystemEntity?>().firstWhere(
-        (member) => member?.id == issue.subsystemId,
+        (subsystem) => subsystem?.id == issue!.subsystemId,
         orElse: () => null,
       );
       return;
@@ -138,6 +162,8 @@ class IssueFormCubit extends Cubit<IssueFormState> {
         spentTime: issue?.spentTime,
         build: issue?.build,
         issueId: issue?.id,
+        isFavorite: issue?.isStarred ?? false,
+        isLoading: false,
       ),
     );
   }
@@ -148,21 +174,50 @@ class IssueFormCubit extends Cubit<IssueFormState> {
     );
   }
 
-  Future<void> _initWithProjectChildren(String projectId) async {
-    _availableSprints = await getSprintsUseCase(
+  Future<bool> _initWithProjectChildren(String projectId) async {
+    debugPrint('project_id: $projectId');
+    await getSprintsUseCase(
       params: GetSprintsParams(projectId: projectId),
-    ).then((result) => result.getOrElse((_) => []));
-    _projectMembers = await getProjectMembersUseCase(
-      params: GetProjectMembersParams(projectId: projectId),
-    ).then((result) => result.getOrElse((_) => []));
-    _subsystems = List<SubsystemEntity>.from(
-      await getSubsystemsUseCase(
-        params: GetSubsystemsParams(projectId: projectId),
-      ).then((result) => result.getOrElse((_) => <SubsystemEntity>[])),
+    ).then(
+      (result) => result.fold((failure) {
+        debugPrint('Error on get sprints');
+        emit(state.copyWith(errorMessage: failure.message, isLoading: false));
+      }, (tags) => _availableSprints = tags),
     );
-    _availableBuilds = await getBuildsUseCase(
-      params: GetBuildsParams(projectId: projectId),
-    ).then((result) => result.getOrElse((_) => []));
+    if (state.errorMessage != null) return false;
+    debugPrint('get it sprints');
+
+    await getProjectMembersUseCase(
+      params: GetProjectMembersParams(projectId: projectId),
+    ).then(
+      (result) => result.fold((failure) {
+        debugPrint('Error on get project members');
+        emit(state.copyWith(errorMessage: failure.message, isLoading: false));
+      }, (tags) => _projectMembers = tags),
+    );
+    if (state.errorMessage != null) return false;
+    debugPrint('get it members');
+
+    await getSubsystemsUseCase(
+      params: GetSubsystemsParams(projectId: projectId),
+    ).then(
+      (result) => result.fold((failure) {
+        debugPrint('Error on get subsystems');
+        emit(state.copyWith(errorMessage: failure.message, isLoading: false));
+      }, (tags) => _subsystems = tags),
+    );
+    if (state.errorMessage != null) return false;
+    debugPrint('get it subsystems');
+
+    await getBuildsUseCase(params: GetBuildsParams(projectId: projectId)).then(
+      (result) => result.fold((failure) {
+        emit(state.copyWith(errorMessage: failure.message, isLoading: false));
+        debugPrint('Error on get issue builds');
+      }, (tags) => _availableBuilds = tags),
+    );
+    if (state.errorMessage != null) return false;
+    debugPrint('get it builds');
+    return true;
   }
 
   void updateSummary(String value) {
@@ -195,7 +250,7 @@ class IssueFormCubit extends Cubit<IssueFormState> {
       return;
     }
 
-    if(!_projectMembers.any((s) => s.id == value.id)) {
+    if (!_projectMembers.any((s) => s.id == value.id)) {
       _projectMembers.add(value);
     }
     emit(state.copyWith(assignee: value));
@@ -232,8 +287,12 @@ class IssueFormCubit extends Cubit<IssueFormState> {
     emit(state.copyWith(spentTime: value, clearSpentTime: value == null));
   }
 
-  void updateVisibility(List<String> value) {
-    emit(state.copyWith());
+  void toggleFavorite() {
+    emit(state.copyWith(isFavorite: !state.isFavorite));
+  }
+
+  void updateVisibility(Map<String, List<String>> value) {
+    emit(state.copyWith(visibility: value));
   }
 
   void updateTags(List<Tag> tags) {
@@ -351,19 +410,21 @@ class IssueFormCubit extends Cubit<IssueFormState> {
     final userSession = get_it<UserSession>();
     final now = DateTime.now();
 
+    final serialNumber = state.project?.startingNumber ?? 1;
+
     final issue = Issue(
       projectId: state.project!.id,
       id: state.issueId ?? '',
-      issueKey: '${state.project?.projectId ?? ''}0',
-      issueNumber: 0,
+      issueKey: '${state.project?.projectKey ?? ''}-$serialNumber',
+      issueNumber: serialNumber,
       summary: state.summary.trim(),
       description: state.description,
       priority: state.priority,
       state: state.state,
       issueType: state.issueType,
-      assigneeId: state.assignee?.id,
-      reporterId: userSession.currentUser?.id ?? 'anonymous',
-      reporterName: userSession.currentUser?.email ?? 'Anonymous',
+      assigneeId: state.assignee?.userId,
+      reporterId: userSession.currentUser!.id,
+      reporterName: userSession.currentUser?.fullName ?? 'Anonymous',
       subsystemId: state.subsystem?.id,
       fixVersions: state.fixVersions,
       build: state.build,
@@ -372,9 +433,11 @@ class IssueFormCubit extends Cubit<IssueFormState> {
       updatedAt: now,
       estimation: state.estimation,
       spentTime: state.spentTime,
+      isStarred: state.isFavorite,
+      visibility: state.visibility,
     );
 
-    if (state.isEditing && state.issueId != null) {
+    if (state.issueId != null) {
       final result = await updateIssue(params: IssueParams(issue: issue));
       result.fold(
         (failure) => emit(
@@ -388,7 +451,28 @@ class IssueFormCubit extends Cubit<IssueFormState> {
         (failure) => emit(
           state.copyWith(isSubmitting: false, errorMessage: failure.message),
         ),
-        (issue) => emit(state.copyWith(isSubmitting: false, issueId: issue.id)),
+        (issue) async {
+          await _advanceProjectStartingNumber(serialNumber);
+          emit(state.copyWith(isSubmitting: false, issueId: issue.id));
+        },
+      );
+    }
+  }
+
+  Future<void> _advanceProjectStartingNumber(int serialNumber) async {
+    final project = state.project;
+    if (project == null) return;
+
+    final nextValue = serialNumber + 1;
+    final result = await updateProjectStartingNumberUseCase(
+      params: UpdateProjectStartingNumberParams(
+        projectId: project.id,
+        startingNumber: nextValue,
+      ),
+    );
+    if (result.isRight()) {
+      emit(
+        state.copyWith(project: project.copyWith(startingNumber: nextValue)),
       );
     }
   }
@@ -487,13 +571,15 @@ class IssueFormCubit extends Cubit<IssueFormState> {
     }
   }
 
-  void updateProject(ProjectEntity project) {
-    _initWithProjectChildren(project.projectId);
-    emit(state.copyWith(
-      project: project,
-      subsystem: null,
-      assignee: null,
-      build: null,
-      ));
+  void updateProject(ProjectEntity project) async {
+    await _initWithProjectChildren(project.id);
+    emit(
+      state.copyWith(
+        project: project,
+        subsystem: null,
+        assignee: null,
+        build: null,
+      ),
+    );
   }
 }

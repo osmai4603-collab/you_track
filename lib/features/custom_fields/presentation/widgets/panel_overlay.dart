@@ -9,7 +9,7 @@ class PanelOverlay extends StatelessWidget {
     super.key,
     required this.isVisible,
     this.onTap,
-    this.animationDuration = const Duration(milliseconds: 300),
+    this.animationDuration = const Duration(milliseconds: 1000),
   });
 
   @override

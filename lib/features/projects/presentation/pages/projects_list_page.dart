@@ -119,7 +119,9 @@ class _ProjectsListPageState extends YouTrackState<ProjectsListPage> {
                           color: colors.outlineVariant.withValues(alpha: 0.3),
                         ),
                         itemBuilder: (context, index) {
-                          return ProjectListTile(projectEntity: projects[index]);
+                          return ProjectListTile(
+                            projectEntity: projects[index],
+                          );
                         },
                       ),
                     ),
@@ -189,7 +191,7 @@ class _ProjectListTileState extends YouTrackState<ProjectListTile> {
               ProjectChip(
                 colors: colors,
                 textTheme: textTheme,
-                shortKey: project.projectId,
+                shortKey: project.projectKey,
                 textColor:
                     _projectColors[Random(0).nextInt(_projectColors.length)],
               ),

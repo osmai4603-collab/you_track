@@ -2,6 +2,7 @@ import 'package:fpdart/fpdart.dart';
 import 'package:issues_tracking/core/errors/failure.dart';
 import 'package:issues_tracking/core/enums/tag_permission_scope_enum.dart';
 import 'package:issues_tracking/core/enums/tag_subscription_event_enum.dart';
+import 'package:issues_tracking/features/groups/domain/entities/group_entity.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_link.dart';
 import '../../domain/entities/tag.dart';
 import '../../domain/entities/project_member.dart';
@@ -23,6 +24,7 @@ class TagsRepositoryImpl implements TagsRepository {
     required bool favorite,
     required Map<String, TagPermissionScope> permissions,
     List<String>? specificUserIds,
+    List<String>? specificGroupIds,
     required List<TagSubscriptionEvent> subscriptions,
   }) async {
     try {
@@ -35,6 +37,7 @@ class TagsRepositoryImpl implements TagsRepository {
         favorite: favorite,
         permissions: permissions.map((key, value) => MapEntry(key, value.name)),
         specificUserIds: specificUserIds,
+        specificGroupIds: specificGroupIds,
         subscriptionEvents: subscriptions.map((e) => e.name).toList(),
       );
       return Right(tag);
@@ -79,6 +82,33 @@ class TagsRepositoryImpl implements TagsRepository {
         );
       }).toList();
       return Right(members);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<GroupEntity>>> getProjectGroups({
+    required String projectId,
+  }) async {
+    try {
+      final groupsData = await dataSource.getProjectGroups(
+        projectId: projectId,
+      );
+      final groups = groupsData.map((e) {
+        final groupData = e['groups'] as Map<String, dynamic>?;
+        return GroupEntity(
+          id:
+              groupData?['id']?.toString() ??
+              e['group_id']?.toString() ??
+              '',
+          name: groupData?['name']?.toString() ?? 'Unknown',
+          description: groupData?['description']?.toString(),
+          logo: groupData?['logo']?.toString(),
+          avatarUrl: groupData?['logo']?.toString(),
+        );
+      }).toList();
+      return Right(groups);
     } catch (e) {
       return Left(ServerFailure(e.toString()));
     }

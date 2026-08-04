@@ -190,6 +190,29 @@
   "duplicatesOption": "يكرر",
   "parentForOption": "أب لـ",
   "subtaskOfOption": "مهمة فرعية لـ",
+  "newTagTitle": "وسم جديد",
+  "tagNameLabel": "اسم الوسم",
+  "tagNameHint": "أدخل اسم الوسم",
+  "removeOnResolutionLabel": "الإزالة عند الحل",
+  "sharedLabel": "مشترك",
+  "favoriteLabel": "وضع علامة كمفضل لجميع المشاهدين",
+  "subscriptionsTitle": "الاشتراكات",
+  "tagScopeOwner": "المالك",
+  "tagScopeAdmin": "مدير",
+  "tagScopeDeveloper": "مطور",
+  "tagScopeViewer": "مشاهد",
+  "tagScopeAllMembers": "جميع الأعضاء",
+  "tagScopeSpecificUsers": "مستخدمون محددون",
+  "tagPermissionView": "يمكنه العرض",
+  "tagPermissionUse": "يمكنه الاستخدام",
+  "tagPermissionEdit": "يمكنه التعديل",
+  "tagEventUpdates": "التحديثات",
+  "tagEventComments": "التعليقات",
+  "tagEventTagAdded": "تمت إضافة الوسم",
+  "tagEventSpentTime": "الوقت المستغرق",
+  "tagEventIssueResolved": "تم حل المشكلة",
+  "tagEventVotes": "التصويتات",
+  "tagEventTagRemoved": "تمت إزالة الوسم",
   "templateDefault": "افتراضي",
   "@templateDefault": {
     "description": "قالب المشروع الافتراضي"
@@ -527,5 +550,325 @@
   "permissionDeniedTooltip": "ليس لديك الصلاحية لتنفيذ هذا الإجراء",
   "@permissionDeniedTooltip": {
     "description": "رسالة تلميح تظهر عند تعطيل إجراء بسبب نقص الصلاحية"
+  },
+  "userProfileGeneral": "عام",
+  "@userProfileGeneral": {
+    "description": "تبويب عام في صفحة الملف الشخصي"
+  },
+  "userProfileWorkspace": "مساحة العمل",
+  "@userProfileWorkspace": {
+    "description": "تبويب مساحة العمل في صفحة الملف الشخصي"
+  },
+  "userProfileTagsAndSearches": "الوسوم والبحوث المحفوظة",
+  "@userProfileTagsAndSearches": {
+    "description": "تبويب الوسوم والبحوث المحفوظة في صفحة الملف الشخصي"
+  },
+  "userProfileNotifications": "الإشعارات",
+  "@userProfileNotifications": {
+    "description": "تبويب الإشعارات في صفحة الملف الشخصي"
+  },
+  "userProfileAccountSecurity": "أمان الحساب",
+  "@userProfileAccountSecurity": {
+    "description": "تبويب أمان الحساب في صفحة الملف الشخصي"
+  },
+  "fullName": "الاسم الكامل",
+  "@fullName": {
+    "description": "حقل الاسم الكامل"
+  },
+  "username": "اسم المستخدم",
+  "@username": {
+    "description": "حقل اسم المستخدم"
+  },
+  "avatar": "الصورة الرمزية",
+  "@avatar": {
+    "description": "حقل الصورة الرمزية"
+  },
+  "vcsUsernames": "أسماء مستخدمي VCS",
+  "@vcsUsernames": {
+    "description": "حقل أسماء مستخدمي أنظمة التحكم بالإصدارات"
+  },
+  "registrationDate": "تاريخ التسجيل",
+  "@registrationDate": {
+    "description": "حقل تاريخ التسجيل"
+  },
+  "personalData": "البيانات الشخصية",
+  "@personalData": {
+    "description": "عنوان قسم البيانات الشخصية"
+  },
+  "downloadCsv": "تنزيل بصيغة CSV",
+  "@downloadCsv": {
+    "description": "زر تنزيل البيانات الشخصية بصيغة CSV"
+  },
+  "localTimezone": "المنطقة الزمنية المحلية",
+  "@localTimezone": {
+    "description": "عنوان قسم المنطقة الزمنية"
+  },
+  "guessTimezone": "تخمين المنطقة الزمنية",
+  "@guessTimezone": {
+    "description": "زر تخمين المنطقة الزمنية تلقائياً"
+  },
+  "sendTestMessage": "إرسال رسالة اختبار",
+  "@sendTestMessage": {
+    "description": "زر إرسال رسالة اختبار للبريد الإلكتروني"
+  },
+  "theme": "المظهر",
+  "@theme": {
+    "description": "عنوان قسم المظهر"
+  },
+  "themeLight": "فاتح",
+  "@themeLight": {
+    "description": "خيار المظهر الفاتح"
+  },
+  "themeDark": "داكن",
+  "@themeDark": {
+    "description": "خيار المظهر الداكن"
+  },
+  "themeSyncOs": "مزامنة مع النظام",
+  "@themeSyncOs": {
+    "description": "خيار مزامنة المظهر مع نظام التشغيل"
+  },
+  "linksPanelPosition": "موضع لوحة الروابط",
+  "@linksPanelPosition": {
+    "description": "عنوان قسم موضع لوحة الروابط"
+  },
+  "belowSummary": "أسفل الملخص",
+  "@belowSummary": {
+    "description": "خيار وضع لوحة الروابط أسفل الملخص"
+  },
+  "belowDescription": "أسفل الوصف",
+  "@belowDescription": {
+    "description": "خيار وضع لوحة الروابط أسفل الوصف"
+  },
+  "showRecentIssues": "إظهار المشاكل والمقالات الأخيرة",
+  "@showRecentIssues": {
+    "description": "مفتاح إظهار العناصر المعروضة مؤخراً"
+  },
+  "newTagOrSearch": "وسم أو بحث محفوظ جديد",
+  "@newTagOrSearch": {
+    "description": "زر إنشاء وسم أو بحث محفوظ جديد"
+  },
+  "delete": "حذف",
+  "@delete": {
+    "description": "زر الحذف"
+  },
+  "searchTagsAndSearches": "البحث في الوسوم والبحوث",
+  "@searchTagsAndSearches": {
+    "description": "حقل البحث في الوسوم والبحوث"
+  },
+  "all": "الكل",
+  "@all": {
+    "description": "خيار عرض الكل"
+  },
+  "createdByMe": "تم إنشاؤها بواسطتي",
+  "@createdByMe": {
+    "description": "خيار عرض العناصر التي أنشأها المستخدم"
+  },
+  "removeOnResolution": "الإزالة عند الحل",
+  "@removeOnResolution": {
+    "description": "خانة إزالة الوسم عند حل المشكلة"
+  },
+  "markAsFavorite": "وضع علامة كمفضل لجميع المشاهدين",
+  "@markAsFavorite": {
+    "description": "خانة وضع علامة كمفضل"
+  },
+  "notificationEvents": "أحداث الإشعارات:",
+  "@notificationEvents": {
+    "description": "عنوان قسم أحداث الإشعارات"
+  },
+  "sendNotificationsTo": "إرسال الإشعارات إلى:",
+  "@sendNotificationsTo": {
+    "description": "عنوان قسم قنوات الإشعار"
+  },
+  "starAutomaticallyWhen": "وضع نجمة تلقائياً عندما:",
+  "@starAutomaticallyWhen": {
+    "description": "عنوان قسم أحداث النجمة التلقائية"
+  },
+  "twoFactorAuth": "المصادقة الثنائية",
+  "@twoFactorAuth": {
+    "description": "عنوان قسم المصادقة الثنائية"
+  },
+  "credentials": "بيانات الاعتماد",
+  "@credentials": {
+    "description": "عنوان قسم بيانات الاعتماد"
+  },
+  "tokens": "الرموز",
+  "@tokens": {
+    "description": "عنوان قسم الرموز"
+  },
+  "changePassword": "تغيير كلمة المرور",
+  "@changePassword": {
+    "description": "زر تغيير كلمة المرور"
+  },
+  "revokeRefreshToken": "إبطال رمز التحديث",
+  "@revokeRefreshToken": {
+    "description": "زر إبطال رمز التحديث"
+  },
+  "deleteCredentials": "حذف بيانات الاعتماد",
+  "@deleteCredentials": {
+    "description": "زر حذف بيانات الاعتماد"
+  },
+  "pairWithApp": "إقران مع التطبيق ...",
+  "@pairWithApp": {
+    "description": "زر الإقران مع تطبيق المصادقة"
+  },
+  "pairWithHardwareToken": "إقران مع رمز مادي ...",
+  "@pairWithHardwareToken": {
+    "description": "زر الإقران مع رمز أجهزة"
+  },
+  "addCredentials": "إضافة بيانات اعتماد ...",
+  "@addCredentials": {
+    "description": "زر إضافة بيانات اعتماد"
+  },
+  "newToken": "رمز جديد ...",
+  "@newToken": {
+    "description": "زر إنشاء رمز جديد"
+  },
+  "newPasswordButton": "كلمة مرور جديدة ...",
+  "@newPasswordButton": {
+    "description": "زر إنشاء كلمة مرور جديدة"
+  },
+  "saveChanges": "حفظ التغييرات",
+  "@saveChanges": {
+    "description": "زر حفظ التغييرات"
+  },
+  "currentPassword": "كلمة المرور الحالية",
+  "@currentPassword": {
+    "description": "حقل كلمة المرور الحالية"
+  },
+  "newPassword": "كلمة المرور الجديدة",
+  "@newPassword": {
+    "description": "حقل كلمة المرور الجديدة"
+  },
+  "confirmPassword": "تأكيد كلمة المرور",
+  "@confirmPassword": {
+    "description": "حقل تأكيد كلمة المرور"
+  },
+  "passwordMismatch": "كلمتا المرور غير متطابقتين",
+  "@passwordMismatch": {
+    "description": "رسالة خطأ عدم تطابق كلمة المرور"
+  },
+  "passwordChangedSuccess": "تم تغيير كلمة المرور بنجاح",
+  "@passwordChangedSuccess": {
+    "description": "رسالة نجاح تغيير كلمة المرور"
+  },
+  "passwordChangeFailed": "فشل تغيير كلمة المرور: {error}",
+  "@passwordChangeFailed": {
+    "description": "رسالة فشل تغيير كلمة المرور",
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "sessionsRevokedSuccess": "تم إبطال الجلسات النشطة الأخرى",
+  "@sessionsRevokedSuccess": {
+    "description": "رسالة نجاح إبطال رمز التحديث"
+  },
+  "sessionsRevokeFailed": "فشل إبطال الجلسات: {error}",
+  "@sessionsRevokeFailed": {
+    "description": "رسالة فشل إبطال رمز التحديث",
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "changesSavedSuccess": "تم حفظ التغييرات بنجاح",
+  "@changesSavedSuccess": {
+    "description": "رسالة نجاح حفظ التغييرات"
+  },
+  "noTagSelected": "لم يتم تحديد أي عنصر للحذف",
+  "@noTagSelected": {
+    "description": "رسالة عدم تحديد عنصر للحذف"
+  },
+  "enterTagName": "أدخل اسم الوسم...",
+  "@enterTagName": {
+    "description": "تلميح حقل اسم الوسم"
+  },
+  "enterSearchQuery": "أدخل استعلام البحث...",
+  "@enterSearchQuery": {
+    "description": "تلميح حقل استعلام البحث"
+  },
+  "searchSavedSearchType": "بحث محفوظ",
+  "@searchSavedSearchType": {
+    "description": "نوع البحث المحفوظ"
+  },
+  "vcsUsernamesHint": "إضافة معرّفات شخصية من أنظمة التحكم بالإصدارات المدمجة (VCS) تسمح لـ YouTrack بإضافة روابط للمشاكل المشار إليها في ارتكازات الكود الخاصة بك.",
+  "@vcsUsernamesHint": {
+    "description": "نص توضيحي لحقل أسماء مستخدمي VCS"
+  },
+  "profileLoadError": "تعذر تحميل الملف الشخصي: {error}",
+  "@profileLoadError": {
+    "description": "رسالة خطأ تحميل الملف الشخصي",
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "changesByMe": "التغييرات التي أجريتها أنا",
+  "@changesByMe": {
+    "description": "خانة إشعار التغييرات التي أجراها المستخدم"
+  },
+  "mentionsMyUsername": "@إشارات تذكر اسم المستخدم الخاص بي",
+  "@mentionsMyUsername": {
+    "description": "خانة إشعار الإشارات"
+  },
+  "changesInDuplicateCluster": "التغييرات في مجموعة المهام المكررة",
+  "@changesInDuplicateCluster": {
+    "description": "خانة إشعار تغييرات المهام المكررة"
+  },
+  "issuesFromEmails": "المشاكل والتعليقات المنشأة من بريدي الإلكتروني",
+  "@issuesFromEmails": {
+    "description": "خانة إشعار العناصر المنشأة من البريد"
+  },
+  "vcsBuildUpdates": "التحديثات المطبقة بواسطة تكاملات VCS وبناء الخادم",
+  "@vcsBuildUpdates": {
+    "description": "خانة إشعار تحديثات VCS"
+  },
+  "failedVcsCommands": "الأوامر الفاشلة في الارتكازات التي تعالجها تكاملات VCS وبناء الخادم",
+  "@failedVcsCommands": {
+    "description": "خانة إشعار أوامر VCS الفاشلة"
+  },
+  "starOnComment": "أعلق على مشكلة أو مقالة",
+  "@starOnComment": {
+    "description": "خانة نجمة تلقائية عند التعليق"
+  },
+  "starOnCreate": "أنشئ مشكلة أو مقالة",
+  "@starOnCreate": {
+    "description": "خانة نجمة تلقائية عند الإنشاء"
+  },
+  "starOnUpdate": "أحدّث مشكلة أو مقالة",
+  "@starOnUpdate": {
+    "description": "خانة نجمة تلقائية عند التحديث"
+  },
+  "starOnAssigned": "أكون مسؤولاً عن مشكلة",
+  "@starOnAssigned": {
+    "description": "خانة نجمة تلقائية عند الإسناد"
+  },
+  "starOnVote": "أصوّت لمشكلة",
+  "@starOnVote": {
+    "description": "خانة نجمة تلقائية عند التصويت"
+  },
+  "emailChannel": "البريد الإلكتروني",
+  "@emailChannel": {
+    "description": "خانة قناة البريد الإلكتروني"
+  },
+  "telegramChannel": "روبوت YouTrack لتطبيق Telegram",
+  "@telegramChannel": {
+    "description": "خانة قناة Telegram"
+  },
+  "connectTelegramAccount": "ربط حسابي",
+  "@connectTelegramAccount": {
+    "description": "زر ربط حساب Telegram"
+  },
+  "testMessageSent": "تم إرسال رسالة الاختبار إلى البريد الإلكتروني",
+  "@testMessageSent": {
+    "description": "رسالة نجاح إرسال رسالة اختبار"
+  },
+  "downloadCsvStarted": "جارٍ تنزيل البيانات الشخصية بصيغة CSV...",
+  "@downloadCsvStarted": {
+    "description": "رسالة بدء تنزيل البيانات بصيغة CSV"
+  },
+  "timezoneGuessed": "تم تخمين المنطقة الزمنية: {zone} (استناداً إلى عنوان IP)",
+  "@timezoneGuessed": {
+    "description": "رسالة تخمين المنطقة الزمنية",
+    "placeholders": {
+      "zone": {}
+    }
   }
 }

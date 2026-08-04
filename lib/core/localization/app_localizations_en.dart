@@ -775,4 +775,247 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get permissionDeniedTooltip =>
       'You don\'t have permission to perform this action';
+
+  @override
+  String get userProfileGeneral => 'General';
+
+  @override
+  String get userProfileWorkspace => 'Workspace';
+
+  @override
+  String get userProfileTagsAndSearches => 'Tags and Saved Searches';
+
+  @override
+  String get userProfileNotifications => 'Notifications';
+
+  @override
+  String get userProfileAccountSecurity => 'Account Security';
+
+  @override
+  String get fullName => 'Full name';
+
+  @override
+  String get username => 'Username';
+
+  @override
+  String get avatar => 'Avatar';
+
+  @override
+  String get vcsUsernames => 'VCS usernames';
+
+  @override
+  String get registrationDate => 'Registration date';
+
+  @override
+  String get personalData => 'Personal data';
+
+  @override
+  String get downloadCsv => 'Download in CSV format';
+
+  @override
+  String get localTimezone => 'Local time zone';
+
+  @override
+  String get guessTimezone => 'Guess time zone';
+
+  @override
+  String get sendTestMessage => 'Send test message';
+
+  @override
+  String get theme => 'Theme';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get themeSyncOs => 'Sync with OS';
+
+  @override
+  String get linksPanelPosition => 'Links panel position';
+
+  @override
+  String get belowSummary => 'Below the summary';
+
+  @override
+  String get belowDescription => 'Below the description';
+
+  @override
+  String get showRecentIssues => 'Show recent issues and articles';
+
+  @override
+  String get newTagOrSearch => 'New tag or saved search';
+
+  @override
+  String get delete => 'Delete';
+
+  @override
+  String get searchTagsAndSearches => 'Search tags and searches';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get createdByMe => 'Created by me';
+
+  @override
+  String get removeOnResolution => 'Remove on resolution';
+
+  @override
+  String get markAsFavorite => 'Mark as favorite for all viewers';
+
+  @override
+  String get notificationEvents => 'Notification events:';
+
+  @override
+  String get sendNotificationsTo => 'Send notifications to:';
+
+  @override
+  String get starAutomaticallyWhen => 'Star automatically when:';
+
+  @override
+  String get twoFactorAuth => 'Two-factor Authentication';
+
+  @override
+  String get credentials => 'Credentials';
+
+  @override
+  String get tokens => 'Tokens';
+
+  @override
+  String get changePassword => 'Change password';
+
+  @override
+  String get revokeRefreshToken => 'Revoke refresh token';
+
+  @override
+  String get deleteCredentials => 'Delete credentials';
+
+  @override
+  String get pairWithApp => 'Pair with app ...';
+
+  @override
+  String get pairWithHardwareToken => 'Pair with hardware token ...';
+
+  @override
+  String get addCredentials => 'Add credentials ...';
+
+  @override
+  String get newToken => 'New token ...';
+
+  @override
+  String get newPasswordButton => 'New password ...';
+
+  @override
+  String get saveChanges => 'Save changes';
+
+  @override
+  String get currentPassword => 'Current password';
+
+  @override
+  String get newPassword => 'New password';
+
+  @override
+  String get confirmPassword => 'Confirm password';
+
+  @override
+  String get passwordMismatch => 'Passwords do not match';
+
+  @override
+  String get passwordChangedSuccess => 'Password changed successfully';
+
+  @override
+  String passwordChangeFailed(Object error) {
+    return 'Failed to change password: $error';
+  }
+
+  @override
+  String get sessionsRevokedSuccess =>
+      'Other active sessions have been revoked';
+
+  @override
+  String sessionsRevokeFailed(Object error) {
+    return 'Failed to revoke sessions: $error';
+  }
+
+  @override
+  String get changesSavedSuccess => 'Changes saved successfully';
+
+  @override
+  String get noTagSelected => 'No item selected to delete';
+
+  @override
+  String get enterTagName => 'Enter tag name...';
+
+  @override
+  String get enterSearchQuery => 'Enter search query...';
+
+  @override
+  String get searchSavedSearchType => 'Saved search';
+
+  @override
+  String get vcsUsernamesHint =>
+      'Adding personal identifiers from integrated version control systems (VCS) lets YouTrack add links to issues referenced in your code commits.';
+
+  @override
+  String profileLoadError(Object error) {
+    return 'Failed to load profile: $error';
+  }
+
+  @override
+  String get changesByMe => 'Changes applied by me';
+
+  @override
+  String get mentionsMyUsername => '@mentions that reference my username';
+
+  @override
+  String get changesInDuplicateCluster => 'Changes in a duplicate cluster';
+
+  @override
+  String get issuesFromEmails => 'Issues and comments created from my emails';
+
+  @override
+  String get vcsBuildUpdates =>
+      'Updates applied by VCS and build server integrations';
+
+  @override
+  String get failedVcsCommands =>
+      'Failed commands in commits processed by VCS and build server integrations';
+
+  @override
+  String get starOnComment => 'I post a comment to an issue or article';
+
+  @override
+  String get starOnCreate => 'I create an issue or article';
+
+  @override
+  String get starOnUpdate => 'I update an issue or article';
+
+  @override
+  String get starOnAssigned => 'I am made responsible for an issue';
+
+  @override
+  String get starOnVote => 'I vote for an issue';
+
+  @override
+  String get emailChannel => 'Email';
+
+  @override
+  String get telegramChannel => 'YouTrack bot for Telegram';
+
+  @override
+  String get connectTelegramAccount => 'Connect my account';
+
+  @override
+  String get testMessageSent => 'Test message sent to email';
+
+  @override
+  String get downloadCsvStarted => 'Downloading personal data as CSV...';
+
+  @override
+  String timezoneGuessed(Object zone) {
+    return 'Time zone guessed: $zone (based on IP address)';
+  }
 }

@@ -73,6 +73,32 @@ class ProjectsRepositoryImpl implements ProjectsRepository {
   }
 
   @override
+  Future<Either<Failure, Unit>> updateProjectStartingNumber(
+    String projectId,
+    int startingNumber,
+  ) async {
+    try {
+      await remoteDataSource.updateStartingNumber(projectId, startingNumber);
+      return const Right(unit);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> updateProjectFavorite(
+    String projectId,
+    bool isFavorite,
+  ) async {
+    try {
+      await remoteDataSource.updateFavorite(projectId, isFavorite);
+      return const Right(unit);
+    } catch (e) {
+      return Left(ServerFailure(e.toString()));
+    }
+  }
+
+  @override
   Future<Either<Failure, Unit>> archiveProject(String id) async {
     try {
       await remoteDataSource.archiveProject(id);

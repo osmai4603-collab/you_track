@@ -11,6 +11,10 @@ abstract class ProjectsRepository {
   Future<Either<Failure, ProjectEntity>> getProjectById(String id);
   Future<Either<Failure, ProjectEntity>> createProject(ProjectEntity project);
   Future<Either<Failure, ProjectEntity>> updateProject(ProjectEntity project);
+  Future<Either<Failure, Unit>> updateProjectStartingNumber(
+      String projectId, int startingNumber);
+  Future<Either<Failure, Unit>> updateProjectFavorite(
+      String projectId, bool isFavorite);
   Future<Either<Failure, Unit>> archiveProject(String id);
   Future<Either<Failure, Unit>> deleteProject(String id);
   Future<Either<Failure, List<ProjectMemberEntity>>> getProjectMembers(String projectId);

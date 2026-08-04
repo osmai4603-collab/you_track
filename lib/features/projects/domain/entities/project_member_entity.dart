@@ -1,5 +1,3 @@
-
-
 import 'package:issues_tracking/features/users/domain/entities/user_entity.dart';
 
 import '../../../../core/entities/entity.dart';
@@ -30,7 +28,7 @@ class ProjectMemberEntity extends Entity {
   @override
   ProjectMemberEntity copyWith({
     String? id,
-    String? projectId,
+    String? projectKey,
     List<String>? roles,
     bool? isOwner,
     String? userId,
@@ -38,7 +36,7 @@ class ProjectMemberEntity extends Entity {
   }) {
     return ProjectMemberEntity(
       id: id ?? this.id,
-      projectId: projectId ?? this.projectId,
+      projectId: projectKey ?? this.projectId,
       roles: roles ?? this.roles,
       isOwner: isOwner ?? this.isOwner,
       userId: userId ?? this.userId,

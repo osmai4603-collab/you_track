@@ -7,35 +7,47 @@ class ShimmerLoading extends StatelessWidget {
 
   const ShimmerLoading._(this.child, {super.key});
 
-  factory ShimmerLoading.table({Key? key, int rows = 8, Duration duration = const Duration(milliseconds: 2500)}) {
+  factory ShimmerLoading.table({
+    Key? key,
+    int rows = 8,
+    Duration duration = const Duration(milliseconds: 2500),
+  }) {
     return ShimmerLoading._(
       _ShimmerTableSkeleton(rowCount: rows, duration: duration),
       key: key,
     );
   }
 
-  factory ShimmerLoading.list({Key? key, int itemCount = 8, Duration duration = const Duration(milliseconds: 2500)}) {
+  factory ShimmerLoading.list({
+    Key? key,
+    int itemCount = 8,
+    Duration duration = const Duration(milliseconds: 2500),
+  }) {
     return ShimmerLoading._(
       _ShimmerListSkeleton(itemCount: itemCount, duration: duration),
       key: key,
     );
   }
 
-  factory ShimmerLoading.tree({Key? key, int itemCount = 6, Duration duration = const Duration(milliseconds: 2500)}) {
+  factory ShimmerLoading.tree({
+    Key? key,
+    int itemCount = 6,
+    Duration duration = const Duration(milliseconds: 2500),
+  }) {
     return ShimmerLoading._(
       _ShimmerTreeSkeleton(itemCount: itemCount, duration: duration),
       key: key,
     );
   }
 
-  factory ShimmerLoading.center({Key? key, double width = 64, double height = 64}) {
+  factory ShimmerLoading.center({
+    Key? key,
+    double width = 64,
+    double height = 64,
+  }) {
     return ShimmerLoading._(
       Center(
-        child: SkeletonShimmer(
-          width: width,
-          height: height,
-          borderRadius: 16,
-        ),
+        child: SkeletonShimmer(width: width, height: height, borderRadius: 16),
       ),
       key: key,
     );
@@ -49,7 +61,10 @@ class _ShimmerTableSkeleton extends StatelessWidget {
   final int rowCount;
   final Duration duration;
 
-  const _ShimmerTableSkeleton({this.rowCount = 5, this.duration = const Duration(milliseconds: 2500)});
+  const _ShimmerTableSkeleton({
+    this.rowCount = 5,
+    this.duration = const Duration(milliseconds: 2500),
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -84,11 +99,31 @@ class _ShimmerTableHeader extends StatelessWidget {
       children: [
         const SizedBox(width: 40),
         const SizedBox(width: AppSpacing.small),
-        Expanded(child: SkeletonShimmer(height: 18, borderRadius: 6, duration: duration)),
+        Expanded(
+          child: SkeletonShimmer(
+            height: 18,
+            borderRadius: 6,
+            duration: duration,
+          ),
+        ),
         const SizedBox(width: AppSpacing.small),
-        SizedBox(width: 120, child: SkeletonShimmer(height: 18, borderRadius: 6, duration: duration)),
+        SizedBox(
+          width: 120,
+          child: SkeletonShimmer(
+            height: 18,
+            borderRadius: 6,
+            duration: duration,
+          ),
+        ),
         const SizedBox(width: AppSpacing.small),
-        SizedBox(width: 100, child: SkeletonShimmer(height: 18, borderRadius: 6, duration: duration)),
+        SizedBox(
+          width: 100,
+          child: SkeletonShimmer(
+            height: 18,
+            borderRadius: 6,
+            duration: duration,
+          ),
+        ),
       ],
     );
   }
@@ -103,13 +138,38 @@ class _ShimmerTableRow extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        SkeletonShimmer(width: 24, height: 24, borderRadius: 6, duration: duration),
+        SkeletonShimmer(
+          width: 24,
+          height: 40,
+          borderRadius: 6,
+          duration: duration,
+        ),
         const SizedBox(width: AppSpacing.small),
-        Expanded(child: SkeletonShimmer(height: 16, borderRadius: 6, duration: duration)),
+        Expanded(
+          child: SkeletonShimmer(
+            height: 16,
+            borderRadius: 6,
+            duration: duration,
+          ),
+        ),
         const SizedBox(width: AppSpacing.small),
-        SizedBox(width: 120, child: SkeletonShimmer(height: 16, borderRadius: 6, duration: duration)),
+        SizedBox(
+          width: 120,
+          child: SkeletonShimmer(
+            height: 20,
+            borderRadius: 6,
+            duration: duration,
+          ),
+        ),
         const SizedBox(width: AppSpacing.small),
-        SizedBox(width: 100, child: SkeletonShimmer(height: 16, borderRadius: 6, duration: duration)),
+        SizedBox(
+          width: 100,
+          child: SkeletonShimmer(
+            height: 20,
+            borderRadius: 6,
+            duration: duration,
+          ),
+        ),
       ],
     );
   }
@@ -119,7 +179,10 @@ class _ShimmerListSkeleton extends StatelessWidget {
   final int itemCount;
   final Duration duration;
 
-  const _ShimmerListSkeleton({this.itemCount = 5, this.duration = const Duration(milliseconds: 2500)});
+  const _ShimmerListSkeleton({
+    this.itemCount = 5,
+    this.duration = const Duration(milliseconds: 2500),
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -139,11 +202,24 @@ class _ShimmerListSkeleton extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
-                      SkeletonShimmer(height: 16, borderRadius: 6, duration: duration),
+                      SkeletonShimmer(
+                        height: 16,
+                        borderRadius: 6,
+                        duration: duration,
+                      ),
                       const SizedBox(height: AppSpacing.extraSmall),
-                      SkeletonShimmer(height: 14, borderRadius: 6, duration: duration),
+                      SkeletonShimmer(
+                        height: 14,
+                        borderRadius: 6,
+                        duration: duration,
+                      ),
                       const SizedBox(height: AppSpacing.extraSmall),
-                      SkeletonShimmer(width: 120, height: 14, borderRadius: 6, duration: duration),
+                      SkeletonShimmer(
+                        width: 120,
+                        height: 14,
+                        borderRadius: 6,
+                        duration: duration,
+                      ),
                     ],
                   ),
                 ),
@@ -160,7 +236,10 @@ class _ShimmerTreeSkeleton extends StatelessWidget {
   final int itemCount;
   final Duration duration;
 
-  const _ShimmerTreeSkeleton({this.itemCount = 4, this.duration = const Duration(milliseconds: 2500)});
+  const _ShimmerTreeSkeleton({
+    this.itemCount = 4,
+    this.duration = const Duration(milliseconds: 2500),
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -168,29 +247,35 @@ class _ShimmerTreeSkeleton extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.medium),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: List.generate(
-          itemCount,
-          (index) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: AppSpacing.small),
-              child: Row(
-                children: [
-                  SizedBox(width: index * 12.0),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SkeletonShimmer(height: 16, borderRadius: 6, duration: duration),
-                        const SizedBox(height: AppSpacing.extraSmall),
-                        SkeletonShimmer(width: 180, height: 14, borderRadius: 6, duration: duration),
-                      ],
-                    ),
+        children: List.generate(itemCount, (index) {
+          return Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.small),
+            child: Row(
+              children: [
+                SizedBox(width: index * 12.0),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SkeletonShimmer(
+                        height: 16,
+                        borderRadius: 6,
+                        duration: duration,
+                      ),
+                      const SizedBox(height: AppSpacing.extraSmall),
+                      SkeletonShimmer(
+                        width: 180,
+                        height: 14,
+                        borderRadius: 6,
+                        duration: duration,
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            );
-          },
-        ),
+                ),
+              ],
+            ),
+          );
+        }),
       ),
     );
   }

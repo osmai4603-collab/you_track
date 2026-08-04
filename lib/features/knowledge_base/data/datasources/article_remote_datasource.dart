@@ -2,7 +2,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/article_model.dart';
 
 abstract class ArticleRemoteDataSource {
-  Future<List<ArticleModel>> getArticleTree(String projectId);
+  Future<List<ArticleModel>> getArticleTree({String? projectId});
   Future<ArticleModel> getArticleById(String articleId);
   Future<ArticleModel> createArticle(ArticleModel article);
   Future<ArticleModel> updateArticle(ArticleModel article);
@@ -16,19 +16,22 @@ class ArticleRemoteDataSourceImpl implements ArticleRemoteDataSource {
   ArticleRemoteDataSourceImpl(this.supabase);
 
   @override
-  Future<List<ArticleModel>> getArticleTree(String projectId) async {
-    final response = await supabase
-        .from('articles')
-        .select()
-        .eq('project_id', projectId)
-        .order('sort_order');
+  Future<List<ArticleModel>> getArticleTree({String? projectId}) async {
+    var response = await supabase.from('articles').select().inFilter(
+      'project_id',
+      [?projectId],
+    );
+
     return (response as List).map((e) => ArticleModel.fromJson(e)).toList();
   }
 
   @override
   Future<ArticleModel> getArticleById(String articleId) async {
-    final response =
-        await supabase.from('articles').select().eq('id', articleId).single();
+    final response = await supabase
+        .from('articles')
+        .select()
+        .eq('id', articleId)
+        .single();
     return ArticleModel.fromJson(response);
   }
 

@@ -20,6 +20,11 @@ abstract class IssuesRepository {
 
   Future<Either<Failure, Issue>> updateIssue(Issue issue);
 
+  Future<Either<Failure, void>> updateIssueStarred(
+    String issueId,
+    bool isStarred,
+  );
+
   Future<Either<Failure, void>> deleteIssue(String issueId);
 
   Future<Either<Failure, String>> uploadAttachment({

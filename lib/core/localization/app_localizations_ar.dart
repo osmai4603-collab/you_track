@@ -450,73 +450,73 @@ class AppLocalizationsAr extends AppLocalizations {
   String get subtaskOfOption => 'مهمة فرعية لـ';
 
   @override
-  String get newTagTitle => 'New Tag';
+  String get newTagTitle => 'وسم جديد';
 
   @override
-  String get tagNameLabel => 'Tag Name';
+  String get tagNameLabel => 'اسم الوسم';
 
   @override
-  String get tagNameHint => 'Enter tag name';
+  String get tagNameHint => 'أدخل اسم الوسم';
 
   @override
-  String get removeOnResolutionLabel => 'Remove on resolution';
+  String get removeOnResolutionLabel => 'الإزالة عند الحل';
 
   @override
-  String get sharedLabel => 'Shared';
+  String get sharedLabel => 'مشترك';
 
   @override
-  String get favoriteLabel => 'Mark as favorite for all viewers';
+  String get favoriteLabel => 'وضع علامة كمفضل لجميع المشاهدين';
 
   @override
-  String get subscriptionsTitle => 'Subscriptions';
+  String get subscriptionsTitle => 'الاشتراكات';
 
   @override
-  String get tagScopeOwner => 'Owner';
+  String get tagScopeOwner => 'المالك';
 
   @override
-  String get tagScopeAdmin => 'Admin';
+  String get tagScopeAdmin => 'مدير';
 
   @override
-  String get tagScopeDeveloper => 'Developer';
+  String get tagScopeDeveloper => 'مطور';
 
   @override
-  String get tagScopeViewer => 'Viewer';
+  String get tagScopeViewer => 'مشاهد';
 
   @override
-  String get tagScopeAllMembers => 'All Members';
+  String get tagScopeAllMembers => 'جميع الأعضاء';
 
   @override
-  String get tagScopeSpecificUsers => 'Specific Users';
+  String get tagScopeSpecificUsers => 'مستخدمون محددون';
 
   @override
-  String get tagPermissionView => 'Can view';
+  String get tagPermissionView => 'يمكنه العرض';
 
   @override
-  String get tagPermissionUse => 'Can use';
+  String get tagPermissionUse => 'يمكنه الاستخدام';
 
   @override
-  String get tagPermissionEdit => 'Can edit';
+  String get tagPermissionEdit => 'يمكنه التعديل';
 
   @override
-  String get tagEventUpdates => 'Updates';
+  String get tagEventUpdates => 'التحديثات';
 
   @override
-  String get tagEventComments => 'Comments';
+  String get tagEventComments => 'التعليقات';
 
   @override
-  String get tagEventTagAdded => 'Tag added';
+  String get tagEventTagAdded => 'تمت إضافة الوسم';
 
   @override
-  String get tagEventSpentTime => 'Spent time';
+  String get tagEventSpentTime => 'الوقت المستغرق';
 
   @override
-  String get tagEventIssueResolved => 'Issue resolved';
+  String get tagEventIssueResolved => 'تم حل المشكلة';
 
   @override
-  String get tagEventVotes => 'Votes';
+  String get tagEventVotes => 'التصويتات';
 
   @override
-  String get tagEventTagRemoved => 'Tag removed';
+  String get tagEventTagRemoved => 'تمت إزالة الوسم';
 
   @override
   String get templateDefault => 'افتراضي';
@@ -774,4 +774,247 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get permissionDeniedTooltip => 'ليس لديك الصلاحية لتنفيذ هذا الإجراء';
+
+  @override
+  String get userProfileGeneral => 'عام';
+
+  @override
+  String get userProfileWorkspace => 'مساحة العمل';
+
+  @override
+  String get userProfileTagsAndSearches => 'الوسوم والبحوث المحفوظة';
+
+  @override
+  String get userProfileNotifications => 'الإشعارات';
+
+  @override
+  String get userProfileAccountSecurity => 'أمان الحساب';
+
+  @override
+  String get fullName => 'الاسم الكامل';
+
+  @override
+  String get username => 'اسم المستخدم';
+
+  @override
+  String get avatar => 'الصورة الرمزية';
+
+  @override
+  String get vcsUsernames => 'أسماء مستخدمي VCS';
+
+  @override
+  String get registrationDate => 'تاريخ التسجيل';
+
+  @override
+  String get personalData => 'البيانات الشخصية';
+
+  @override
+  String get downloadCsv => 'تنزيل بصيغة CSV';
+
+  @override
+  String get localTimezone => 'المنطقة الزمنية المحلية';
+
+  @override
+  String get guessTimezone => 'تخمين المنطقة الزمنية';
+
+  @override
+  String get sendTestMessage => 'إرسال رسالة اختبار';
+
+  @override
+  String get theme => 'المظهر';
+
+  @override
+  String get themeLight => 'فاتح';
+
+  @override
+  String get themeDark => 'داكن';
+
+  @override
+  String get themeSyncOs => 'مزامنة مع النظام';
+
+  @override
+  String get linksPanelPosition => 'موضع لوحة الروابط';
+
+  @override
+  String get belowSummary => 'أسفل الملخص';
+
+  @override
+  String get belowDescription => 'أسفل الوصف';
+
+  @override
+  String get showRecentIssues => 'إظهار المشاكل والمقالات الأخيرة';
+
+  @override
+  String get newTagOrSearch => 'وسم أو بحث محفوظ جديد';
+
+  @override
+  String get delete => 'حذف';
+
+  @override
+  String get searchTagsAndSearches => 'البحث في الوسوم والبحوث';
+
+  @override
+  String get all => 'الكل';
+
+  @override
+  String get createdByMe => 'تم إنشاؤها بواسطتي';
+
+  @override
+  String get removeOnResolution => 'الإزالة عند الحل';
+
+  @override
+  String get markAsFavorite => 'وضع علامة كمفضل لجميع المشاهدين';
+
+  @override
+  String get notificationEvents => 'أحداث الإشعارات:';
+
+  @override
+  String get sendNotificationsTo => 'إرسال الإشعارات إلى:';
+
+  @override
+  String get starAutomaticallyWhen => 'وضع نجمة تلقائياً عندما:';
+
+  @override
+  String get twoFactorAuth => 'المصادقة الثنائية';
+
+  @override
+  String get credentials => 'بيانات الاعتماد';
+
+  @override
+  String get tokens => 'الرموز';
+
+  @override
+  String get changePassword => 'تغيير كلمة المرور';
+
+  @override
+  String get revokeRefreshToken => 'إبطال رمز التحديث';
+
+  @override
+  String get deleteCredentials => 'حذف بيانات الاعتماد';
+
+  @override
+  String get pairWithApp => 'إقران مع التطبيق ...';
+
+  @override
+  String get pairWithHardwareToken => 'إقران مع رمز مادي ...';
+
+  @override
+  String get addCredentials => 'إضافة بيانات اعتماد ...';
+
+  @override
+  String get newToken => 'رمز جديد ...';
+
+  @override
+  String get newPasswordButton => 'كلمة مرور جديدة ...';
+
+  @override
+  String get saveChanges => 'حفظ التغييرات';
+
+  @override
+  String get currentPassword => 'كلمة المرور الحالية';
+
+  @override
+  String get newPassword => 'كلمة المرور الجديدة';
+
+  @override
+  String get confirmPassword => 'تأكيد كلمة المرور';
+
+  @override
+  String get passwordMismatch => 'كلمتا المرور غير متطابقتين';
+
+  @override
+  String get passwordChangedSuccess => 'تم تغيير كلمة المرور بنجاح';
+
+  @override
+  String passwordChangeFailed(Object error) {
+    return 'فشل تغيير كلمة المرور: $error';
+  }
+
+  @override
+  String get sessionsRevokedSuccess => 'تم إبطال الجلسات النشطة الأخرى';
+
+  @override
+  String sessionsRevokeFailed(Object error) {
+    return 'فشل إبطال الجلسات: $error';
+  }
+
+  @override
+  String get changesSavedSuccess => 'تم حفظ التغييرات بنجاح';
+
+  @override
+  String get noTagSelected => 'لم يتم تحديد أي عنصر للحذف';
+
+  @override
+  String get enterTagName => 'أدخل اسم الوسم...';
+
+  @override
+  String get enterSearchQuery => 'أدخل استعلام البحث...';
+
+  @override
+  String get searchSavedSearchType => 'بحث محفوظ';
+
+  @override
+  String get vcsUsernamesHint =>
+      'إضافة معرّفات شخصية من أنظمة التحكم بالإصدارات المدمجة (VCS) تسمح لـ YouTrack بإضافة روابط للمشاكل المشار إليها في ارتكازات الكود الخاصة بك.';
+
+  @override
+  String profileLoadError(Object error) {
+    return 'تعذر تحميل الملف الشخصي: $error';
+  }
+
+  @override
+  String get changesByMe => 'التغييرات التي أجريتها أنا';
+
+  @override
+  String get mentionsMyUsername => '@إشارات تذكر اسم المستخدم الخاص بي';
+
+  @override
+  String get changesInDuplicateCluster => 'التغييرات في مجموعة المهام المكررة';
+
+  @override
+  String get issuesFromEmails =>
+      'المشاكل والتعليقات المنشأة من بريدي الإلكتروني';
+
+  @override
+  String get vcsBuildUpdates =>
+      'التحديثات المطبقة بواسطة تكاملات VCS وبناء الخادم';
+
+  @override
+  String get failedVcsCommands =>
+      'الأوامر الفاشلة في الارتكازات التي تعالجها تكاملات VCS وبناء الخادم';
+
+  @override
+  String get starOnComment => 'أعلق على مشكلة أو مقالة';
+
+  @override
+  String get starOnCreate => 'أنشئ مشكلة أو مقالة';
+
+  @override
+  String get starOnUpdate => 'أحدّث مشكلة أو مقالة';
+
+  @override
+  String get starOnAssigned => 'أكون مسؤولاً عن مشكلة';
+
+  @override
+  String get starOnVote => 'أصوّت لمشكلة';
+
+  @override
+  String get emailChannel => 'البريد الإلكتروني';
+
+  @override
+  String get telegramChannel => 'روبوت YouTrack لتطبيق Telegram';
+
+  @override
+  String get connectTelegramAccount => 'ربط حسابي';
+
+  @override
+  String get testMessageSent => 'تم إرسال رسالة الاختبار إلى البريد الإلكتروني';
+
+  @override
+  String get downloadCsvStarted => 'جارٍ تنزيل البيانات الشخصية بصيغة CSV...';
+
+  @override
+  String timezoneGuessed(Object zone) {
+    return 'تم تخمين المنطقة الزمنية: $zone (استناداً إلى عنوان IP)';
+  }
 }

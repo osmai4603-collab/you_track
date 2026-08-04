@@ -40,13 +40,12 @@ class _GroupsPageState extends State<GroupsPage> {
   Widget build(BuildContext context) {
     return BlocBuilder<GroupsBloc, GroupsState>(
       builder: (context, state) {
-        final showPanel = state is GroupsLoaded && state.selectedGroupId != null;
+        final showPanel =
+            state is GroupsLoaded && state.selectedGroupId != null;
         Widget content;
 
         if (state is GroupsLoading) {
-          content = ShimmerLoading.table(
-            key: const ValueKey('groups-loading'),
-          );
+          content = ShimmerLoading.table(key: const ValueKey('groups-loading'));
         } else if (state is GroupsError) {
           content = Center(
             key: const ValueKey('groups-error'),
@@ -65,9 +64,12 @@ class _GroupsPageState extends State<GroupsPage> {
                       children: [
                         Expanded(child: _buildSearchField()),
                         const SizedBox(width: 8),
-                        if (context.watch<UserSession>().hasPermission(Permission.systemLowLevelAdminWrite))
+                        if (context.watch<UserSession>().hasPermission(
+                          Permission.systemLowLevelAdminWrite,
+                        ))
                           FilledButton.icon(
-                            onPressed: () => context.push(AppRouteKeys.createGroup),
+                            onPressed: () =>
+                                context.push(AppRouteKeys.createGroup),
                             icon: const Icon(Icons.add, size: 18),
                             label: const Text('Add group'),
                           ),
@@ -79,7 +81,7 @@ class _GroupsPageState extends State<GroupsPage> {
                 ],
               ),
               AnimatedPositioned(
-                duration: const Duration(milliseconds: 250),
+                duration: const Duration(milliseconds: 2500),
                 curve: Curves.easeInOut,
                 right: showPanel ? 0 : -500,
                 top: 0,

@@ -42,7 +42,7 @@ class _YouTrackSidebarState extends State<YouTrackSidebar> {
     const selectedTextColor = Colors.white; // لون النصوص المحددة
 
     return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 2500),
       width: _isCollapsed ? 80 : 200,
       decoration: const BoxDecoration(
         gradient: LinearGradient(

@@ -31,8 +31,8 @@ class _IssuesPageState extends State<IssuesPage> {
       if (mounted) {
         if (widget.projectId != null) {
           context.read<IssuesBloc>().add(
-                UpdateFilter(IssueFilter(projectFilter: widget.projectId)),
-              );
+            UpdateFilter(IssueFilter(projectFilter: widget.projectId)),
+          );
         } else {
           context.read<IssuesBloc>().add(const LoadIssues());
         }
@@ -44,13 +44,14 @@ class _IssuesPageState extends State<IssuesPage> {
   Widget build(BuildContext context) {
     return BlocBuilder<IssuesBloc, IssuesState>(
       builder: (context, state) {
-        final showPanel = state is IssuesLoaded && state.selectedIssueId != null;
+        final showPanel =
+            state is IssuesLoaded && state.selectedIssueId != null;
         Widget content;
 
         if (state is IssuesLoading) {
           content = ShimmerLoading.list(
             key: const ValueKey('issues-loading'),
-            itemCount: 6,
+            itemCount: 10,
           );
         } else if (state is IssuesError) {
           content = Center(
@@ -70,7 +71,7 @@ class _IssuesPageState extends State<IssuesPage> {
                 ],
               ),
               AnimatedPositioned(
-                duration: const Duration(milliseconds: 250),
+                duration: const Duration(milliseconds: 500),
                 curve: Curves.easeInOut,
                 right: showPanel ? 0 : -500,
                 top: 0,

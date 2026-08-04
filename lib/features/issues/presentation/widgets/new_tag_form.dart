@@ -12,11 +12,7 @@ class NewTagForm extends StatefulWidget {
   final String projectId;
   final String? currentIssueId;
 
-  const NewTagForm({
-    super.key,
-    required this.projectId,
-    this.currentIssueId,
-  });
+  const NewTagForm({super.key, required this.projectId, this.currentIssueId});
 
   @override
   State<NewTagForm> createState() => _NewTagFormState();
@@ -57,17 +53,23 @@ class _NewTagFormState extends State<NewTagForm> {
                 errorText: state.nameError,
                 border: const OutlineInputBorder(),
               ),
-              onChanged: (value) => context.read<NewTagCubit>().updateName(value),
+              onChanged: (value) =>
+                  context.read<NewTagCubit>().updateName(value),
             ),
             _buildOwnerDropdown(context, state, localization),
             SwitchListTile(
+              controlAffinity: .leading,
               title: Row(
                 children: [
                   Text(localization.removeOnResolutionLabel),
                   const SizedBox(width: 8),
                   const Tooltip(
                     message: 'Auto-remove tag from issue when it is resolved',
-                    child: Icon(Icons.help_outline, size: 16, color: Colors.grey),
+                    child: Icon(
+                      Icons.help_outline,
+                      size: 16,
+                      color: Colors.grey,
+                    ),
                   ),
                 ],
               ),
@@ -77,18 +79,20 @@ class _NewTagFormState extends State<NewTagForm> {
               contentPadding: EdgeInsets.zero,
             ),
             SwitchListTile(
+              controlAffinity: .leading,
               title: Text(localization.sharedLabel),
               value: state.shared,
-              onChanged: (value) => context.read<NewTagCubit>().updateShared(value),
+              onChanged: (value) =>
+                  context.read<NewTagCubit>().updateShared(value),
               contentPadding: EdgeInsets.zero,
             ),
             CheckboxListTile(
+              controlAffinity: .leading,
               title: Text(localization.favoriteLabel),
               value: state.favorite,
               onChanged: (value) =>
                   context.read<NewTagCubit>().updateFavorite(value ?? false),
               contentPadding: EdgeInsets.zero,
-              controlAffinity: ListTileControlAffinity.leading,
             ),
             const TagPermissionsSection(),
             const TagSubscriptionsSection(),
@@ -120,10 +124,11 @@ class _NewTagFormState extends State<NewTagForm> {
         labelText: 'Owner',
         border: OutlineInputBorder(),
       ),
+      style: TextTheme.of(context).labelSmall?.copyWith(fontWeight: .bold),
       items: state.members.map((member) {
         return DropdownMenuItem(
           value: member.id,
-          child: Text(member.name),
+          child: Text(member.name, style: TextTheme.of(context).bodySmall),
         );
       }).toList(),
       onChanged: (value) {

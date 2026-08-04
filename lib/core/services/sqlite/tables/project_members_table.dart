@@ -13,9 +13,10 @@ class ProjectMembersTable extends TableById implements SqliteTable {
   String get projectId => 'project_id';
   String get userId => 'user_id';
   String get isOwner => 'is_owner';
+  String get role => 'role';
 
   @override
-  List<String> get columns => [id, projectId, userId, isOwner];
+  List<String> get columns => [id, projectId, userId, isOwner, role];
 
   @override
   String get queryCreateTable => '''
@@ -23,7 +24,8 @@ class ProjectMembersTable extends TableById implements SqliteTable {
       $id TEXT PRIMARY KEY NOT NULL,
       $projectId TEXT NOT NULL,
       $userId TEXT NOT NULL,
-      $isOwner INTEGER DEFAULT 0
+      $isOwner INTEGER DEFAULT 0,
+      $role TEXT DEFAULT ''
     )
   ''';
 }

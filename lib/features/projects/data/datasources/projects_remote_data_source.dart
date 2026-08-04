@@ -1,5 +1,6 @@
 import 'package:issues_tracking/core/init_dependencies.dart';
 import 'package:issues_tracking/core/utils/printing.dart';
+import 'package:issues_tracking/features/users/data/models/user_model.dart';
 import 'package:issues_tracking/features/users/domain/usecases/user_session.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../models/project_model.dart';
@@ -13,6 +14,8 @@ abstract class ProjectsRemoteDataSource {
   Future<ProjectModel> getProjectById(String id);
   Future<ProjectModel> createProject(ProjectModel project);
   Future<ProjectModel> updateProject(ProjectModel project);
+  Future<void> updateStartingNumber(String projectId, int startingNumber);
+  Future<void> updateFavorite(String projectId, bool isFavorite);
   Future<void> archiveProject(String id);
   Future<void> deleteProject(String id);
   Future<List<ProjectMemberModel>> getProjectMembers(String projectId);
@@ -101,8 +104,26 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
         'No project updated. Project not found or update not allowed (RLS).',
       );
     }
-    printMap(title: 'Updated Project', data: response);
     return ProjectModel.fromJson(response);
+  }
+
+  @override
+  Future<void> updateStartingNumber(
+    String projectId,
+    int startingNumber,
+  ) async {
+    await supabase
+        .from('projects')
+        .update({'starting_number': startingNumber})
+        .eq('id', projectId);
+  }
+
+  @override
+  Future<void> updateFavorite(String projectId, bool isFavorite) async {
+    await supabase
+        .from('projects')
+        .update({'is_favorite': isFavorite})
+        .eq('id', projectId);
   }
 
   @override
@@ -160,6 +181,7 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
 
     final inheritedMembersMap = <String, ProjectMemberModel>{};
     for (final gm in (groupMembersResponse as List)) {
+      printMap(title: 'Project Member', data: gm);
       final userId = gm['user_id'] as String;
       final groupId = gm['group_id'] as String;
       final role = groupRoles[groupId] ?? 'Contributor';
@@ -169,14 +191,14 @@ class ProjectsRemoteDataSourceImpl implements ProjectsRemoteDataSource {
           !inheritedMembersMap.containsKey(userId)) {
         final userData = gm['users'];
         if (userData != null) {
-          inheritedMembersMap[userId] = ProjectMemberModel.fromJson({
-            'id': 'inherited_${userId}_$groupId',
-            'project_id': projectId,
-            'user_id': userId,
-            'roles': [role],
-            'is_owner': false,
-            'users': userData,
-          });
+          inheritedMembersMap[userId] = ProjectMemberModel(
+            id: 'inherited_${projectId}_$userId',
+            projectId: projectId,
+            userId: userId,
+            roles: [role],
+            isOwner: false,
+            userData: UserModel.tryParseFromJson(userData),
+          );
         }
       }
     }

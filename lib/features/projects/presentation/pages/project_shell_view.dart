@@ -106,16 +106,19 @@ class _ProjectShellViewState extends State<ProjectShellView> {
                                     if (state.status ==
                                         ProjectMembersStatus.loading) {
                                       content = Center(
-                                        key: const ValueKey('project-shell-members-loading'),
-                                        child: SizedBox(
-                                          width: 240,
-                                          child: ShimmerLoading.list(itemCount: 4),
+                                        key: const ValueKey(
+                                          'project-shell-members-loading',
+                                        ),
+                                        child: ShimmerLoading.list(
+                                          itemCount: 7,
                                         ),
                                       );
                                     } else if (state.status ==
                                         ProjectMembersStatus.failure) {
                                       content = Center(
-                                        key: const ValueKey('project-shell-members-error'),
+                                        key: const ValueKey(
+                                          'project-shell-members-error',
+                                        ),
                                         child: SelectableText(
                                           state.errorMessage ??
                                               'Failed to load members',
@@ -126,7 +129,9 @@ class _ProjectShellViewState extends State<ProjectShellView> {
                                       );
                                     } else if (state.members.isEmpty) {
                                       content = Center(
-                                        key: const ValueKey('project-shell-members-empty'),
+                                        key: const ValueKey(
+                                          'project-shell-members-empty',
+                                        ),
                                         child: Text(
                                           'No members yet',
                                           style: textTheme.bodySmall?.copyWith(
@@ -141,7 +146,9 @@ class _ProjectShellViewState extends State<ProjectShellView> {
                                         textTheme,
                                       );
                                     }
-                                    return AnimatedContentSwitcher(child: content);
+                                    return AnimatedContentSwitcher(
+                                      child: content,
+                                    );
                                   },
                                 ),
                           ),
@@ -154,15 +161,16 @@ class _ProjectShellViewState extends State<ProjectShellView> {
                                 Widget content;
                                 if (state is IssuesLoading) {
                                   content = Center(
-                                    key: const ValueKey('project-shell-issues-loading'),
-                                    child: SizedBox(
-                                      width: 240,
-                                      child: ShimmerLoading.list(itemCount: 4),
+                                    key: const ValueKey(
+                                      'project-shell-issues-loading',
                                     ),
+                                    child: ShimmerLoading.list(itemCount: 7),
                                   );
                                 } else if (state is IssuesError) {
                                   content = Center(
-                                    key: const ValueKey('project-shell-issues-error'),
+                                    key: const ValueKey(
+                                      'project-shell-issues-error',
+                                    ),
                                     child: SelectableText(
                                       state.message,
                                       style: textTheme.bodySmall?.copyWith(
@@ -173,7 +181,9 @@ class _ProjectShellViewState extends State<ProjectShellView> {
                                 } else if (state is IssuesLoaded) {
                                   if (state.filteredIssues.isEmpty) {
                                     content = Center(
-                                      key: const ValueKey('project-shell-issues-empty'),
+                                      key: const ValueKey(
+                                        'project-shell-issues-empty',
+                                      ),
                                       child: Text(
                                         'No issues found',
                                         style: textTheme.bodySmall?.copyWith(
@@ -191,7 +201,9 @@ class _ProjectShellViewState extends State<ProjectShellView> {
                                   }
                                 } else {
                                   content = const SizedBox.shrink(
-                                    key: ValueKey('project-shell-issues-empty-state'),
+                                    key: ValueKey(
+                                      'project-shell-issues-empty-state',
+                                    ),
                                   );
                                 }
                                 return AnimatedContentSwitcher(child: content);
@@ -343,7 +355,7 @@ class _ProjectShellViewState extends State<ProjectShellView> {
                       style: textTheme.labelSmall!.copyWith(
                         color: colors.onSurfaceVariant,
                         fontWeight: FontWeight.w500,
-                      ), 
+                      ),
                       styleHover: textTheme.labelSmall!.copyWith(
                         color: colors.secondary,
                         fontWeight: FontWeight.w500,
@@ -436,7 +448,7 @@ class _ProjectViewSideBarState extends YouTrackState<_ProjectViewSideBar> {
                 spacing: AppSpacing.small,
                 children: [
                   ProjectChip(
-                    shortKey: project?.projectId ?? '',
+                    shortKey: project?.projectKey ?? '',
                     colors: colors,
                     textTheme: textTheme,
                   ),
@@ -456,7 +468,7 @@ class _ProjectViewSideBarState extends YouTrackState<_ProjectViewSideBar> {
                         ),
                       ),
                       Text(
-                        project?.projectId ?? '...'.toUpperCase(),
+                        project?.projectKey ?? '...'.toUpperCase(),
                         style: textTheme.labelMedium?.copyWith(
                           fontWeight: FontWeight.w500,
                           color: colors.onSurfaceVariant,
@@ -542,7 +554,7 @@ class _VerticalScrollListState extends State<_VerticalScrollList> {
         0.0,
         _scrollController.position.maxScrollExtent,
       ),
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
   }
@@ -553,7 +565,7 @@ class _VerticalScrollListState extends State<_VerticalScrollList> {
         0.0,
         _scrollController.position.maxScrollExtent,
       ),
-      duration: const Duration(milliseconds: 200),
+      duration: const Duration(milliseconds: 500),
       curve: Curves.easeInOut,
     );
   }

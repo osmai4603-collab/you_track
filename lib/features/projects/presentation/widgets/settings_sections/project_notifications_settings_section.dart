@@ -143,16 +143,20 @@ class _ProjectNotificationsSettingsSectionState
 
       setState(() {
         _issues = issues
-            .map((issue) => IssueData(
-                  id: issue.id,
-                  summary: issue.summary,
-                  issueKey: issue.issueKey,
-                ))
+            .map(
+              (issue) => IssueData(
+                id: issue.id,
+                summary: issue.summary,
+                issueKey: issue.issueKey,
+              ),
+            )
             .toList();
         _selectedTemplate = _issues.isNotEmpty
             ? (_issues.any((issue) => issue.id == _selectedTemplate?.id)
-                ? _issues.firstWhere((issue) => issue.id == _selectedTemplate!.id)
-                : _issues.first)
+                  ? _issues.firstWhere(
+                      (issue) => issue.id == _selectedTemplate!.id,
+                    )
+                  : _issues.first)
             : null;
         _isLoadingIssues = false;
       });
@@ -187,17 +191,17 @@ class _ProjectNotificationsSettingsSectionState
         if (state.status == ProjectDetailsStatus.loading) {
           content = Center(
             key: const ValueKey('project-notifications-loading'),
-            child: SizedBox(
-              width: 480,
-              child: ShimmerLoading.list(itemCount: 6),
-            ),
+            child: ShimmerLoading.list(itemCount: 9),
           );
         } else {
           content = Stack(
             key: const ValueKey('project-notifications-loaded'),
             children: [
               SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 16,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [

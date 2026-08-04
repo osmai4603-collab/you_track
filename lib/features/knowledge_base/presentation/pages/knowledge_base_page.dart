@@ -7,7 +7,6 @@ import 'package:issues_tracking/features/knowledge_base/presentation/bloc/articl
 import 'package:issues_tracking/features/knowledge_base/presentation/cubits/article_notification_cubit.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/cubits/article_search_cubit.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/cubits/article_toc_cubit.dart';
-import 'package:issues_tracking/features/knowledge_base/presentation/widgets/article_notification_badge.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/widgets/article_tree_sidebar.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/widgets/article_content_viewer.dart';
 import 'package:issues_tracking/features/knowledge_base/presentation/widgets/article_toc_panel.dart';
@@ -15,7 +14,7 @@ import 'package:issues_tracking/features/knowledge_base/presentation/widgets/art
 import 'package:issues_tracking/features/knowledge_base/presentation/widgets/article_empty_state.dart';
 
 class KnowledgeBasePage extends StatelessWidget {
-  final String projectId;
+  final String? projectId;
   final String role;
 
   const KnowledgeBasePage({
@@ -40,16 +39,6 @@ class KnowledgeBasePage extends StatelessWidget {
         BlocProvider(create: (_) => get_it<ArticleSearchCubit>()),
       ],
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('Knowledge Base'),
-          actions: [
-            ArticleNotificationBadge(
-              onNotificationTap: (articleId, commentId) {
-                context.read<ArticleTreeBloc>().add(SelectArticle(articleId));
-              },
-            ),
-          ],
-        ),
         body: Row(
           children: [
             SizedBox(
@@ -77,7 +66,10 @@ class KnowledgeBasePage extends StatelessWidget {
                   }
                   if (state is ArticleTreeLoaded) {
                     if (state.selectedArticleId == null) {
-                      return ArticleEmptyState(role: role);
+                      return ArticleEmptyState(
+                        role: role,
+                        projectId: projectId,
+                      );
                     }
                     final selected = state.articles.firstWhere(
                       (a) => a.id == state.selectedArticleId,

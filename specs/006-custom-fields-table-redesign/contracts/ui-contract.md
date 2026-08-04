@@ -120,7 +120,7 @@ CustomFieldsSettingsSection
 **Trigger**: Replace button with 1 field selected
 **Content**:
 - TextField at top (for searching/filtering values)
-- List of PopupMenuItems with field values
+- List of AppPopupMenuItems with field values
 **Actions**: Select value (closes popup)
 
 ## Empty State

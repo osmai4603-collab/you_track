@@ -35,7 +35,7 @@ class ProjectSettingsSidebar extends StatelessWidget {
       builder: (context, state) {
         final project = state.project;
         final projectName = project?.name ?? 'Loading...';
-        final projectKey = project?.projectId ?? '...';
+        final projectKey = project?.projectKey ?? '...';
         final owner = project?.ownerId ?? 'admin';
         final createdAt = project?.createdAt ?? DateTime.now();
 

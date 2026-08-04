@@ -64,7 +64,7 @@ class DashboardWidgetCard extends StatelessWidget {
                   padding: AppSpacing.paddingAllSmall,
                   menuPadding: AppSpacing.paddingAllSmall,
                   itemBuilder: (context) => [
-                    const AppPopupMenuItem(
+                    const AppPopupMenuItem<String>(
                       value: 'edit',
                       child: Text('Edit settings'),
                     ),

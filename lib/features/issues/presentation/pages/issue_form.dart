@@ -9,11 +9,11 @@ import 'package:issues_tracking/features/issues/domain/entities/issue.dart';
 import 'package:issues_tracking/features/issues/domain/entities/issue_link.dart';
 import 'package:issues_tracking/features/issues/presentation/cubits/issue_form_cubit.dart';
 import 'package:issues_tracking/features/issues/presentation/cubits/issue_form_state.dart';
-import 'package:issues_tracking/features/issues/presentation/widgets/issue_form_top_bar.dart';
-import 'package:issues_tracking/features/issues/presentation/widgets/issue_form_toolbar.dart';
-import 'package:issues_tracking/features/issues/presentation/widgets/issue_form_attachment_zone.dart';
-import 'package:issues_tracking/features/issues/presentation/widgets/issue_form_sidebar.dart';
-import 'package:issues_tracking/features/issues/presentation/widgets/issue_form_action_bar.dart';
+import 'package:issues_tracking/features/issues/presentation/widgets/issue_form/issue_form_top_bar.dart';
+import 'package:issues_tracking/features/issues/presentation/widgets/issue_form/issue_form_toolbar.dart';
+import 'package:issues_tracking/features/issues/presentation/widgets/issue_form/issue_form_attachment_zone.dart';
+import 'package:issues_tracking/features/issues/presentation/widgets/issue_form/issue_form_sidebar.dart';
+import 'package:issues_tracking/features/issues/presentation/widgets/issue_form/issue_form_action_bar.dart';
 
 // ---------- Design Tokens ----------
 class YTColors {
@@ -315,11 +315,13 @@ class _IssueFormState extends State<IssueForm> {
               child: Column(
                 children: [
                   IssueFormToolbar(controller: _editorController),
-                  FleatherEditor(
-                    controller: _editorController,
-                    focusNode: _editorFocusNode,
-                    padding: const EdgeInsets.all(16),
-                    // placeholder: 'Type or paste a description...',
+                  Expanded(
+                    child: FleatherEditor(
+                      controller: _editorController,
+                      focusNode: _editorFocusNode,
+                      padding: const EdgeInsets.all(16),
+                      // placeholder: 'Type or paste a description...',
+                    ),
                   ),
                 ],
               ),
