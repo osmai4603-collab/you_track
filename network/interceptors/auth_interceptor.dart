@@ -8,28 +8,24 @@ class AuthInterceptor extends Interceptor {
   final List<String> unauthenticatedPaths;
 
   AuthInterceptor(
-      this._authDelegate, {
-        this._sessionController,
-        this.unauthenticatedPaths = const ['/api/v4/users/login'],
-      });
+    this._authDelegate, {
+    this._sessionController,
+    this.unauthenticatedPaths = const ['/auth/login', '/auth/refresh'],
+  });
 
   @override
   Future<void> onRequest(
-      RequestOptions options,
-      RequestInterceptorHandler handler,
-      ) async {
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     final isUnauthenticated = unauthenticatedPaths.any(
-          (p) => options.path.endsWith(p),
+      (p) => options.path.endsWith(p),
     );
 
     if (!isUnauthenticated) {
-      final cookies = await _authDelegate.getAuthToken();
-      if (cookies != null && cookies.isNotEmpty) {
-        options.headers['Cookie'] = cookies;
-        // final csrf = await _authDelegate.getCsrfToken();
-        // if (csrf != null && csrf.isNotEmpty) {
-        //   options.headers['X-CSRF-Token'] = csrf;
-        // }
+      final token = await _authDelegate.getAuthToken();
+      if (token != null && token.isNotEmpty) {
+        options.headers['Cookie'] = 'youtrack_session=$token';
       }
     }
     options.headers['X-Requested-With'] = 'XMLHttpRequest';
@@ -38,9 +34,9 @@ class AuthInterceptor extends Interceptor {
 
   @override
   Future<void> onError(
-      DioException err,
-      ErrorInterceptorHandler handler,
-      ) async {
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
     if (err.response?.statusCode == 401) {
       await _authDelegate.onAuthenticationError();
       _sessionController?.emit(SessionEvent.expired);

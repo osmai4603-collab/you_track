@@ -1,3 +1,4 @@
+import 'package:youtrack_api/src/models/user_auth.dart';
 
 import 'network_result.dart';
 
@@ -35,5 +36,12 @@ abstract interface class NetworkAPI {
     Map<String, dynamic>? queryParameters,
     dynamic data,
   });
-  Future<ApiResult<T>> head<T>({required String endpoint, Map<String, dynamic>? queryParameters, required T Function(dynamic) fromJson});
+  Future<ApiResult<T>> head<T>({
+    required String endpoint,
+    Map<String, dynamic>? queryParameters,
+    required T Function(dynamic) fromJson,
+  });
+  Future<void> onLogin(UserAuth token);
+  Future<void> onLogout();
+  Future<void> onRefreshToken(UserAuth token);
 }

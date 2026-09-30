@@ -11,7 +11,7 @@ class NetworkConfig {
     this.connectTimeout = const Duration(seconds: 30),
     this.receiveTimeout = const Duration(seconds: 30),
     this.maxRetries = 3,
-    this.unauthenticatedPaths = const [],
+    this.unauthenticatedPaths = const ['/auth/login', '/auth/refresh'],
     this.defaultHeaders,
   });
 

@@ -30,14 +30,11 @@ class UserModel extends Equatable {
   });
 
   static UserModel? tryParseFromJson(Map<String, dynamic>? data) {
-    print('model: $data');
     if (data == null) return null;
     return UserModel.fromJson(data);
   }
 
   factory UserModel.fromJson(Map<String, dynamic> data) {
-    print('model from json: $data');
-
     List<String> parsedGroups = [];
     List<String> parsedProjects = [];
 
@@ -74,16 +71,58 @@ class UserModel extends Equatable {
     }
 
     return UserModel(
-      id: data['id'],
-      fullName: data['full_name'] ?? '',
-      username: (data['user_name'] ?? '').toString(),
-      email: data['email'],
-      avatarUrl: data['avatar_url'],
-      createdAt: DateTime.tryParse(data['created_at'] ?? ''),
-      isBanned: data['is_banned'] as bool? ?? false,
+      id: _pick(data, ['id']).toString(),
+      fullName: _pickString(data, const ['fullName', 'full_name', 'name']),
+      username: _pickString(
+        data,
+        const ['login', 'user_name', 'username', 'userKey'],
+      ),
+      email: _pickString(data, const ['email']),
+      avatarUrl: _pickNullableString(data, const [
+        'avatarUrl',
+        'avatar_url',
+      ]),
+      createdAt: DateTime.tryParse(
+        _pickString(data, const ['created_at']).isEmpty
+            ? ''
+            : _pickString(data, const ['created_at']),
+      ),
+      isBanned: _pickBool(data, const ['banned', 'is_banned']),
       groups: parsedGroups,
       projects: parsedProjects,
     );
+  }
+
+  /// Reads the first present key so the model works against both the
+  /// canonical camelCase payload and the legacy snake_case aliases.
+  static Object? _pick(Map<String, dynamic> data, List<String> keys) {
+    for (final key in keys) {
+      final value = data[key];
+      if (value != null) return value;
+    }
+    return null;
+  }
+
+  static String _pickString(Map<String, dynamic> data, List<String> keys) {
+    final value = _pick(data, keys);
+    return value?.toString() ?? '';
+  }
+
+  static String? _pickNullableString(
+    Map<String, dynamic> data,
+    List<String> keys,
+  ) {
+    final value = _pick(data, keys);
+    if (value == null) return null;
+    final text = value.toString();
+    return text.isEmpty ? null : text;
+  }
+
+  static bool _pickBool(Map<String, dynamic> data, List<String> keys) {
+    final value = _pick(data, keys);
+    if (value is bool) return value;
+    if (value is String) return value.toLowerCase() == 'true';
+    return false;
   }
 
   Map<String, dynamic> toJson() {
@@ -101,5 +140,15 @@ class UserModel extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, fullName, username, email, avatarUrl, createdAt, isBanned, groups, projects];
+  List<Object?> get props => [
+    id,
+    fullName,
+    username,
+    email,
+    avatarUrl,
+    createdAt,
+    isBanned,
+    groups,
+    projects,
+  ];
 }

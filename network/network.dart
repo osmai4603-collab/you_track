@@ -1,4 +1,4 @@
-
+import 'package:youtrack_api/src/models/user_auth.dart';
 import 'package:youtrack_api/src/network/network_api.dart';
 import 'package:youtrack_api/src/network/network_result.dart';
 import 'package:dio/dio.dart';
@@ -23,16 +23,14 @@ enum AcceptType {
   const AcceptType(this.value);
 }
 
-
-
-
 final class YouTrackNetworkApi implements NetworkAPI {
   late final Dio _dio;
   late final NetworkConfig _config;
   final TokenProvider _authDelegate;
   final SessionController? _sessionController;
 
-  YouTrackNetworkApi(this._config, {
+  YouTrackNetworkApi(
+    this._config, {
     required this._authDelegate,
     required this._sessionController,
     List<Interceptor>? customInterceptors,
@@ -67,6 +65,7 @@ final class YouTrackNetworkApi implements NetworkAPI {
 
     _dio.interceptors.add(
       LogInterceptor(
+        responseBody: true,
         // requestBody: false,
         // responseBody: false,
         // error: true,
@@ -80,13 +79,13 @@ final class YouTrackNetworkApi implements NetworkAPI {
   }
 
   @override
-  Future<ApiResult<void>> delete({required String endpoint, Map<String, dynamic>? queryParameters, data}) async {
+  Future<ApiResult<void>> delete({
+    required String endpoint,
+    Map<String, dynamic>? queryParameters,
+    data,
+  }) async {
     try {
-      await _dio.put(
-        endpoint,
-        data: data,
-        queryParameters: queryParameters,
-      );
+      await _dio.put(endpoint, data: data, queryParameters: queryParameters);
       return const ApiSuccess(null);
     } on DioException catch (e) {
       return ApiFailure(mapDioError(e));
@@ -96,7 +95,11 @@ final class YouTrackNetworkApi implements NetworkAPI {
   }
 
   @override
-  Future<ApiResult<T>> get<T>({required String endpoint, Map<String, dynamic>? queryParameters, required T Function(Map<String, dynamic>) fromJson}) async {
+  Future<ApiResult<T>> get<T>({
+    required String endpoint,
+    Map<String, dynamic>? queryParameters,
+    required T Function(Map<String, dynamic>) fromJson,
+  }) async {
     try {
       final response = await _dio.get(
         endpoint,
@@ -111,16 +114,30 @@ final class YouTrackNetworkApi implements NetworkAPI {
   }
 
   @override
-  Future<ApiResult<List<T>>> getList<T>({required String endpoint, Map<String, dynamic>? queryParameters, required T Function(Map<String, dynamic>) fromJson}) async {
+  Future<ApiResult<List<T>>> getList<T>({
+    required String endpoint,
+    Map<String, dynamic>? queryParameters,
+    required T Function(Map<String, dynamic>) fromJson,
+  }) async {
     try {
       final response = await _dio.get(
         endpoint,
         queryParameters: queryParameters,
       );
-      if (response.data is List) {
-        return ApiSuccess(response.data.map(fromJson).toList());
-      }
-      return ApiSuccess([fromJson(response.data)]);
+      final data = response.data;
+
+      // `response.data` is dynamic, so passing `fromJson` straight to `map`
+      // resolves the call at runtime, where `List.map` demands a
+      // `(dynamic) => dynamic` and rejects a `(Map<String, dynamic>) => T`.
+      // Wrapping it in a closure keeps the call statically typed, and lets each
+      // element be normalised to a string-keyed map first.
+      final List<dynamic> items = data is List ? data : [data];
+
+      return ApiSuccess(
+        items
+            .map((item) => fromJson(Map<String, dynamic>.from(item as Map)))
+            .toList(growable: false),
+      );
     } on DioException catch (e) {
       return ApiFailure(mapDioError(e));
     } catch (e) {
@@ -129,7 +146,12 @@ final class YouTrackNetworkApi implements NetworkAPI {
   }
 
   @override
-  Future<ApiResult<T>> patch<T>({required String endpoint, data, Map<String, dynamic>? queryParameters, required T Function(Map<String, dynamic>) fromJson}) async {
+  Future<ApiResult<T>> patch<T>({
+    required String endpoint,
+    data,
+    Map<String, dynamic>? queryParameters,
+    required T Function(Map<String, dynamic>) fromJson,
+  }) async {
     try {
       final response = await _dio.patch(
         endpoint,
@@ -145,7 +167,12 @@ final class YouTrackNetworkApi implements NetworkAPI {
   }
 
   @override
-  Future<ApiResult<T>> post<T>({required String endpoint, data, Map<String, dynamic>? queryParameters, required T Function(Map<String, dynamic>) fromJson}) async {
+  Future<ApiResult<T>> post<T>({
+    required String endpoint,
+    data,
+    Map<String, dynamic>? queryParameters,
+    required T Function(Map<String, dynamic>) fromJson,
+  }) async {
     try {
       final response = await _dio.post(
         endpoint,
@@ -161,7 +188,12 @@ final class YouTrackNetworkApi implements NetworkAPI {
   }
 
   @override
-  Future<ApiResult<T>> put<T>({required String endpoint, data, Map<String, dynamic>? queryParameters, required T Function(Map<String, dynamic>) fromJson}) async {
+  Future<ApiResult<T>> put<T>({
+    required String endpoint,
+    data,
+    Map<String, dynamic>? queryParameters,
+    required T Function(Map<String, dynamic>) fromJson,
+  }) async {
     try {
       final response = await _dio.put(
         endpoint,
@@ -177,7 +209,11 @@ final class YouTrackNetworkApi implements NetworkAPI {
   }
 
   @override
-  Future<ApiResult<T>> head<T>({required String endpoint, Map<String, dynamic>? queryParameters, required T Function(dynamic) fromJson}) async {
+  Future<ApiResult<T>> head<T>({
+    required String endpoint,
+    Map<String, dynamic>? queryParameters,
+    required T Function(dynamic) fromJson,
+  }) async {
     try {
       final response = await _dio.head(
         endpoint,
@@ -230,5 +266,29 @@ final class YouTrackNetworkApi implements NetworkAPI {
       );
     }
     return UnknownError(error);
+  }
+
+  @override
+  Future<void> onLogin(UserAuth token) async {
+    if (token.accessToken.isNotEmpty) {
+      await _authDelegate.saveToken(token.accessToken);
+      _sessionController?.emit(SessionEvent.restored);
+    }
+  }
+
+  @override
+  Future<void> onLogout() async {
+    final hasToken = (await _authDelegate.getAuthToken()) != null;
+    await _authDelegate.clearToken();
+    if (hasToken) {
+      _sessionController?.emit(SessionEvent.loggedOut);
+    }
+  }
+
+  @override
+  Future<void> onRefreshToken(UserAuth token) async {
+    if (token.accessToken.isNotEmpty && token.refreshToken.isNotEmpty) {
+      await _authDelegate.saveToken(token.accessToken);
+    }
   }
 }
