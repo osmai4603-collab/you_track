@@ -70,7 +70,7 @@ class IssueFormSidebar extends StatelessWidget {
               label: 'Project',
               trailing: cubit.state.project == null
                   ? null
-                  : ProjectIcon(projectCode: cubit.state.project!.projectKey),
+                  : ProjectIcon(projectCode: cubit.state.project!.shortName),
               value: cubit.state.project?.name ?? 'No project selected',
               onTap: () => _showProjectPicker(context),
             ),
@@ -264,10 +264,10 @@ class IssueFormSidebar extends StatelessWidget {
         children: cubit.availableProjects
             .map(
               (project) => ListTile(
-                leading: ProjectIcon(projectCode: project.projectKey),
+                leading: ProjectIcon(projectCode: project.shortName),
                 title: Text(project.name),
-                subtitle: Text(project.projectKey),
-                trailing: project.projectKey == cubit.state.project?.projectKey
+                subtitle: Text(project.shortName),
+                trailing: project.shortName == cubit.state.project?.shortName
                     ? const Icon(Icons.check)
                     : null,
                 onTap: () {

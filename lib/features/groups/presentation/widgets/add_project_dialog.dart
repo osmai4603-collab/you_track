@@ -213,7 +213,7 @@ class _AddProjectDialogState extends State<AddProjectDialog> {
                                   ),
                                   DataCell(
                                     Text(
-                                      project.projectKey,
+                                      project.shortName,
                                       style: textTheme.bodySmall?.copyWith(
                                         color: isExisting
                                             ? colors.onSurfaceVariant

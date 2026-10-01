@@ -25,7 +25,7 @@ class AgileBoardsApi {
     required String state,
   }) async {
     return _api.post<void>(
-      endpoint: '/issues/$issueId/state',
+      endpoint: '/issues/${Uri.encodeComponent(issueId)}/state',
       queryParameters: {'state': state},
       fromJson: (_) {},
     );

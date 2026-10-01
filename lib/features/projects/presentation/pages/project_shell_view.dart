@@ -448,7 +448,7 @@ class _ProjectViewSideBarState extends YouTrackState<_ProjectViewSideBar> {
                 spacing: AppSpacing.small,
                 children: [
                   ProjectChip(
-                    shortKey: project?.projectKey ?? '',
+                    shortKey: project?.shortName ?? '',
                     colors: colors,
                     textTheme: textTheme,
                   ),
@@ -468,7 +468,7 @@ class _ProjectViewSideBarState extends YouTrackState<_ProjectViewSideBar> {
                         ),
                       ),
                       Text(
-                        project?.projectKey ?? '...'.toUpperCase(),
+                        project?.shortName ?? '...'.toUpperCase(),
                         style: textTheme.labelMedium?.copyWith(
                           fontWeight: FontWeight.w500,
                           color: colors.onSurfaceVariant,

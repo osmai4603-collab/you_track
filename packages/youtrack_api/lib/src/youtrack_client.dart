@@ -1,7 +1,16 @@
 import 'package:youtrack_api/src/api/agile_boards_api.dart';
+import 'package:youtrack_api/src/api/custom_fields_api.dart';
+import 'package:youtrack_api/src/api/dashboards_api.dart';
+import 'package:youtrack_api/src/api/groups_api.dart';
 import 'package:youtrack_api/src/api/issues_api.dart';
+import 'package:youtrack_api/src/api/knowledge_base_api.dart';
 import 'package:youtrack_api/src/api/projects_api.dart';
+import 'package:youtrack_api/src/api/roles_api.dart';
+import 'package:youtrack_api/src/api/tags_api.dart';
+import 'package:youtrack_api/src/api/time_tracking_api.dart';
+import 'package:youtrack_api/src/api/user_profile_api.dart';
 import 'package:youtrack_api/src/api/users_api.dart';
+import 'package:youtrack_api/src/api/version_control_api.dart';
 import 'package:youtrack_api/src/models/user_auth.dart';
 import 'network/network_api.dart';
 import 'network/network_result.dart';
@@ -12,6 +21,17 @@ class YoutrackClient {
   late final ProjectsApi projects;
   late final IssuesApi issues;
   late final AgileBoardsApi boards;
+  late final TagsApi tags;
+  late final GroupsApi groups;
+  late final RolesApi roles;
+  late final CustomFieldsApi customFields;
+  late final DashboardsApi dashboards;
+  late final ArticlesApi articles;
+  late final ArticleCommentsApi articleComments;
+  late final ArticleNotificationsApi articleNotifications;
+  late final TimeTrackingApi timeTracking;
+  late final UserProfileApi userProfile;
+  late final VersionControlApi versionControl;
 
   YoutrackClient(this._api);
 
@@ -24,6 +44,17 @@ class YoutrackClient {
     projects = ProjectsApi(_api);
     issues = IssuesApi(_api);
     boards = AgileBoardsApi(_api);
+    tags = TagsApi(_api);
+    groups = GroupsApi(_api);
+    roles = RolesApi(_api);
+    customFields = CustomFieldsApi(_api);
+    dashboards = DashboardsApi(_api);
+    articles = ArticlesApi(_api);
+    articleComments = ArticleCommentsApi(_api);
+    articleNotifications = ArticleNotificationsApi(_api);
+    timeTracking = TimeTrackingApi(_api);
+    userProfile = UserProfileApi(_api);
+    versionControl = VersionControlApi(_api);
     _hasInitBefore = true;
   }
 

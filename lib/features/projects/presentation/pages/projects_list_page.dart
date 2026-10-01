@@ -191,7 +191,7 @@ class _ProjectListTileState extends YouTrackState<ProjectListTile> {
               ProjectChip(
                 colors: colors,
                 textTheme: textTheme,
-                shortKey: project.projectKey,
+                shortKey: project.shortName,
                 textColor:
                     _projectColors[Random(0).nextInt(_projectColors.length)],
               ),

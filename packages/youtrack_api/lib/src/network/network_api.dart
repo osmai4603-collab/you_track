@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:youtrack_api/src/models/user_auth.dart';
 
 import 'network_result.dart';
@@ -17,6 +19,7 @@ abstract interface class NetworkAPI {
     required String endpoint,
     dynamic data,
     Map<String, dynamic>? queryParameters,
+    void Function(int sent, int total)? onSendProgress,
     required T Function(Map<String, dynamic>) fromJson,
   });
   Future<ApiResult<T>> put<T>({
@@ -35,6 +38,19 @@ abstract interface class NetworkAPI {
     required String endpoint,
     Map<String, dynamic>? queryParameters,
     dynamic data,
+  });
+  Future<ApiResult<Map<String, dynamic>>> uploadFile({
+    required String endpoint,
+    required String filePath,
+    required String fileName,
+    String fieldName = 'file',
+    Map<String, dynamic>? fields,
+    Map<String, dynamic>? queryParameters,
+    void Function(double progress)? onProgress,
+  });
+  Future<ApiResult<Uint8List>> downloadFile({
+    required String endpoint,
+    Map<String, dynamic>? queryParameters,
   });
   Future<ApiResult<T>> head<T>({
     required String endpoint,

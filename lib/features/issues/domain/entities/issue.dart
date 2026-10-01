@@ -72,6 +72,7 @@ class Issue extends Entity {
     this.visibility = const {'users': [], 'groups': []},
     this.sprints = const [],
     this.links = const [],
+    String reporterName = '',
   });
 
   @override
@@ -147,6 +148,7 @@ class Issue extends Entity {
       visibility: visibility ?? this.visibility,
       sprints: sprints ?? this.sprints,
       links: links ?? this.links,
+      reporterName: reporterName ?? '',
     );
   }
 

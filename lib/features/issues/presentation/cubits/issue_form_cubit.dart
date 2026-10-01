@@ -415,7 +415,7 @@ class IssueFormCubit extends Cubit<IssueFormState> {
     final issue = Issue(
       projectId: state.project!.id,
       id: state.issueId ?? '',
-      issueKey: '${state.project?.projectKey ?? ''}-$serialNumber',
+      issueKey: '${state.project?.shortName ?? ''}-$serialNumber',
       issueNumber: serialNumber,
       summary: state.summary.trim(),
       description: state.description,

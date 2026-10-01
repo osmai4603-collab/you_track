@@ -73,7 +73,7 @@ class _ProjectGeneralSettingsSectionState
         if (state.status == ProjectDetailsStatus.success &&
             state.project != null) {
           _nameController.text = state.project!.name;
-          _idController.text = state.project!.projectKey;
+          _idController.text = state.project!.shortName;
           _descriptionController.text = state.project!.description ?? '';
           _defaultVisibility = state.project!.visibility;
           _recommendedVisibility = [...state.project!.recommendedVisibility];
@@ -222,7 +222,7 @@ class _ProjectGeneralSettingsSectionState
   ) {
     return Row(
       children: [
-        ProjectIcon(projectCode: state.project?.projectKey ?? ''),
+        ProjectIcon(projectCode: state.project?.shortName ?? ''),
         const SizedBox(width: AppSpacing.medium),
         Expanded(
           child: Column(

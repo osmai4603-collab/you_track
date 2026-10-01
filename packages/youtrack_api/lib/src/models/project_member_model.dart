@@ -20,6 +20,7 @@ class ProjectMemberModel extends Equatable {
 
   factory ProjectMemberModel.fromJson(Map<String, dynamic> data) {
     final user = data['user'];
+    final userMap = user is Map ? Map<String, dynamic>.from(user) : null;
     final flattenedUserId = _pickString(data, const ['userId', 'user_id']);
 
     return ProjectMemberModel(
@@ -29,8 +30,8 @@ class ProjectMemberModel extends Equatable {
       isOwner: _pickBool(data, const ['isOwner', 'is_owner']),
       userId: flattenedUserId.isNotEmpty
           ? flattenedUserId
-          : _pickString(user, const ['id']),
-      userData: user == null ? null : UserModel.fromJson(data['user']),
+          : _pickString(userMap, const ['id']),
+      userData: userMap == null ? null : UserModel.fromJson(userMap),
     );
   }
 
@@ -90,16 +91,6 @@ class ProjectMemberModel extends Equatable {
 
   static String _pickString(Map<String, dynamic>? data, List<String> keys) {
     return _pick(data, keys)?.toString() ?? '';
-  }
-
-  static Map<String, dynamic>? _pickMap(
-    Map<String, dynamic>? data,
-    List<String> keys,
-  ) {
-    final value = _pick(data, keys);
-    if (value is Map<String, dynamic>) return value;
-    if (value is Map) return Map<String, dynamic>.from(value);
-    return null;
   }
 
   static bool _pickBool(Map<String, dynamic>? data, List<String> keys) {

@@ -77,7 +77,7 @@ description: كيفية التعامل مع SQLite3، تعاريف الجداو�
 
 ### تصميم كلاس جدول البيانات (مثال: `MyTable` في `lib/core/tables/my_table.dart`):
 ```dart
-import 'package:you_track/core/services/sqlite/table_info.dart';
+import 'package:issues_tracking/core/services/sqlite/table_info.dart';
 
 class MyTable extends TableInfo {
   static final MyTable _instance = MyTable._internal();
@@ -97,8 +97,8 @@ class MyTable extends TableInfo {
 
 ### تصميم كلاس إنشاء الجدول (مثال: `MyTableSqlite` في `lib/core/services/sqlite/sqlite_tables/my_table_sqlite.dart`):
 ```dart
-import 'package:you_track/core/services/sqlite/sqlite_tables/sqlite_table.dart';
-import 'package:you_track/core/tables/my_table.dart';
+import 'package:issues_tracking/core/services/sqlite/sqlite_tables/sqlite_table.dart';
+import 'package:issues_tracking/core/tables/my_table.dart';
 
 class MyTableSqlite extends MyTable implements SqliteTable {
   static final MyTableSqlite _instance = MyTableSqlite._internal();

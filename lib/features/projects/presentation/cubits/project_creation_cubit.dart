@@ -124,7 +124,7 @@ class ProjectCreationCubit extends Cubit<ProjectCreationState> {
     final newProject = ProjectEntity(
       id: 'proj_${DateTime.now().millisecondsSinceEpoch}',
       name: state.projectName.trim(),
-      projectKey: state.projectKey.trim().toUpperCase(),
+      shortName: state.projectKey.trim().toUpperCase(),
       description: state.projectDescription.isNotEmpty
           ? state.projectDescription.trim()
           : state.selectedTemplate.description,

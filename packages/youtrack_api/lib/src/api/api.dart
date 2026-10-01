@@ -1,3 +1,14 @@
 export 'agile_boards_api.dart';
+export 'custom_fields_api.dart';
+export 'dashboards_api.dart';
+export 'groups_api.dart';
+export 'issues_api.dart';
+export 'json_api.dart';
+export 'knowledge_base_api.dart';
 export 'projects_api.dart';
+export 'roles_api.dart';
+export 'tags_api.dart';
+export 'time_tracking_api.dart';
+export 'user_profile_api.dart';
 export 'users_api.dart';
+export 'version_control_api.dart';

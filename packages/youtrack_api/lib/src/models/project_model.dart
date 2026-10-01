@@ -17,7 +17,7 @@ class ProjectModel extends Equatable {
   final String? issuesUrl;
 
   /// Empty when the project has no leader assigned.
-  final String leaderId;
+  final String ownerId;
   final String teamId;
   final String organizationId;
 
@@ -28,10 +28,10 @@ class ProjectModel extends Equatable {
 
   /// Creation time in milliseconds since the Unix epoch, as stored by the
   /// server. Zero means the server sent no usable value.
-  final int creationTime;
+  final int createdAt;
 
   final bool pinned;
-  final bool archived;
+  final bool isArchived;
   final bool template;
   final bool restricted;
   final bool hasArticles;
@@ -44,13 +44,13 @@ class ProjectModel extends Equatable {
     this.description,
     this.iconUrl,
     this.issuesUrl,
-    this.leaderId = '',
+    this.ownerId = '',
     this.teamId = '',
     this.organizationId = '',
     this.projectTypeId = '',
-    this.creationTime = 0,
+    this.createdAt = 0,
     this.pinned = false,
-    this.archived = false,
+    this.isArchived = false,
     this.template = false,
     this.restricted = false,
     this.hasArticles = false,
@@ -65,7 +65,7 @@ class ProjectModel extends Equatable {
       description: _pickNullableString(data, const ['description']),
       iconUrl: _pickNullableString(data, const ['iconUrl', 'icon_url']),
       issuesUrl: _pickNullableString(data, const ['issuesUrl', 'issues_url']),
-      leaderId: _pickString(data, const ['leaderId', 'leader_id']),
+      ownerId: _pickString(data, const ['leaderId', 'leader_id']),
       teamId: _pickString(data, const ['teamId', 'team_id']),
       organizationId: _pickString(data, const [
         'organizationId',
@@ -75,14 +75,14 @@ class ProjectModel extends Equatable {
         'projectTypeId',
         'project_type_id',
       ]),
-      creationTime: _pickInt(data, const [
+      createdAt: _pickInt(data, const [
         'creationTime',
         'creation_time',
         'createdAt',
         'created_at',
       ]),
       pinned: _pickBool(data, const ['pinned']),
-      archived: _pickBool(data, const ['archived']),
+      isArchived: _pickBool(data, const ['archived']),
       template: _pickBool(data, const ['template']),
       restricted: _pickBool(data, const ['restricted']),
       hasArticles: _pickBool(data, const ['hasArticles', 'has_articles']),
@@ -98,13 +98,13 @@ class ProjectModel extends Equatable {
       'description': description,
       'iconUrl': iconUrl,
       'issuesUrl': issuesUrl,
-      'leaderId': leaderId,
+      'leaderId': ownerId,
       'teamId': teamId,
       'organizationId': organizationId,
       'projectTypeId': projectTypeId,
-      'creationTime': creationTime,
+      'creationTime': createdAt,
       'pinned': pinned,
-      'archived': archived,
+      'archived': isArchived,
       'template': template,
       'restricted': restricted,
       'hasArticles': hasArticles,
@@ -158,13 +158,13 @@ class ProjectModel extends Equatable {
     description,
     iconUrl,
     issuesUrl,
-    leaderId,
+    ownerId,
     teamId,
     organizationId,
     projectTypeId,
-    creationTime,
+    createdAt,
     pinned,
-    archived,
+    isArchived,
     template,
     restricted,
     hasArticles,

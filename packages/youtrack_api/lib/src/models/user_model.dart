@@ -38,23 +38,26 @@ class UserModel extends Equatable {
     List<String> parsedGroups = [];
     List<String> parsedProjects = [];
 
-    if (data['group_members'] != null && data['group_members'] is List) {
-      for (final gm in data['group_members']) {
-        final group = gm['groups'];
-        if (group != null) {
-          if (group['name'] != null) {
-            parsedGroups.add(group['name'].toString());
-          }
-          if (group['group_projects'] != null &&
-              group['group_projects'] is List) {
-            for (final gp in group['group_projects']) {
-              final proj = gp['projects'];
-              if (proj != null && proj['name'] != null) {
-                if (!parsedProjects.contains(proj['name'].toString())) {
-                  parsedProjects.add(proj['name'].toString());
-                }
-              }
-            }
+    final rawGroupMembers = data['group_members'];
+    if (rawGroupMembers is List) {
+      for (final rawMembership in rawGroupMembers) {
+        if (rawMembership is! Map) continue;
+        final membership = Map<String, dynamic>.from(rawMembership);
+        final rawGroup = membership['groups'];
+        if (rawGroup is! Map) continue;
+        final group = Map<String, dynamic>.from(rawGroup);
+        final groupName = group['name']?.toString();
+        if (groupName != null) parsedGroups.add(groupName);
+
+        final rawGroupProjects = group['group_projects'];
+        if (rawGroupProjects is! List) continue;
+        for (final rawGroupProject in rawGroupProjects) {
+          if (rawGroupProject is! Map) continue;
+          final rawProject = rawGroupProject['projects'];
+          if (rawProject is! Map) continue;
+          final projectName = rawProject['name']?.toString();
+          if (projectName != null && !parsedProjects.contains(projectName)) {
+            parsedProjects.add(projectName);
           }
         }
       }
@@ -71,17 +74,16 @@ class UserModel extends Equatable {
     }
 
     return UserModel(
-      id: _pick(data, ['id']).toString(),
+      id: _pickString(data, const ['id']),
       fullName: _pickString(data, const ['fullName', 'full_name', 'name']),
-      username: _pickString(
-        data,
-        const ['login', 'user_name', 'username', 'userKey'],
-      ),
-      email: _pickString(data, const ['email']),
-      avatarUrl: _pickNullableString(data, const [
-        'avatarUrl',
-        'avatar_url',
+      username: _pickString(data, const [
+        'login',
+        'user_name',
+        'username',
+        'userKey',
       ]),
+      email: _pickString(data, const ['email']),
+      avatarUrl: _pickNullableString(data, const ['avatarUrl', 'avatar_url']),
       createdAt: DateTime.tryParse(
         _pickString(data, const ['created_at']).isEmpty
             ? ''
@@ -90,6 +92,11 @@ class UserModel extends Equatable {
       isBanned: _pickBool(data, const ['banned', 'is_banned']),
       groups: parsedGroups,
       projects: parsedProjects,
+      initials: _pickString(data, const ['initials']).isNotEmpty
+          ? _pickString(data, const ['initials'])
+          : _computeInitials(
+              _pickString(data, const ['fullName', 'full_name', 'name']),
+            ),
     );
   }
 
@@ -123,6 +130,20 @@ class UserModel extends Equatable {
     if (value is bool) return value;
     if (value is String) return value.toLowerCase() == 'true';
     return false;
+  }
+
+  static String _computeInitials(String fullName) {
+    final names = fullName
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((name) => name.isNotEmpty)
+        .toList(growable: false);
+    if (names.isEmpty) return '';
+    String firstRune(String value) =>
+        String.fromCharCode(value.runes.first).toUpperCase();
+
+    if (names.length == 1) return firstRune(names.first);
+    return '${firstRune(names.first)}${firstRune(names.last)}';
   }
 
   Map<String, dynamic> toJson() {

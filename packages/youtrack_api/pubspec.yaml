@@ -1,5 +1,5 @@
 name: youtrack_api
-description: "A complete Flutter package for interacting with the Mattermost API, featuring comprehensive endpoint coverage, WebSocket support, and robust error handling. Build custom Mattermost clients and integrations with ease."
+description: "Typed client models and API abstractions for the YouTrack issue-tracking application."
 version: 1.0.10
 
 environment:

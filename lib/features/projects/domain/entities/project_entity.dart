@@ -5,7 +5,7 @@ import '../../../../core/entities/entity.dart';
 class ProjectEntity extends Entity {
   final String id;
   final String name;
-  final String projectKey;
+  final String shortName;
   final String? description;
   final bool isArchived;
   final ProjectTemplateType templateType;
@@ -23,7 +23,7 @@ class ProjectEntity extends Entity {
   const ProjectEntity({
     required this.id,
     required this.name,
-    required this.projectKey,
+    required this.shortName,
     this.description,
     this.isArchived = false,
     required this.templateType,
@@ -62,7 +62,7 @@ class ProjectEntity extends Entity {
     return ProjectEntity(
       id: id ?? this.id,
       name: name ?? this.name,
-      projectKey: projectId ?? this.projectKey,
+      shortName: projectId ?? this.shortName,
       description: description ?? this.description,
       isArchived: isArchived ?? this.isArchived,
       templateType: templateType ?? this.templateType,
@@ -84,7 +84,7 @@ class ProjectEntity extends Entity {
   List<Object?> get props => [
     id,
     name,
-    projectKey,
+    shortName,
     description,
     isArchived,
     templateType,

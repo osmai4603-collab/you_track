@@ -8,7 +8,7 @@ class ProjectModel extends ProjectEntity {
   const ProjectModel({
     required super.id,
     required super.name,
-    required super.projectKey,
+    required super.shortName,
     super.description,
     super.isArchived,
     required super.templateType,
@@ -28,7 +28,7 @@ class ProjectModel extends ProjectEntity {
     return ProjectModel(
       id: entity.id,
       name: entity.name,
-      projectKey: entity.projectKey,
+      shortName: entity.shortName,
       description: entity.description,
       isArchived: entity.isArchived,
       templateType: entity.templateType,
@@ -52,7 +52,7 @@ class ProjectModel extends ProjectEntity {
     return ProjectModel(
       id: safeJson['id']?.toString() ?? '',
       name: safeJson['name']?.toString() ?? '',
-      projectKey: safeJson['project_id']?.toString() ?? '',
+      shortName: safeJson['project_id']?.toString() ?? '',
       description: safeJson['description']?.toString(),
       isArchived: safeJson['is_archived'] == true,
       templateType: ProjectTemplateType.of(safeJson['template_type']),
@@ -97,7 +97,7 @@ class ProjectModel extends ProjectEntity {
     return {
       if (id.isNotEmpty) 'id': id,
       'name': name,
-      'project_id': projectKey,
+      'project_id': shortName,
       'description': description,
       'is_archived': isArchived,
       'template_type': templateType.name,

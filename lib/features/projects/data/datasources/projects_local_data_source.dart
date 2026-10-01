@@ -34,7 +34,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
     ProjectModel(
       id: 'proj_demo',
       name: 'Demo Project',
-      projectKey: 'DEMO',
+      shortName: 'DEMO',
       description: 'Demonstration project showcasing YouTrack capabilities.',
       isArchived: false,
 
@@ -46,7 +46,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
     ProjectModel(
       id: 'proj_fingerprint',
       name: 'fingerprint',
-      projectKey: 'FIN',
+      shortName: 'FIN',
       description: 'Biometric fingerprint authentication subsystem.',
       isArchived: false,
 
@@ -58,7 +58,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
     ProjectModel(
       id: 'proj_test',
       name: 'Test project',
-      projectKey: 'TP',
+      shortName: 'TP',
       description: 'Primary testing environment for new workflow features.',
       isArchived: false,
 
@@ -101,7 +101,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
   @override
   Future<ProjectModel> getProjectById(String id) async {
     final project = _projects.firstWhere(
-      (p) => p.id == id || p.projectKey == id,
+      (p) => p.id == id || p.shortName == id,
       orElse: () => throw Exception('Project not found with ID: $id'),
     );
     return project;
@@ -124,12 +124,16 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
   }
 
   @override
-  Future<void> updateStartingNumber(String projectId, int startingNumber) async {
+  Future<void> updateStartingNumber(
+    String projectId,
+    int startingNumber,
+  ) async {
     final index = _projects.indexWhere((p) => p.id == projectId);
     if (index != -1) {
       final p = _projects[index];
-      _projects[index] =
-          ProjectModel.fromEntity(p.copyWith(startingNumber: startingNumber));
+      _projects[index] = ProjectModel.fromEntity(
+        p.copyWith(startingNumber: startingNumber),
+      );
     }
   }
 
@@ -138,8 +142,9 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
     final index = _projects.indexWhere((p) => p.id == projectId);
     if (index != -1) {
       final p = _projects[index];
-      _projects[index] =
-          ProjectModel.fromEntity(p.copyWith(isFavorite: isFavorite));
+      _projects[index] = ProjectModel.fromEntity(
+        p.copyWith(isFavorite: isFavorite),
+      );
     }
   }
 
@@ -151,7 +156,7 @@ class ProjectsLocalDataSourceImpl implements ProjectsLocalDataSource {
       _projects[index] = ProjectModel(
         id: p.id,
         name: p.name,
-        projectKey: p.projectKey,
+        shortName: p.shortName,
         description: p.description,
         isArchived: true,
         templateType: p.templateType,
